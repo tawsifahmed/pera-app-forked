@@ -6,7 +6,7 @@ import { onMounted, reactive, ref, watch } from 'vue';
 definePageMeta({
       middleware: 'auth',
       layout: 'default' // this should match the name of the file inside the middleware directory 
-  })
+})
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
@@ -122,17 +122,17 @@ watch(
     <div class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
+                <NuxtLink to="companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Companies</span>
                         <div class="text-900 font-medium text-xl">152</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                        <i class="pi pi-microsoft text-blue-500 text-xl"></i>
                     </div>
-                </div>
-                <span class="text-green-500 font-medium">24 new </span>
-                <span class="text-500">since last visit</span>
+                </NuxtLink>
+                <!-- <span class="text-green-500 font-medium">24 new </span> -->
+                <!-- <span class="text-500">since last visit</span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -140,14 +140,14 @@ watch(
                 <div class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Spaces</span>
-                        <div class="text-900 font-medium text-xl">$2.100</div>
+                        <div class="text-900 font-medium text-xl">21</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-orange-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-map-marker text-orange-500 text-xl"></i>
+                        <i class="pi pi-folder-open text-orange-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">%52+ </span>
-                <span class="text-500">since last week</span>
+                <!-- <span class="text-green-500 font-medium">%52+ </span> -->
+                <!-- <span class="text-500">since last week</span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -161,8 +161,8 @@ watch(
                         <i class="pi pi-inbox text-cyan-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500">newly registered</span>
+                <!-- <span class="text-green-500 font-medium">520 </span>
+                <span class="text-500">newly registered</span> -->
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -173,14 +173,14 @@ watch(
                         <div class="text-900 font-medium text-xl">152 Unread</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-comment text-purple-500 text-xl"></i>
+                        <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </div>
-                <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span>
+                <!-- <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span> -->
             </div>
         </div>
-
+<!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Recent Sales</h5>
@@ -289,12 +289,13 @@ watch(
                 </ul>
             </div>
         </div>
+         -->
         <div class="col-12 xl:col-6">
             <div class="card">
-                <h5>Sales Overview</h5>
+                <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <div class="flex align-items-center justify-content-between mb-4">
                     <h5>Notifications</h5>
                     <div>
@@ -355,7 +356,7 @@ watch(
                 <div class="mt-4 mr-auto md:mt-0 md:mr-0">
                     <a href="https://www.primefaces.org/primeblocks-vue" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised"> Get Started </a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>

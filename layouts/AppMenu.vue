@@ -7,8 +7,29 @@ const model = ref([
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
     },
     {
-        label: 'UI Components',
+        label: 'Components',
         items: [
+            {
+                label: 'Company',
+                icon: 'pi pi-fw pi-microsoft',
+                items: [
+                    {
+                        label: 'Create Company',
+                        icon: 'pi pi-fw pi-plus',
+                        // to: '/auth/login'
+                    },
+                    {
+                        label: 'List of Companies',
+                        icon: 'pi pi-fw pi-list',
+                        to: '/companies'
+                    },
+                    {
+                        label: 'Access Denied',
+                        icon: 'pi pi-fw pi-lock',
+                        to: '/auth/access'
+                    }
+                ]
+            },
             {
                 label: 'Form Layout',
                 icon: 'pi pi-fw pi-id-card',

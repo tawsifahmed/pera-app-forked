@@ -2,6 +2,11 @@
 import { ref, onMounted } from 'vue';
 import ProductService from '@/service/ProductService';
 
+// definePageMeta({
+//       middleware: 'auth',
+//       layout: 'default' // this should match the name of the file inside the middleware directory 
+// })
+
 const picklistValue = ref([
     [
         { name: 'San Francisco', code: 'SF' },
