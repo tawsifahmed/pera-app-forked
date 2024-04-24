@@ -23,11 +23,11 @@ const model = ref([
                         icon: 'pi pi-fw pi-list',
                         to: '/companies'
                     },
-                    {
-                        label: 'Access Denied',
-                        icon: 'pi pi-fw pi-lock',
-                        to: '/auth/access'
-                    }
+                    // {
+                    //     label: 'Access Denied',
+                    //     icon: 'pi pi-fw pi-lock',
+                    //     to: '/auth/access'
+                    // }
                 ]
             },
             {
@@ -236,11 +236,11 @@ const model = ref([
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
-        <li>
+        <!-- <li>
             <a href="https://www.primefaces.org/primeblocks-vue/#/" target="_blank">
                 <img src="/layout/images/banner-primeblocks.png" alt="Prime Blocks" class="w-full mt-3" />
             </a>
-        </li>
+        </li> -->
     </ul>
 </template>
 
