@@ -408,11 +408,10 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 </script>
 
 <template lang="">
-    <div class=" position-relative min-vh-100 d-flex flex-column justify-content-between w-100">
+    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div class="prog-bar position-fixed top-7 left-6 right-20 z-10">
             <ProgressBar :value="progress"></ProgressBar>
         </div>
-    
         <div class="flex-grow-1" v-if="showStepCompany">
             <h3 class="text-dark my-4 text-center font-weight-semibold">How large is your company?</h3>
             <div class="centering m-0 g-4 text-sm">
@@ -421,8 +420,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
             <div v-if="selectAmountId" class="d-flex justify-content-end border-top mt-6 position-absolute w-100 bottom-0">
                 <Button @click="() => { showStepCompany = false; showStepSolution = true; }" label="Next" class=" next-btn text-xl bg-primary border border-primary text-white px-6 py-2 text-xl mt-6"/>
             </div>
-        </div>
-    
+        </div>    
         <div v-if="showStepSolution">
             <h3 class="text-dark my-4 text-center font-weight-semibold">Company work type?</h3>
             <div class="centering text-sm">
@@ -536,5 +534,10 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
 .prog-bar {
     top: 24px;
+}
+
+.modal-container{
+    height: 300px;
+    
 }
 </style>

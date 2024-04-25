@@ -15,9 +15,9 @@ const { companies } = useRoute().params
 console.log('companyParams,', companies)
 const visible = ref(false);
 
-  if(singleCompany.value === undefined){
-    throw createError({statusCode: 404, message: 'Company not found', fatal: true})
-  }
+if(singleCompany.value === undefined){
+throw createError({statusCode: 404, message: 'Company not found', fatal: true})
+}
 
 const openCreateSpace = () => {
   visible.value = true;
@@ -53,9 +53,66 @@ const getBackgroundColor = (color) => {
 </script>
 
 <template>
-    <div>
-        
-        <!-- <pre>{{ singleCompany }}</pre> -->
+    <!-- <pre>{{ singleCompany }}</pre> -->
+
+    <div class="grid">
+        <div class="col-12">
+            <div class="card">
+                <div class="m-4">
+                    <!-- <pre>{{companyList}}</pre> -->
+                    <div class="flex header-con mx-auto justify-center items-center w-full">
+                        <h1
+                            class="text-center header-text text-3xl font-semibold mb-6 mt-1 bg-indigo-100 px-3 py-2 rounded">
+                            Company Name: {{ singleCompany?.name }}
+                        </h1>
+                    </div>
+                    <div class="create-btn-wrapper">
+                        <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Space +" />
+                        <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                            <CreateSpecificSpace :singleCompany="singleCompany" />
+                        </Dialog>
+                        <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
+                    </div>
+                   
+                    
+                    
+                    <div class=" gap-4 mb-8">
+                        <div class="card">
+                            <!-- <pre>{{singleCompany?.spaces}}</pre> -->
+                            <DataTable :value="singleCompany?.spaces" tableStyle="min-width: 50rem">
+                                <Column field="id" header="ID"></Column>
+                                <Column field="name" header="Space Name"></Column>
+                                <Column field="description" header="Description"></Column>
+                                <Column field="color" header="Space Color"></Column>
+                                <Column header="Action">
+                                    <template #body="slotProps">
+                                        <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
+                                            <Button class="cursor-pointer text-white px-5 py-2" label="Enter" />
+                                        </NuxtLink>
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </div>
+                        <!-- <div v-for="company in companyList" :key="company" class="border bg-zinc-100">
+                                <div >
+                                <div class="text-center text-indigo-500 tracking-wide  rounded-md p-2 capitalize">
+                                    {{ company?.name }} 
+                                </div>
+                                </div>
+                                <div>
+                                
+                                <NuxtLink :to="`/company/${company?.id}`" class="">
+                                    <p class=" bg-indigo-500 hover:bg-purple-600 transition-all duration-200 mt-5 text-white py-2 text-lg font-medium cursor-pointer tracking-wide text-center rounded-lg px-2">Enter</p>
+                                </NuxtLink>
+                                </div>
+                            </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div>
         <div class="flex mx-auto justify-between items-center w-full mt-4">
           <NuxtLink to="/companies" class="cursor-pointer text-lg font-semibold mb-6 mt-1 bg-indigo-400 hover:bg-indigo-500 transition-all duration-150 text-white py-1 px-4 rounded">Back</NuxtLink>
             <h1 class="text-center text-xl font-semibold mb-6 mt-1 bg-indigo-100 px-4 py-1 rounded">Company Portal</h1>
@@ -111,10 +168,16 @@ const getBackgroundColor = (color) => {
           </template>
         </Card>
       </div>
-    </div>
+    </div> -->
   </template>
   
   
   <style scoped>
+
+  .create-btn-wrapper{
+    display: flex;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+  }
   /* Add your custom styles here */
   </style>
