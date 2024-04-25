@@ -1,6 +1,12 @@
 <template>
     <div class="card">
         <h5>Company List</h5>
+        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+            <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Space +" />
+            <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <CreateCompany/>
+            </Dialog>
+        </div>
         <DataTable v-model:filters="filters" :value="companyList" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #header>
                 <div class="flex justify-content-end">
@@ -41,10 +47,16 @@ import DataTable from 'primevue/datatable';
 const filters = ref();
 const loading = ref(true);
 
+const visibleCreateCompany = ref(true);
+
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getCompanyList } = useCompanyStore();
 const { companyList } = storeToRefs(useCompanyStore());
+
+const handleCreateCompanyModal = () => {
+    visibleCreateCompany.value = true;
+};
 
 watchEffect(() => {
     getCompanyList();
@@ -78,5 +90,10 @@ initFilters();
 .p-fieldset {
     border: 1px solid rgb(39, 39, 39) !important;
     padding-left: 10px !important;
+}
+
+.create-space-btn-wrapper{
+    display: flex;
+    justify-content: end;
 }
 </style>

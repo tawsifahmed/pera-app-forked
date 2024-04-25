@@ -1,53 +1,57 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-      <div class="company-name flex justify-center text-center mb-5">
-          <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
-      </div>
-      <FloatLabel>
-        <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceNameInput" />
-        <label>Set Space Name</label>
-        
-    </FloatLabel>
-    <br>
-    <br>
-    <FloatLabel>
-      <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceDescripInput"/>
-      <label>Set Space Description</label>
       
-    </FloatLabel>
-    <br>
-    <h3 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h3>
-    <div class="m-0 pb-6 d-flex justify-content-center">
-      <div class="flex justify-center items-start">
-        <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
-        <div class="ml-2">
-          <p class="text-xs ml-2 mb-1">COLORS</p>
-          <div class="flex">
-              <div id="crimson" class='color' @click="changeColor"></div>
-              <div id="skyblue" class='color' @click="changeColor"></div>
-              <div id="orange" class='color' @click="changeColor"></div>
-              <div id="purple" class='color' @click="changeColor"></div>
-              <div id="cadetblue" class='color' @click="changeColor"></div>
-              <div id="burlywood" class='color' @click="changeColor"></div>
-              <div id="pink" class='color' @click="changeColor"></div>
-              <div id="lightseagreen" class='color' @click="changeColor"></div>
+      <div v-if="spaceFormInputs">
+              <div class="company-name flex justify-center text-center mb-5">
+                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
+            </div>
+            <FloatLabel>
+              <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceNameInput" />
+              <label>Set Space Name</label>
+              
+          </FloatLabel>
+          <br>
+          <br>
+          <FloatLabel>
+            <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceDescripInput"/>
+            <label>Set Space Description</label>
+            
+          </FloatLabel>
+          <br>
+          <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
+          <div class="m-0 pb-6 d-flex justify-content-center colorpicker-wrapper">
+            <div class="flex justify-center items-start">
+              <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
+              <div class="ml-2">
+                <p class="text-xs ml-2 mb-1">COLORS</p>
+                <div class="flex">
+                    <div id="crimson" class='color' @click="changeColor"></div>
+                    <div id="skyblue" class='color' @click="changeColor"></div>
+                    <div id="orange" class='color' @click="changeColor"></div>
+                    <div id="purple" class='color' @click="changeColor"></div>
+                    <div id="cadetblue" class='color' @click="changeColor"></div>
+                    <div id="burlywood" class='color' @click="changeColor"></div>
+                    <div id="pink" class='color' @click="changeColor"></div>
+                    <div id="lightseagreen" class='color' @click="changeColor"></div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+          <br>
+          <div class="create-btn-wrapper">
+            <Button @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
+          </div>
       </div>
-    </div>
-    <br>
-    <Button @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
-    <br>
+
 
       <div v-if="showFinalMsg">
-        <h1 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Space created successfully</h1>
-        <div class="m-0 pt-6 pb-6">
-            <div class="w-1/2 mx-auto flex flex-col">
-                <FloatLabel class="">
-                    <!-- <InputText type="email" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="workSpaceName"/> -->
-                    <label>You can close the modal now.</label>
-                </FloatLabel>
-            </div>
+        <h3 class="text-dark my-4 text-black text-center font-weight-semibold">Space created successfully</h3>
+           
+        <div class="centering">
+            <FloatLabel>
+                <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
+                <p class="font-xl">You can close the modal now.</p>
+            </FloatLabel>
         </div>
     </div>
 
@@ -73,6 +77,7 @@ const showSetupSpaceTask = ref(false);
 const showEnableFeatures = ref(false);
 const showDefaultViews = ref(false);
 const showSpacePreview = ref(false); 
+const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 
 const progress = ref(12.5);
@@ -592,7 +597,7 @@ const handleCreateSpace = async () => {
         await createSpace(createSpaceData);
 
         if(isSpaceCreated.value === true){
-            showSpacePreview.value = false
+            spaceFormInputs.value = false
             showFinalMsg.value = true   
 
             console.log('space created')
@@ -680,5 +685,14 @@ onMounted(() => {
   border-radius: 5px;
 }
 
+
+.colorpicker-wrapper{
+  display: flex;
+}
+
+.create-btn-wrapper{
+  display: flex;
+  justify-content: center;
+}
   
 </style>
