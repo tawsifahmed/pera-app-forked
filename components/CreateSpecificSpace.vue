@@ -39,7 +39,7 @@
           </div>
           <br>
           <div class="create-btn-wrapper">
-            <Button @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
+            <Button :disabled="btnHandler" @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
           </div>
       </div>
 
@@ -79,6 +79,7 @@ const showDefaultViews = ref(false);
 const showSpacePreview = ref(false); 
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
+const btnHandler = ref(true);
 
 const progress = ref(12.5);
 
@@ -365,6 +366,7 @@ watch(spaceAvatarPreview, (newV, oldV) => {
   progress.value = progress.value;
 });
 
+console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
 const changeColor = (event) => {
   if(dynamicDiv.value.style.backgroundColor === event.target.id){
@@ -573,7 +575,15 @@ watch(defViewsChecker, (newV, oldV) => {
         progress.value = progress.value + progressFordefViewsChecker
 }); 
 
+if (spaceAvatarPreview.value !== null || spaceNameInput.value !== null || spaceDescripInput.value !== null) {
+    btnHandler.value = false;
+    console.log('spaceAvatarPreview', spaceAvatarPreview.value);
+
+  }
+  
 const handleCreateSpace = async () => {
+  
+
         // const formData = new FormData()
         // formData.append('name', workSpaceName.value)
         // formData.append('size', wPeople.value)

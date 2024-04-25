@@ -47,7 +47,7 @@ import DataTable from 'primevue/datatable';
 const filters = ref();
 const loading = ref(true);
 
-const visibleCreateCompany = ref(true);
+const visibleCreateCompany = ref(false);
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
