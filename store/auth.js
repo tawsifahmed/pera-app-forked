@@ -15,7 +15,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async authenticateUser({ email, password }) {
       // useFetch from nuxt 3
-      const { data, pending } = await useFetch(`http://188.166.212.40/api/v1/login`, {
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async registerUser({ userName, email, password, confirmPass }) {
-      const { data, pending } = await useFetch(`http://188.166.212.40/api/v1/register`, {
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -51,7 +51,7 @@ export const useAuthStore = defineStore('auth', {
         this.userCreated = true;
 
         if(this.userCreated) {
-          const { data, pending } = await useFetch(`http://188.166.212.40/api/v1/login`, {
+          const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: {
@@ -80,7 +80,7 @@ export const useAuthStore = defineStore('auth', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'userProf',
-        () => $fetch('http://188.166.212.40/api/v1/users/profile',{
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/profile',{
           headers: {
             Authorization: `Bearer ${token.value}`,
           },

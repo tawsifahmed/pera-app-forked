@@ -21,7 +21,7 @@ export const useCompanyStore = defineStore('workStation', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'companyList',
-        () => $fetch('http://188.166.212.40/api/v1/company/list',{
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/company/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
@@ -37,9 +37,10 @@ export const useCompanyStore = defineStore('workStation', {
     },
     async getSingleCompany(company){
         const token = useCookie('token'); 
+        console.log('token', token.value)
         const { data, pending, error } = await useAsyncData(
             'companyList',
-            () => $fetch(`http://188.166.212.40/api/v1/company/show/${company}`,{
+            () => $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`,{
             headers: {
                 Authorization: `Bearer ${token.value}`,
             },
@@ -50,24 +51,31 @@ export const useCompanyStore = defineStore('workStation', {
             // }
         )
         this.singleCompany = data.value?.data;
+        console.log('singlCompData', data)
         console.log('singlComp', this.singleCompany)
         // console.log('userProfile', this.companyList)
     },
-    async createCompany ({name, wPeople, numEmployees, company_role, services}) {
+    async createCompany ({name, email, address, contact_number, numEmployees, company_type, 
+      // services
+    }) {
       const token = useCookie('token'); 
-      const { data, pending } = await useFetch(`http://188.166.212.40/api/v1/company/create`, {
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
         body: {
           'name' : name,
-          'size' : wPeople,
+          'email' : email,
+          'address' : address,
+          'contact_number' : contact_number,
+          // 'size' : wPeople,
           'number_of_employees' : numEmployees,
-          'company_role' : company_role,
-          'services' : services
+          'company_type' : company_type,
+          // 'services' : services
         },
       });
+        console.log('company created', data)
        
         if(data.value.app_message === 'success'){
           this.iscompanyCreated = true;
@@ -80,7 +88,7 @@ export const useCompanyStore = defineStore('workStation', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'spaceList',
-        () => $fetch('http://188.166.212.40/api/v1/space/list',{
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/space/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
@@ -98,7 +106,7 @@ export const useCompanyStore = defineStore('workStation', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
           'companyList',
-          () => $fetch(`http://188.166.212.40/api/v1/space/show/${space}`,{
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/space/show/${space}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
           },
@@ -114,7 +122,7 @@ export const useCompanyStore = defineStore('workStation', {
     },
     async createSpace ({name, description, company_id, color, shared_status, task_statuses, features, views}) {
       const token = useCookie('token'); 
-      const { data, pending } = await useFetch(`http://188.166.212.40/api/v1/space/create`, {
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token.value}`,

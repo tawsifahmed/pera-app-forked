@@ -19,7 +19,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     const showStepName = ref(false)
     const showFinalMsg = ref(false)
 
-    const progress = ref(10)
+    const progress = ref(0)
 
     // How large is your company?
     const  numEmployees = ref(null)
@@ -69,9 +69,9 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     watch(selectAmountId, (newV, oldV) => {
         let progressForAmount
         if(newV !== null && oldV === null){
-            progressForAmount = 15     
+            progressForAmount = 25     
         }else if(newV === null && oldV !== null){
-            progressForAmount = -15
+            progressForAmount = -25
         }
         else{
             progressForAmount = 0
@@ -269,18 +269,20 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
         if(solutionId.value === s?.id){
             solutionId.value = null
             sSolution.value = null
+            console.log('solutionId', sSolution.value) 
         }else {
             solutionId.value = s?.id
             sSolution.value = s?.label
+            console.log('solutionId', sSolution.value)
         }
     }
 
     watch(solutionId, (newV, oldV) => {
         let progressForsolution
         if(newV !== null && oldV === null){
-            progressForsolution = 15     
+            progressForsolution = 25     
         }else if(newV === null && oldV !== null){
-            progressForsolution = -15
+            progressForsolution = -25
         }
         else{
             progressForsolution = 0
@@ -321,10 +323,10 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     watch(validEmailStatus, (newV, oldV) => {
         let progressForInvite
         if(newV === true && oldV === false){
-            progressForInvite = 15
+            progressForInvite = 25
             pForEmail.value = true
         }else if(newV === false && oldV === true){
-            progressForInvite = -15
+            progressForInvite = -25
             pForEmail.value = false     
         }
         else{
@@ -342,14 +344,14 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     watch(workSpaceName, (newVal, oldVal) => {
         let progressForName
         if(oldVal === '' && newVal !== ''){
-            progressForName = 15
+            progressForName = 25
             pWName.value = true
         }else if(oldVal !== '' && newVal === ''){
-            progressForName = -15
+            progressForName = -25
             pWName.value = true
         }
         else if(oldVal === null && newVal !== null){
-            progressForName = 15
+            progressForName = 25
             pWName.value = true
         }else {
             progressForName = 0
@@ -374,14 +376,17 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
         const  workspaceData = {
             'name': workSpaceName.value,
-            'wPeople': wPeople.value,
-            'numEmployees': numEmployees.value,
-            'company_role': rRole.value,
-            'services': null
+            'email': invite.value,
+            'address': null,
+            'contact_number': null,
+            // 'wPeople': wPeople.value,
+            'number_of_employees': numEmployees.value,
+            'company_type': sSolution.value,
+            // 'services': null
             // 'sSolution': sSolution.value,
             // 'invite': invite.value,
         }
-        console.log('workspaceData', workspaceData)
+        // console.log('workspaceData', workspaceData)
         // setWorkStation(formData.value)
         // console.log('createCompData.value', createCompData.value)
         // return
@@ -403,8 +408,8 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 </script>
 
 <template lang="">
-    <div class="position-relative min-vh-100 d-flex flex-column justify-content-between w-100">
-        <div class="position-fixed top-7 left-6 right-20 z-10">
+    <div class=" position-relative min-vh-100 d-flex flex-column justify-content-between w-100">
+        <div class="prog-bar position-fixed top-7 left-6 right-20 z-10">
             <ProgressBar :value="progress"></ProgressBar>
         </div>
     
@@ -430,16 +435,16 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
         </div>
     
         <div v-if="showStepInvite">
-            <h3 class="text-dark my-4 text-center font-weight-semibold">Invite people to your Workspace?</h3>
-            <div class="p-6">
+            <h3 class="text-dark my-4 text-center font-weight-semibold">Provide your Email</h3>
+           
                 <div class="centering">
                     <FloatLabel>
                         <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="invite" @Input="handleEmail"/>
-                        <label>Enter email address...</label>
+                        <label>Email address</label>
                         <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
                     </FloatLabel>
                 </div>
-            </div>
+           
             <div class="d-flex justify-content-between w-100 border-top mt-6 gap-4 position-absolute bottom-0">
                 <Button @click="() => { showStepSolution = true; showStepInvite = false; }" label="Prev" class="text-primary text-white border border-primary bg-light px-6 py-2 text-xl mt-6"/>
                 <Button v-if="pForEmail" @click="() => { showStepInvite = false; showStepName = true; }" label="Next" class="next-btn bg-primary border border-primary text-white px-6 py-2 text-xl mt-6"/>
@@ -448,7 +453,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     
         <div v-if="showStepName">
             <h3 class="text-dark my-4 text-center font-weight-semibold">Lastly, Set Company Name.</h3>
-            <div class="p-6">
+         
                 <div class="centering">
                     <FloatLabel>
                         <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/>
@@ -457,22 +462,23 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
                 </div>
                 <div class="d-flex justify-content-between w-100 border-top mt-6 gap-4 position-absolute bottom-0">
                     <Button @click="() => { showStepInvite = true; showStepName = false; }" label="Prev" class=" text-white border border-primary bg-light px-6 py-2 text-xl mt-6"/>
-                    <Button @click="handleCreateWorkspace" v-if="progress >= 70" class="bg-primary next-btn text-white px-6 py-2 text-xl mt-6" label="Create Workspace"/>
+                    <Button @click="handleCreateWorkspace" v-if="progress >= 60" class="bg-primary next-btn text-white px-6 py-2 text-xl mt-6" label="Create Company"/>
                 </div>
         </div>
     
-        <div v-if="showFinalMsg">
+        <div class="final-msg" v-if="showFinalMsg">
             <h3 class="text-dark my-4 text-black text-center font-weight-semibold">Company created successfully</h3>
-            <div class="p-6">
-                <div class="centering">
-                    <FloatLabel class="">
-                        <label>You can close the modal now.</label>
-                    </FloatLabel>
-                </div>
+           
+            <div class="centering">
+                <FloatLabel>
+                    <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
+                    <p class="font-xl">You can close the modal now.</p>
+                </FloatLabel>
             </div>
         </div>
     </div>
-    </div>
+
+ 
     
 </template>
 
@@ -522,5 +528,13 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
 .text-danger{
     color: red;
+}
+
+.final-msg{
+    z-index: 100000 !important;
+}
+
+.prog-bar {
+    top: 24px;
 }
 </style>
