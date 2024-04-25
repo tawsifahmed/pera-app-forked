@@ -191,6 +191,14 @@
   --primary-800:#096647;
   --primary-900:#064a34;
 }
+.error-report {
+  color:var(--red-500);
+  font-weight: 600;
+}
+.error-report span{
+  font-size:12px;
+  font-weight: 600;
+}
 
 .p-editor-container .p-editor-toolbar {
   background: #ffffff;

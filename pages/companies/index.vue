@@ -92,8 +92,8 @@ initFilters();
     padding-left: 10px !important;
 }
 
-.create-space-btn-wrapper{
-    display: flex;
-    justify-content: end;
-}
+//.create-space-btn-wrapper{
+//    display: flex;
+//    justify-content: end;
+//}
 </style>

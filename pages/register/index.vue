@@ -73,40 +73,61 @@ const handleLoginSubmit = async () => {
 <template>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden pt-1">
         <div class="flex flex-column align-items-center justify-content-center">
-            <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
-            <!-- <h2 class="font-bold">Pera App</h2> -->
+
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <!-- <img src="/demo/images/login/avatar.png" alt="Image" height="50" class="mb-3" /> -->
-                        <div class="text-900 text-3xl font-medium mb-3 font-bold">Pera App</div>
-                        <span class="text-600 font-medium">Sign Up</span>
+                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign Up</div>
                     </div>
                     <Toast />
                     <form @submit.prevent="handleLoginSubmit">
-                        <label for="name1" class="block text-900 text-xl font-medium mb-2">Username</label>
-                        <InputText id="name1" v-model="createUser.userName" type="text" placeholder="Set Name" class="w-full md:w-30rem mb-4" style="padding: 1rem" required />
-                        <p class="error" v-if="errorData.userNameError">Enter a valid user name!</p>
-                        <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" v-model="createUser.email" type="email" placeholder="Email address" class="w-full md:w-30rem mb-4" style="padding: 1rem" required />
-                        <p class="error" v-if="errorData.emailError">Enter a valid email address!</p>
-                        <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="createUser.password" placeholder="Password" :toggleMask="true" class="w-full mb-4" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
-                        <p class="error mt-3" v-if="errorData.passwordError">Enter a valid password!</p>
-                        <label for="password2" class="block text-900 font-medium text-xl mb-2">Confirm Password</label>
-                        <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password" :toggleMask="true" class="w-full mb-4" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
-                        <p class="error-text" v-if="errorData.confirmPassError">Enter a valid password!</p>
-                        <!-- <div class="flex align-items-center justify-content-between mb-5 gap-5">
-                            <div class="flex align-items-center">
-                                <Checkbox id="rememberme1" v-model="checked" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
-                            </div>
-                            <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
-                        </div> -->
+                        <div class="field md:w-28rem mb-4">
+                            <label for="name" class="block text-900 text-xl font-medium mb-2">Full Name</label>
+                            <InputText id="name" v-model="createUser.userName" type="text" placeholder="John Doe" class="w-full" style="padding: 1rem"  />
+                            <small id="name-help" class="error-report"  v-if="errorData.userNameError">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Full name required!
+                            </small>
+                        </div>
+                        <div class="field md:w-28rem mb-4">
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <InputText id="email" v-model="createUser.email" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
+                            <small id="email-help" class="error-report"  v-if="errorData.emailError">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
+                            </small>
+                        </div>
+                        <div class="field md:w-28rem mb-4">
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
+                            <Password id="password" v-model="createUser.password" placeholder="Password" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }">
+                                <template #header>
+                                    <h6>Pick a password</h6>
+                                </template>
+                                <template #footer>
+                                    <Divider />
+                                    <p class="mt-2">Suggestions</p>
+                                    <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                                        <li>At least one lowercase</li>
+                                        <li>At least one uppercase</li>
+                                        <li>At least one numeric</li>
+                                        <li>Minimum 8 characters</li>
+                                    </ul>
+                                </template>
+                            </Password>
+                            <small id="password-help" class="error-report"  v-if="errorData.passwordError">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required!
+                            </small>
+                        </div>
+                        <div class="field md:w-28rem mb-4">
+                            <label for="password2" class="block text-900 font-medium text-xl mb-2">Confirm Password</label>
+                            <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+                            <small id="password-help" class="error-report"  v-if="errorData.confirmPassError">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required!
+                            </small>
+                        </div>
                         <Button type="submit" label="Sign Up" class="w-full p-3 text-xl"></Button>
                     </form>
-                    <div class="flex flex-wrap items-center justify-between mb-8 mt-3">
-                        <NuxtLink to="/login" class="forgot_pass md:mb-0 mb-3">Already have an account? Click Here.</NuxtLink>
+                    <div class="flex flex-wrap items-center justify-between mt-4">
+                        Already have an account? &nbsp;<NuxtLink to="/login" class="forgot_pass md:mb-0">Click Here.</NuxtLink>
                         <!-- <nuxt-link to="/" class="forgot_pass">Forgot password?</nuxt-link> -->
                     </div>
                 </div>

@@ -12,7 +12,6 @@ export const useCompanyStore = defineStore('workStation', {
     // space api
     spaceList: null,
     isSpaceCreated: false,
-    spaceList: null,
     singleSpace: null
   }),
   
