@@ -3,40 +3,109 @@
       
       <div v-if="spaceFormInputs">
               <div class="company-name flex justify-center text-center mb-5">
-                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
+                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
             </div>
             <FloatLabel>
-              <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceNameInput" />
+              <InputText
+                type="text"
+                class="form-control border border-primary"
+                v-model="spaceNameInput"
+              />
               <label>Set Space Name</label>
-              
-          </FloatLabel>
-          <br>
-          <br>
-          <FloatLabel>
-            <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceDescripInput"/>
-            <label>Set Space Description</label>
-            
-          </FloatLabel>
-          <br>
-          <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
-          <div class="m-0 pb-6 d-flex justify-content-center colorpicker-wrapper">
-            <div class="flex justify-center items-start">
-              <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
-              <div class="ml-2">
-                <p class="text-xs ml-2 mb-1">COLORS</p>
-                <div class="flex">
-                    <div id="crimson" class='color' @click="changeColor"></div>
-                    <div id="skyblue" class='color' @click="changeColor"></div>
-                    <div id="orange" class='color' @click="changeColor"></div>
-                    <div id="purple" class='color' @click="changeColor"></div>
-                    <div id="cadetblue" class='color' @click="changeColor"></div>
-                    <div id="burlywood" class='color' @click="changeColor"></div>
-                    <div id="pink" class='color' @click="changeColor"></div>
-                    <div id="lightseagreen" class='color' @click="changeColor"></div>
+            </FloatLabel>
+        
+            <div class="my-4">
+              <h1 class="text-dark text-center fw-bold">Setup space task status</h1>
+              <div class="py-3">
+                <div class="w-100">
+                  <p class="text-uppercase text-muted">Add task statuses</p>
+                  <div class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <ColorPicker v-model="colorHEX" inputId="cp-hex" format="hex" />
+                      <InputGroup class="d-flex border rounded w-75">
+                        <InputText
+                          class="form-control"
+                          v-model="taskStatusName"
+                          placeholder="e.g., TO-DO, DOING"
+                        />
+                        <InputGroupAddon
+                          @click="addTaskStatus"
+                          class="btn btn-outline-secondary"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="w-6 h-6"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 4.5v15m7.5-7.5h-15"
+                            />
+                          </svg>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </div>
+                    <p
+                      v-if="addTaskSTatusError"
+                      class="text-danger text-small"
+                    >
+                      Please Type task name!
+                    </p>
+                  </div>
+        
+                  <div class="d-flex flex-column gap-2 mt-3 ps-4">
+                    <div
+                      class="d-flex"
+                      v-for="(task, index) in taskStatusList"
+                      :key="index"
+                    >
+                      <div class="d-flex align-items-center border rounded w-25">
+                        <div
+                          class="me-2"
+                          :style="{ backgroundColor: task.taskColor }"
+                        ></div>
+                        <p class="text-uppercase text-muted">
+                          {{ task.taskName }}
+                        </p>
+                      </div>
+                      <div @click="handleDeleteTask(index)" class="cursor-pointer ms-1">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          class="w-5 h-5"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107m-1.022-.165L18.16 19.673a2.25 a2.25 0 0 1-2.244 2.077H8.084a2.25 a2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <div class="d-flex align-items-center justify-content-between w-100 border-top mt-3 gap-4 position-absolute bottom-0">
+                <Button
+                  @click="() => { showSetSpaceColor = true; showSetupSpaceTask = false; }"
+                  label="Prev"
+                  class="btn btn-outline-primary px-3"
+                />
+                <Button
+                  v-if="taskStatusNullCheck"
+                  @click="() => { showSetupSpaceTask = false; showEnableFeatures = true; }"
+                  label="Next"
+                  class="btn btn-primary px-3"
+                />
+              </div>
             </div>
-          </div>
           <br>
           <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
           <br>
@@ -60,6 +129,8 @@
     </div>
 </template>
 
+
+
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
@@ -68,7 +139,7 @@ const { isSpaceCreated } = storeToRefs(useCompanyStore());
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
 
-const {singleCompany} = defineProps(['singleCompany']);
+const {singleSpace} = defineProps(['singleSpace']);
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
@@ -113,21 +184,6 @@ const changeColor = (event) => {
     spaceColorPreview.value.style.border = 'none';
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const handleCreateSpace = async () => {
         if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
@@ -256,6 +312,16 @@ onMounted(() => {
 .create-btn-wrapper{
   display: flex;
   justify-content: center;
+}
+
+.min-vh-30 {
+  min-height: 30rem;
+}
+.max-vh-100 {
+  max-height: 100%;
+}
+.cursor-pointer {
+  cursor: pointer;
 }
   
 </style>

@@ -117,10 +117,10 @@ export const useCompanyStore = defineStore('workStation', {
           // }
         )
         this.singleSpace = data.value?.data;
-        console.log('singlComp', this.singleCompany)
+        console.log('singlComp', this.singleSpace)
         // console.log('userProfile', this.companyList)
     },
-    async createSpace ({name, description, company_id, color, shared_status, task_statuses, features, views}) {
+    async createSpace ({name, description, company_id, color}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/create`, {
         method: 'POST',
@@ -132,10 +132,10 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           'company_id' : company_id,
           'color' : color,
-          'shared_status' : shared_status,
-          'task_statuses' : task_statuses,
-          'features' : features,
-          'views' : views
+          // 'shared_status' : shared_status,
+          // 'task_statuses' : task_statuses,
+          // 'features' : features,
+          // 'views' : views
           },
         });
        
