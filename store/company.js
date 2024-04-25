@@ -13,7 +13,12 @@ export const useCompanyStore = defineStore('workStation', {
     spaceList: null,
     isSpaceCreated: false,
     spaceList: null,
-    singleSpace: null
+    singleSpace: null,
+
+    // projectapi
+    projectList: null,
+    isProjectCreated: false,
+    singleProject: null
   }),
   
   actions: {
@@ -145,6 +150,33 @@ export const useCompanyStore = defineStore('workStation', {
           this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
+        }
+    },
+    async createProject ({name, description, space_id, task_statuses}) {
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'name' : name,
+          'description' : description,
+          'space_id' : space_id,
+          'task_statuses' : task_statuses,
+          // 'shared_status' : shared_status,
+          // 'task_statuses' : task_statuses,
+          // 'features' : features,
+          // 'views' : views
+          },
+        });
+       
+        if(data.value.app_message === 'success'){
+          console.log('project created')
+          this.isProjectCreated = true;
+          this.getSpaceList();
+          this.getCompanyList();
+          this.getSingleSpace(company_id);
         }
     },
   },

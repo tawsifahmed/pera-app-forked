@@ -62,7 +62,7 @@ watchEffect(() => {
                                 <Column field="id" header="ID"></Column>
                                 <Column field="name" header="Project Name"></Column>
                                 <Column field="space_name" header="Under the Space of"></Column>
-                                <Column field="teams.length" header="Teams"></Column>
+                                <!-- <Column field="teams.length" header="Teams"></Column> -->
                                 <!-- <Column field="color" header="Space Color"></Column> -->
                                 <Column header="Action">
                                     <template #body="slotProps">

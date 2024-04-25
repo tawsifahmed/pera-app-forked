@@ -5,118 +5,116 @@
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
             </div>
-            <FloatLabel>
-              <InputText
-                type="text"
-                class="form-control border border-primary"
-                v-model="spaceNameInput"
-              />
-              <label>Set Space Name</label>
-            </FloatLabel>
+            <div style="display: flex; justify-content: center; gap: 30px">
+              <div class="" style="display: flex; justify-content: center; margin: 40px 0;">
+                <FloatLabel >
+                  <InputText
+                    type="text"
+                    class="form-control border border-primary"
+                    v-model="projectNameInput"
+                  />
+                  <label>Set Project Name</label>
+                </FloatLabel>
+              </div>
+              <div class="" style="display: flex; justify-content: center; margin: 40px 0;">
+                <FloatLabel >
+                  <InputText
+                    type="text"
+                    class="form-control border border-primary"
+                    v-model="projectDescriptionInput"
+                  />
+                  <label>Set Project Description</label>
+                </FloatLabel>
+              </div>
+            </div>
         
-            <div class="my-4">
-              <h1 class="text-dark text-center fw-bold">Setup space task status</h1>
-              <div class="py-3">
-                <div class="w-100">
-                  <p class="text-uppercase text-muted">Add task statuses</p>
-                  <div class="d-flex flex-column gap-2">
-                    <div class="d-flex align-items-center gap-2">
-                      <ColorPicker v-model="colorHEX" inputId="cp-hex" format="hex" />
-                      <InputGroup class="d-flex border rounded w-75">
-                        <InputText
-                          class="form-control"
-                          v-model="taskStatusName"
-                          placeholder="e.g., TO-DO, DOING"
-                        />
-                        <InputGroupAddon
-                          @click="addTaskStatus"
-                          class="btn btn-outline-secondary"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-6 h-6"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M12 4.5v15m7.5-7.5h-15"
+            <div class="mb-4">
+              <h4 class="text-dark text-center fw-bold">Setup space task status</h4>
+              <div class="pb-3">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-12" style="width: 50%; margin: 0 auto;">
+                      <!-- <p class="text-uppercase text-muted">Add task statuses</p> -->
+                      <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center gap-2 status-fields">
+                          <ColorPicker v-model="colorHEX" inputId="cp-hex" format="hex" />
+                          <InputGroup class="border rounded flex-grow-1">
+                            <InputText
+                              class="form-control"
+                              v-model="taskStatusName"
+                              placeholder="e.g., TO-DO, DOING"
                             />
-                          </svg>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </div>
-                    <p
-                      v-if="addTaskSTatusError"
-                      class="text-danger text-small"
-                    >
-                      Please Type task name!
-                    </p>
-                  </div>
-        
-                  <div class="d-flex flex-column gap-2 mt-3 ps-4">
-                    <div
-                      class="d-flex"
-                      v-for="(task, index) in taskStatusList"
-                      :key="index"
-                    >
-                      <div class="d-flex align-items-center border rounded w-25">
-                        <div
-                          class="me-2"
-                          :style="{ backgroundColor: task.taskColor }"
-                        ></div>
-                        <p class="text-uppercase text-muted">
-                          {{ task.taskName }}
+                            <InputGroupAddon
+                              @click="addTaskStatus"
+                              class="btn btn-outline-secondary cursor-pointer"
+                            >
+                              <!-- <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                class="w-6 h-6"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 4.5v15m7.5-7.5h-15"
+                                />
+                              </svg> -->
+                              <p class="pi pi-plus-circle cursor-pointer"></p>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </div>
+                        <p
+                          v-if="addTaskSTatusError"
+                          class="text-danger text-small"
+                        >
+                          Please Type task name!
                         </p>
                       </div>
-                      <div @click="handleDeleteTask(index)" class="cursor-pointer ms-1">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-5 h-5"
+                    </div>
+                  </div>
+                  
+                  <div class="row ps-4 wpp">
+                    <div class="col-12 d-flex flex-column gap-2 ghj">
+                      <div
+                        class="d-flex delete-task"
+                        v-for="(task, index) in taskStatusList"
+                        :key="index"
+                      >
+                        <div class="d-flex align-items-center border rounded flex-grow-1 status-length">
+                          <div
+                            class="status-colors"
+                            :style="{ backgroundColor: task.taskColor }"
+                          ></div>
+                          <p class="text-uppercase text-muteds">
+                            {{ task.taskName }}
+                          </p>
+                        </div>
+                        <div
+                          @click="handleDeleteTask(index)"
+                          class="cursor-pointer ms-1"
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107m-1.022-.165L18.16 19.673a2.25 a2.25 0 0 1-2.244 2.077H8.084a2.25 a2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0"
-                          />
-                        </svg>
+                          <p class="pi pi-trash"></p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="d-flex align-items-center justify-content-between w-100 border-top mt-3 gap-4 position-absolute bottom-0">
-                <Button
-                  @click="() => { showSetSpaceColor = true; showSetupSpaceTask = false; }"
-                  label="Prev"
-                  class="btn btn-outline-primary px-3"
-                />
-                <Button
-                  v-if="taskStatusNullCheck"
-                  @click="() => { showSetupSpaceTask = false; showEnableFeatures = true; }"
-                  label="Next"
-                  class="btn btn-primary px-3"
-                />
-              </div>
             </div>
           <br>
-          <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
+          <p class="text-center"v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
           <br>
           <div class="create-btn-wrapper">
-            <Button @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
+            <Button @click="handleCreateProject" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Project"/>
           </div>
       </div>
 
 
       <div v-if="showFinalMsg">
-        <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Space created successfully</h3>
+        <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Project created successfully</h3>
            
         <div class="centering">
             <FloatLabel>
@@ -134,8 +132,8 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createSpace } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceCreated } = storeToRefs(useCompanyStore()); 
+const { createProject } = useCompanyStore(); // use authenticateUser action from  auth store
+const { isProjectCreated } = storeToRefs(useCompanyStore()); 
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
 
@@ -150,63 +148,112 @@ const dynamicDiv = ref(null);
 
 const spaceAvatarPreview = ref(null);
 
-const spaceNameInput = ref(null);
+
+const taskStatusName = ref('');
+
+const taskStatusList = ref([]);
+
+const colorHEX = ref('6466f1');
+
+const taskStatusNullCheck = ref(null);
+
+const addTaskSTatusError= ref(false);
+
+const checked = ref(false);
+
+const checkedViews = ref([]);
+
+const defViewsChecker = ref(null);
+
+const projectNameInput = ref(null);
+
+const projectDescriptionInput = ref(null);
 
 const spaceDescripInput = ref(null);
 
 const spaceColorPreview = ref(null);
 
-console.log('spaceAvatarPreview', spaceAvatarPreview.value)
+// const changeColor = (event) => {
+//   if(dynamicDiv.value.style.backgroundColor === event.target.id){
+//     dynamicDiv.value.style.border = '2px solid black';
+//     dynamicDiv.value.style.backgroundColor = null;
+//     dynamicDiv.value.style.color = null;
+//     spaceAvatarPreview.value = null;
+//     spaceColorPreview.value.style.border = '2px solid black';
+//     spaceColorPreview.value.style.backgroundColor = null;
+//     spaceColorPreview.value.style.color = null;
 
-const changeColor = (event) => {
-  if(dynamicDiv.value.style.backgroundColor === event.target.id){
-    dynamicDiv.value.style.border = '2px solid black';
-    dynamicDiv.value.style.backgroundColor = null;
-    dynamicDiv.value.style.color = null;
-    spaceAvatarPreview.value = null;
-    spaceColorPreview.value.style.border = '2px solid black';
-    spaceColorPreview.value.style.backgroundColor = null;
-    spaceColorPreview.value.style.color = null;
+//   }else{
+//     dynamicDiv.value.style.backgroundColor = event.target.id;
+//     dynamicDiv.value.style.color = 'white';
+//     dynamicDiv.value.style.border = 'none';
+//     let storeAvatarData = {
+//       bgcolor: event.target.id,
+//       color: 'white' 
+//     }
+//     spaceAvatarPreview.value = storeAvatarData.bgcolor;
+//     // console.log('storeAvatarData', spaceAvatarPreview.value);
 
+//     spaceColorPreview.value.style.backgroundColor = event.target.id;
+//     spaceColorPreview.value.style.color = 'white';
+//     spaceColorPreview.value.style.border = 'none';
+//   }
+// };
+
+
+const addTaskStatus = () => {
+  taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
+  if(taskStatusName?.value?.length > 0){
+    
+    const newTaskStatusList = {
+    taskName: taskStatusName.value,
+    taskColor: `#${colorHEX.value}`
+   }
+   taskStatusList.value.push(newTaskStatusList);
+   taskStatusName.value = '';
+   console.log('taskStatusListType', typeof taskStatusList.value);
+   console.log('taskStatusList', taskStatusList.value);
   }else{
-    dynamicDiv.value.style.backgroundColor = event.target.id;
-    dynamicDiv.value.style.color = 'white';
-    dynamicDiv.value.style.border = 'none';
-    let storeAvatarData = {
-      bgcolor: event.target.id,
-      color: 'white' 
-    }
-    spaceAvatarPreview.value = storeAvatarData.bgcolor;
-    // console.log('storeAvatarData', spaceAvatarPreview.value);
+    addTaskSTatusError.value = true;
+  }
 
-    spaceColorPreview.value.style.backgroundColor = event.target.id;
-    spaceColorPreview.value.style.color = 'white';
-    spaceColorPreview.value.style.border = 'none';
+  if(taskStatusList.value.length > 0){
+    taskStatusNullCheck.value = true;
   }
 };
 
-const handleCreateSpace = async () => {
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
+const handleDeleteTask = (index) => {
+  taskStatusList.value.splice(index, 1);
+  console.log('taskStatusList', taskStatusList.value);
+  console.log('ss',taskStatusList.value.length);
+  if (taskStatusList.value.length == 0){
+    taskStatusNullCheck.value = false;
+  }
+};
+
+const handleCreateProject = async () => {
+        if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0){
             errorHandler.value = true
-            return
+            // return
         }else{
-            const createSpaceData = {
-              'name': spaceNameInput.value,
-              'description': spaceDescripInput.value,
-              'company_id': singleCompany.id,
-              'color': spaceAvatarPreview.value,
+            errorHandler.value = false
+            const createProjectData = {
+              'name': projectNameInput.value,
+              'description': projectDescriptionInput.value,
+              'space_id': singleSpace.id,
+              // 'color': spaceAvatarPreview.value,
               // 'shared_status': selectedShareSpace.value,
-              // 'task_statuses': taskStatusList.value,
+              'task_statuses': taskStatusList.value,
               // 'features': selectedFeatures.value,
               // 'views': checkedViews,
           }
-          console.log('spaceData', createSpaceData)
+          console.log('spaceData', createProjectData)
 
           
           
-          await createSpace(createSpaceData);
+          await createProject(createProjectData);
 
-          if(isSpaceCreated.value === true){
+          if(isProjectCreated.value === true){
               spaceFormInputs.value = false
               showFinalMsg.value = true   
 
@@ -236,7 +283,7 @@ onMounted(() => {
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 #dynamic-div{
   height: 70px;
@@ -323,5 +370,51 @@ onMounted(() => {
 .cursor-pointer {
   cursor: pointer;
 }
-  
+
+.status-fields{
+  display: flex;
+  flex-direction: row;
+  height: fit-content;
+}
+
+.status-length{
+  display: flex;
+  flex-direction: row;
+  border: 1px solid gray;
+  justify-content: center;
+  p{
+    padding: 0 3px;
+  }
+}
+
+.status-colors{
+  height: 24px;
+  width: 14px;
+}
+
+.delete-task{
+  width: fit-content;
+  display: flex;
+  gap: 4px;
+  font-size: 14px !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.wpp{
+  width: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.ghj{
+  display: flex;
+    justify-content: center;
+    /* flex-direction: row; */
+    align-items: center;
+    margin-left: 180px;
+}
+.text-muteds{
+  width: 70px;
+}  
 </style>
