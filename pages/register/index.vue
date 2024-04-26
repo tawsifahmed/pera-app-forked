@@ -35,7 +35,6 @@ const errorData = ref({
 
 
 const regBtnHandle = ref(false)
-
 const handleLoginSubmit = async () => {
     createUser.value.userName ? errorData.value.userNameError = false : errorData.value.userNameError = true
     createUser.value.email ? errorData.value.emailError = false : errorData.value.emailError = true
@@ -44,16 +43,11 @@ const handleLoginSubmit = async () => {
     if(createUser.value.password !== createUser.value.confirmPass){
         errorData.value.confirmPassError = true
     }
-
     if(errorData.value.userNameError || errorData.value.emailError || errorData.value.passwordError || errorData.value.confirmPassError){
-        console.log('registration error')
+        loading.value = false;
     }else{
         regBtnHandle.value = true
-        await registerUser(createUser.value); 
-    
-        console.log('password =>', createUser.value.password)
-        console.log('confirmPass =>', createUser.value.confirmPass)
-        
+        await registerUser(createUser.value);
         if(authenticated.value === true){
             
             console.log('authenticated =>', authenticated)
@@ -124,7 +118,7 @@ const handleLoginSubmit = async () => {
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required!
                             </small>
                         </div>
-                        <Button type="submit" label="Sign Up" class="w-full p-3 text-xl"></Button>
+                        <Button type="submit" label="Sign Up" :loading="regBtnHandle" class="w-full p-3 text-xl"></Button>
                     </form>
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Already have an account? &nbsp;<NuxtLink to="/login" class="forgot_pass md:mb-0">Click Here.</NuxtLink>

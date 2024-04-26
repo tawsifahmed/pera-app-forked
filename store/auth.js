@@ -23,14 +23,14 @@ export const useAuthStore = defineStore('auth', {
           password,
         },
       });
-      this.loading = pending;
-      console.log('loading', pending)
-
       if (data.value) {
-        console.log('data', data.value)
         const token = useCookie('token'); 
         token.value = data?.value?.access_token; 
         this.authenticated = true; //  authenticated state value to true
+      }else{
+        const token = useCookie('token');
+        this.authenticated = false;
+        token.value = '';
       }
     },
     async registerUser({ userName, email, password, confirmPass }) {
@@ -44,12 +44,8 @@ export const useAuthStore = defineStore('auth', {
           'password_confirmation' : confirmPass
         },
       });
-      this.loading = pending;
-      console.log('loading', pending.value)
       if (data.value) {
-        console.log('data', data.value)
         this.userCreated = true;
-
         if(this.userCreated) {
           const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
             method: 'POST',
@@ -59,11 +55,7 @@ export const useAuthStore = defineStore('auth', {
               password,
             },
           });
-          this.loading = pending;
-          console.log('loading', pending)
-    
           if (data.value) {
-            console.log('data', data.value)
             const token = useCookie('token'); 
             token.value = data?.value?.access_token; 
             this.authenticated = true; //  authenticated state value to true
