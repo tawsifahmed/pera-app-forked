@@ -32,7 +32,7 @@
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div> -->
-                        <Button type="submit" label="Sign In" class="w-full p-3 text-xl"></Button>
+                        <Button type="submit" label="Sign In" :loading="loginBtnHandle" class="w-full p-3 text-xl"/>
                     </form>
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Don't have an account?&nbsp;  <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here.</NuxtLink>
@@ -74,7 +74,6 @@ import Checkbox from 'primevue/checkbox'
 import RadioButton from 'primevue/radiobutton';
 import Toast from 'primevue/toast';
 const toast = useToast();
-const loginBtnHandle = ref(false)
 
 // definePageMeta({
 //     middleware: 'auth',
@@ -92,18 +91,17 @@ const errorData = ref({
     passwordError: false
 })
 
-const showPassword = ref(false)
-
+const loginBtnHandle = ref(false);
 const handleLoginSubmit = async () => {
+    loginBtnHandle.value = true;
     user.value.email ? errorData.value.emailError = false : errorData.value.emailError = true
     user.value.password ? errorData.value.passwordError = false : errorData.value.passwordError = true
     if (errorData.value.emailError || errorData.value.passwordError) {
-        console.log('login error')
+        loginBtnHandle.value = false;
     }else{
         loginBtnHandle.value = true
         await authenticateUser(user.value); // call authenticateUser and pass the user object
-
-        if (authenticated.value === true) {
+        if (authenticated.value == true) {
             errorData.value.passwordError = false
             errorData.value.emailError = false
             toast.add({ severity: 'success', summary: 'Login Success', detail: '', life: 3000 });
