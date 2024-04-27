@@ -1,8 +1,8 @@
 <template>
     <div class="card">
-        <h5>Company List</h5>
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-            <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Space +" />
+        <h5>Dashboard > Company List</h5>
+        <div class="d-flex create-btn-wrapper mb-3 mr-2">
+            <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany/>
             </Dialog>
@@ -27,8 +27,10 @@
             <Column header="Action">
                 <template #body="slotProps">
                     <NuxtLink :to="`/companies/${slotProps.data.id}`">
-                        <Button class="cursor-pointer text-white px-5 py-2" label="Enter" />
+                        <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                     </NuxtLink>
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editProduct(slotProps.data)" />
+                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProduct(slotProps.data)" />
                 </template>
             </Column>
         </DataTable>
@@ -92,8 +94,9 @@ initFilters();
     padding-left: 10px !important;
 }
 
-//.create-space-btn-wrapper{
-//    display: flex;
-//    justify-content: end;
-//}
+.create-btn-wrapper{
+    display: flex;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+  }
 </style>
