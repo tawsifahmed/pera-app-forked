@@ -105,10 +105,10 @@
               </div>
             </div>
           <br>
-          <p class="text-center"v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
+          <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
           <br>
           <div class="create-btn-wrapper">
-            <Button @click="handleCreateProject" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Project"/>
+            <Button @click="handleCreateProject" class="text-white py-2 px-6 tracking-wide" label="Create Project"/>
           </div>
       </div>
 

@@ -41,7 +41,7 @@
           <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
           <br>
           <div class="create-btn-wrapper">
-            <Button @click="handleCreateSpace" class="bg-purple-500 text-white py-2 px-6 tracking-wide" label="Create Space"/>
+            <Button @click="handleCreateSpace" class="text-white py-2 px-6 tracking-wide" label="Create Space"/>
           </div>
       </div>
 
