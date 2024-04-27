@@ -1,3 +1,83 @@
+<script setup>
+definePageMeta({
+    middleware: 'auth',
+    layout: 'default' // this should match the name of the file inside the middleware directory
+});
+
+import { FilterMatchMode } from 'primevue/api';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+const filters = ref();
+const loading = ref(true);
+
+const visibleCreateCompany = ref(false);
+
+import { storeToRefs } from 'pinia';
+import { useCompanyStore } from '~/store/company';
+const { getCompanyList, deleteCompany } = useCompanyStore();
+const { companyList, isCompanyDeleted } = storeToRefs(useCompanyStore());
+
+const handleCreateCompanyModal = () => {
+    visibleCreateCompany.value = true;
+};
+
+const deleteCompanyDialog = ref(false);
+
+const dltConfrimPressed = ref(false);
+
+const deletingCompany = () => {
+    dltConfrimPressed.value = true;
+    deleteCompanyDialog.value = false;
+    console.log('company deleted')
+};
+
+
+const confirmdeleteCompany = () => {
+    deleteCompanyDialog.value = true;
+};
+
+
+
+// const confirmdeleteCompany = async () => {
+//     deleteCompanyDialog.value = true;
+
+//     // return 
+//     console.log('id', id);
+//     let ad = id;
+//     // console.log('company_id', company_id);
+
+//     // const deleteCompanyId = {
+//     //           'company_id': company_id,
+//     // };
+
+//     // console.log('deleteCompany', deleteCompanyId);
+//     // return
+
+//     await deleteCompany(ad);
+//     if(isCompanyDeleted.value === true){
+//         deleteCompanyDialog.value = false;
+
+//               console.log('company deleted')
+//           }else{
+//               console.log('company not deleted')
+//           }
+
+//     // deleteCompanyDialog.value = true;
+// };
+
+watchEffect(() => {
+    getCompanyList();
+    loading.value = false;
+});
+const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    };
+};
+
+initFilters();
+</script>
+
 <template>
     <div class="card">
         <h5>Dashboard > Company List</h5>
@@ -29,48 +109,38 @@
                     <NuxtLink :to="`/companies/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                     </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editProduct(slotProps.data)" />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProduct(slotProps.data)" />
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
+                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany" />
+                  
+
+                    <!-- <Dialog v-model:visible="deleteCompanyDialog" modal :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                        <div class="flex align-items-center justify-content-center">
+                           
+                          
+                        </div>
+                        <template #footer>
+                            <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
+                            <Button label="Yes" icon="pi pi-check" text @click="deleteCompany" />
+                        </template>
+                    </Dialog> -->
+                
                 </template>
             </Column>
+          
+            
         </DataTable>
+
+        <Dialog v-model:visible="deleteCompanyDialog" header=" " :style="{ width: '25rem' }">
+              
+            <p>Are you sure you want to delete?</p>
+            <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
+            
+        </Dialog>
     </div>
 </template>
 
-<script setup>
-definePageMeta({
-    middleware: 'auth',
-    layout: 'default' // this should match the name of the file inside the middleware directory
-});
 
-import { FilterMatchMode } from 'primevue/api';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
-const filters = ref();
-const loading = ref(true);
-
-const visibleCreateCompany = ref(false);
-
-import { storeToRefs } from 'pinia';
-import { useCompanyStore } from '~/store/company';
-const { getCompanyList } = useCompanyStore();
-const { companyList } = storeToRefs(useCompanyStore());
-
-const handleCreateCompanyModal = () => {
-    visibleCreateCompany.value = true;
-};
-
-watchEffect(() => {
-    getCompanyList();
-    loading.value = false;
-});
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-initFilters();
-</script>
 
 <style lang="scss">
 .header-con {

@@ -6,6 +6,7 @@ export const useCompanyStore = defineStore('workStation', {
     loading: false,
     createCompany: null,
     iscompanyCreated: false,
+    isCompanyDeleted: false,
     companyList: null,
     singleCompany: null,
 
@@ -85,6 +86,35 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value.app_message === 'success'){
           this.iscompanyCreated = true;
+          this.getCompanyList();
+          // console.log('test')
+        }
+
+    },
+    async deleteCompany (id) {
+      console.log('printCompid', id)
+      // return
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : id,
+          // 'email' : email,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isCompanyDeleted = true;
           this.getCompanyList();
           // console.log('test')
         }
