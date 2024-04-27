@@ -18,7 +18,8 @@ export const useCompanyStore = defineStore('workStation', {
     // projectapi
     projectList: null,
     isProjectCreated: false,
-    singleProject: null
+    projectList: null,
+    singleProject: null,
   }),
   
   actions: {
@@ -176,7 +177,7 @@ export const useCompanyStore = defineStore('workStation', {
           this.isProjectCreated = true;
           this.getSpaceList();
           this.getCompanyList();
-          this.getSingleSpace(company_id);
+          this.getSingleSpace(space_id);
         }
     },
   },
