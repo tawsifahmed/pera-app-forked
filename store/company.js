@@ -13,6 +13,7 @@ export const useCompanyStore = defineStore('workStation', {
     // space api
     spaceList: null,
     isSpaceCreated: false,
+    isSpaceDeleted: false,
     spaceList: null,
     singleSpace: null,
 
@@ -182,6 +183,36 @@ export const useCompanyStore = defineStore('workStation', {
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
+    },
+    async deleteSpace (spaceId, companyId) {
+      // console.log('printCompid', id)
+      // return
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/delete/${spaceId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : spaceId,
+          // 'email' : email,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isSpaceDeleted = true;
+          this.getCompanyList();
+          this.getSpaceList();
+          this.getSingleCompany(companyId);
+        }
+
     },
     async createProject ({name, description, space_id, task_statuses}) {
       const token = useCookie('token'); 

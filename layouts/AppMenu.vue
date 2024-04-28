@@ -4,12 +4,8 @@ import AppMenuItem from './AppMenuItem.vue';
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
-    },
-    {
-        label: 'Components',
-        items: [
-            {
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
+                {
                 label: 'Company',
                 icon: 'pi pi-fw pi-microsoft',
                 items: [
@@ -28,8 +24,15 @@ const model = ref([
                     //     icon: 'pi pi-fw pi-lock',
                     //     to: '/auth/access'
                     // }
-                ]
-            },
+                    ]
+                },
+    
+            ],
+    },
+    {
+        label: 'Theme Components',
+        items: [
+            
             {
                 label: 'Form Layout',
                 icon: 'pi pi-fw pi-id-card',

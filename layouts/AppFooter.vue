@@ -9,9 +9,12 @@ const logoUrl = computed(() => {
 
 <template>
     <div class="layout-footer">
-        <img :src="logoUrl" alt="Logo" height="20" class="mr-2" />
-        by
-        <span class="font-medium ml-2">Singularity</span>
+        <img src="/demo/images/login/avatar.png" alt="Logo" height="20" class="mr-2" />
+        by<span class="font-medium">Singularity</span>
     </div>
 </template>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.font-medium{
+    margin-left: 0.35rem !important;
+}
+</style>

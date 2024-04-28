@@ -106,6 +106,7 @@ initFilters();
                 <CreateCompany/>
             </Dialog>
         </div>
+        <!-- <pre>{{companyList}}</pre> -->
         <DataTable v-model:filters="filters" :value="companyList" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #header>
                 <div class="flex justify-content-end">
