@@ -20,6 +20,7 @@ export const useCompanyStore = defineStore('workStation', {
     // projectapi
     projectList: null,
     isProjectCreated: false,
+    isProjectDeleted: false,
     projectList: null,
     singleProject: null,
   }),
@@ -214,6 +215,42 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
+    async getProjectList(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+        'spaceList',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/space/list',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }), 
+        // {
+        //   watch: [this.companyList]
+        // }
+      )
+
+      this.spaceList = data.value?.data;
+      // console.log('userProfile', this.companyList) 
+    },
+    async getSingleProject(projectID){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+          'companyList',
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}`,{
+          headers: {
+              Authorization: `Bearer ${token.value}`,
+          },
+          
+          }),
+          // {
+          //   watch: [this.companyList]
+          // }
+        )
+        this.singleProject = data.value?.data;
+        console.log('singlComp', this.singleProject)
+        // console.log('userProfile', this.companyList)
+    },
     async createProject ({name, description, space_id, task_statuses}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
@@ -240,6 +277,36 @@ export const useCompanyStore = defineStore('workStation', {
           this.getCompanyList();
           this.getSingleSpace(space_id);
         }
+    },
+    async deleteProject (projectID, spaceId) {
+      console.log('projectIDstore', projectID)
+      
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/delete/${projectID}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : projectID,
+          // 'email' : email,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isProjectDeleted = true;
+          this.getCompanyList();
+          this.getSpaceList();
+          this.getSingleSpace(spaceId);
+        }
+
     },
   },
 });

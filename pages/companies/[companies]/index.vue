@@ -33,11 +33,10 @@ const openCreateSpace = () => {
 
 const refSpaceId = ref(null);
 
-const refCompanyId = ref(null);
+
 
 const confirmDeleteSpace = (spaceId) => {
   refSpaceId.value = spaceId;
-  refCompanyId.value = companies;
     console.log('refCompanyId', refSpaceId.value);
     deleteSpaceDialog.value = true;
 
@@ -140,7 +139,7 @@ initFilters();
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink>
                   <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded  />
-                  <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id, slotProps.data.id.company_id)" />
+                  <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
               </template>
           </Column>
       </DataTable>
@@ -148,7 +147,7 @@ initFilters();
       <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
               
         <p>Are you sure you want to delete?</p>
-        <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
+        <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
         <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
         
       </Dialog>
