@@ -100,13 +100,19 @@ initFilters();
 //     return color;
 //   }
 // };
+
+
+const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
+const breadcrumbItems = ref([{ label: `Company - ${singleCompany.value.name}` },]);
+
+
 </script>
 
 <template>
     <!-- <pre>{{ singleCompany }}</pre> -->
     <div class="card">
-      <h5>Dashboard > {{ singleCompany?.name }}</h5>
       <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+           <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
           <div class="create-btn-wrapper">
             <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Space +" />
             <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -162,6 +168,12 @@ initFilters();
     display: flex;
     margin-bottom: 15px;
     justify-content: flex-end;
+  }
+
+  .create-space-btn-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: start
   }
   /* Add your custom styles here */
   </style>

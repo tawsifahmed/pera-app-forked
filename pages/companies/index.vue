@@ -95,12 +95,16 @@ const initFilters = () => {
 };
 
 initFilters();
+
+
+const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
+const breadcrumbItems = ref([{ label: `Companies` },]);
 </script>
 
 <template>
     <div class="card">
         <div class="d-flex create-btn-wrapper mr-2">
-            <h5 class="breadc">Dashboard > Company List</h5>
+            <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany/>

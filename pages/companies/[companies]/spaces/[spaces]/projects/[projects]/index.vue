@@ -122,12 +122,12 @@ const deletingTask = async () => {
 
 
 const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-const breadcrumbItems = ref([{ label: `Company - ${singleProject.value?.company_name}` }, { label: `Space - ${singleProject.value?.space_name}` }, { label: `Project - ${singleProject.value?.name}` }]);
+const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_name}` }, { label: `Space - ${singleProject.value.space_name}` }, { label: `Project - ${singleProject.value.name}` }]);
 
 </script>
 
 <template>
-    <pre>{{ singleProject }}</pre>
+    <!-- <pre>{{ singleProject }}</pre> -->
     
     <div class="card">     
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
@@ -256,6 +256,6 @@ const breadcrumbItems = ref([{ label: `Company - ${singleProject.value?.company_
   .create-space-btn-wrapper{
     display: flex;
     justify-content: space-between;
-    align-items: start
+    align-items: start;
   }
   </style>
