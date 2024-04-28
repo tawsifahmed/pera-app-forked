@@ -372,7 +372,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     const errorHandler = ref(false)
 
     const handleCreateWorkspace = async () => {
-        if(numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null){
+        if(numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === ''){
             errorHandler.value = true
             return
         }else{
@@ -401,7 +401,11 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
         if(iscompanyCreated.value === true){
             spaceFormInputs.value = false
-            showFinalMsg.value = true   
+            showFinalMsg.value = true 
+            numEmployees.value = null
+            sSolution.value = null
+            invite.value = null
+            workSpaceName.value = null  
 
             console.log('showFinalMsg', showFinalMsg.value)
 
@@ -421,8 +425,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 </script>
 
 <template lang="">
-
-    <div class="position-relative flex flex-column justify-content-between w-100 modal-container"> 
+    <div class="position-relative flex flex-column justify-content-between w-100 modal-container "> 
         <div v-if="spaceFormInputs">
             <div class="flex justify-content-center">
                 <FloatLabel class="w-full md:w-50rem mt-4">
@@ -430,7 +433,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
                     <label for="dd-city">Select Companny Size</label>
                 </FloatLabel>
             </div>
-            
+            <br>
             <div class="flex justify-content-center">
                 <FloatLabel class="w-full md:w-50rem mt-4">
                     <Dropdown v-model="sSolution" inputId="dd-city" :options="solutions" optionLabel="label" class="w-full" />
@@ -439,7 +442,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
                 </FloatLabel>
             </div>
             
-            
+            <br>
             <br>
             <FloatLabel>
                 <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail"/>
@@ -447,7 +450,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
                 <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
             </FloatLabel>
             <br>
-            
+            <br>
             <FloatLabel>
                 <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="workSpaceName"/>
                 <label>Workspace name...</label>
@@ -483,53 +486,11 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
 <style lang="scss" scoped>
 
-.top-7 {
-    top: 2.5rem;
-}
-
-.left-6 {
-    left: 1.5rem;
-}
-
-.right-20 {
-    right: 5rem;
-}
-
-.text-xs {
-    font-size: 0.75rem;
-}
-
-.next-btn{
-    float: right;
-}
-
-.centering{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap:7px;
-    flex-wrap: wrap;
-    button{
-        text-wrap: nowrap;
-    }
-}
 
 .text-danger{
     color: red;
 }
 
-.final-msg{
-    z-index: 100000 !important;
-}
-
-.prog-bar {
-    top: 24px;
-}
-
-.modal-container{
-    height: 300px;
-    
-}
 
 
 .create-btn-wrapper{
