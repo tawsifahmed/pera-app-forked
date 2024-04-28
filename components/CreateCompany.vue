@@ -48,10 +48,10 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
             id: 6,
             label: "2000+"
         },
-        {
-            id: 7,
-            label: "I don't know"
-        }
+        // {
+        //     id: 7,
+        //     label: "I don't know"
+        // }
     ])
 
     const selectAmountId = ref(null)

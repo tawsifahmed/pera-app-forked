@@ -100,19 +100,18 @@ initFilters();
 //     return color;
 //   }
 // };
-
-
-const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-const breadcrumbItems = ref([{ label: `Company - ${singleCompany.value.name}` },]);
-
-
 </script>
 
 <template>
-    <!-- <pre>{{ singleCompany }}</pre> -->
+    <!-- <pre class="">{{ singleCompany.name }}</pre> -->
     <div class="card">
       <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-           <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
+           <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
+           <div class="breadCrumWrap">
+            <p class="pi pi-home"></p>
+            <p class="pi pi-angle-right"></p>
+            <p class="text">Company - {{singleCompany?.name}}</p>
+           </div>
           <div class="create-btn-wrapper">
             <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Space +" />
             <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -144,7 +143,7 @@ const breadcrumbItems = ref([{ label: `Company - ${singleCompany.value.name}` },
                   <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink>
-                  <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded  />
+                  <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded  /> -->
                   <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
               </template>
           </Column>
@@ -162,18 +161,28 @@ const breadcrumbItems = ref([{ label: `Company - ${singleCompany.value.name}` },
 </template>
   
   
-  <style scoped>
+<style lang="scss" scoped>
 
-  .create-btn-wrapper{
-    display: flex;
-    margin-bottom: 15px;
-    justify-content: flex-end;
-  }
+.create-btn-wrapper{
+  display: flex;
+  margin-bottom: 15px;
+  justify-content: flex-end;
+}
 
-  .create-space-btn-wrapper{
-    display: flex;
-    justify-content: space-between;
-    align-items: start
+.create-space-btn-wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/* Add your custom styles here */
+
+.breadCrumWrap{
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  align-items: start;
+  .text{
+    line-height: 1;
   }
-  /* Add your custom styles here */
-  </style>
+}
+</style>

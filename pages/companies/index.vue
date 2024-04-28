@@ -97,14 +97,19 @@ const initFilters = () => {
 initFilters();
 
 
-const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-const breadcrumbItems = ref([{ label: `Companies` },]);
+// const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
+// const breadcrumbItems = ref([{ label: `Companies` },]);
 </script>
 
 <template>
     <div class="card">
         <div class="d-flex create-btn-wrapper mr-2">
-            <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
+            <div class="breadCrumWrap">
+                <p class="pi pi-home"></p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Companies</p>
+            </div>
+            <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany/>
@@ -133,7 +138,7 @@ const breadcrumbItems = ref([{ label: `Companies` },]);
                     <NuxtLink :to="`/companies/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                     </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
+                    <!-- <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                   
 
@@ -195,8 +200,19 @@ const breadcrumbItems = ref([{ label: `Companies` },]);
     align-items: center;
     h5:first-child{
         //margin-top: 0 !important;
-    }
-  }
+}
+}
+
+
+.breadCrumWrap{
+display: flex;
+justify-content: center;
+gap: 5px;
+align-items: start;
+.text{
+    line-height: 1;
+}
+}
 
   //.breadc{
    // margin-top: 0 !important;

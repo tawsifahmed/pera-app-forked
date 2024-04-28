@@ -74,11 +74,6 @@ const initFilters = () => {
 initFilters();
 
 
-const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-const breadcrumbItems = ref([{ label: `Company - ${singleSpace.value.company_name}` }, { label: `Space - ${singleSpace.value.name}` },]);
-
-
-
 </script>
 
 <template>
@@ -87,7 +82,13 @@ const breadcrumbItems = ref([{ label: `Company - ${singleSpace.value.company_nam
     <div class="card">
         <!-- <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5> -->
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-            <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
+            <div class="breadCrumWrap">
+                <p class="pi pi-home"></p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Company - {{singleSpace?.company_name}}</p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Space - {{singleSpace?.name}}</p>
+            </div>
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Project +" />
               <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -119,7 +120,7 @@ const breadcrumbItems = ref([{ label: `Company - ${singleSpace.value.company_nam
                     <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
+                    <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                 </template>
             </Column>
@@ -148,6 +149,17 @@ const breadcrumbItems = ref([{ label: `Company - ${singleSpace.value.company_nam
   .create-space-btn-wrapper{
     display: flex;
     justify-content: space-between;
-    align-items: start
+    align-items: center;
+  }
+
+
+  .breadCrumWrap{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: start;
+    .text{
+      line-height: 1;
+    }
   }
   </style>

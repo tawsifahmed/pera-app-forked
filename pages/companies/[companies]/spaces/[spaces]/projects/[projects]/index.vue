@@ -121,8 +121,8 @@ const deletingTask = async () => {
 }
 
 
-const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_name}` }, { label: `Space - ${singleProject.value.space_name}` }, { label: `Project - ${singleProject.value.name}` }]);
+// const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
+// const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_name}` }, { label: `Space - ${singleProject.value.space_name}` }, { label: `Project - ${singleProject.value.name}` }]);
 
 </script>
 
@@ -131,7 +131,15 @@ const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_n
     
     <div class="card">     
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-            <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
+            <div class="breadCrumWrap">
+                <p class="pi pi-home"></p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Company - {{singleProject?.company_name}}</p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Space - {{singleProject?.space_name}}</p>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Project - {{singleProject?.name}}</p>
+               </div>
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
               <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -205,7 +213,7 @@ const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_n
             <Column header="Action">
                 <template #body="slotProps">
                   
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
+                    <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.data.id)" />
                 </template>
             </Column>
@@ -256,6 +264,16 @@ const breadcrumbItems = ref([{ label: `Company - ${singleProject.value.company_n
   .create-space-btn-wrapper{
     display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
+
+  .breadCrumWrap{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
     align-items: start;
+    .text{
+      line-height: 1;
+    }
   }
   </style>
