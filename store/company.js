@@ -21,7 +21,12 @@ export const useCompanyStore = defineStore('workStation', {
     projectList: null,
     isProjectCreated: false,
     isProjectDeleted: false,
-    projectList: null,
+    singleProject: null,
+
+    // task api
+    taskList: null,
+    isTaskCreated: false,
+    isTaskDeleted: false,
     singleProject: null,
   }),
   
@@ -305,6 +310,64 @@ export const useCompanyStore = defineStore('workStation', {
           this.getCompanyList();
           this.getSpaceList();
           this.getSingleSpace(spaceId);
+        }
+
+    },
+    async createTask ({name, description, project_id}) {
+      console.log('projectIDstore', project_id)
+      // return
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'name' : name,
+          'description' : description,
+          'project_id' : project_id,
+          // 'shared_status' : shared_status,
+          // 'task_statuses' : task_statuses,
+          // 'features' : features,
+          // 'views' : views
+          },
+        });
+       
+        if(data.value.app_message === 'success'){
+          console.log('project created')
+          this.isTaskCreated = true;
+          this.getSpaceList();
+          this.getCompanyList();
+          this.getSingleProject(project_id);
+        }
+    },
+    async deleteTask (taskID, projectId) {
+      console.log('projectIDstore', projectId)
+      
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : taskID,
+          // 'email' : email,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isTaskDeleted = true;
+          this.getCompanyList();
+          this.getSpaceList();
+          this.getSingleProject(projectId);
         }
 
     },

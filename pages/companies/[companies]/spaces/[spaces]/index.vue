@@ -76,7 +76,7 @@ initFilters();
 </script>
 
 <template>
-    <pre>{{ singleSpace }}</pre>
+    <!-- <pre>{{ singleSpace }}</pre> -->
     
     <div class="card">
         <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5>
@@ -124,7 +124,7 @@ initFilters();
             <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingProject" />
             
-          </Dialog>
+        </Dialog>
     </div>
 </template>
   
