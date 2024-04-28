@@ -99,8 +99,8 @@ initFilters();
 
 <template>
     <div class="card">
-        <h5>Dashboard > Company List</h5>
-        <div class="d-flex create-btn-wrapper mb-3 mr-2">
+        <div class="d-flex create-btn-wrapper mr-2">
+            <h5 class="breadc">Dashboard > Company List</h5>
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany/>
@@ -186,6 +186,14 @@ initFilters();
 .create-btn-wrapper{
     display: flex;
     margin-bottom: 15px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    h5:first-child{
+        //margin-top: 0 !important;
+    }
   }
+
+  //.breadc{
+   // margin-top: 0 !important;
+  //}
 </style>

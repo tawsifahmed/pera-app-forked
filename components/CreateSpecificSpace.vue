@@ -6,14 +6,14 @@
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div>
             <FloatLabel>
-              <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceNameInput" />
+              <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceNameInput" />
               <label>Set Space Name</label>
               
           </FloatLabel>
           <br>
           <br>
           <FloatLabel>
-            <InputText type="text" class="w-full px-4 py-2 shadow border border-purple-500 focus:border-purple-500" v-model="spaceDescripInput"/>
+            <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceDescripInput"/>
             <label>Set Space Description</label>
             
           </FloatLabel>
