@@ -7,8 +7,12 @@ definePageMeta({
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import Toast from 'primevue/toast';
+
 const filters = ref();
 const loading = ref(true);
+const toast = useToast();
+
 
 const visibleCreateCompany = ref(false);
 
@@ -25,16 +29,37 @@ const deleteCompanyDialog = ref(false);
 
 const dltConfrimPressed = ref(false);
 
-const deletingCompany = () => {
-    dltConfrimPressed.value = true;
-    deleteCompanyDialog.value = false;
-    console.log('company deleted')
-};
+// const deletingCompany = () => {
+//     dltConfrimPressed.value = true;
+//     deleteCompanyDialog.value = false;
+//     console.log('company deleted')
+// };
 
+const refCompanyId = ref(null);
 
-const confirmdeleteCompany = () => {
+const confirmdeleteCompany = (companyId) => {
+    refCompanyId.value = companyId;
+    console.log('refCompanyId', refCompanyId.value);
     deleteCompanyDialog.value = true;
+
 };
+
+const deletingCompany = async () => {
+
+    console.log('refCompanyIdFin', refCompanyId.value);
+    
+    // return 
+    await deleteCompany(refCompanyId.value);
+
+    if(isCompanyDeleted.value === true){
+        toast.add({ severity: 'info', summary: 'Successfull', detail: 'Company Deleted Successfully', life: 3000 });
+        deleteCompanyDialog.value = false;
+            console.log('company deleted')
+        }else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', life: 3000 });       
+            console.log('company not deleted')
+        }
+}
 
 
 
@@ -54,15 +79,9 @@ const confirmdeleteCompany = () => {
 //     // return
 
 //     await deleteCompany(ad);
-//     if(isCompanyDeleted.value === true){
-//         deleteCompanyDialog.value = false;
 
-//               console.log('company deleted')
-//           }else{
-//               console.log('company not deleted')
-//           }
 
-//     // deleteCompanyDialog.value = true;
+    // deleteCompanyDialog.value = true;
 // };
 
 watchEffect(() => {
@@ -110,7 +129,7 @@ initFilters();
                         <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                     </NuxtLink>
                     <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany" />
+                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                   
 
                     <!-- <Dialog v-model:visible="deleteCompanyDialog" modal :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
