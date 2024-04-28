@@ -120,14 +120,18 @@ const deletingTask = async () => {
         }
 }
 
+
+const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
+const breadcrumbItems = ref([{ label: `Company - ${singleProject.value?.company_name}` }, { label: `Space - ${singleProject.value?.space_name}` }, { label: `Project - ${singleProject.value?.name}` }]);
+
 </script>
 
 <template>
     <pre>{{ singleProject }}</pre>
     
-    <div class="card">
-        <h5>Dashboard > <span class="font-italic font-bold">Company:</span> {{ singleProject?.company_name }} > <span class="font-italic font-bold">Space:</span> {{ singleProject?.space_name }} > <span class="font-italic font-bold">Project:</span> {{ singleProject.name }}</h5>
+    <div class="card">     
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+            <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" />
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
               <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -247,5 +251,11 @@ const deletingTask = async () => {
         border-left: none !important;
         border-right: none !important;
       }
+  }
+
+  .create-space-btn-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: start
   }
   </style>
