@@ -5,8 +5,9 @@ export const useCompanyStore = defineStore('workStation', {
   state: () => ({
     loading: false,
     createCompany: null,
-    iscompanyCreated: false,
+    isCompanyCreated: false,
     isCompanyDeleted: false,
+    isCompanyEdited: false,
     companyList: null,
     singleCompany: null,
 
@@ -69,9 +70,7 @@ export const useCompanyStore = defineStore('workStation', {
         console.log('singlComp', this.singleCompany)
         // console.log('userProfile', this.companyList)
     },
-    async createCompany ({name, email, address, contact_number, numEmployees, company_type, 
-      // services
-    }) {
+    async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
         method: 'POST',
@@ -83,16 +82,45 @@ export const useCompanyStore = defineStore('workStation', {
           'email' : email,
           'address' : address,
           'contact_number' : contact_number,
-          // 'size' : wPeople,
-          'number_of_employees' : numEmployees,
+          'number_of_employees' : number_of_employees,
           'company_type' : company_type,
-          // 'services' : services
+          'logo': logo,
+
         },
       });
         console.log('company created', data)
        
         if(data.value.app_message === 'success'){
-          this.iscompanyCreated = true;
+          this.isCompanyCreated = true;
+          this.getCompanyList();
+          // console.log('test')
+        }
+
+    },
+    async editCompany ({id, name, email, address, contact_number, number_of_employees, company_type, logo}) {
+      console.log('printCompid', id)
+      // return
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/update/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : id,
+          'name' : name,
+          'email' : email,
+          'address' : address,
+          'contact_number' : contact_number,
+          'number_of_employees' : number_of_employees,
+          'company_type' : company_type,
+          'logo': logo,
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isCompanyEdited = true;
           this.getCompanyList();
           // console.log('test')
         }

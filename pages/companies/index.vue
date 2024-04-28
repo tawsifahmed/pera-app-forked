@@ -15,6 +15,7 @@ const toast = useToast();
 
 
 const visibleCreateCompany = ref(false);
+const visibleEditCompany = ref(false);
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
@@ -23,6 +24,13 @@ const { companyList, isCompanyDeleted } = storeToRefs(useCompanyStore());
 
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
+};
+
+
+
+const editCompany = (id) => {
+    visibleEditCompany.value = true;
+    refCompanyId.value = id;
 };
 
 const deleteCompanyDialog = ref(false);
@@ -127,7 +135,7 @@ initFilters();
                     </IconField>
                 </div>
             </template>
-            <template #empty> No Data found... </template>
+            <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="id" header="ID" sortable></Column>
             <Column field="name" header="Name" sortable></Column>
@@ -138,7 +146,7 @@ initFilters();
                     <NuxtLink :to="`/companies/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                     </NuxtLink>
-                    <!-- <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                   
 
@@ -165,6 +173,10 @@ initFilters();
             <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
             
+        </Dialog>
+
+        <Dialog v-model:visible="visibleEditCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <EditCompany :refCompanyId="refCompanyId" />
         </Dialog>
     </div>
 </template>

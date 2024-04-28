@@ -3,13 +3,17 @@
 
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createCompany, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isCompanyCreated } = storeToRefs(useCompanyStore()); 
+const { editCompany, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
+const { isCompanyEdited } = storeToRefs(useCompanyStore()); 
     // import { storeToRefs } from 'pinia'
     // import {useWorkStation} from '@/store/workSpace'
     // const workStation = useWorkStation()
     // const { setWorkStation } = workStation
     // const { workStations } = storeToRefs(workStation)
+
+    const {refCompanyId} = defineProps(['refCompanyId']);
+    
+
 
     const showStepCompany = ref(true)
     const showStepPeople = ref(false)
@@ -55,8 +59,6 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         // }
     ])
 
-
-    //How many people will you be working with?
    
     const workingPeople = reactive([
         {
@@ -92,18 +94,6 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         //     label: "I don't know"
         // }
     ])
-
-    const selectPeopleId = ref(null)
-
-    const selectPeople = (p) => {
-        if(selectPeopleId.value === p?.id){
-            selectPeopleId.value = null
-            wPeople.value = null
-        }else {
-            selectPeopleId.value = p?.id
-            wPeople.value = p?.label
-        }
-    }
 
     // Which solution would you like to start with?
     const sSolution = ref(null)
@@ -196,7 +186,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
     // Lastly, what would you like to name your Workspace?
     const workSpaceName =  ref(null)
 
-
+console.log('refCompanyId', refCompanyId)
 
     // console.log('wPeople', wPeople.value)
     // const createCompData = ref({
@@ -209,7 +199,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
 
     const errorHandler = ref(false)
 
-    const handleCreateWorkspace = async () => {
+    const handleEditCompany = async () => {
         if(numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === ''){
             errorHandler.value = true
             return
@@ -225,6 +215,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         console.log('sS', sS)
         
         const  workspaceData = {
+            'id': refCompanyId,
             'name': workSpaceName.value,
             'email': invite.value,
             'address': null,
@@ -241,10 +232,10 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         // console.log('createCompData.value', createCompData.value)
         // return
 
-        // await createCompany(createCompData.value);
-        await createCompany(workspaceData);
+        // await editCompany(createCompData.value);
+        await editCompany(workspaceData);
         // await getCompanyList();
-        if(isCompanyCreated.value === true){
+        if(isCompanyEdited.value === true){
             spaceFormInputs.value = false
             showFinalMsg.value = true 
             numEmployees.value = null
@@ -274,6 +265,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
 
 <template lang="">
     <div class="position-relative flex flex-column justify-content-between w-100 modal-container "> 
+        <!-- <p>refCompanyId {{refCompanyId}}</p> -->
         <div v-if="spaceFormInputs">
             <div class="flex justify-content-center">
                 <FloatLabel class="w-full md:w-50rem mt-4">
@@ -306,13 +298,13 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
             <br>
             <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
             <div class="create-btn-wrapper">
-              <Button @click="handleCreateWorkspace" class="text-white py-2 px-6 tracking-wide" label="Create Company"/>
+              <Button @click="handleEditCompany" class="text-white py-2 px-6 tracking-wide" label="Update Company"/>
             </div>
         </div>
   
   
         <div v-if="showFinalMsg">
-          <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Company created successfully</h3>
+          <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Company edited successfully</h3>
              
           <div class="centering">
               <FloatLabel>
