@@ -3,8 +3,8 @@
 import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getSingleSpace } = useCompanyStore();
-const { singleSpace } = storeToRefs(useCompanyStore());
+const { getSingleSpace, deleteProject } = useCompanyStore();
+const { singleSpace, isProjectDeleted } = storeToRefs(useCompanyStore());
 
 definePageMeta({
   middleware: 'auth',
@@ -16,6 +16,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 const filters = ref();
 const loading = ref(true);
+const toast = useToast();
 
 const { spaces } = useRoute().params
 console.log('spaceParams,', spaces)
@@ -27,6 +28,34 @@ throw createError({statusCode: 404, message: 'Space not found', fatal: true})
 
 const openCreateSpace = () => {
   visible.value = true;
+}
+
+const refProjectId = ref(null);
+
+const confirmDeleteProject = (spaceId) => {
+  refProjectId.value = spaceId;
+    console.log('refCompanyId', refProjectId.value);
+    deleteProjectDialog.value = true;
+
+};
+
+const deleteProjectDialog = ref(false);
+
+const deletingProject = async () => {
+
+    console.log('refCompanyIdFin', refProjectId.value);
+
+    // return 
+    await deleteProject(refProjectId.value, spaces);
+
+    if(isProjectDeleted.value === true){
+        toast.add({ severity: 'info', summary: 'Successfull', detail: 'Space Deleted Successfully', life: 3000 });
+        deleteProjectDialog.value = false;
+            console.log('space deleted')
+        }else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', life: 3000 });       
+            console.log('space not deleted')
+        }
 }
 
 watchEffect(() => {
@@ -47,7 +76,7 @@ initFilters();
 </script>
 
 <template>
-    <!-- <pre>{{ singleSpace }}</pre> -->
+    <pre>{{ singleSpace }}</pre>
     
     <div class="card">
         <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5>
@@ -83,11 +112,19 @@ initFilters();
                     <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editProduct(slotProps.data)" />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProduct(slotProps.data)" />
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded />
+                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
+
+        <Dialog v-model:visible="deleteProjectDialog" header=" " :style="{ width: '25rem' }">
+              
+            <p>Are you sure you want to delete?</p>
+            <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="deletingProject" />
+            
+          </Dialog>
     </div>
 </template>
   
