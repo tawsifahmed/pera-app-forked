@@ -13,7 +13,6 @@ const filters = ref();
 const loading = ref(true);
 const toast = useToast();
 
-
 const visibleCreateCompany = ref(false);
 const visibleEditCompany = ref(false);
 
@@ -25,8 +24,6 @@ const { companyList, isCompanyDeleted } = storeToRefs(useCompanyStore());
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
 };
-
-
 
 const editCompany = (id) => {
     visibleEditCompany.value = true;
@@ -49,48 +46,23 @@ const confirmdeleteCompany = (companyId) => {
     refCompanyId.value = companyId;
     console.log('refCompanyId', refCompanyId.value);
     deleteCompanyDialog.value = true;
-
 };
 
 const deletingCompany = async () => {
-
     console.log('refCompanyIdFin', refCompanyId.value);
-    
-    // return 
+
+    // return
     await deleteCompany(refCompanyId.value);
 
-    if(isCompanyDeleted.value === true){
+    if (isCompanyDeleted.value === true) {
         toast.add({ severity: 'info', summary: 'Successfull', detail: 'Company Deleted Successfully', life: 3000 });
         deleteCompanyDialog.value = false;
-            console.log('company deleted')
-        }else{
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', life: 3000 });       
-            console.log('company not deleted')
-        }
-}
-
-
-
-// const confirmdeleteCompany = async () => {
-//     deleteCompanyDialog.value = true;
-
-//     // return 
-//     console.log('id', id);
-//     let ad = id;
-//     // console.log('company_id', company_id);
-
-//     // const deleteCompanyId = {
-//     //           'company_id': company_id,
-//     // };
-
-//     // console.log('deleteCompany', deleteCompanyId);
-//     // return
-
-//     await deleteCompany(ad);
-
-
-    // deleteCompanyDialog.value = true;
-// };
+        console.log('company deleted');
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', life: 3000 });
+        console.log('company not deleted');
+    }
+};
 
 watchEffect(() => {
     getCompanyList();
@@ -103,10 +75,6 @@ const initFilters = () => {
 };
 
 initFilters();
-
-
-// const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
-// const breadcrumbItems = ref([{ label: `Companies` },]);
 </script>
 
 <template>
@@ -120,7 +88,7 @@ initFilters();
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                <CreateCompany/>
+                <CreateCompany />
             </Dialog>
         </div>
         <!-- <pre>{{companyList}}</pre> -->
@@ -148,31 +116,14 @@ initFilters();
                     </NuxtLink>
                     <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
-                  
-
-                    <!-- <Dialog v-model:visible="deleteCompanyDialog" modal :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                        <div class="flex align-items-center justify-content-center">
-                           
-                          
-                        </div>
-                        <template #footer>
-                            <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
-                            <Button label="Yes" icon="pi pi-check" text @click="deleteCompany" />
-                        </template>
-                    </Dialog> -->
-                
                 </template>
             </Column>
-          
-            
         </DataTable>
 
         <Dialog v-model:visible="deleteCompanyDialog" header=" " :style="{ width: '25rem' }">
-              
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
-            
         </Dialog>
 
         <Dialog v-model:visible="visibleEditCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -180,8 +131,6 @@ initFilters();
         </Dialog>
     </div>
 </template>
-
-
 
 <style lang="scss">
 .header-con {
@@ -205,28 +154,27 @@ initFilters();
     padding-left: 10px !important;
 }
 
-.create-btn-wrapper{
+.create-btn-wrapper {
     display: flex;
     margin-bottom: 15px;
     justify-content: space-between;
     align-items: center;
-    h5:first-child{
+    h5:first-child {
         //margin-top: 0 !important;
-}
-}
-
-
-.breadCrumWrap{
-display: flex;
-justify-content: center;
-gap: 5px;
-align-items: start;
-.text{
-    line-height: 1;
-}
+    }
 }
 
-  //.breadc{
-   // margin-top: 0 !important;
-  //}
+.breadCrumWrap {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    align-items: start;
+    .text {
+        line-height: 1;
+    }
+}
+
+//.breadc{
+// margin-top: 0 !important;
+//}
 </style>

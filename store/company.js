@@ -15,6 +15,7 @@ export const useCompanyStore = defineStore('workStation', {
     spaceList: null,
     isSpaceCreated: false,
     isSpaceDeleted: false,
+    isSpaceEdited: false,
     spaceList: null,
     singleSpace: null,
 
@@ -217,6 +218,40 @@ export const useCompanyStore = defineStore('workStation', {
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
+    },
+    async editSpace ({id, name, description, company_id, color}) {
+      // console.log('printrefSpaceId', refSpaceId)
+      // return
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/update/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : id,
+          'name' : name,
+          'description' : description,
+          'company_id' : company_id,
+          'color' : color,
+          // 'email' : email,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isSpaceEdited = true;
+          this.getCompanyList();
+          this.getSpaceList();
+          this.getSingleCompany(company_id);
+        }
+
     },
     async deleteSpace (spaceId, companyId) {
       // console.log('printCompid', id)

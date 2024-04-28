@@ -76,6 +76,14 @@ const initFilters = () => {
 };
 initFilters();
 
+const visibleEditSpace = ref(false);
+
+const editSpace = (id) => {
+  visibleEditSpace.value = true;
+  refSpaceId.value = id;
+  console.log('refSpaceId', refSpaceId.value)
+};
+
 
 
 // const getBackgroundColor = (color) => {
@@ -143,7 +151,7 @@ initFilters();
                   <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink>
-                  <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded  /> -->
+                  <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editSpace(slotProps.data.id)"  />
                   <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
               </template>
           </Column>
@@ -153,9 +161,11 @@ initFilters();
               
         <p>Are you sure you want to delete?</p>
         <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-        <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
-        
+        <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" /> 
       </Dialog>
+      <Dialog v-model:visible="visibleEditSpace" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <EditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"/>
+    </Dialog>
   </div>
 
 </template>
