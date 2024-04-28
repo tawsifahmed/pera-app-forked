@@ -133,26 +133,27 @@ const deletingTask = async () => {
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <p class="pi pi-home"></p>
-                <p class="pi pi-angle-right"></p>
+                <p class="pi pi-angle-right font-bold"></p>
                 <p class="text">Company - {{singleProject?.company_name}}</p>
-                <p class="pi pi-angle-right"></p>
+                <p class="pi pi-angle-right font-bold"></p>
                 <p class="text">Space - {{singleProject?.space_name}}</p>
-                <p class="pi pi-angle-right"></p>
+                <p class="pi pi-angle-right font-bold"></p>
                 <p class="text">Project - {{singleProject?.name}}</p>
                </div>
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
-              <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+              <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceFormInputs">
                     <div class="company-name flex justify-center text-center mb-6">
                       <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Project: {{singleProject?.name}}</p>
                     </div>
-                    <div class="" style="display: flex; justify-content: center;">
+                    <div>
                       <FloatLabel >
                         <InputText
                           type="text"
                           class="form-control border border-primary"
-                          style="width: 30vw"
+                          
                           v-model="taskNameInput"
                         />
                         <label>Set Task Name</label>
@@ -163,7 +164,7 @@ const deletingTask = async () => {
                         <InputText
                           type="text"
                           class="form-control border border-primary"
-                          style="width: 30vw"
+                          
                           v-model="taskDescriptionInput"
                         />
                         <label>Set Task Description</label>
@@ -186,8 +187,9 @@ const deletingTask = async () => {
                       <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
                       <!-- <p class="text-center mb-2">You can close the modal now.</p> -->
                   </FloatLabel>
+                  </div>
+               </div>
               </div>
-          </div>
               </Dialog>
               <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
           </div>

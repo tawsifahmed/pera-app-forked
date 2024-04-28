@@ -111,7 +111,7 @@ initFilters();
             </div>
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
-            <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany/>
             </Dialog>
         </div>

@@ -17,6 +17,7 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     const showStepSolution = ref(false)
     const showStepInvite = ref(false)
     const showStepName = ref(false)
+    const spaceFormInputs = ref(true)
     const showFinalMsg = ref(false)
 
     const progress = ref(0)
@@ -367,12 +368,15 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     // services: null
     // })
 
+
+    const errorHandler = ref(false)
+
     const handleCreateWorkspace = async () => {
-        // const formData = new FormData()
-        // formData.append('name', workSpaceName.value)
-        // formData.append('size', wPeople.value)
-        // formData.append('number_of_employees', numEmployees.value)
-        // formData.append('company_role', rRole.value)
+        if(numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null){
+            errorHandler.value = true
+            return
+        }else{
+            errorHandler.value = false
 
         const  workspaceData = {
             'name': workSpaceName.value,
@@ -396,94 +400,88 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
         // await getCompanyList();
 
         if(iscompanyCreated.value === true){
-            showStepName.value = false
-            showFinalMsg.value = true
+            spaceFormInputs.value = false
+            showFinalMsg.value = true   
+
             console.log('showFinalMsg', showFinalMsg.value)
 
             console.log('company created')
         }else{
             console.log('company not created')
         }
+        }
+
+        // const formData = new FormData()
+        // formData.append('name', workSpaceName.value)
+        // formData.append('size', wPeople.value)
+        // formData.append('number_of_employees', numEmployees.value)
+        // formData.append('company_role', rRole.value)
+
     }
 </script>
 
 <template lang="">
-    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-        <div class="prog-bar position-fixed top-7 left-6 right-20 z-10">
-            <ProgressBar :value="progress"></ProgressBar>
-        </div>
-        <div class="flex-grow-1" v-if="showStepCompany">
-            <h3 class="text-dark my-4 text-center font-weight-semibold">How large is your company?</h3>
-            <div class="centering m-0 g-4 text-sm">
-                <Button :class="amount?.id === selectAmountId &&  'bg-primary text-white'" class="px-4 py-2 text-primary border border-primary"  v-for="amount in companyLargeAmount" :key="amount" :label="amount?.label" @click="selectAmount(amount)" severity="help" text raised />
-            </div>
-            <div v-if="selectAmountId" class="d-flex justify-content-end border-top mt-6 position-absolute w-100 bottom-0">
-                <Button @click="() => { showStepCompany = false; showStepSolution = true; }" label="Next" class=" next-btn text-xl bg-primary border border-primary text-white px-6 py-2 text-xl mt-6"/>
-            </div>
-        </div>    
-        <div v-if="showStepSolution">
-            <h3 class="text-dark my-4 text-center font-weight-semibold">Company work type?</h3>
-            <div class="centering text-sm">
-                <Button @click="selectSolution(solution)" :class="solution?.id === solutionId &&  'bg-primary text-white'" class="px-4 py-2 text-primary border border-primary"  v-for="solution in solutions" :key="solution" :label="solution?.label" severity="help" text raised />
-            </div>
-            <div class="d-flex justify-content-between w-100 border-top mt-6 gap-4 position-absolute bottom-0">
-                <Button @click="() => { showStepCompany = true; showStepSolution = false; }" label="Prev" class="text-primary text-white border border-primary bg-light px-6 py-2 text-xl mt-6"/>
-                <Button v-if="solutionId" @click="() => { showStepSolution = false; showStepInvite = true; }" label="Next" class="next-btn bg-primary border border-primary text-white px-6 py-2 text-xl mt-6"/>
-            </div>
-        </div>
-    
-        <div v-if="showStepInvite">
-            <h3 class="text-dark my-4 text-center font-weight-semibold">Provide your Email</h3>
-           
-                <div class="centering">
-                    <FloatLabel>
-                        <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="invite" @Input="handleEmail"/>
-                        <label>Email address</label>
-                        <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
-                    </FloatLabel>
-                </div>
-           
-            <div class="d-flex justify-content-between w-100 border-top mt-6 gap-4 position-absolute bottom-0">
-                <Button @click="() => { showStepSolution = true; showStepInvite = false; }" label="Prev" class="text-primary text-white border border-primary bg-light px-6 py-2 text-xl mt-6"/>
-                <Button v-if="pForEmail" @click="() => { showStepInvite = false; showStepName = true; }" label="Next" class="next-btn bg-primary border border-primary text-white px-6 py-2 text-xl mt-6"/>
-            </div>
-        </div>
-    
-        <div v-if="showStepName">
-            <h3 class="text-dark my-4 text-center font-weight-semibold">Lastly, Set Company Name.</h3>
-         
-                <div class="centering">
-                    <FloatLabel>
-                        <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/>
-                        <label>Workspace name...</label>
-                    </FloatLabel>
-                </div>
-                <div class="d-flex justify-content-between w-100 border-top mt-6 gap-4 position-absolute bottom-0">
-                    <Button @click="() => { showStepInvite = true; showStepName = false; }" label="Prev" class=" text-white border border-primary bg-light px-6 py-2 text-xl mt-6"/>
-                    <Button @click="handleCreateWorkspace" v-if="progress >= 60" class="bg-primary next-btn text-white px-6 py-2 text-xl mt-6" label="Create Company"/>
-                </div>
-        </div>
-    
-        <div class="final-msg" v-if="showFinalMsg">
-            <h3 class="text-dark my-4 text-black text-center font-weight-semibold">Company created successfully</h3>
-           
-            <div class="centering">
-                <FloatLabel>
-                    <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
-                    <p class="font-xl">You can close the modal now.</p>
+
+    <div class="position-relative flex flex-column justify-content-between w-100 modal-container"> 
+        <div v-if="spaceFormInputs">
+            <div class="flex justify-content-center">
+                <FloatLabel class="w-full md:w-50rem mt-4">
+                    <Dropdown v-model="numEmployees" inputId="dd-city" :options="companyLargeAmount" optionLabel="label" class="w-full" />
+                    <label for="dd-city">Select Companny Size</label>
                 </FloatLabel>
             </div>
+            
+            <div class="flex justify-content-center">
+                <FloatLabel class="w-full md:w-50rem mt-4">
+                    <Dropdown v-model="sSolution" inputId="dd-city" :options="solutions" optionLabel="label" class="w-full" />
+                    <label for="dd-city">Company work type?
+                    </label>
+                </FloatLabel>
+            </div>
+            
+            
+            <br>
+            <FloatLabel>
+                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail"/>
+                <label>Email address</label>
+                <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
+            </FloatLabel>
+            <br>
+            
+            <FloatLabel>
+                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="workSpaceName"/>
+                <label>Workspace name...</label>
+            </FloatLabel>
+            <br>
+            <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
+            <div class="create-btn-wrapper">
+              <Button @click="handleCreateWorkspace" class="text-white py-2 px-6 tracking-wide" label="Create Company"/>
+            </div>
         </div>
-    </div>
+  
+  
+        <div v-if="showFinalMsg">
+          <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Company created successfully</h3>
+             
+          <div class="centering">
+              <FloatLabel>
+                  <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
+                  <p class="text-center mb-2">You can close the modal now.</p>
+              </FloatLabel>
+          </div>
+      </div>
+  
+      </div>
+
+
+    <!--  -->
+   
 
  
     
 </template>
 
 <style lang="scss" scoped>
-.position-fixed {
-    position: fixed;
-}
 
 .top-7 {
     top: 2.5rem;
@@ -495,14 +493,6 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
 
 .right-20 {
     right: 5rem;
-}
-
-.z-10 {
-    z-index: 10;
-}
-
-.min-vh-100 {
-    min-height: 100vh;
 }
 
 .text-xs {
@@ -540,4 +530,10 @@ const { iscompanyCreated } = storeToRefs(useCompanyStore());
     height: 300px;
     
 }
+
+
+.create-btn-wrapper{
+    display: flex;
+    justify-content: center;
+  }
 </style>

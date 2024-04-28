@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 // import { useAsyncData } from '@nuxtjs/composition-api';
 
-export const useCompanyStore = defineStore('workStation', {
+export const useWorkStation = defineStore('workStation', {
   state: () => ({
     loading: false,
     createCompany: null,

@@ -4,36 +4,33 @@
       <div v-if="spaceFormInputs">
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
-            </div>
-            <div style="display: flex; justify-content: center; gap: 30px">
-              <div class="" style="display: flex; justify-content: center; margin: 40px 0;">
+              </div>
                 <FloatLabel >
                   <InputText
                     type="text"
-                    class="form-control border border-primary"
+                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
                     v-model="projectNameInput"
                   />
                   <label>Set Project Name</label>
                 </FloatLabel>
-              </div>
-              <div class="" style="display: flex; justify-content: center; margin: 40px 0;">
+                <br>
+                <br>
                 <FloatLabel >
                   <InputText
                     type="text"
-                    class="form-control border border-primary"
+                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
                     v-model="projectDescriptionInput"
                   />
                   <label>Set Project Description</label>
                 </FloatLabel>
-              </div>
-            </div>
-        
+                <br>
+                <br>
             <div class="mb-4">
-              <h4 class="text-dark text-center fw-bold">Setup space task status</h4>
+              <h4 class="text-slate-700 mb-2 text-center font-semibold tracking-wide left-3">Setup space task status</h4>
               <div class="pb-3">
                 <div class="container">
                   <div class="row">
-                    <div class="col-12" style="width: 50%; margin: 0 auto;">
+                    <div class="col-12" style="width: 80%; margin: 0 auto;">
                       <!-- <p class="text-uppercase text-muted">Add task statuses</p> -->
                       <div class="d-flex flex-column gap-2">
                         <div class="d-flex align-items-center gap-2 status-fields">
@@ -349,6 +346,8 @@ onMounted(() => {
 
 .company-name{
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
 }
 
 
@@ -415,6 +414,8 @@ onMounted(() => {
     margin-left: 180px;
 }
 .text-muteds{
-  width: 70px;
+  width: 90px;
+  text-transform: uppercase;
+
 }  
 </style>

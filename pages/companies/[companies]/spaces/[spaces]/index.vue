@@ -91,7 +91,7 @@ initFilters();
             </div>
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Project +" />
-              <Dialog v-model:visible="visible" modal header=" " :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+              <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                   <CreateSpecificProject :singleSpace="singleSpace" />
               </Dialog>
               <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
