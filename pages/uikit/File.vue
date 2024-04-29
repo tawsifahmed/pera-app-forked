@@ -4,7 +4,7 @@ import { useToast } from 'primevue/usetoast';
 const toast = useToast();
 
 const onUpload = () => {
-    toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded', life: 3000 });
 };
 </script>
 
