@@ -201,13 +201,13 @@ watchEffect(() => {
     <div class="card">     
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
-                <p class="pi pi-home"></p>
+                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <p class="text">Company - {{singleProject?.company_name}}</p>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{singleProject?.company_name}}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <p class="text">Space - {{singleProject?.space_name}}</p>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Company - {{singleProject?.space_name}}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <p class="text">Project - {{singleProject?.name}}</p>
+                <p class="text cursor-pointer">Project - {{singleProject?.name}}</p>
                </div>
             <div class="create-btn-wrapper">
               <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />

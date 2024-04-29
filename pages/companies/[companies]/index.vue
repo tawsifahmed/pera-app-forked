@@ -116,7 +116,7 @@ const editSpace = (id) => {
       <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
            <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
            <div class="breadCrumWrap">
-            <p class="pi pi-home"></p>
+            <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
             <p class="pi pi-angle-right"></p>
             <p class="text">Company - {{singleCompany?.name}}</p>
            </div>

@@ -81,7 +81,7 @@ initFilters();
     <div class="card">
         <div class="d-flex create-btn-wrapper mr-2">
             <div class="breadCrumWrap">
-                <p class="pi pi-home"></p>
+                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
                 <p class="text">Companies</p>
             </div>
