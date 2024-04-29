@@ -184,6 +184,7 @@ export const useCompanyStore = defineStore('workStation', {
         this.spaceList = data.value?.data;
         
         if(this.spaceList?.length > 0){
+          this.spaceSidebarlist = [];
             this.spaceList.forEach(element => {
                 let obj = {
                     'label': element?.name,
@@ -193,7 +194,7 @@ export const useCompanyStore = defineStore('workStation', {
                 this.spaceSidebarlist.push(obj)
             });
         }
-        console.log('spaceSidebarlist', this.spaceSidebarlist) 
+        // console.log('spaceSidebarlist', this.spaceSidebarlist) 
       }
     },
     async getSingleSpace(space){
@@ -299,7 +300,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isSpaceDeleted = true;
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(companyId);
         }
@@ -341,7 +342,7 @@ export const useCompanyStore = defineStore('workStation', {
         console.log('singlComp', this.singleProject)
         // console.log('userProfile', this.companyList)
     },
-    async createProject ({name, description, space_id, task_statuses}) {
+    async createProject ({name, description, space_id, statuses}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
         method: 'POST',
@@ -352,7 +353,7 @@ export const useCompanyStore = defineStore('workStation', {
           'name' : name,
           'description' : description,
           'space_id' : space_id,
-          'task_statuses' : task_statuses,
+          'statuses' : statuses,
           // 'shared_status' : shared_status,
           // 'task_statuses' : task_statuses,
           // 'features' : features,

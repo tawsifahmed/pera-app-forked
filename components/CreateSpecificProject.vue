@@ -2,13 +2,14 @@
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       
       <div v-if="spaceFormInputs">
+        <h4 class="text-center text-primary">Create Project</h4>
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
               </div>
                 <FloatLabel class="mt-4 mb-2">
                   <InputText
                     type="text"
-                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
+                    class="w-full px-4 py-2 shadow border focus:border-purple-500"
                     v-model="projectNameInput"
                   />
                   <label>Set Project Name</label>
@@ -17,7 +18,7 @@
                 <FloatLabel class="mt-5 mb-4">
                   <InputText
                     type="text"
-                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
+                    class="w-full px-4 py-2 shadow border focus:border-purple-500"
                     v-model="projectDescriptionInput"
                   />
                   <label>Set Project Description</label>
@@ -227,7 +228,7 @@ const handleCreateProject = async () => {
               // 'color': spaceAvatarPreview.value,
               // 'shared_status': selectedShareSpace.value,
               'statuses': taskStatusList.value,
-              'assignee': null
+             
               // 'features': selectedFeatures.value,
               // 'views': checkedViews,
           }
