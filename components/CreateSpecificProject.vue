@@ -5,7 +5,7 @@
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
               </div>
-                <FloatLabel >
+                <FloatLabel class="mt-4 mb-2">
                   <InputText
                     type="text"
                     class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
@@ -13,9 +13,8 @@
                   />
                   <label>Set Project Name</label>
                 </FloatLabel>
-                <br>
-                <br>
-                <FloatLabel >
+                
+                <FloatLabel class="mt-5 mb-4">
                   <InputText
                     type="text"
                     class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
@@ -23,8 +22,7 @@
                   />
                   <label>Set Project Description</label>
                 </FloatLabel>
-                <br>
-                <br>
+                
             <div class="mb-4">
               <h4 class="text-slate-700 mb-2 text-center font-semibold tracking-wide left-3">Setup space task status</h4>
               <div class="pb-3">
@@ -148,7 +146,22 @@ const spaceAvatarPreview = ref(null);
 
 const taskStatusName = ref('');
 
-const taskStatusList = ref([]);
+const taskStatusList = ref([
+  {
+    'taskName': 'Open',
+    taskColor: `#6466f1`
+  },
+  {
+    'taskName': 'Doing',
+    taskColor: `#ff0084`
+  },
+  {
+    'taskName': 'Dev Done',
+    taskColor: `#12955d`
+  },
+]);
+
+console.log('taskStatusList', taskStatusList.value);
 
 const colorHEX = ref('6466f1');
 
@@ -244,9 +257,9 @@ const handleCreateProject = async () => {
               // 'features': selectedFeatures.value,
               // 'views': checkedViews,
           }
-          console.log('spaceData', createProjectData)
+          console.log('projectData', createProjectData)
 
-          
+          // return
           
           await createProject(createProjectData);
 
