@@ -128,8 +128,6 @@ const deletingTask = async () => {
 </script>
 
 <template>
-    <!-- <pre>{{ singleProject }}</pre> -->
-    
     <div class="card">     
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">

@@ -14,14 +14,6 @@ console.log('path', useRoute().path);
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
-// Define a computed property to determine if the profile route is active
-const isProfileActive = computed(() => {
-  // return router.currentRoute.value.path === '/profile';
-  if(useRouter().path === '/profile'){
-    return true;
-  }
-});
-
 
 const logout = () => {
   logUserOut();

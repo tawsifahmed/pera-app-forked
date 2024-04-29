@@ -3,6 +3,12 @@ import { useLayout } from '@/layouts/composables/layout';
 import { ProductService } from '@/service/ProductService';
 import { onMounted, reactive, ref, watch } from 'vue';
 
+
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
+const { userCompany } = storeToRefs(useAuthStore()); 
+
 definePageMeta({
       middleware: 'auth',
       layout: 'default' // this should match the name of the file inside the middleware directory 
@@ -37,7 +43,26 @@ const items = ref([
 ]);
 const lineOptions = ref(null);
 
+const visibleCreateCompany  = ref(false);
+
+const hasUserCompany = ref(null)
+
+const checkUser = () => {
+    if (process.client){
+        hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'))
+        console.log('hasUserCompany =>', hasUserCompany.value)
+        if(hasUserCompany.value === null || hasUserCompany.value?.length  == 0){
+            visibleCreateCompany.value =  true;
+        }else {
+            visibleCreateCompany.value =  false;
+        }
+
+        console.log('visibleCreateCompany =>', visibleCreateCompany.value)
+    }
+}
+
 onMounted(() => {
+    checkUser()
     ProductService.getProductsSmall().then((data) => (products.value = data));
 });
 
@@ -358,5 +383,9 @@ watch(
                 </div>
             </div> -->
         </div>
+
+        <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <CreateCompany/>
+        </Dialog>
     </div>
 </template>
