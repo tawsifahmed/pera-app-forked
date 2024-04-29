@@ -1,12 +1,12 @@
 <script setup>
+import { ProductService } from '@/service/ProductService';
 import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
-// import ProductService from '@/service/ProductService';
 import { useToast } from 'primevue/usetoast';
+import { onBeforeMount, onMounted, ref } from 'vue';
 
 const toast = useToast();
 
-const products = ref(null);
+const products = ref();
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
@@ -20,8 +20,6 @@ const statuses = ref([
     { label: 'LOWSTOCK', value: 'lowstock' },
     { label: 'OUTOFSTOCK', value: 'outofstock' }
 ]);
-
-const productService = new ProductService();
 
 const getBadgeSeverity = (inventoryStatus) => {
     switch (inventoryStatus.toLowerCase()) {
@@ -40,8 +38,16 @@ onBeforeMount(() => {
     initFilters();
 });
 onMounted(() => {
-    productService.getProducts().then((data) => (products.value = data));
+    ProductService.getProducts().then((data) => {
+        products.value = getProductData(data);
+    });
 });
+const getProductData = (data) => {
+    return [...(data || [])].map((d) => {
+        d.date = new Date(d.date);
+        return d;
+    });
+};
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
