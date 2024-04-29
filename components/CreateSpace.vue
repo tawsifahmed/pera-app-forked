@@ -118,6 +118,7 @@ watchEffect(() => {
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       <div v-if="spaceFormInputs">
           <h4 class="text-center text-primary">Create Space</h4>
+          
           <!-- <div class="flex justify-content-center">
             
             <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
