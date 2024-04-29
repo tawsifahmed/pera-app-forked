@@ -83,7 +83,8 @@ const handleCreateTask = async () => {
             showFinalMsg.value = true
             visible.value = false
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });   
-
+            spaceFormInputs.value = true
+            showFinalMsg.value = false
             console.log('task created')
         }else{
             console.log('task not created')
@@ -149,21 +150,21 @@ const deletingTask = async () => {
                       <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Project: {{singleProject?.name}}</p>
                     </div>
                     <div>
-                      <FloatLabel >
+                      <FloatLabel class="mt-4 mb-2">
                         <InputText
                           type="text"
-                          class="form-control border border-primary"
+                          class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
                           
                           v-model="taskNameInput"
                         />
                         <label>Set Task Name</label>
                       </FloatLabel>
                     </div>
-                    <div class="" style="display: flex; justify-content: center; margin: 30px 0; ">
-                      <FloatLabel >
+                    <div class="">
+                      <FloatLabel class="mt-4 mb-2">
                         <InputText
                           type="text"
-                          class="form-control border border-primary"
+                          class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
                           
                           v-model="taskDescriptionInput"
                         />
@@ -180,7 +181,7 @@ const deletingTask = async () => {
       
       
             <div v-if="showFinalMsg">
-              <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Project created successfully</h3>
+              <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
                  
               <div class="centering">
                   <FloatLabel>

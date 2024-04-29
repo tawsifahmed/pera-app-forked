@@ -73,6 +73,13 @@ const initFilters = () => {
 };
 initFilters();
 
+const visibleEditProject = ref(false);
+
+const edittProject = (id) =>{
+    visibleEditProject.value = true;
+    refProjectId.value = id;
+}
+
 
 </script>
 
@@ -120,7 +127,7 @@ initFilters();
                     <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink>
-                    <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click=edittProject(slotProps.data) />
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                 </template>
             </Column>
@@ -132,6 +139,10 @@ initFilters();
             <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingProject" />
             
+        </Dialog>
+
+        <Dialog v-model:visible="visibleEditProject" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <EditProject :refProjectId="refProjectId" :singleSpace="singleSpace"/>
         </Dialog>
     </div>
 </template>

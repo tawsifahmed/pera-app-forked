@@ -2,6 +2,7 @@
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       
       <div v-if="spaceFormInputs">
+        <!-- <pre>{{refProjectId}}</pre> -->
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
               </div>
@@ -107,7 +108,6 @@
           </div>
       </div>
 
-
       <div v-if="showFinalMsg">
         <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Project created successfully</h3>
            
@@ -132,7 +132,7 @@ const { isProjectCreated } = storeToRefs(useCompanyStore());
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
 
-const {singleSpace} = defineProps(['singleSpace']);
+const {refProjectId, singleSpace} = defineProps(['singleSpace', 'refProjectId']);
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
@@ -169,15 +169,9 @@ const taskStatusNullCheck = ref(null);
 
 const addTaskSTatusError= ref(false);
 
-const checked = ref(false);
+const projectNameInput = ref(refProjectId?.name);
 
-const checkedViews = ref([]);
-
-const defViewsChecker = ref(null);
-
-const projectNameInput = ref(null);
-
-const projectDescriptionInput = ref(null);
+const projectDescriptionInput = ref(refProjectId?.description);
 
 const spaceDescripInput = ref(null);
 
@@ -226,14 +220,13 @@ const handleCreateProject = async () => {
               'space_id': singleSpace.id,
               // 'color': spaceAvatarPreview.value,
               // 'shared_status': selectedShareSpace.value,
-              'statuses': taskStatusList.value,
-              'assignee': null
+              'task_statuses': taskStatusList.value,
               // 'features': selectedFeatures.value,
               // 'views': checkedViews,
           }
           console.log('projectData', createProjectData)
 
-          
+          // return
           
           await createProject(createProjectData);
 

@@ -12,15 +12,13 @@ const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
 
-const progress = ref(12.5);
-
-const dynamicDiv = ref(refSpaceId.color);
+const dynamicDiv = ref(null);
 
 const spaceAvatarPreview = ref(null);
 
-const spaceNameInput = ref(refSpaceId.name);
+const spaceNameInput = ref(refSpaceId?.name);
 
-const spaceDescripInput = ref(refSpaceId.description);
+const spaceDescripInput = ref(refSpaceId?.description);
 
 const spaceColorPreview = ref(null);
 
@@ -108,23 +106,24 @@ onMounted(() => {
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       <div v-if="spaceFormInputs">
+        <h4 class="text-center text-primary">Create Space</h4>
+          
         <!-- <pre>{{refSpaceId}}</pre> -->
               <div class="company-name flex justify-center text-center mb-5">
-                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Companys: {{singleCompany?.name}}</p>
+                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div>
-            <FloatLabel>
+            <FloatLabel class="w-full md:w-50rem mt-3 mb-2">
               <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceNameInput" />
               <label>Set Space Name</label>
               
           </FloatLabel>
-          <br>
-          <br>
-          <FloatLabel>
+         
+          <FloatLabel class="w-full md:w-50rem mt-4 mb-3">
             <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceDescripInput"/>
             <label>Set Space Description</label>
             
           </FloatLabel>
-          <br>
+          
           <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
           <div class="m-0 pb-6 d-flex justify-content-center colorpicker-wrapper">
             <div class="flex justify-center items-start">

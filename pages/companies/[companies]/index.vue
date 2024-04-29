@@ -151,7 +151,7 @@ const editSpace = (id) => {
                   <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink>
-                  <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editSpace(slotProps.data.id)"  />
+                  <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
                   <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
               </template>
           </Column>
