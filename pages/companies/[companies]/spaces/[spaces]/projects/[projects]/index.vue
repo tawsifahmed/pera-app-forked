@@ -3,8 +3,8 @@
 import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, deleteTask  } = useCompanyStore();
-const { singleProject, isTaskCreated, isTaskDeleted } = storeToRefs(useCompanyStore());
+const { getSingleProject, createTask, editTask, deleteTask  } = useCompanyStore();
+const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited } = storeToRefs(useCompanyStore());
 
 definePageMeta({
   middleware: 'auth',
@@ -21,6 +21,10 @@ const toast = useToast();
 const { projects } = useRoute().params
 console.log('projectParams,', projects)
 const visible = ref(false);
+const visibleEdit = ref(false);
+
+
+const refTaskId = ref(null);
 
 // if(singleSpace.value === undefined){
 // throw createError({statusCode: 404, message: 'Space not found', fatal: true})
@@ -30,20 +34,10 @@ const openCreateSpace = () => {
   visible.value = true;
 }
 
-watchEffect(() => {
-    getSingleProject(projects);
-    loading.value = false;
-
-  console.log('projects,', projects)
-})
 
 
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-initFilters();
+
+
 
 
 // task create
@@ -93,7 +87,66 @@ const handleCreateTask = async () => {
     }
 }
 
-const refTaskId = ref(null);
+const taskNameEditInput = ref(null);
+const taskEditDescriptionInput = ref(null);
+
+const refTaskIdForEdit = ref(null);
+const edittingTask = (task) => {
+  console.log('task', task)
+  visibleEdit.value = true;
+  refTaskIdForEdit.value = task.id;
+  console.log('refTaskIdForEdit', refTaskIdForEdit.value);
+  taskNameEditInput.value = task.name;
+  taskEditDescriptionInput.value = task.description;
+
+}
+
+
+const spaceEditFormInputs = ref(true);
+
+const showEditFinalMsg = ref(false);
+
+const EditErrorHandler = ref(false);
+
+const handleUpdateTask = async () => {
+    if(taskNameEditInput.value === null || taskEditDescriptionInput.value === null){
+      EditErrorHandler.value = true
+        // return
+    }else{
+      EditErrorHandler.value = false
+
+        let id = refTaskIdForEdit.value;
+        const editTaskData = {
+            'id' : refTaskIdForEdit.value,
+            'name': taskNameEditInput.value,
+            'description': taskEditDescriptionInput.value,
+            'project_id': projects,
+            // 'color': spaceAvatarPreview.value,
+            // 'shared_status': selectedShareSpace.value,
+            // 'task_statuses': taskStatusList.value,
+            // 'features': selectedFeatures.value,
+            // 'views': checkedViews,
+        }
+        console.log('taskData', editTaskData)
+
+        // return
+        await editTask(editTaskData);
+
+        if(isTaskEdited.value === true){
+            spaceEditFormInputs.value = false
+            showEditFinalMsg.value = true
+            visibleEdit.value = false
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });   
+            spaceEditFormInputs.value = true
+            showEditFinalMsg.value = false
+            console.log('task updated')
+        }else{
+            console.log('task not updated')
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });       
+        }
+    }
+}
+
 
 const confirmDeleteTask = (taskId) => {
   refTaskId.value = taskId;
@@ -101,6 +154,8 @@ const confirmDeleteTask = (taskId) => {
     deleteTaskDialog.value = true;
 
 };
+
+
 
 const deleteTaskDialog = ref(false);
 
@@ -120,6 +175,21 @@ const deletingTask = async () => {
             console.log('space not deleted')
         }
 }
+
+const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    };
+};
+initFilters();
+
+watchEffect(() => {
+    getSingleProject(projects);
+    loading.value = false;
+
+  
+})
+
 
 
 // const breadcrumbHome = ref({ icon: 'pi pi-home', to: '/' });
@@ -144,14 +214,16 @@ const deletingTask = async () => {
               <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceFormInputs">
-                    <div class="company-name flex justify-center text-center mb-6">
+                  <h4 class="text-center text-primary">Create Task</h4>
+
+                    <!-- <div class="company-name flex justify-center text-center mb-6">
                       <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Project: {{singleProject?.name}}</p>
-                    </div>
+                    </div> -->
                     <div>
                       <FloatLabel class="mt-4 mb-2">
                         <InputText
                           type="text"
-                          class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
+                          class="w-full px-4 py-2 shadow border focus:border-purple-500"
                           
                           v-model="taskNameInput"
                         />
@@ -162,7 +234,7 @@ const deletingTask = async () => {
                       <FloatLabel class="mt-4 mb-2">
                         <InputText
                           type="text"
-                          class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
+                          class="w-full px-4 py-2 shadow border focus:border-purple-500"
                           
                           v-model="taskDescriptionInput"
                         />
@@ -179,6 +251,57 @@ const deletingTask = async () => {
       
       
             <div v-if="showFinalMsg">
+              <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
+                 
+              <div class="centering">
+                  <FloatLabel>
+                      <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
+                      <!-- <p class="text-center mb-2">You can close the modal now.</p> -->
+                  </FloatLabel>
+                  </div>
+               </div>
+              </div>
+              </Dialog>
+              <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
+                <div v-if="spaceEditFormInputs">
+                  <h4 class="text-center text-primary">Edit Task</h4>
+
+                    <!-- <div class="company-name flex justify-center text-center mb-6">
+                      <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Project: {{singleProject?.name}}</p>
+                    </div> -->
+                    <div>
+                      <FloatLabel class="mt-4 mb-2">
+                        <InputText
+                          type="text"
+                          class="w-full px-4 py-2 shadow border focus:border-purple-500"
+                          
+                          v-model="taskNameEditInput"
+                        />
+                        <label>Set Task Name</label>
+                      </FloatLabel>
+                    </div>
+                    <div class="">
+                      <FloatLabel class="mt-4 mb-2">
+                        <InputText
+                          type="text"
+                          class="w-full px-4 py-2 shadow border focus:border-purple-500"
+                          
+                          v-model="taskEditDescriptionInput"
+                        />
+                        <label>Set Task Description</label>
+                      </FloatLabel>
+                    </div>      
+                <br>
+                <p class="text-center" v-if="EditErrorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
+                <br>
+                <div class="create-btn-wrappe">
+                  <Button @click="handleUpdateTask" class="text-white py-2 px-6 tracking-wide" label="Update Task"/>
+                </div>
+            </div>
+      
+      
+            <div v-if="showEditFinalMsg">
               <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
                  
               <div class="centering">
@@ -214,7 +337,7 @@ const deletingTask = async () => {
             <Column header="Action">
                 <template #body="slotProps">
                   
-                    <!-- <Button disabled icon="pi pi-pencil" class="mr-2" severity="success" rounded /> -->
+                    <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="edittingTask(slotProps.data)" rounded /> 
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.data.id)" />
                 </template>
             </Column>

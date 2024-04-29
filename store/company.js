@@ -30,6 +30,7 @@ export const useCompanyStore = defineStore('workStation', {
     taskList: null,
     isTaskCreated: false,
     isTaskDeleted: false,
+    isTaskEdited: false,
     singleProject: null,
   }),
   
@@ -186,15 +187,16 @@ export const useCompanyStore = defineStore('workStation', {
         if(this.spaceList?.length > 0){
           this.spaceSidebarlist = [];
             this.spaceList.forEach(element => {
+              //console.log('element', element)
                 let obj = {
                     'label': element?.name,
                     'icon': 'pi pi-globe',
-                    'to': ''
+                    'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
                 }
                 this.spaceSidebarlist.push(obj)
             });
         }
-        // console.log('spaceSidebarlist', this.spaceSidebarlist) 
+        console.log('spaceSidebarlist', this.spaceSidebarlist) 
       }
     },
     async getSingleSpace(space){
@@ -454,6 +456,41 @@ export const useCompanyStore = defineStore('workStation', {
           this.getCompanyList();
           this.getSpaceList();
           this.getSingleProject(projectId);
+        }
+
+    },
+    async editTask ({id, name, description, project_id}) {
+      console.log('taskIDstore', id)
+      console.log('project_id', project_id)
+
+      
+      
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : id,
+          'name' : name,
+          'description' : description,
+          'projectId' : project_id,
+          // 'address' : address,
+          // 'contact_number' : contact_number,
+          // // 'size' : wPeople,
+          // 'number_of_employees' : numEmployees,
+          // 'company_type' : company_type,
+          // 'services' : services
+        },
+      });
+        console.log('data', data)
+       
+        if(data.value?.app_message === 'success'){
+          this.isTaskEdited = true;
+          this.getCompanyList();
+          this.getSpaceList();
+          this.getSingleProject(project_id);
         }
 
     },

@@ -240,7 +240,7 @@ const initFilters = () => {
                         <small class="p-invalid" v-if="submitted && !product.name">Name is required.</small>
                     </div>
                     <div class="field">
-                        <label for="description">Description</label>
+                        <label >Description</label>
                         <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
                     </div>
 
