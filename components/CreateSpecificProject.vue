@@ -183,33 +183,6 @@ const spaceDescripInput = ref(null);
 
 const spaceColorPreview = ref(null);
 
-// const changeColor = (event) => {
-//   if(dynamicDiv.value.style.backgroundColor === event.target.id){
-//     dynamicDiv.value.style.border = '2px solid black';
-//     dynamicDiv.value.style.backgroundColor = null;
-//     dynamicDiv.value.style.color = null;
-//     spaceAvatarPreview.value = null;
-//     spaceColorPreview.value.style.border = '2px solid black';
-//     spaceColorPreview.value.style.backgroundColor = null;
-//     spaceColorPreview.value.style.color = null;
-
-//   }else{
-//     dynamicDiv.value.style.backgroundColor = event.target.id;
-//     dynamicDiv.value.style.color = 'white';
-//     dynamicDiv.value.style.border = 'none';
-//     let storeAvatarData = {
-//       bgcolor: event.target.id,
-//       color: 'white' 
-//     }
-//     spaceAvatarPreview.value = storeAvatarData.bgcolor;
-//     // console.log('storeAvatarData', spaceAvatarPreview.value);
-
-//     spaceColorPreview.value.style.backgroundColor = event.target.id;
-//     spaceColorPreview.value.style.color = 'white';
-//     spaceColorPreview.value.style.border = 'none';
-//   }
-// };
-
 
 const addTaskStatus = () => {
   taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;

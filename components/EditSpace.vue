@@ -14,13 +14,13 @@ const errorHandler = ref(false);
 
 const progress = ref(12.5);
 
-const dynamicDiv = ref(null);
+const dynamicDiv = ref(refSpaceId.color);
 
 const spaceAvatarPreview = ref(null);
 
-const spaceNameInput = ref(null);
+const spaceNameInput = ref(refSpaceId.name);
 
-const spaceDescripInput = ref(null);
+const spaceDescripInput = ref(refSpaceId.description);
 
 const spaceColorPreview = ref(null);
 
@@ -60,7 +60,7 @@ const handleEditSpace = async () => {
             return
         }else{
             const editSpaceData = {
-              'id': refSpaceId,
+              'id': refSpaceId.id,
               'name': spaceNameInput.value,
               'description': spaceDescripInput.value,
               'company_id': singleCompany.id,
@@ -108,7 +108,7 @@ onMounted(() => {
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       <div v-if="spaceFormInputs">
-        <pre>{{refSpaceId}}</pre>
+        <!-- <pre>{{refSpaceId}}</pre> -->
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Companys: {{singleCompany?.name}}</p>
             </div>
@@ -233,6 +233,8 @@ onMounted(() => {
 
 .company-name{
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
 }
 
 
