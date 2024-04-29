@@ -26,7 +26,27 @@ const model = ref([
                     // }
                     ]
                 },
-    
+                {
+                    label: 'Space',
+                    icon: 'pi pi-fw pi-microsoft',
+                    items: [
+                        {
+                            label: 'Create Company',
+                            icon: 'pi pi-fw pi-plus',
+                            // to: '/auth/login'
+                        },
+                        {
+                            label: 'List of Companies',
+                            icon: 'pi pi-fw pi-list',
+                            to: '/companies'
+                        },
+                        // {
+                        //     label: 'Access Denied',
+                        //     icon: 'pi pi-fw pi-lock',
+                        //     to: '/auth/access'
+                        // }
+                        ]
+                },
             ],
     },
     {

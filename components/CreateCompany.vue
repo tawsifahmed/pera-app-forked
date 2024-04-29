@@ -276,36 +276,29 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
     <div class="position-relative flex flex-column justify-content-between w-100 modal-container "> 
         <div v-if="spaceFormInputs">
             <div class="flex justify-content-center">
-                <FloatLabel class="w-full md:w-50rem mt-4">
+                <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                     <Dropdown v-model="numEmployees" inputId="dd-city" :options="companyLargeAmount" optionLabel="label" class="w-full" />
                     <label for="dd-city">Select Companny Size</label>
                 </FloatLabel>
             </div>
-            <br>
             <div class="flex justify-content-center">
-                <FloatLabel class="w-full md:w-50rem mt-4">
+                <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                     <Dropdown v-model="sSolution" inputId="dd-city" :options="solutions" optionLabel="label" class="w-full" />
                     <label for="dd-city">Company work type?
                     </label>
                 </FloatLabel>
             </div>
-            
-            <br>
-            <br>
-            <FloatLabel>
+            <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                 <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail"/>
                 <label>Email address</label>
                 <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
             </FloatLabel>
-            <br>
-            <br>
-            <FloatLabel>
+            <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                 <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="workSpaceName"/>
                 <label>Workspace name...</label>
             </FloatLabel>
-            <br>
             <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
-            <div class="create-btn-wrapper">
+            <div class="create-btn-wrapper mt-4">
               <Button @click="handleCreateWorkspace" class="text-white py-2 px-6 tracking-wide" label="Create Company"/>
             </div>
         </div>
