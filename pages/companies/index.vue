@@ -86,12 +86,11 @@ initFilters();
                 <p class="text">Companies</p>
             </div>
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
-            <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
+            <!-- <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
             <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <CreateCompany />
-            </Dialog>
+            </Dialog> -->
         </div>
-        <!-- <pre>{{companyList}}</pre> -->
         <DataTable v-model:filters="filters" :value="companyList" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #header>
                 <div class="flex justify-content-end">

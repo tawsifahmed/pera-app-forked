@@ -5,33 +5,23 @@ import AppMenuItem from './AppMenuItem.vue';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getSpaceList } = useCompanyStore();
-const { spaceList } = storeToRefs(useCompanyStore());
+const { spaceList, spaceSidebarlist } = storeToRefs(useCompanyStore());
 
 const model = ref([
     {
         label: 'Home',
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                {
-                label: 'Company',
-                icon: 'pi pi-fw pi-microsoft',
-                items: [
-                    {
-                        label: 'Create Company',
-                        icon: 'pi pi-fw pi-plus',
-                        // to: '/auth/login'
-                    },
-                    // {
-                    //     label: 'List of Companies',
-                    //     icon: 'pi pi-fw pi-list',
-                    //     to: '/companies'
-                    // },
-                    // {
-                    //     label: 'Access Denied',
-                    //     icon: 'pi pi-fw pi-lock',
-                    //     to: '/auth/access'
-                    // }
-                    ]
-                },
+                // {
+                //     label: 'Company',
+                //     icon: 'pi pi-fw pi-microsoft',
+                //     items: [
+                //         {
+                //             label: 'Create Company',
+                //             icon: 'pi pi-fw pi-plus',
+                //             // to: '/auth/login'
+                //         }
+                //     ]
+                // },
                 {
                     label: 'Space',
                     icon: 'pi pi-fw pi-box',
@@ -40,6 +30,10 @@ const model = ref([
                     ]
                 },
             ],
+    },
+    {
+        label: 'Space list',
+        items: []
     },
     {
         label: 'Theme Components',
@@ -246,12 +240,12 @@ const model = ref([
 
 watchEffect(() => {
     getSpaceList()
+    model.value[1].items = spaceSidebarlist.value
 })
 </script>
 
 <template>
     <ul class="layout-menu">
-        <pre>{{ spaceList }}</pre>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>

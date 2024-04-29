@@ -235,10 +235,10 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         }
         console.log('workspaceData', workspaceData)
 
+
         
         // setWorkStation(formData.value)
         // console.log('createCompData.value', createCompData.value)
-        // return
 
         // await createCompany(createCompData.value);
         await createCompany(workspaceData);

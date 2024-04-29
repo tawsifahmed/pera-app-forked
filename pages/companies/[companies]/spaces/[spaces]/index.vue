@@ -77,8 +77,6 @@ initFilters();
 </script>
 
 <template>
-    <!-- <pre>{{ singleSpace }}</pre> -->
-    
     <div class="card">
         <!-- <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5> -->
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">

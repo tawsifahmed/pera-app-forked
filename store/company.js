@@ -18,6 +18,7 @@ export const useCompanyStore = defineStore('workStation', {
     isSpaceEdited: false,
     spaceList: null,
     singleSpace: null,
+    spaceSidebarlist: [],
 
     // projectapi
     projectList: null,
@@ -73,6 +74,9 @@ export const useCompanyStore = defineStore('workStation', {
     },
     async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
       const token = useCookie('token'); 
+      
+      console.log('company_type =>', company_type)
+      
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
         method: 'POST',
         headers: {
@@ -89,9 +93,10 @@ export const useCompanyStore = defineStore('workStation', {
 
         },
       });
-        console.log('company created', data)
        
         if(data.value.app_message === 'success'){
+          console.log('company =>', data.value?.data?.id)
+          localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
           this.getCompanyList();
           // console.log('test')
@@ -157,22 +162,39 @@ export const useCompanyStore = defineStore('workStation', {
 
     },
     async getSpaceList(){
+      let id = null
+      if(process.client){
+        id = JSON.parse(localStorage.getItem('userCompany'))
+      }
       const token = useCookie('token'); 
-      const { data, pending, error } = await useAsyncData(
-        'spaceList',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/space/list',{
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        
-        }), 
-        // {
-        //   watch: [this.companyList]
-        // }
-      )
+      if(id){
+        const { data, pending, error } = await useAsyncData(
+          'spaceList',
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/space/list/${id}`,{
+            headers: {
+              Authorization: `Bearer ${token.value}`,
+            },
+          
+          }), 
+          // {
+          //   watch: [this.companyList]
+          // }
+        )
 
-      this.spaceList = data.value?.data;
-      // console.log('userProfile', this.companyList) 
+        this.spaceList = data.value?.data;
+        
+        if(this.spaceList?.length > 0){
+            this.spaceList.forEach(element => {
+                let obj = {
+                    'label': element?.name,
+                    'icon': 'pi pi-globe',
+                    'to': ''
+                }
+                this.spaceSidebarlist.push(obj)
+            });
+        }
+        console.log('spaceSidebarlist', this.spaceSidebarlist) 
+      }
     },
     async getSingleSpace(space){
       const token = useCookie('token'); 

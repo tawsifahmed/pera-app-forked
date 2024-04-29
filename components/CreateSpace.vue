@@ -27,7 +27,7 @@ const company = ref(null)
 console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
 const changeColor = (event) => {
-  if(dynamicDiv.value.style.backgroundColor === event.target.id){
+  if(dynamicDiv.value?.style?.backgroundColor === event.target.id){
     dynamicDiv.value.style.border = '2px solid black';
     dynamicDiv.value.style.backgroundColor = null;
     dynamicDiv.value.style.color = null;
@@ -55,17 +55,16 @@ const changeColor = (event) => {
 
 
 const handleCreateSpace = async () => {
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null || company.value === null){
+        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
             errorHandler.value = true
             return
         }else{
 
-        
           // return
             const createSpaceData = {
               'name': spaceNameInput.value,
               'description': spaceDescripInput.value,
-              'company_id': company.value.id,
+              'company_id': companyList.value[0].id,
               'color': spaceAvatarPreview.value,
               // 'shared_status': selectedShareSpace.value,
               // 'task_statuses': taskStatusList.value,
@@ -119,21 +118,21 @@ watchEffect(() => {
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       <div v-if="spaceFormInputs">
           <h4 class="text-center text-primary">Create Space</h4>
-          <div class="flex justify-content-center">
+          <!-- <div class="flex justify-content-center">
             
             <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                 <Dropdown v-model="company" inputId="dd-city" :options="companyList" optionLabel="name" class="w-full" />
                 <label for="dd-city">Select Companny Size</label>
             </FloatLabel>
-          </div>
+          </div> -->
 
           <FloatLabel class="w-full md:w-50rem mt-3 mb-2">
-            <InputText type="text" class="w-full px-4 py-2 shadow border  focus:border-purple-500" v-model="spaceNameInput" />
+            <InputText type="text" class="w-full px-2 py-2 shadow border  focus:border-purple-500" v-model="spaceNameInput" />
             <label>Set Space Name</label>
           </FloatLabel>
 
           <FloatLabel class="w-full md:w-50rem mt-4 mb-3">
-            <InputText type="text" class="w-full px-4 py-2 shadow border  focus:border-purple-500" v-model="spaceDescripInput"/>
+            <InputText type="text" class="w-full px-2 py-2 shadow border  focus:border-purple-500" v-model="spaceDescripInput"/>
             <label>Set Space Description</label>
           </FloatLabel>
 
@@ -166,7 +165,7 @@ watchEffect(() => {
       </div>
 
       <div v-if="showFinalMsg">
-        <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Space created successfully</h3>
+        <h3 class="text-primary mb-4 text-black text-center font-weight-semibold">Space created successfully</h3>
            
         <div class="centering">
             <FloatLabel>

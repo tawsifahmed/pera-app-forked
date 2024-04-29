@@ -108,7 +108,6 @@ onMounted(() => {
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
       <div v-if="spaceFormInputs">
-        <pre>{{refSpaceId}}</pre>
               <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Companys: {{singleCompany?.name}}</p>
             </div>

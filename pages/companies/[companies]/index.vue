@@ -128,7 +128,6 @@ const editSpace = (id) => {
             <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
         </div>
       </div>
-      <!-- <pre>{{singleCompany?.spaces}}</pre> -->
       <DataTable v-model:filters="filters" :value="singleCompany?.spaces" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
           <template #header>
               <div class="flex justify-content-end">

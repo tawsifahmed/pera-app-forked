@@ -9,7 +9,8 @@ export const useAuthStore = defineStore('auth', {
     userProfile: null,
     createCompany: null,
     iscompanyCreated: false,
-    companyList: null
+    companyList: null,
+    userCompany: null
   }),
   
   actions: {
@@ -24,6 +25,8 @@ export const useAuthStore = defineStore('auth', {
         },
       });
       if (data.value) {
+        this.userCompany = data?.value?.company?.id;
+        localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
         const token = useCookie('token'); 
         token.value = data?.value?.access_token; 
         this.authenticated = true; //  authenticated state value to true
@@ -65,6 +68,7 @@ export const useAuthStore = defineStore('auth', {
     },
     logUserOut() {
       const token = useCookie('token');
+      localStorage.removeItem('userCompany')
       this.authenticated = false; 
       token.value = null;
     },
