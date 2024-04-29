@@ -105,7 +105,7 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="id" header="ID" sortable></Column>
-            <Column field="name" header="Name" sortable></Column>
+            <Column field="name" header="Company Name" sortable></Column>
             <Column field="number_of_employees" sortable header="Number of Employees"></Column>
             <Column field="company_type" sortable header="Type"></Column>
             <Column header="Action">
