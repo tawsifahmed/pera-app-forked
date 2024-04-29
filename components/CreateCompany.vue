@@ -231,8 +231,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
             'contact_number': null,
             'number_of_employees': nE,
             'company_type': sS,
-            "logo": null,
-
+            "logo": null
         }
         console.log('workspaceData', workspaceData)
 
@@ -267,14 +266,12 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
         // formData.append('company_role', rRole.value)
 
     }
-
-    console.log('sSolution', sSolution.value)
-    console.log('numEmployees', numEmployees.value)
 </script>
 
 <template lang="">
     <div class="position-relative flex flex-column justify-content-between w-100 modal-container "> 
         <div v-if="spaceFormInputs">
+            <h4 class="text-center text-primary">Create Company</h4>
             <div class="flex justify-content-center">
                 <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
                     <Dropdown v-model="numEmployees" inputId="dd-city" :options="companyLargeAmount" optionLabel="label" class="w-full" />
@@ -289,13 +286,13 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
                 </FloatLabel>
             </div>
             <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
-                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail"/>
+                <InputText type="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail"/>
                 <label>Email address</label>
                 <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
             </FloatLabel>
             <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
-                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="workSpaceName"/>
-                <label>Workspace name...</label>
+                <InputText type="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="workSpaceName"/>
+                <label>Company name...</label>
             </FloatLabel>
             <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
             <div class="create-btn-wrapper mt-4">
@@ -305,7 +302,7 @@ const { isCompanyCreated } = storeToRefs(useCompanyStore());
   
   
         <div v-if="showFinalMsg">
-          <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Company created successfully</h3>
+          <h3 class="text-primary mb-4 text-black text-center font-weight-semibold">Company created successfully</h3>
              
           <div class="centering">
               <FloatLabel>

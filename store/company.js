@@ -212,7 +212,7 @@ export const useCompanyStore = defineStore('workStation', {
         });
        
         if(data.value.app_message === 'success'){
-          console.log('space created')
+          console.log('space created', data)
           this.isSpaceCreated = true;
           this.getCompanyList();
           this.getSpaceList();

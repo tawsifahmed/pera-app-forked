@@ -12,7 +12,7 @@ const addMessage = (type) => {
     if (type === 'success') {
         message.value = [{ severity: 'success', detail: 'Success Message', content: 'Message sent', id: count.value++ }];
     } else if (type === 'info') {
-        message.value = [{ severity: 'info', detail: 'Info Message', content: 'PrimeVue rocks', id: count.value++ }];
+        message.value = [{ severity: 'success', detail: 'Info Message', content: 'PrimeVue rocks', id: count.value++ }];
     } else if (type === 'warn') {
         message.value = [{ severity: 'warn', detail: 'Warn Message', content: 'There are unsaved changes', id: count.value++ }];
     } else if (type === 'error') {
@@ -25,7 +25,7 @@ const showSuccess = () => {
 };
 
 const showInfo = () => {
-    toast.add({ severity: 'info', summary: 'Info Message', detail: 'Message Detail', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Info Message', detail: 'Message Detail', life: 3000 });
 };
 
 const showWarn = () => {

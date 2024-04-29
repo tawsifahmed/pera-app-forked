@@ -82,7 +82,7 @@ const handleCreateTask = async () => {
             spaceFormInputs.value = false
             showFinalMsg.value = true
             visible.value = false
-            toast.add({ severity: 'info', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });   
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });   
 
             console.log('task created')
         }else{
@@ -111,7 +111,7 @@ const deletingTask = async () => {
     await deleteTask(refTaskId.value, projects);
 
     if(isTaskDeleted.value === true){
-        toast.add({ severity: 'info', summary: 'Successfull', detail: 'Task Deleted Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', life: 3000 });
         deleteTaskDialog.value = false;
             console.log('space deleted')
         }else{

@@ -1,12 +1,11 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createSpace } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceCreated } = storeToRefs(useCompanyStore()); 
+const { createSpace, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
+const { isSpaceCreated, companyList } = storeToRefs(useCompanyStore()); 
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
 
-const {singleCompany} = defineProps(['singleCompany']);
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
@@ -22,6 +21,8 @@ const spaceNameInput = ref(null);
 const spaceDescripInput = ref(null);
 
 const spaceColorPreview = ref(null);
+
+const company = ref(null)
 
 console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
@@ -53,29 +54,18 @@ const changeColor = (event) => {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const handleCreateSpace = async () => {
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
+        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null || company.value === null){
             errorHandler.value = true
             return
         }else{
+
+        
+          // return
             const createSpaceData = {
               'name': spaceNameInput.value,
               'description': spaceDescripInput.value,
-              'company_id': singleCompany.id,
+              'company_id': company.value.id,
               'color': spaceAvatarPreview.value,
               // 'shared_status': selectedShareSpace.value,
               // 'task_statuses': taskStatusList.value,
@@ -84,6 +74,7 @@ const handleCreateSpace = async () => {
           }
           console.log('spaceData', createSpaceData)
 
+          // return
           
           
           await createSpace(createSpaceData);
@@ -113,6 +104,11 @@ onMounted(() => {
   // dynamicDiv.value.style.color = 'black';
   // spaceColorPreview.value.style.border = '2px solid black';
   // spaceColorPreview.value.style.color = 'black';
+ 
+});
+
+watchEffect(() => {
+    getCompanyList();
 });
 
 
@@ -121,25 +117,28 @@ onMounted(() => {
 
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-      
       <div v-if="spaceFormInputs">
-              <div class="company-name flex justify-center text-center mb-5">
-                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
-            </div>
-            <FloatLabel>
-              <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceNameInput" />
-              <label>Set Space Name</label>
-              
-          </FloatLabel>
-          <br>
-          <br>
-          <FloatLabel>
-            <InputText type="text" class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500" v-model="spaceDescripInput"/>
-            <label>Set Space Description</label>
+          <h4 class="text-center text-primary">Create Space</h4>
+          <div class="flex justify-content-center">
             
+            <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
+                <Dropdown v-model="company" inputId="dd-city" :options="companyList" optionLabel="name" class="w-full" />
+                <label for="dd-city">Select Companny Size</label>
+            </FloatLabel>
+          </div>
+
+          <FloatLabel class="w-full md:w-50rem mt-3 mb-2">
+            <InputText type="text" class="w-full px-4 py-2 shadow border  focus:border-purple-500" v-model="spaceNameInput" />
+            <label>Set Space Name</label>
           </FloatLabel>
-          <br>
+
+          <FloatLabel class="w-full md:w-50rem mt-4 mb-3">
+            <InputText type="text" class="w-full px-4 py-2 shadow border  focus:border-purple-500" v-model="spaceDescripInput"/>
+            <label>Set Space Description</label>
+          </FloatLabel>
+
           <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
+
           <div class="m-0 pb-6 d-flex justify-content-center colorpicker-wrapper">
             <div class="flex justify-center items-start">
               <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
@@ -158,14 +157,13 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <br>
+          
           <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
-          <br>
+
           <div class="create-btn-wrapper">
             <Button @click="handleCreateSpace" class="text-white py-2 px-6 tracking-wide" label="Create Space"/>
           </div>
       </div>
-
 
       <div v-if="showFinalMsg">
         <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Space created successfully</h3>
@@ -176,7 +174,7 @@ onMounted(() => {
                 <p class="text-center mb-2">You can close the modal now.</p>
             </FloatLabel>
         </div>
-    </div>
+      </div>
 
     </div>
 </template>
@@ -247,8 +245,6 @@ onMounted(() => {
 
 .company-name{
   border-radius: 5px;
-  display: flex;
-  justify-content: center;
 }
 
 
