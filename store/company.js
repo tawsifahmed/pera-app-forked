@@ -10,6 +10,7 @@ export const useCompanyStore = defineStore('workStation', {
     isCompanyEdited: false,
     companyList: null,
     singleCompany: null,
+    singleCompanyName: null,
 
     // space api
     spaceList: null,
@@ -51,6 +52,8 @@ export const useCompanyStore = defineStore('workStation', {
       )
 
       this.companyList = data.value?.data;
+      console.log('CompName', data.value?.data[0]?.name)
+      this.singleCompanyName = data.value?.data[0]?.name;
       // console.log('userProfile', this.companyList) 
     },
     async getSingleCompany(company){
@@ -69,8 +72,8 @@ export const useCompanyStore = defineStore('workStation', {
             // }
         )
         this.singleCompany = data.value?.data;
-        console.log('singlCompData', data)
-        console.log('singlComp', this.singleCompany)
+        // console.log('singlCompData', data)
+        // console.log('singlComp', this.singleCompany)
         // console.log('userProfile', this.companyList)
     },
     async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
@@ -239,7 +242,6 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value.app_message === 'success'){
           console.log('space created', data)
           this.isSpaceCreated = true;
-          this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
@@ -272,7 +274,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isSpaceEdited = true;
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
@@ -367,7 +369,7 @@ export const useCompanyStore = defineStore('workStation', {
           console.log('project created')
           this.isProjectCreated = true;
           this.getSpaceList();
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSingleSpace(space_id);
         }
     },
@@ -395,7 +397,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isProjectDeleted = true;
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleSpace(spaceId);
         }
@@ -425,7 +427,7 @@ export const useCompanyStore = defineStore('workStation', {
           console.log('project created')
           this.isTaskCreated = true;
           this.getSpaceList();
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSingleProject(project_id);
         }
     },
@@ -453,7 +455,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleProject(projectId);
         }
