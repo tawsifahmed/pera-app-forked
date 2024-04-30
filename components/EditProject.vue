@@ -82,10 +82,10 @@
                         <div class="d-flex align-items-center border rounded flex-grow-1 status-length">
                           <div
                             class="status-colors"
-                            :style="{ backgroundColor: task.taskColor }"
+                            :style="{ backgroundColor: task.taskStatusColor }"
                           ></div>
                           <p class="text-uppercase text-muteds">
-                            {{ task.taskName }}
+                            {{ task.taskStatusName }}
                           </p>
                         </div>
                         <div
@@ -148,16 +148,16 @@ const taskStatusName = ref('');
 
 const taskStatusList = ref([
   {
-    'taskName': 'Open',
-    taskColor: `#6466f1`
+    'taskStatusName': 'Open',
+    taskStatusColor: `#6466f1`
   },
   {
-    'taskName': 'Doing',
-    taskColor: `#ff0084`
+    'taskStatusName': 'Doing',
+    taskStatusColor: `#ff0084`
   },
   {
-    'taskName': 'Dev Done',
-    taskColor: `#12955d`
+    'taskStatusName': 'Dev Done',
+    taskStatusColor: `#12955d`
   },
 ]);
 
@@ -183,8 +183,8 @@ const addTaskStatus = () => {
   if(taskStatusName?.value?.length > 0){
     
     const newTaskStatusList = {
-    taskName: taskStatusName.value,
-    taskColor: `#${colorHEX.value}`
+    taskStatusName: taskStatusName.value,
+    taskStatusColor: `#${colorHEX.value}`
    }
    taskStatusList.value.push(newTaskStatusList);
    taskStatusName.value = '';

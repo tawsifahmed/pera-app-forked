@@ -241,7 +241,7 @@ const model = ref([
 watchEffect(() => {
     getSpaceList()
     getCompanyList()
-    model.value[1].items = spaceSidebarlist.value
+    // model.value[1].items = spaceSidebarlist.value
 })
 </script>
 
