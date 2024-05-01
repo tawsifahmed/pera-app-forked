@@ -5,7 +5,7 @@ import AppMenuItem from './AppMenuItem.vue';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getSpaceList, getCompanyList } = useCompanyStore();
-const { companyList, spaceSidebarlist, singleCompanyName } = storeToRefs(useCompanyStore());
+const { spaceSidebarlist, singleCompanyName } = storeToRefs(useCompanyStore());
 
 const model = ref([
     {
@@ -240,9 +240,9 @@ const model = ref([
 
 
 watchEffect(() => {
-    // getSpaceList()
+    getSpaceList()
      getCompanyList()
-    // model.value[1].items = spaceSidebarlist.value
+    model.value[1].items = spaceSidebarlist.value
 }) 
 
 
