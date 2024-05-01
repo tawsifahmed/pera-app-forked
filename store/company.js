@@ -33,6 +33,7 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskDeleted: false,
     isTaskEdited: false,
     singleProject: null,
+    tasks: [],
   }),
   
   actions: {
@@ -343,7 +344,28 @@ export const useCompanyStore = defineStore('workStation', {
           // }
         )
         this.singleProject = data.value?.data;
-        console.log('singlComp', this.singleProject)
+
+        if(this.singleProject?.tasks?.length > 0){
+          this.tasks = [];
+            this.singleProject?.tasks.forEach(element => {
+                let obj = {
+                  'key': element.id,
+                  'data': {
+                            name: element.name,
+                            description: element.description,
+                            assignee: '',
+                            dueDate: 'Today',
+                            priority: 'High',
+                            action:   '',
+                          },
+                  'children': [],
+                }
+                this.tasks.push(obj)
+            });
+        }
+        console.log('tasks', this.tasks)
+
+        // console.log('singlComp', this.singleProject)
         // console.log('userProfile', this.companyList)
     },
     async createProject ({name, description, space_id, statuses}) {
