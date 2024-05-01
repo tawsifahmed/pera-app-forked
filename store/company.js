@@ -368,7 +368,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value.app_message === 'success'){
           console.log('project created')
           this.isProjectCreated = true;
-          this.getSpaceList();
+          // this.getSpaceList();
           // this.getCompanyList();
           this.getSingleSpace(space_id);
         }
@@ -398,7 +398,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isProjectDeleted = true;
           // this.getCompanyList();
-          this.getSpaceList();
+          // this.getSpaceList();
           this.getSingleSpace(spaceId);
         }
 
@@ -426,7 +426,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value.app_message === 'success'){
           console.log('project created')
           this.isTaskCreated = true;
-          this.getSpaceList();
+          // this.getSpaceList();
           // this.getCompanyList();
           this.getSingleProject(project_id);
         }
