@@ -3,7 +3,7 @@
 import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getSingleCompany, deleteSpace } = useCompanyStore();
+const { getCompanyList, getSingleCompany, deleteSpace } = useCompanyStore();
 const { singleCompany, isSpaceDeleted } = storeToRefs(useCompanyStore());
 
 definePageMeta({
@@ -63,11 +63,7 @@ const deletingSpace = async () => {
 }
 
 
-watchEffect(() => {
-  getSingleCompany(companies);
-  loading.value = false;
-  console.log('company,', companies)
-})
+
 
 const initFilters = () => {
     filters.value = {
@@ -83,6 +79,12 @@ const editSpace = (id) => {
   refSpaceId.value = id;
   console.log('refSpaceId', refSpaceId.value)
 };
+
+watchEffect(() => {
+  getSingleCompany(companies);
+  loading.value = false;
+  console.log('company,', companies)
+})
 
 
 

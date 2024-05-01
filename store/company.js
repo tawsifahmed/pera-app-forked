@@ -72,7 +72,7 @@ export const useCompanyStore = defineStore('workStation', {
             // }
         )
         this.singleCompany = data.value?.data;
-        // console.log('singlCompData', data)
+        console.log('singlCompData', data)
         // console.log('singlComp', this.singleCompany)
         // console.log('userProfile', this.companyList)
     },
