@@ -146,7 +146,7 @@ const edittProject = (id) =>{
 </template>
   
   
-  <style scoped>
+  <style lang="scss" scoped>
 
   .create-btn-wrapper{
     display: flex;

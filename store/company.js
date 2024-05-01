@@ -512,7 +512,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
-          this.getCompanyList();
+          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleProject(project_id);
         }

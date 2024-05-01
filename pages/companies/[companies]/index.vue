@@ -143,10 +143,10 @@ watchEffect(() => {
           </template>
           <template #empty> No Data found... </template>
           <template #loading> Loading data. Please wait. </template>
-          <Column field="id" header="ID"></Column>
-          <Column field="name" header="Space Name"></Column>
-          <Column field="description" header="Description"></Column>
-          <Column field="color" header="Space Color"></Column>
+          <Column field="id" header="ID" sortable></Column>
+          <Column field="name" header="Space Name" sortable></Column>
+          <Column field="description" header="Description" sortable></Column>
+          <Column field="color" header="Space Color" sortable></Column>
           <Column header="Action">
               <template #body="slotProps">
                   <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
