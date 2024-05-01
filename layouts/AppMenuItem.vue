@@ -83,8 +83,11 @@ const checkActiveRoute = (item) => {
 
 <template>
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
-        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">
+        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
+            <div v-if="item.option == 'space_option'">
+                <Button icon="pi pi-plus" class="p-button-sm" @click="itemClick($event, item, index)" severity="secondary" aria-label="Bookmark" text  />
+            </div>
         </div>
         <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <CreateCompany/>

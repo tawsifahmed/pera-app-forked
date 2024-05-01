@@ -10,29 +10,12 @@ const { companyList, spaceSidebarlist } = storeToRefs(useCompanyStore());
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                // {
-                //     label: 'Company',
-                //     icon: 'pi pi-fw pi-microsoft',
-                //     items: [
-                //         {
-                //             label: 'Create Company',
-                //             icon: 'pi pi-fw pi-plus',
-                //             // to: '/auth/login'
-                //         }
-                //     ]
-                // },
-                {
-                    label: 'Space',
-                    icon: 'pi pi-fw pi-box',
-                    items: [
-
-                    ]
-                },
-            ],
+        option: 'home_option',
+        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },],
     },
     {
-        label: 'Space list',
+        label: 'Space',
+        option: 'space_option',
         items: []
     },
     // {
@@ -238,26 +221,47 @@ const model = ref([
     // }
 ]);
 
-watchEffect(() => {
-    getSpaceList()
-    getCompanyList()
-    model.value[1].items = spaceSidebarlist.value
+const spaceList = ref([])
+// model.value[1].items = spaceSidebarlist.value
+
+// watchEffect(() => {
+//     getSpaceList()
+//     getCompanyList()
+//     //model.value[1].items = spaceSidebarlist.value
+// })
+const getAllList = async() => {
+    await getCompanyList()
+    console.log('companyList = >', companyList.value[0]?.spaces)
+    if(companyList.value[0]?.spaces?.length > 0){
+        spaceList.value = [];
+        companyList.value[0]?.spaces.forEach(element => {
+            //console.log('element', element)
+            let obj = {
+                'label': element?.name,
+                'icon': 'pi pi-globe',
+                'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
+            }
+            spaceList.value.push(obj)
+        });
+    }
+    model.value[1].items = spaceList.value
+}
+
+onMounted(async() => {
+    await getAllList()
 })
+
+watch()
+
 </script>
 
 <template>
     <ul class="layout-menu">
-        <!-- <pre>{{companyList}}</pre> -->
-        <h4 v-for="(company, index) in companyList" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{company?.name}}</h4>
+        <h4 v-for="company in companyList" :key="company" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{company?.name}}</h4>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
-        <!-- <li>
-            <a href="https://www.primefaces.org/primeblocks-vue/#/" target="_blank">
-                <img src="/layout/images/banner-primeblocks.png" alt="Prime Blocks" class="w-full mt-3" />
-            </a>
-        </li> -->
     </ul>
 </template>
 
