@@ -61,7 +61,7 @@ export const useCompanyStore = defineStore('workStation', {
         const token = useCookie('token'); 
         console.log('token', token.value)
         const { data, pending, error } = await useAsyncData(
-            'companyList',
+            'singleCompany',
             () => $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`,{
             headers: {
                 Authorization: `Bearer ${token.value}`,
@@ -206,7 +206,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleSpace(space){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-          'companyList',
+          'singleSpace',
           () => $fetch(`http://188.166.212.40/pera/public/api/v1/space/show/${space}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
@@ -314,7 +314,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getProjectList(){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-        'spaceList',
+        'projectList',
         () => $fetch('http://188.166.212.40/pera/public/api/v1/space/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
@@ -332,7 +332,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleProject(projectID){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-          'companyList',
+          'singleProjectList',
           () => $fetch(`http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
@@ -478,7 +478,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
           // this.getCompanyList();
-          this.getSpaceList();
+          // this.getSpaceList();
           this.getSingleProject(projectId);
         }
 
@@ -513,7 +513,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
           // this.getCompanyList();
-          this.getSpaceList();
+          // this.getSpaceList();
           this.getSingleProject(project_id);
         }
 
