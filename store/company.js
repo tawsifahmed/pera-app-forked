@@ -34,6 +34,11 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskEdited: false,
     singleProject: null,
     tasks: [],
+
+    asngUsers: [],
+
+    users: [],
+    priorityList: [],
   }),
   
   actions: {
@@ -339,34 +344,41 @@ export const useCompanyStore = defineStore('workStation', {
           },
           
           }),
-          // {
-          //   watch: [this.companyList]
-          // }
         )
         this.singleProject = data.value?.data;
 
         if(this.singleProject?.tasks?.length > 0){
           this.tasks = [];
             this.singleProject?.tasks.forEach(element => {
+              if(element?.assignee.length > 0){
+                this.asngUsers = [];
+                element?.assignee.forEach(val => {
+                    let obj2 = {
+                        'id': val.id,
+                        'name': val.name,
+                    }
+                    this.asngUsers.push(obj2)
+                });
+              }else{
+                this.asngUsers = [];
+              }
                 let obj = {
                   'key': element.id,
                   'data': {
                             name: element.name,
                             description: element.description,
-                            assignee: '',
-                            dueDate: 'Today',
-                            priority: 'High',
+                            assigneeObj: this.asngUsers,
+                            assignee: this.asngUsers.map((obj) => obj.name).join(", "),
+                            dueDate: element.due_date? this.formatDate(element.due_date) : '',
+                            priority: element.priority,
                             action:   '',
                           },
                   'children': [],
                 }
                 this.tasks.push(obj)
+                console.log(this.tasks);
             });
         }
-        console.log('tasks', this.tasks)
-
-        // console.log('singlComp', this.singleProject)
-        // console.log('userProfile', this.companyList)
     },
     async createProject ({name, description, space_id, statuses}) {
       const token = useCookie('token'); 
@@ -483,12 +495,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async editTask ({id, name, description, project_id}) {
-      console.log('taskIDstore', id)
-      console.log('project_id', project_id)
-
-      
-      
+    async editTask ({id, name, description, project_id,due_date,priority,assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -499,6 +506,9 @@ export const useCompanyStore = defineStore('workStation', {
           'id' : id,
           'name' : name,
           'description' : description,
+          'due_date' : due_date,
+          'priority' : priority,
+          'assignees' : assignees,
           'projectId' : project_id,
           // 'address' : address,
           // 'contact_number' : contact_number,
@@ -508,7 +518,6 @@ export const useCompanyStore = defineStore('workStation', {
           // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
@@ -518,5 +527,60 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
+
+    async getTaskAssignModalData(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+        'companyList',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }), 
+      )
+
+      if(data.value?.data?.length > 0){
+        this.users = [];
+        data.value?.data.forEach(element => {
+              let obj = {
+                'id': element.id,
+                'name': element.name,
+              }
+              this.users.push(obj)
+          });
+      }
+
+      
+    },
+
+    async getTaskAssignModalData(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+        'companyList',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }), 
+      )
+
+      if(data.value?.data?.length > 0){
+        this.users = [];
+        data.value?.data.forEach(element => {
+              let obj = {
+                'id': element.id,
+                'name': element.name,
+              }
+              this.users.push(obj)
+          });
+      }
+
+    },
+    formatDate(dateString){
+      const date = new Date(dateString);
+      return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+  },
   },
 });

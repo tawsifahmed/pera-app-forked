@@ -10,35 +10,34 @@ const { spaceSidebarlist, singleCompanyName } = storeToRefs(useCompanyStore());
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                // {
-                //     label: 'Company',
-                //     icon: 'pi pi-fw pi-microsoft',
-                //     items: [
-                //         {
-                //             label: 'Create Company',
-                //             icon: 'pi pi-fw pi-plus',
-                //             // to: '/auth/login'
-                //         }
-                //     ]
-                // },
-                {
-                    label: 'Space',
-                    icon: 'pi pi-fw pi-box',
-                    items: [
-
-                    ]
-                },
-            ],
+        items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
+            // {
+            //     label: 'Company',
+            //     icon: 'pi pi-fw pi-microsoft',
+            //     items: [
+            //         {
+            //             label: 'Create Company',
+            //             icon: 'pi pi-fw pi-plus',
+            //             // to: '/auth/login'
+            //         }
+            //     ]
+            // },
+            {
+                label: 'Space',
+                icon: 'pi pi-fw pi-box',
+                items: []
+            }
+        ]
     },
     {
         label: 'Space list',
-        items: [spaceSidebarlist.value]
-    },
+        items: spaceSidebarlist.value
+    }
     // {
     //     label: 'Theme Components',
     //     items: [
-            
+
     //         {
     //             label: 'Form Layout',
     //             icon: 'pi pi-fw pi-id-card',
@@ -240,26 +239,23 @@ const model = ref([
 
 // model.value[1].items = spaceSidebarlist.value
 
-
-
 watchEffect(() => {
-    getSpaceList()
-    getCompanyList()
-}) 
-
+    getSpaceList();
+    getCompanyList();
+});
 
 // watchEffect(singleCompanyName, (newV, oldV) => {
 //     console.log('newVal', newV)
 //     console.log('oldVal', oldV)
-    
+
 //     // isActiveMenu.value = newVal === itemKey.value || newVal.startsWith(itemKey.value + '-');
 // })
-</script>  
+</script>
 
 <template>
     <ul class="layout-menu">
         <!-- <pre>{{companyList}}</pre> -->
-        <h4 v-if="singleCompanyName" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{singleCompanyName}}</h4>
+        <h4 v-if="singleCompanyName" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{ singleCompanyName }}</h4>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
@@ -277,9 +273,8 @@ watchEffect(() => {
 </template>
 
 <style lang="scss" scoped>
-.rounded{
+.rounded {
     border-radius: 6px;
-    text-transform: capitalize; 
+    text-transform: capitalize;
 }
-
 </style>
