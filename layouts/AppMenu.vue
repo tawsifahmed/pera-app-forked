@@ -259,7 +259,7 @@ watchEffect(() => {
 <template>
     <ul class="layout-menu">
         <!-- <pre>{{companyList}}</pre> -->
-        <h4 class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{singleCompanyName}}</h4>
+        <h4 v-if="singleCompanyName" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{singleCompanyName}}</h4>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>

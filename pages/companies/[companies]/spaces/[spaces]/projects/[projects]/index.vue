@@ -76,6 +76,8 @@ const handleCreateTask = async () => {
             spaceFormInputs.value = false
             showFinalMsg.value = true
             visible.value = false
+            taskNameInput.value = null;
+            taskDescriptionInput.value = null;
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });   
             spaceFormInputs.value = true
             showFinalMsg.value = false
