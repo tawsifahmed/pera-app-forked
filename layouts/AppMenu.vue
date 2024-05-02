@@ -4,9 +4,8 @@ import AppMenuItem from './AppMenuItem.vue';
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getSpaceList, getCompanyList } = useCompanyStore();
-const { spaceSidebarlist, singleCompanyName } = storeToRefs(useCompanyStore());
-
+const { getCompanyList } = useCompanyStore();
+const { companyList } = storeToRefs(useCompanyStore());
 
 const model = ref([
     {
@@ -19,18 +18,32 @@ const model = ref([
     {
         label: 'Spaces',
         option:'space_option',
-        items: spaceSidebarlist.value
+        items: []
     }
 ])
 
-onMounted(async() => {
-    await getSpaceList()
-    await getCompanyList()
+const setData = () =>{
     console.log('model =>', model.value[1].items)
+    console.log('companyList =>', companyList.value[0].spaces)
+    const items = []
+    companyList.value[0].spaces.forEach(element => {
+        const obj = {
+            'label': element?.name,
+            'icon': 'pi pi-globe',
+            'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
+        }
+        items.push(obj)
+    });
+    model.value[1].items = items.reverse();
+}
+
+
+onMounted(async() => {
+    await getCompanyList()
+    setData()
 })
 
-watch(spaceSidebarlist.value, async() =>{
-    await getSpaceList()
+watch(companyList, async(newValue)=>{
     await getCompanyList()
     setData()
 })
@@ -39,11 +52,11 @@ watch(spaceSidebarlist.value, async() =>{
 
 <template>
     <div>
-    <div class="mt-3" v-if="singleCompanyName">
-        <pre>spaceSidebarlist = {{ spaceSidebarlist }}</pre>
+    <div class="mt-3" v-if="companyList">
+        <!-- <pre>companyList = {{ companyList }}</pre> -->
         <div class="flex align-items-center">
             <Button class="mr-2"  severity="secondary" >S</Button>
-            <h5 class="m-0 font-bold font-size-16">{{singleCompanyName}}</h5>
+            <h5 class="m-0 font-bold font-size-16">{{companyList[0]?.name}}</h5>
         </div>
     </div>
     <ul class="layout-menu">

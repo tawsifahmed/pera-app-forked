@@ -71,7 +71,7 @@ const hideDialog = () => {
     <Dialog v-model:visible="spaceFormInputs" :style="{ width: '450px' }" header="Create Space" :modal="true" class="p-fluid">
         <div class="field">
             <label for="name">Space Name</label>
-            <InputText id="name" v-model="spaceNameInput" required="true" autofocus :invalid="spaceNameError" />
+            <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
         </div>
         <div class="field">
             <label for="name">Space Description</label>

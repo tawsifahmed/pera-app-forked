@@ -41,6 +41,9 @@ export const useCompanyStore = defineStore('workStation', {
   
   actions: {
     async getCompanyList(){
+
+      console.log('test test test')
+
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'companyList',
@@ -92,12 +95,11 @@ export const useCompanyStore = defineStore('workStation', {
       });
        
         if(data.value.app_message === 'success'){
-          console.log('company =>', data.value?.data?.id)
+          console.log('createCompany =>', data.value)
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
-          this.getCompanyList();
-        }
-
+          await this.getCompanyList();
+        } 
     },
     async editCompany ({id, name, email, address, contact_number, number_of_employees, company_type, logo}) {
       console.log('printCompid', id)
@@ -220,8 +222,9 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value.app_message === 'success'){
           this.isSpaceCreated = true;
-          this.getSpaceList();
-          this.getSingleCompany(company_id);
+          await this.getCompanyList()
+          await this.getSpaceList();
+          await this.getSingleCompany(company_id);
         }
     },
     async editSpace ({id, name, description, company_id, color}) {
