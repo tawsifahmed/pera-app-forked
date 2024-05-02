@@ -62,7 +62,7 @@ const checkUser = () => {
 
 onMounted(() => {
     checkUser()
-    ProductService.getProductsSmall().then((data) => (products.value = data));
+    // ProductService.getProductsSmall().then((data) => (products.value = data));
 });
 
 const formatCurrency = (value) => {

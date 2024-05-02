@@ -7,34 +7,46 @@ import { useCompanyStore } from '~/store/company';
 const { getSpaceList, getCompanyList } = useCompanyStore();
 const { spaceSidebarlist, singleCompanyName } = storeToRefs(useCompanyStore());
 
+
 const model = ref([
     {
         label: 'Home',
+        option:'home_option',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-            {
-                label: 'Space',
-                icon: 'pi pi-fw pi-box',
-                items: []
-            }
         ]
     },
     {
-        label: 'Space list',
+        label: 'Spaces',
+        option:'space_option',
         items: spaceSidebarlist.value
     }
-]);
+])
 
-watchEffect(() => {
-    getSpaceList();
-    getCompanyList();
-});
+onMounted(async() => {
+    await getSpaceList()
+    await getCompanyList()
+    console.log('model =>', model.value[1].items)
+})
+
+watch(spaceSidebarlist.value, async() =>{
+    await getSpaceList()
+    await getCompanyList()
+    setData()
+})
 
 </script>
 
 <template>
+    <div>
+    <div class="mt-3" v-if="singleCompanyName">
+        <pre>spaceSidebarlist = {{ spaceSidebarlist }}</pre>
+        <div class="flex align-items-center">
+            <Button class="mr-2"  severity="secondary" >S</Button>
+            <h5 class="m-0 font-bold font-size-16">{{singleCompanyName}}</h5>
+        </div>
+    </div>
     <ul class="layout-menu">
-        <h4 v-if="singleCompanyName" class="mt-2 text-center bg-primary rounded px-2 py-1 text-white">{{ singleCompanyName }}</h4>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
@@ -49,6 +61,7 @@ watchEffect(() => {
             </a>
         </li> -->
     </ul>
+    </div>
 </template>
 
 <style lang="scss" scoped>
