@@ -1,193 +1,138 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const { createSpace, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceCreated, companyList } = storeToRefs(useCompanyStore()); 
-import ColorPicker from 'primevue/colorpicker';
-import InputSwitch from 'primevue/inputswitch';
-
-const spaceFormInputs = ref(true);
-const showFinalMsg = ref(false);
-const errorHandler = ref(false);
-
-const progress = ref(12.5);
-
+const { isSpaceCreated, companyList } = storeToRefs(useCompanyStore());
+const spaceFormInputs = ref(false);
+const spaceNameError = ref(false);
+const spaceDescriptionError = ref(false);
 const dynamicDiv = ref(null);
 
-const spaceAvatarPreview = ref(null);
-
 const spaceNameInput = ref(null);
-
 const spaceDescripInput = ref(null);
-
+const spaceAvatarPreview = ref(null);
 const spaceColorPreview = ref(null);
 
 const company = ref(null)
-
-console.log('spaceAvatarPreview', spaceAvatarPreview.value)
-
 const changeColor = (event) => {
-  if(dynamicDiv.value?.style?.backgroundColor === event.target.id){
-    dynamicDiv.value.style.border = '2px solid black';
-    dynamicDiv.value.style.backgroundColor = null;
-    dynamicDiv.value.style.color = null;
-    spaceAvatarPreview.value = null;
-    spaceColorPreview.value.style.border = '2px solid black';
-    spaceColorPreview.value.style.backgroundColor = null;
-    spaceColorPreview.value.style.color = null;
+    if(dynamicDiv.value?.style?.backgroundColor === event.target.id){
+        dynamicDiv.value.style.border = '2px solid black';
+        dynamicDiv.value.style.backgroundColor = null;
+        dynamicDiv.value.style.color = null;
+        spaceAvatarPreview.value = null;
+        spaceColorPreview.value.style.border = '2px solid black';
+        spaceColorPreview.value.style.backgroundColor = null;
+        spaceColorPreview.value.style.color = null;
 
-  }else{
-    dynamicDiv.value.style.backgroundColor = event.target.id;
-    dynamicDiv.value.style.color = 'white';
-    dynamicDiv.value.style.border = 'none';
-    let storeAvatarData = {
-      bgcolor: event.target.id,
-      color: 'white' 
+    }else{
+        dynamicDiv.value.style.backgroundColor = event.target.id;
+        dynamicDiv.value.style.color = 'white';
+        dynamicDiv.value.style.border = 'none';
+        let storeAvatarData = {
+            bgcolor: event.target.id,
+            color: 'white'
+        }
+        spaceAvatarPreview.value = storeAvatarData.bgcolor;
+        spaceColorPreview.value.style.backgroundColor = event.target.id;
+        spaceColorPreview.value.style.color = 'white';
+        spaceColorPreview.value.style.border = 'none';
     }
-    spaceAvatarPreview.value = storeAvatarData.bgcolor;
-    // console.log('storeAvatarData', spaceAvatarPreview.value);
-
-    spaceColorPreview.value.style.backgroundColor = event.target.id;
-    spaceColorPreview.value.style.color = 'white';
-    spaceColorPreview.value.style.border = 'none';
-  }
 };
 
 
 const handleCreateSpace = async () => {
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
-            errorHandler.value = true
-            return
-        }else{
-
-          // return
-            const createSpaceData = {
-              'name': spaceNameInput.value,
-              'description': spaceDescripInput.value,
-              'company_id': companyList.value[0].id,
-              'color': spaceAvatarPreview.value,
-              // 'shared_status': selectedShareSpace.value,
-              // 'task_statuses': taskStatusList.value,
-              // 'features': selectedFeatures.value,
-              // 'views': checkedViews,
-          }
-          console.log('spaceData', createSpaceData)
-
-          // return
-          
-          
-          await createSpace(createSpaceData);
-
-          if(isSpaceCreated.value === true){
-              spaceFormInputs.value = false
-              showFinalMsg.value = true   
-
-              console.log('space created')
-          }else{
-              console.log('space not created')
-          }
+    if(spaceNameInput.value === null){
+        spaceNameError.value = true;
+        return;
+    }if(spaceDescripInput.value === null){
+        spaceDescriptionError.value = true;
+        return;
+    }else{
+        const createSpaceData = {
+            'name': spaceNameInput.value,
+            'description': spaceDescripInput.value,
+            'company_id': companyList.value[0].id,
+            'color': spaceAvatarPreview.value,
         }
-
-        // const formData = new FormData()
-        // formData.append('name', workSpaceName.value)
-        // formData.append('size', wPeople.value)
-        // formData.append('number_of_employees', numEmployees.value)
-        // formData.append('company_role', rRole.value)
-
-        
+        // return
+        await createSpace(createSpaceData);
+        if(isSpaceCreated.value == true){
+            spaceFormInputs.value = false;
+            spaceNameInput.value = null;
+            spaceDescripInput.value = null;
+            spaceAvatarPreview.value = null;
+            spaceColorPreview.value = null;
+            toast.add({ severity: 'success', summary: 'Success Message', detail: 'Message Content', life: 3000 });
+        }else{
+            spaceFormInputs.value = true;
+        }
     }
-
-
-onMounted(() => {
-  // dynamicDiv.value.style.border = '2px solid black';
-  // dynamicDiv.value.style.color = 'black';
-  // spaceColorPreview.value.style.border = '2px solid black';
-  // spaceColorPreview.value.style.color = 'black';
- 
-});
+}
 
 watchEffect(() => {
     getCompanyList();
 });
-
+const showDialog = () => {
+    spaceFormInputs.value = true
+}
+const hideDialog = () => {
+    spaceFormInputs.value = false
+}
 
 </script>
 
 
 <template>
-    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-      <div v-if="spaceFormInputs">
-          <h4 class="text-center text-primary">Create Space</h4>
-          
-          <!-- <div class="flex justify-content-center">
-            
-            <FloatLabel class="w-full md:w-50rem mt-4 mb-2">
-                <Dropdown v-model="company" inputId="dd-city" :options="companyList" optionLabel="name" class="w-full" />
-                <label for="dd-city">Select Companny Size</label>
-            </FloatLabel>
-          </div> -->
-
-          <FloatLabel class="w-full md:w-50rem mt-3 mb-2">
-            <InputText type="text" class="w-full px-2 py-2 shadow border  focus:border-purple-500" v-model="spaceNameInput" />
-            <label>Set Space Name</label>
-          </FloatLabel>
-
-          <FloatLabel class="w-full md:w-50rem mt-4 mb-3">
-            <InputText type="text" class="w-full px-2 py-2 shadow border  focus:border-purple-500" v-model="spaceDescripInput"/>
-            <label>Set Space Description</label>
-          </FloatLabel>
-
-          <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
-
-          <div class="m-0 pb-6 d-flex justify-content-center colorpicker-wrapper">
-            <div class="flex justify-center items-start">
-              <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
-              <div class="ml-2">
-                <p class="text-xs ml-2 mb-1">COLORS</p>
-                <div class="flex">
-                    <div id="crimson" class='color' @click="changeColor"></div>
-                    <div id="skyblue" class='color' @click="changeColor"></div>
-                    <div id="orange" class='color' @click="changeColor"></div>
-                    <div id="purple" class='color' @click="changeColor"></div>
-                    <div id="cadetblue" class='color' @click="changeColor"></div>
-                    <div id="burlywood" class='color' @click="changeColor"></div>
-                    <div id="pink" class='color' @click="changeColor"></div>
-                    <div id="lightseagreen" class='color' @click="changeColor"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
-
-          <div class="create-btn-wrapper">
-            <Button @click="handleCreateSpace" class="text-white py-2 px-6 tracking-wide" label="Create Space"/>
-          </div>
-      </div>
-
-      <div v-if="showFinalMsg">
-        <h3 class="text-primary mb-4 text-black text-center font-weight-semibold">Space created successfully</h3>
-           
-        <div class="centering">
-            <FloatLabel>
-                <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
-                <p class="text-center mb-2">You can close the modal now.</p>
-            </FloatLabel>
+    <div>
+    <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
+    <Dialog v-model:visible="spaceFormInputs" :style="{ width: '450px' }" header="Create Space" :modal="true" class="p-fluid">
+        <div class="field">
+            <label for="name">Space Name</label>
+            <InputText id="name" v-model="spaceNameInput" required="true" autofocus :invalid="spaceNameError" />
         </div>
-      </div>
-
+        <div class="field">
+            <label for="name">Space Description</label>
+            <Textarea id="description" v-model="spaceDescripInput"  rows="3" cols="20" :invalid="spaceDescriptionError"/>
+        </div>
+        <div class="field">
+            <label for="name">Space Color</label>
+            <div class="m-0 d-flex colorpicker-wrapper">
+                <div class="flex justify-center align-items-center">
+                    <div id="dynamic-div" style ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
+                    <div class="ml-2">
+                        <div class="flex ">
+                            <div id="crimson" class='color' @click="changeColor"></div>
+                            <div id="skyblue" class='color' @click="changeColor"></div>
+                            <div id="orange" class='color' @click="changeColor"></div>
+                            <div id="purple" class='color' @click="changeColor"></div>
+                            <div id="cadetblue" class='color' @click="changeColor"></div>
+                            <div id="burlywood" class='color' @click="changeColor"></div>
+                            <div id="pink" class='color' @click="changeColor"></div>
+                            <div id="lightseagreen" class='color' @click="changeColor"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
+            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateSpace" />
+        </template>
+    </Dialog>
     </div>
 </template>
 
 <style scoped>
 
 #dynamic-div{
-  height: 70px;
-  width: 70px;
-  border-radius: 18px;
-  border: 2px solid black;
-  color: black;
-  display: flex;
+    height: 55px;
+    width: 55px;
+    border-radius: 10px;
+    border: 2px solid black;
+    color: black;
+    display: flex;
 }
 
 .color{

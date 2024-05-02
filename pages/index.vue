@@ -1,6 +1,5 @@
 <script setup>
 import { useLayout } from '@/layouts/composables/layout';
-import { ProductService } from '@/service/ProductService';
 import { onMounted, reactive, ref, watch } from 'vue';
 
 
@@ -63,7 +62,7 @@ const checkUser = () => {
 
 onMounted(() => {
     checkUser()
-    ProductService.getProductsSmall().then((data) => (products.value = data));
+    // ProductService.getProductsSmall().then((data) => (products.value = data));
 });
 
 const formatCurrency = (value) => {

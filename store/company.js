@@ -17,7 +17,6 @@ export const useCompanyStore = defineStore('workStation', {
     isSpaceCreated: false,
     isSpaceDeleted: false,
     isSpaceEdited: false,
-    spaceList: null,
     singleSpace: null,
     spaceSidebarlist: [],
 
@@ -32,7 +31,6 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskCreated: false,
     isTaskDeleted: false,
     isTaskEdited: false,
-    singleProject: null,
     tasks: [],
 
     asngUsers: [],
@@ -217,10 +215,6 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           'company_id' : company_id,
           'color' : color,
-          // 'shared_status' : shared_status,
-          // 'task_statuses' : task_statuses,
-          // 'features' : features,
-          // 'views' : views
           },
         });
        
