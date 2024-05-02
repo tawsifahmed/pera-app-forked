@@ -55,12 +55,6 @@ const itemClick = (event, item) => {
         return;
     }
 
-    if (item?.label === "Space") {
-        visibleCreateSpace.value = true;
-        event.preventDefault(); // Prevent default navigation for this special case
-        return;
-    }
-
     const { overlayMenuActive, staticMenuMobileActive } = layoutState;
 
     if ((item.to || item.url) && (staticMenuMobileActive.value || overlayMenuActive.value)) {
@@ -79,19 +73,53 @@ const itemClick = (event, item) => {
 const checkActiveRoute = (item) => {
     return route.path === item.to;
 };
+
+const menu = ref();
+const items = ref([
+    {
+        label: 'Settings',
+        items: [
+            {
+                label: 'Create Space',
+                icon: 'pi pi-plus'
+            },
+            {
+                label: 'Manage Space',
+                icon: 'pi pi-th-large'
+            },
+            {
+                label: 'Show all Space',
+                icon: 'pi pi-eye'
+            },
+            {
+                label: 'Show Archive',
+                icon: 'pi pi-inbox'
+            }
+        ]
+    }
+]);
+
+const toggle = (event) => {
+    menu.value.toggle(event);
+};
 </script>
 
 <template>
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
-        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">
+        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
+            <div v-if="item.option == 'space_option'">
+                <div class="flex">
+                    <Button type="button" icon="pi pi-ellipsis-h" class="p-button-sm" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                    <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                    <CreateSpace/>
+                </div>
+            </div>
         </div>
         <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <CreateCompany/>
         </Dialog>
-        <Dialog v-model:visible="visibleCreateSpace" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <CreateSpace />
-        </Dialog>
+
         <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text">{{ item.label }}</span>

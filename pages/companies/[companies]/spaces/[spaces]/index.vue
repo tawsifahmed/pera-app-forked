@@ -19,7 +19,6 @@ const loading = ref(true);
 const toast = useToast();
 
 const { spaces } = useRoute().params
-console.log('spaceParams,', spaces)
 const visible = ref(false);
 
 if(singleSpace.value === undefined){
@@ -61,8 +60,6 @@ const deletingProject = async () => {
 watchEffect(() => {
     getSingleSpace(spaces);
     loading.value = false;
-
-  console.log('spaces,', spaces)
 })
 
 
