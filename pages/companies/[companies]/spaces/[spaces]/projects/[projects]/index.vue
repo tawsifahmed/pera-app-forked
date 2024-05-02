@@ -411,15 +411,14 @@ watchEffect(() => {
 }
 
 .comment-wrapper {
-    overflow: hidden; /* Hide overflow to make .comments scrollable */
-    height: 70vh; /* Fixed height for .comments */
+    overflow: hidden; 
+    height: 70vh; 
     border: 1px solid #e2e8f0;
     border-radius: 5px;
     background-color: #f7fafc;
 }
 
 .comments {
-    
     overflow-y: auto; 
     height: 92%; 
     padding: 10px;
@@ -427,12 +426,10 @@ watchEffect(() => {
 
 .comment-add {
     padding: 20px;
-     
     margin-bottom: 15px;
     border-top: 1px solid #e2e8f0; 
     padding: 10px;
     width: 100%;
-    
     position: relative;
 }
 
