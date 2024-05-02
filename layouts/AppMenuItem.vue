@@ -55,12 +55,6 @@ const itemClick = (event, item) => {
         return;
     }
 
-    // if (item?.label === "Spaces") {
-    //     visibleCreateSpace.value = true;
-    //     event.preventDefault(); // Prevent default navigation for this special case
-    //     return;
-    // }
-
     const { overlayMenuActive, staticMenuMobileActive } = layoutState;
 
     if ((item.to || item.url) && (staticMenuMobileActive.value || overlayMenuActive.value)) {

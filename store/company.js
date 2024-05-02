@@ -57,6 +57,7 @@ export const useCompanyStore = defineStore('workStation', {
 
       this.companyList = data.value?.data;
       this.singleCompanyName = data.value?.data[0]?.name;
+
     },
     async getSingleCompany(company){
         const token = useCookie('token'); 
@@ -223,8 +224,6 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value.app_message === 'success'){
           this.isSpaceCreated = true;
           await this.getCompanyList()
-          await this.getSpaceList();
-          await this.getSingleCompany(company_id);
         }
     },
     async editSpace ({id, name, description, company_id, color}) {

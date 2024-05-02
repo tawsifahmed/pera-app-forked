@@ -24,7 +24,7 @@ const model = ref([
 
 const setData = () =>{
     const items = []
-    companyList.value[0].spaces.forEach(element => {
+    companyList.value[0]?.spaces.forEach(element => {
         const obj = {
             'label': element?.name,
             'icon': 'pi pi-globe',
@@ -45,9 +45,8 @@ watchEffect(async() => {
 <template>
     <div>
     <div class="mt-3" v-if="companyList">
-        <!-- <pre>companyList = {{ companyList }}</pre> -->
         <div class="flex align-items-center">
-            <Button class="mr-2"  severity="secondary" >S</Button>
+            <Button class="mr-2" severity="secondary" >S</Button>
             <h5 class="m-0 font-bold font-size-16">{{companyList[0]?.name}}</h5>
         </div>
     </div>
@@ -56,15 +55,6 @@ watchEffect(async() => {
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
-        <!-- <template v-for="(item, i) in spaceSidebarlist" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
-        </template> -->
-        <!-- <li>
-            <a href="https://www.primefaces.org/primeblocks-vue/#/" target="_blank">
-                <img src="/layout/images/banner-primeblocks.png" alt="Prime Blocks" class="w-full mt-3" />
-            </a>
-        </li> -->
     </ul>
     </div>
 </template>
