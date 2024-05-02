@@ -23,8 +23,6 @@ const model = ref([
 ])
 
 const setData = () =>{
-    console.log('model =>', model.value[1].items)
-    console.log('companyList =>', companyList.value[0].spaces)
     const items = []
     companyList.value[0].spaces.forEach(element => {
         const obj = {
@@ -37,13 +35,7 @@ const setData = () =>{
     model.value[1].items = items.reverse();
 }
 
-
-onMounted(async() => {
-    await getCompanyList()
-    setData()
-})
-
-watch(companyList, async(newValue)=>{
+watchEffect(async() => {
     await getCompanyList()
     setData()
 })
