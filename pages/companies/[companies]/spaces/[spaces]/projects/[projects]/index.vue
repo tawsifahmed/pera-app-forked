@@ -415,13 +415,15 @@ watchEffect(() => {
     height: 70vh; 
     border: 1px solid #e2e8f0;
     border-radius: 5px;
+    padding: 5px !important;
     background-color: #f7fafc;
 }
 
 .comments {
     overflow-y: auto; 
-    height: 92%; 
-    padding: 10px;
+    height: 90%; 
+    padding: 5px;
+    
 }
 
 .comment-add {
