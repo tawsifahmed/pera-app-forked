@@ -36,8 +36,8 @@ const setData = () =>{
 }
 
 watchEffect(async() => {
-    await getCompanyList()
-    setData()
+    // await getCompanyList()
+    // setData()
 })
 
 </script>
