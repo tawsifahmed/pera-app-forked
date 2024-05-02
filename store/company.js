@@ -10,6 +10,7 @@ export const useCompanyStore = defineStore('workStation', {
     isCompanyEdited: false,
     companyList: null,
     singleCompany: null,
+    singleCompanyName: null,
 
     // space api
     spaceList: null,
@@ -32,6 +33,12 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskDeleted: false,
     isTaskEdited: false,
     singleProject: null,
+    tasks: [],
+
+    asngUsers: [],
+
+    users: [],
+    priorityList: [],
   }),
   
   actions: {
@@ -45,13 +52,10 @@ export const useCompanyStore = defineStore('workStation', {
           },
         
         }), 
-        // {
-        //   watch: [this.companyList]
-        // }
       )
 
       this.companyList = data.value?.data;
-      // console.log('userProfile', this.companyList) 
+      this.singleCompanyName = data.value?.data[0]?.name;
     },
     async getSingleCompany(company){
         const token = useCookie('token'); 
@@ -64,14 +68,8 @@ export const useCompanyStore = defineStore('workStation', {
             },
             
             }),
-            // {
-            //   watch: [this.companyList]
-            // }
         )
         this.singleCompany = data.value?.data;
-        console.log('singlCompData', data)
-        console.log('singlComp', this.singleCompany)
-        // console.log('userProfile', this.companyList)
     },
     async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
       const token = useCookie('token'); 
@@ -100,7 +98,6 @@ export const useCompanyStore = defineStore('workStation', {
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
           this.getCompanyList();
-          // console.log('test')
         }
 
     },
@@ -129,7 +126,6 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isCompanyEdited = true;
           this.getCompanyList();
-          // console.log('test')
         }
 
     },
@@ -177,9 +173,6 @@ export const useCompanyStore = defineStore('workStation', {
             },
           
           }), 
-          // {
-          //   watch: [this.companyList]
-          // }
         )
 
         this.spaceList = data.value?.data;
@@ -196,7 +189,6 @@ export const useCompanyStore = defineStore('workStation', {
                 this.spaceSidebarlist.push(obj)
             });
         }
-        console.log('spaceSidebarlist', this.spaceSidebarlist) 
       }
     },
     async getSingleSpace(space){
@@ -209,13 +201,9 @@ export const useCompanyStore = defineStore('workStation', {
           },
           
           }),
-          // {
-          //   watch: [this.companyList]
-          // }
+          
         )
         this.singleSpace = data.value?.data;
-        console.log('singlComp', this.singleSpace)
-        // console.log('userProfile', this.companyList)
     },
     async createSpace ({name, description, company_id, color}) {
       const token = useCookie('token'); 
@@ -237,16 +225,12 @@ export const useCompanyStore = defineStore('workStation', {
         });
        
         if(data.value.app_message === 'success'){
-          console.log('space created', data)
           this.isSpaceCreated = true;
-          this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
     },
     async editSpace ({id, name, description, company_id, color}) {
-      // console.log('printrefSpaceId', refSpaceId)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/update/${id}`, {
         method: 'POST',
@@ -268,19 +252,15 @@ export const useCompanyStore = defineStore('workStation', {
           // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isSpaceEdited = true;
-          this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
 
     },
     async deleteSpace (spaceId, companyId) {
-      // console.log('printCompid', id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/delete/${spaceId}`, {
         method: 'DELETE',
@@ -289,20 +269,11 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : spaceId,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isSpaceDeleted = true;
-          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(companyId);
         }
@@ -318,13 +289,9 @@ export const useCompanyStore = defineStore('workStation', {
           },
         
         }), 
-        // {
-        //   watch: [this.companyList]
-        // }
       )
 
       this.spaceList = data.value?.data;
-      // console.log('userProfile', this.companyList) 
     },
     async getSingleProject(projectID){
       const token = useCookie('token'); 
@@ -336,13 +303,40 @@ export const useCompanyStore = defineStore('workStation', {
           },
           
           }),
-          // {
-          //   watch: [this.companyList]
-          // }
         )
         this.singleProject = data.value?.data;
-        console.log('singlComp', this.singleProject)
-        // console.log('userProfile', this.companyList)
+
+        if(this.singleProject?.tasks?.length > 0){
+          this.tasks = [];
+            this.singleProject?.tasks.forEach(element => {
+              if(element?.assignee.length > 0){
+                this.asngUsers = [];
+                element?.assignee.forEach(val => {
+                    let obj2 = {
+                        'id': val.id,
+                        'name': val.name,
+                    }
+                    this.asngUsers.push(obj2)
+                });
+              }else{
+                this.asngUsers = [];
+              }
+                let obj = {
+                  'key': element.id,
+                  'data': {
+                            name: element.name,
+                            description: element.description,
+                            assigneeObj: this.asngUsers,
+                            assignee: this.asngUsers.map((obj) => obj.name).join(", "),
+                            dueDate: element.due_date? this.formatDate(element.due_date) : '',
+                            priority: element.priority,
+                            action:   '',
+                          },
+                  'children': [],
+                }
+                this.tasks.push(obj)
+            });
+        }
     },
     async createProject ({name, description, space_id, statuses}) {
       const token = useCookie('token'); 
@@ -356,18 +350,11 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           'space_id' : space_id,
           'statuses' : statuses,
-          // 'shared_status' : shared_status,
-          // 'task_statuses' : task_statuses,
-          // 'features' : features,
-          // 'views' : views
           },
         });
        
         if(data.value.app_message === 'success'){
-          console.log('project created')
           this.isProjectCreated = true;
-          this.getSpaceList();
-          this.getCompanyList();
           this.getSingleSpace(space_id);
         }
     },
@@ -391,19 +378,14 @@ export const useCompanyStore = defineStore('workStation', {
           // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isProjectDeleted = true;
-          this.getCompanyList();
-          this.getSpaceList();
           this.getSingleSpace(spaceId);
         }
 
     },
     async createTask ({name, description, project_id}) {
-      console.log('projectIDstore', project_id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
         method: 'POST',
@@ -422,10 +404,7 @@ export const useCompanyStore = defineStore('workStation', {
         });
        
         if(data.value.app_message === 'success'){
-          console.log('project created')
           this.isTaskCreated = true;
-          this.getSpaceList();
-          this.getCompanyList();
           this.getSingleProject(project_id);
         }
     },
@@ -440,31 +419,18 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : taskID,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
         console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
-          this.getCompanyList();
           this.getSpaceList();
           this.getSingleProject(projectId);
         }
 
     },
-    async editTask ({id, name, description, project_id}) {
-      console.log('taskIDstore', id)
-      console.log('project_id', project_id)
-
-      
-      
+    async editTask ({id, name, description, project_id,due_date,priority,assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -475,16 +441,12 @@ export const useCompanyStore = defineStore('workStation', {
           'id' : id,
           'name' : name,
           'description' : description,
+          'due_date' : due_date,
+          'priority' : priority,
+          'assignees' : assignees,
           'projectId' : project_id,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
@@ -494,5 +456,60 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
+
+    async getTaskAssignModalData(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+        'companyList',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }), 
+      )
+
+      if(data.value?.data?.length > 0){
+        this.users = [];
+        data.value?.data.forEach(element => {
+              let obj = {
+                'id': element.id,
+                'name': element.name,
+              }
+              this.users.push(obj)
+          });
+      }
+
+      
+    },
+
+    async getTaskAssignModalData(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+        'companyList',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }), 
+      )
+
+      if(data.value?.data?.length > 0){
+        this.users = [];
+        data.value?.data.forEach(element => {
+              let obj = {
+                'id': element.id,
+                'name': element.name,
+              }
+              this.users.push(obj)
+          });
+      }
+
+    },
+    formatDate(dateString){
+      const date = new Date(dateString);
+      return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+  },
   },
 });

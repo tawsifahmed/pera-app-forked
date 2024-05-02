@@ -3,8 +3,8 @@
       
       <div v-if="spaceFormInputs">
         <h4 class="text-center text-primary">Create Project</h4>
-              <div class="company-name flex justify-center text-center mb-5">
-                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
+              <div class="flex justify-content-center">
+                <Dropdown disabled :placeholder="`Space: ${singleSpace?.name}`" class="w-full md:w-20rem" />
               </div>
                 <FloatLabel class="mt-4 mb-2">
                   <InputText
@@ -82,10 +82,10 @@
                         <div class="d-flex align-items-center border rounded flex-grow-1 status-length">
                           <div
                             class="status-colors"
-                            :style="{ backgroundColor: task.taskColor }"
+                            :style="{ backgroundColor: task.taskStatusColor }"
                           ></div>
                           <p class="text-uppercase text-muteds">
-                            {{ task.taskName }}
+                            {{ task.taskStatusName }}
                           </p>
                         </div>
                         <div
@@ -138,60 +138,38 @@ const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
 
-const progress = ref(12.5);
-
-const dynamicDiv = ref(null);
-
-const spaceAvatarPreview = ref(null);
-
-
 const taskStatusName = ref('');
 
 const taskStatusList = ref([
   {
-    'taskName': 'Open',
-    taskColor: `#6466f1`
+    'taskStatusName': 'Open',
+    'taskStatusColor': `#6466f1`
   },
   {
-    'taskName': 'Doing',
-    taskColor: `#ff0084`
+    'taskStatusName': 'Doing',
+    'taskStatusColor': `#ff0084`
   },
   {
-    'taskName': 'Dev Done',
-    taskColor: `#12955d`
+    'taskStatusName': 'Dev Done',
+    'taskStatusColor': `#12955d`
   },
 ]);
 
 console.log('taskStatusList', taskStatusList.value);
 
 const colorHEX = ref('6466f1');
-
 const taskStatusNullCheck = ref(null);
-
 const addTaskSTatusError= ref(false);
-
-const checked = ref(false);
-
-const checkedViews = ref([]);
-
-const defViewsChecker = ref(null);
-
 const projectNameInput = ref(null);
-
 const projectDescriptionInput = ref(null);
-
-const spaceDescripInput = ref(null);
-
-const spaceColorPreview = ref(null);
-
 
 const addTaskStatus = () => {
   taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
   if(taskStatusName?.value?.length > 0){
     
     const newTaskStatusList = {
-    taskName: taskStatusName.value,
-    taskColor: `#${colorHEX.value}`
+    taskStatusName: taskStatusName.value,
+    taskStatusColor: `#${colorHEX.value}`
    }
    taskStatusList.value.push(newTaskStatusList);
    taskStatusName.value = '';

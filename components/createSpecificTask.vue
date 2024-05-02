@@ -131,8 +131,8 @@ const addTaskStatus = () => {
   if(taskStatusName?.value?.length > 0){
     
     const newTaskStatusList = {
-    taskName: taskStatusName.value,
-    taskColor: `#${colorHEX.value}`
+    taskStatusName: taskStatusName.value,
+    taskStatusColor: `#${colorHEX.value}`
    }
    taskStatusList.value.push(newTaskStatusList);
    taskStatusName.value = '';
