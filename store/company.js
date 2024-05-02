@@ -52,15 +52,10 @@ export const useCompanyStore = defineStore('workStation', {
           },
         
         }), 
-        // {
-        //   watch: [this.companyList]
-        // }
       )
 
       this.companyList = data.value?.data;
-      console.log('CompName', data.value?.data[0]?.name)
       this.singleCompanyName = data.value?.data[0]?.name;
-      // console.log('userProfile', this.companyList) 
     },
     async getSingleCompany(company){
         const token = useCookie('token'); 
@@ -73,14 +68,8 @@ export const useCompanyStore = defineStore('workStation', {
             },
             
             }),
-            // {
-            //   watch: [this.companyList]
-            // }
         )
         this.singleCompany = data.value?.data;
-        console.log('singlCompData', data)
-        // console.log('singlComp', this.singleCompany)
-        // console.log('userProfile', this.companyList)
     },
     async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
       const token = useCookie('token'); 
@@ -109,7 +98,6 @@ export const useCompanyStore = defineStore('workStation', {
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
           this.getCompanyList();
-          // console.log('test')
         }
 
     },
@@ -138,7 +126,6 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isCompanyEdited = true;
           this.getCompanyList();
-          // console.log('test')
         }
 
     },
@@ -186,9 +173,6 @@ export const useCompanyStore = defineStore('workStation', {
             },
           
           }), 
-          // {
-          //   watch: [this.companyList]
-          // }
         )
 
         this.spaceList = data.value?.data;
@@ -205,7 +189,6 @@ export const useCompanyStore = defineStore('workStation', {
                 this.spaceSidebarlist.push(obj)
             });
         }
-        console.log('spaceSidebarlist', this.spaceSidebarlist) 
       }
     },
     async getSingleSpace(space){
@@ -218,13 +201,9 @@ export const useCompanyStore = defineStore('workStation', {
           },
           
           }),
-          // {
-          //   watch: [this.companyList]
-          // }
+          
         )
         this.singleSpace = data.value?.data;
-        console.log('singlComp', this.singleSpace)
-        // console.log('userProfile', this.companyList)
     },
     async createSpace ({name, description, company_id, color}) {
       const token = useCookie('token'); 
@@ -246,15 +225,12 @@ export const useCompanyStore = defineStore('workStation', {
         });
        
         if(data.value.app_message === 'success'){
-          console.log('space created', data)
           this.isSpaceCreated = true;
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
     },
     async editSpace ({id, name, description, company_id, color}) {
-      // console.log('printrefSpaceId', refSpaceId)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/update/${id}`, {
         method: 'POST',
@@ -276,19 +252,15 @@ export const useCompanyStore = defineStore('workStation', {
           // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isSpaceEdited = true;
-          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(company_id);
         }
 
     },
     async deleteSpace (spaceId, companyId) {
-      // console.log('printCompid', id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/delete/${spaceId}`, {
         method: 'DELETE',
@@ -297,20 +269,11 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : spaceId,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isSpaceDeleted = true;
-          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleCompany(companyId);
         }
@@ -326,13 +289,9 @@ export const useCompanyStore = defineStore('workStation', {
           },
         
         }), 
-        // {
-        //   watch: [this.companyList]
-        // }
       )
 
       this.spaceList = data.value?.data;
-      // console.log('userProfile', this.companyList) 
     },
     async getSingleProject(projectID){
       const token = useCookie('token'); 
@@ -376,7 +335,6 @@ export const useCompanyStore = defineStore('workStation', {
                   'children': [],
                 }
                 this.tasks.push(obj)
-                console.log(this.tasks);
             });
         }
     },
@@ -392,18 +350,11 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           'space_id' : space_id,
           'statuses' : statuses,
-          // 'shared_status' : shared_status,
-          // 'task_statuses' : task_statuses,
-          // 'features' : features,
-          // 'views' : views
           },
         });
        
         if(data.value.app_message === 'success'){
-          console.log('project created')
           this.isProjectCreated = true;
-          // this.getSpaceList();
-          // this.getCompanyList();
           this.getSingleSpace(space_id);
         }
     },
@@ -427,19 +378,14 @@ export const useCompanyStore = defineStore('workStation', {
           // 'services' : services
         },
       });
-        console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isProjectDeleted = true;
-          // this.getCompanyList();
-          // this.getSpaceList();
           this.getSingleSpace(spaceId);
         }
 
     },
     async createTask ({name, description, project_id}) {
-      console.log('projectIDstore', project_id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
         method: 'POST',
@@ -458,10 +404,7 @@ export const useCompanyStore = defineStore('workStation', {
         });
        
         if(data.value.app_message === 'success'){
-          console.log('project created')
           this.isTaskCreated = true;
-          // this.getSpaceList();
-          // this.getCompanyList();
           this.getSingleProject(project_id);
         }
     },
@@ -476,20 +419,12 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : taskID,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
         console.log('data', data)
        
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
-          // this.getCompanyList();
           this.getSpaceList();
           this.getSingleProject(projectId);
         }
@@ -510,12 +445,6 @@ export const useCompanyStore = defineStore('workStation', {
           'priority' : priority,
           'assignees' : assignees,
           'projectId' : project_id,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
        
