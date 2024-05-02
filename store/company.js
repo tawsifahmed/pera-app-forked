@@ -39,6 +39,10 @@ export const useCompanyStore = defineStore('workStation', {
 
     users: [],
     priorityList: [],
+
+    singleTaskComments: null,
+    isTaskCommentCreated: false,
+    
   }),
   
   actions: {
@@ -411,6 +415,7 @@ export const useCompanyStore = defineStore('workStation', {
     async deleteTask (taskID, projectId) {
       console.log('projectIDstore', projectId)
       
+      
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
         method: 'DELETE',
@@ -425,12 +430,12 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
-          this.getSpaceList();
+          // this.getSpaceList();
           this.getSingleProject(projectId);
         }
 
     },
-    async editTask ({id, name, description, project_id,due_date,priority,assignees}) {
+    async editTask ({id, name, description, project_id, due_date, priority, assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -450,8 +455,6 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
-          this.getCompanyList();
-          this.getSpaceList();
           this.getSingleProject(project_id);
         }
 
@@ -461,7 +464,7 @@ export const useCompanyStore = defineStore('workStation', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'companyList',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
@@ -482,31 +485,46 @@ export const useCompanyStore = defineStore('workStation', {
 
       
     },
-
-    async getTaskAssignModalData(){
+    async getSingleTaskComments(id){
       const token = useCookie('token'); 
+      console.log('token', token.value)
       const { data, pending, error } = await useAsyncData(
-        'companyList',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+          'getSingleTaskComments',
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/comments/list/${id}`,{
           headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        
-        }), 
+              Authorization: `Bearer ${token.value}`,
+            },
+          }),
       )
+      this.singleTaskComments = data.value?.data;
+      console.log('singleTaskComments', this.singleTaskComments)
+  },
 
-      if(data.value?.data?.length > 0){
-        this.users = [];
-        data.value?.data.forEach(element => {
-              let obj = {
-                'id': element.id,
-                'name': element.name,
-              }
-              this.users.push(obj)
-          });
-      }
+    async addTaskComment (id, comment) {
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/comments/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'comment' : comment,
+          'commentable_id' : id,
+        },
+      });
+       
+        if(data.value?.app_message === 'success'){
+          
+          this.isTaskCommentCreated = true;
+          this.getSingleTaskComments(id);
+          // this.getCompanyList();
+          // this.getSpaceList();
+          console.log('test', data)
+          
+        }
 
     },
+
     formatDate(dateString){
       const date = new Date(dateString);
       return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
