@@ -115,6 +115,55 @@
             <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingTask" />
         </Dialog>
+
+        <!--  -->
+        <Button label="Show" @click="handleTaskDetailView" />
+        <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <div class="grid">
+                <div class="col-12 lg:col-7">
+                    <div class="task-detail">
+                        <h4>Task</h4>
+                        <div class="card w-full">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 lg:col-5">
+                    <div>
+                        <h4 class="cmc">Comments</h4>
+                        <div class="card comment-wrapper">
+                            <div class="comments">
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                                <p>1</p>
+                            </div>
+                            <div class="comment-add">                        
+                                <div class="formgroup-inline">
+                                    <div class="field">
+                                        <InputText type="text" placeholder="Add comment" />
+                                    </div>
+            
+                                    <Button type="button" label="Add" v-tooltip="'Click to proceed'" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </Dialog>
     </div>
 </template>
 <script setup>
@@ -297,6 +346,12 @@ const initFilters = () => {
 };
 initFilters();
 
+const visibleTaskDetailView = ref(false);
+
+const handleTaskDetailView = () => {
+    visibleTaskDetailView.value = true;
+};
+
 watchEffect(() => {
     getSingleProject(projects);
     loading.value = false;
@@ -345,5 +400,50 @@ watchEffect(() => {
     .text {
         line-height: 1;
     }
+}
+
+.task-detail{
+    
+}
+
+.cmc{
+    text-wrap: nowrap;
+}
+
+.comment-wrapper {
+    overflow: hidden; /* Hide overflow to make .comments scrollable */
+    height: 70vh; /* Fixed height for .comments */
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    background-color: #f7fafc;
+}
+
+.comments {
+    
+    overflow-y: auto; 
+    height: 92%; 
+    padding: 10px;
+}
+
+.comment-add {
+    padding: 20px;
+     
+    margin-bottom: 15px;
+    border-top: 1px solid #e2e8f0; 
+    padding: 10px;
+    width: 100%;
+    
+    position: relative;
+}
+
+.formgroup-inline{
+    flex-wrap: nowrap;
+}
+.formgroup-inline .field {
+    width: 100% !important;
+}
+
+.formgroup-inline .field input {
+    width: 100% !important; 
 }
 </style>
