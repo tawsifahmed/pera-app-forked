@@ -143,12 +143,6 @@ const visibleEdit = ref(false);
 
 const refTaskId = ref(null);
 
-import { NodeService } from '@/service/NodeService';
-
-onMounted(() => {
-    NodeService.getTreeTableNodes().then((data) => (nodes.value = data));
-});
-
 const nodes = ref();
 
 const openCreateSpace = () => {
