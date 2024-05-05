@@ -26,8 +26,6 @@ const props = defineProps({
 });
 const isActiveMenu = ref(false);
 const itemKey = ref(null);
-const visibleCreateCompany = ref(false);
-const visibleCreateSpace = ref(false)
 
 onBeforeMount(() => {
     itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);
@@ -46,12 +44,6 @@ const itemClick = (event, item) => {
     if (item.disabled) {
         event.preventDefault();
 
-        return;
-    }
-
-    if (item?.label === "Company") {
-        visibleCreateCompany.value = true;
-        event.preventDefault(); // Prevent default navigation for this special case
         return;
     }
 
@@ -116,10 +108,7 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-        <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <CreateCompany/>
-        </Dialog>
-
+        <CreateCompany/>
         <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text">{{ item.label }}</span>
