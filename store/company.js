@@ -337,6 +337,9 @@ export const useCompanyStore = defineStore('workStation', {
                 this.tasks.push(obj)
             });
         }
+        else{
+          this.tasks = [];
+        }
     },
     async createProject ({name, description, space_id, statuses}) {
       const token = useCookie('token'); 
@@ -431,7 +434,9 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async editTask ({id, name, description, project_id, due_date, priority, assignees}) {
+    async editTask ({id, name, description, project_id, due_date, priority, assignees, attachments}) {
+      console.log('attachments', attachments)
+      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -446,10 +451,12 @@ export const useCompanyStore = defineStore('workStation', {
           'priority' : priority,
           'assignees' : assignees,
           'projectId' : project_id,
+          'attachments' : attachments,
         },
       });
        
         if(data.value?.app_message === 'success'){
+          console.log('dataAttach', data)
           this.isTaskEdited = true;
           this.getSingleProject(project_id);
         }
