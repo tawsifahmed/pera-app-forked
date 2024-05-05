@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia';
-// import { useAsyncData } from '@nuxtjs/composition-api';
-
 export const useCompanyStore = defineStore('workStation', {
   state: () => ({
     loading: false,
@@ -32,18 +30,13 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskDeleted: false,
     isTaskEdited: false,
     tasks: [],
-
     asngUsers: [],
-
     users: [],
     priorityList: [],
   }),
   
   actions: {
     async getCompanyList(){
-
-      console.log('test test test')
-
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'companyList',
@@ -54,14 +47,11 @@ export const useCompanyStore = defineStore('workStation', {
         
         }), 
       )
-
       this.companyList = data.value?.data;
       this.singleCompanyName = data.value?.data[0]?.name;
-
     },
     async getSingleCompany(company){
-        const token = useCookie('token'); 
-        console.log('token', token.value)
+        const token = useCookie('token');
         const { data, pending, error } = await useAsyncData(
             'companyList',
             () => $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`,{
@@ -74,10 +64,7 @@ export const useCompanyStore = defineStore('workStation', {
         this.singleCompany = data.value?.data;
     },
     async createCompany ({name, email, address, contact_number, number_of_employees, company_type, logo}) {
-      const token = useCookie('token'); 
-      
-      console.log('company_type =>', company_type)
-      
+      const token = useCookie('token');
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
         method: 'POST',
         headers: {
@@ -96,15 +83,12 @@ export const useCompanyStore = defineStore('workStation', {
       });
        
         if(data.value.app_message === 'success'){
-          console.log('createCompany =>', data.value)
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
           await this.getCompanyList();
         } 
     },
     async editCompany ({id, name, email, address, contact_number, number_of_employees, company_type, logo}) {
-      console.log('printCompid', id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/update/${id}`, {
         method: 'POST',
@@ -122,8 +106,6 @@ export const useCompanyStore = defineStore('workStation', {
           'logo': logo,
         },
       });
-        console.log('data', data)
-       
         if(data.value?.app_message === 'success'){
           this.isCompanyEdited = true;
           this.getCompanyList();
@@ -131,8 +113,6 @@ export const useCompanyStore = defineStore('workStation', {
 
     },
     async deleteCompany (id) {
-      console.log('printCompid', id)
-      // return
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/delete/${id}`, {
         method: 'DELETE',
@@ -141,21 +121,11 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : id,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
-        console.log('data', data)
-       
         if(data.value?.app_message === 'success'){
           this.isCompanyDeleted = true;
           this.getCompanyList();
-          // console.log('test')
         }
 
     },
@@ -181,7 +151,6 @@ export const useCompanyStore = defineStore('workStation', {
         if(this.spaceList?.length > 0){
           this.spaceSidebarlist = [];
             this.spaceList.forEach(element => {
-              //console.log('element', element)
                 let obj = {
                     'label': element?.name,
                     'icon': 'pi pi-globe',
@@ -239,13 +208,6 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           'company_id' : company_id,
           'color' : color,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
        
@@ -355,8 +317,6 @@ export const useCompanyStore = defineStore('workStation', {
         }
     },
     async deleteProject (projectID, spaceId) {
-      console.log('projectIDstore', projectID)
-      
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/delete/${projectID}`, {
         method: 'DELETE',
@@ -365,13 +325,6 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'id' : projectID,
-          // 'email' : email,
-          // 'address' : address,
-          // 'contact_number' : contact_number,
-          // // 'size' : wPeople,
-          // 'number_of_employees' : numEmployees,
-          // 'company_type' : company_type,
-          // 'services' : services
         },
       });
        
@@ -392,10 +345,6 @@ export const useCompanyStore = defineStore('workStation', {
           'name' : name,
           'description' : description,
           'project_id' : project_id,
-          // 'shared_status' : shared_status,
-          // 'task_statuses' : task_statuses,
-          // 'features' : features,
-          // 'views' : views
           },
         });
        
@@ -405,8 +354,6 @@ export const useCompanyStore = defineStore('workStation', {
         }
     },
     async deleteTask (taskID, projectId) {
-      console.log('projectIDstore', projectId)
-      
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
         method: 'DELETE',
@@ -417,8 +364,6 @@ export const useCompanyStore = defineStore('workStation', {
           'id' : taskID,
         },
       });
-        console.log('data', data)
-       
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
           this.getSpaceList();
@@ -475,8 +420,6 @@ export const useCompanyStore = defineStore('workStation', {
               this.users.push(obj)
           });
       }
-
-      
     },
 
     formatDate(dateString){
