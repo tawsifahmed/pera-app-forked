@@ -33,6 +33,10 @@ export const useCompanyStore = defineStore('workStation', {
     asngUsers: [],
     users: [],
     priorityList: [],
+
+    singleTaskComments: null,
+    isTaskCommentCreated: false,
+    
   }),
   
   actions: {
@@ -366,12 +370,12 @@ export const useCompanyStore = defineStore('workStation', {
       });
         if(data.value?.app_message === 'success'){
           this.isTaskDeleted = true;
-          this.getSpaceList();
+          // this.getSpaceList();
           this.getSingleProject(projectId);
         }
 
     },
-    async editTask ({id, name, description, project_id,due_date,priority,assignees}) {
+    async editTask ({id, name, description, project_id, due_date, priority, assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -391,8 +395,6 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskEdited = true;
-          this.getCompanyList();
-          this.getSpaceList();
           this.getSingleProject(project_id);
         }
 
@@ -402,7 +404,7 @@ export const useCompanyStore = defineStore('workStation', {
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
         'companyList',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
@@ -420,6 +422,40 @@ export const useCompanyStore = defineStore('workStation', {
               this.users.push(obj)
           });
       }
+    },
+    async getSingleTaskComments(id){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+          'getSingleTaskComments',
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/comments/list/${id}`,{
+          headers: {
+              Authorization: `Bearer ${token.value}`,
+            },
+          }),
+      )
+      this.singleTaskComments = data.value?.data;
+  },
+
+    async addTaskComment (id, comment) {
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/comments/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'comment' : comment,
+          'commentable_id' : id,
+        },
+      });
+       
+        if(data.value?.app_message === 'success'){
+          this.isTaskCommentCreated = true;
+          this.getSingleTaskComments(id);
+          // this.getCompanyList();
+          // this.getSpaceList();
+        }
+
     },
 
     formatDate(dateString){

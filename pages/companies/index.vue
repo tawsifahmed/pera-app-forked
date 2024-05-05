@@ -68,6 +68,7 @@ watchEffect(() => {
     getCompanyList();
     loading.value = false;
 });
+
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
