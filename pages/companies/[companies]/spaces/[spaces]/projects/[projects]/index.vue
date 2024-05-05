@@ -11,11 +11,7 @@
                 <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
             </div>
             <div class="create-btn-wrapper">
-                <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
-
-                
-
-                
+                <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
             </div>
         </div>
         <div class="card">
@@ -37,8 +33,9 @@
                 <Column field="priority" header="Priority"></Column>
                 <Column field="action" header="Action">
                     <template #body="slotProps">
-                        <Button icon="pi pi-bars" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
-                        <Button icon="pi pi-plus" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
+                        <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
+                        <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
+                        <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
                         <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
                     </template>
                 </Column>
@@ -49,7 +46,9 @@
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceFormInputs">
-                    <h4 class="text-center text-primary">Create Task</h4>
+                    <h4 class="text-center text-primary">{{ createTaskTitle }}</h4>
+                    <InputText type="hidden" v-model="taskId" />
+
                     <div>
                         <FloatLabel class="mt-4 mb-2">
                             <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskNameInput" />
@@ -125,16 +124,9 @@
                 </div>
             </div>
         </Dialog>
-    
-        <!-- Delete Task Modal -->
-        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
-            <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
-        </Dialog>
-        
+
         <!-- Task Detail Modal -->
-        <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="grid">
                 <div class="col-12 lg:col-7">
                     <div class="task-detail">
@@ -145,7 +137,7 @@
                             </div>
                             <div class="field flex flex-column">
                                 <label for="name">Description:</label>
-                                <Textarea id="description" v-model="taskEditDescriptionInput"  rows="3" cols="20" />
+                                <Textarea id="description" v-model="taskEditDescriptionInput" rows="3" cols="20" />
                             </div>
                             <!-- <div class="mb-1">
                                 <label>Attachment:</label>
@@ -154,40 +146,35 @@
                                 <input type="file" ref="fileInput" @change="handleFileChange">
                                 <button type="submit">Upload</button>
                               </form> -->
-                        
-                              
-                            
-                            
-                            <div class="flex justify-content-end ">
+
+                            <div class="flex justify-content-end">
                                 <Button @click="handleAttachmentSubmit" label="Submit" />
                             </div>
                         </div>
                     </div>
-                    
                 </div>
                 <div class="col-12 lg:col-5">
                     <div>
                         <h5 class="cmc">Comments</h5>
                         <div class="comment-wrapper card">
-                                <div class="comments">
-                                    <Card  class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                                        <template class="commentator-name" #title>{{ val.commentator_name }}</template>
-                                        <template #content>
-                                            <p class="m-0">
-                                             {{ val.comment }}
-                                            </p>
-                                            <i class="float-right "> {{ val.time }} </i>
-                                        </template>
-                                    </Card>
-                                </div>
-                            
-                            
-                            <div class="comment-add">                        
+                            <div class="comments">
+                                <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                                    <template class="commentator-name" #title>{{ val.commentator_name }}</template>
+                                    <template #content>
+                                        <p class="m-0">
+                                            {{ val.comment }}
+                                        </p>
+                                        <i class="float-right"> {{ val.time }} </i>
+                                    </template>
+                                </Card>
+                            </div>
+
+                            <div class="comment-add">
                                 <form @submit.prevent="handleTaskComment" class="formgroup-inline">
                                     <div class="field">
                                         <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
                                     </div>
-        
+
                                     <Button type="submit" label="Add" :loading="btnLoading" />
 
                                     <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
@@ -196,8 +183,14 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+        </Dialog>
+
+        <!-- Delete Task Modal -->
+        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
+            <p>Are you sure you want to delete?</p>
+            <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
+            <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
         </Dialog>
     </div>
 </template>
@@ -225,8 +218,18 @@ const btnLoading = ref(false);
 const { projects } = useRoute().params;
 const visible = ref(false);
 const refTaskId = ref(null);
+const taskId = ref(null);
+const createTaskTitle = ref(null);
 
-const openCreateSpace = () => {
+const openCreateSpace = (key, type) => {
+    if (key) {
+        taskId.value = key;
+    }
+    if (type == 'sub-task') {
+        createTaskTitle.value = 'Create Sub Task';
+    } else {
+        createTaskTitle.value = 'Create Task';
+    }
     visible.value = true;
 };
 
@@ -248,9 +251,9 @@ const handleCreateTask = async () => {
         const createTaskData = {
             name: taskNameInput.value,
             description: taskDescriptionInput.value,
-            project_id: projects
+            project_id: projects,
+            parent_task_id: taskId.value
         };
-        // return
         await createTask(createTaskData);
         if (isTaskCreated.value === true) {
             btnLoading.value = false;
@@ -332,7 +335,7 @@ const handleUpdateTask = async () => {
             visibleEdit.value = false;
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
             spaceEditFormInputs.value = true;
-            showEditFinalMsg.value = false; 
+            showEditFinalMsg.value = false;
         } else {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });
@@ -361,7 +364,6 @@ const deletingTask = async () => {
     }
 };
 
-
 const visibleTaskDetailView = ref(false);
 
 const handleTaskDetailView = (task) => {
@@ -370,9 +372,6 @@ const handleTaskDetailView = (task) => {
     getSingleTaskComments(task.key);
     visibleTaskDetailView.value = true;
 };
-
-
-
 
 const taskCommentInput = ref(null);
 const handleTaskComment = async () => {
@@ -399,7 +398,6 @@ watchEffect(() => {
     getSingleProject(projects);
     loading.value = false;
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -446,17 +444,16 @@ watchEffect(() => {
     }
 }
 
-.task-detail{
-    
+.task-detail {
 }
 
-.cmc{
+.cmc {
     text-wrap: nowrap;
 }
 
 .comment-wrapper {
-    overflow: hidden; 
-    height: 70vh; 
+    overflow: hidden;
+    height: 70vh;
     //border: 1px solid #e2e8f0;
     //border-radius: 5px;
     padding: 5px !important;
@@ -464,22 +461,21 @@ watchEffect(() => {
 }
 
 .comments {
-    overflow-y: auto; 
-    height: 90%; 
+    overflow-y: auto;
+    height: 90%;
     padding: 5px;
-    
 }
 
 .comment-add {
     padding: 20px;
     margin-bottom: 15px;
-    border-top: 1px solid #e2e8f0; 
+    border-top: 1px solid #e2e8f0;
     padding: 10px;
     width: 100%;
     position: relative;
 }
 
-.formgroup-inline{
+.formgroup-inline {
     flex-wrap: nowrap;
 }
 .formgroup-inline .field {
@@ -487,23 +483,21 @@ watchEffect(() => {
 }
 
 .formgroup-inline .field input {
-    width: 100% !important; 
+    width: 100% !important;
 }
 
-.float-right{
+.float-right {
     float: right;
     font-size: 12px;
     color: gray;
 }
 
-.task-edit{
+.task-edit {
     padding-left: 0.7rem !important;
     padding-right: 0.7rem !important;
 }
 
-
-.p-fileupload-buttonbar:last-child{
+.p-fileupload-buttonbar:last-child {
     display: none !important;
 }
-
 </style>

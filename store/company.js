@@ -31,6 +31,9 @@ export const useCompanyStore = defineStore('workStation', {
     isTaskEdited: false,
     tasks: [],
     asngUsers: [],
+
+    subTasks:[],
+
     users: [],
     priorityList: [],
 
@@ -268,9 +271,55 @@ export const useCompanyStore = defineStore('workStation', {
         )
         this.singleProject = data.value?.data;
 
-        if(this.singleProject?.tasks?.length > 0){
+        // if(this.singleProject?.tasks?.length > 0){
+        //   this.tasks = [];
+        //     this.singleProject?.tasks.forEach(element => {
+        //       if(element?.assignee.length > 0){
+        //         this.asngUsers = [];
+        //         element?.assignee.forEach(val => {
+        //             let obj2 = {
+        //                 'id': val.id,
+        //                 'name': val.name,
+        //             }
+        //             this.asngUsers.push(obj2)
+        //         });
+        //       }else{
+        //         this.asngUsers = [];
+        //       }
+        //         let obj = {
+        //           'key': element.id,
+        //           'data': {
+        //                     name: element.name,
+        //                     description: element.description,
+        //                     assigneeObj: this.asngUsers,
+        //                     assignee: this.asngUsers.map((obj) => obj.name).join(", "),
+        //                     dueDate: element.due_date? this.formatDate(element.due_date) : '',
+        //                     priority: element.priority,
+        //                     action:   '',
+        //                   },
+        //           'children': [],
+        //         }
+        //         this.tasks.push(obj)
+        //     });
+        // }
+        this.getTaskList();
+    },
+
+    async getTaskList(){
+      const token = useCookie('token'); 
+      const { data, pending, error } = await useAsyncData(
+          'companyList',
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/tasks/list`,{
+          headers: {
+              Authorization: `Bearer ${token.value}`,
+          },
+          
+          }),
+        )
+
+        if(data.value?.data?.length > 0){
           this.tasks = [];
-            this.singleProject?.tasks.forEach(element => {
+          data.value?.data.forEach(element => {
               if(element?.assignee.length > 0){
                 this.asngUsers = [];
                 element?.assignee.forEach(val => {
@@ -283,6 +332,28 @@ export const useCompanyStore = defineStore('workStation', {
               }else{
                 this.asngUsers = [];
               }
+
+              if(element.sub_task.length > 0){
+                element.sub_task.forEach(val => {
+                    let obj3 = {
+                      'key': val.id,
+                      'data': {
+                                name: val.name,
+                                description: val.description,
+                                assigneeObj: "",
+                                assignee: "",
+                                dueDate: val.due_date? this.formatDate(val.due_date) : '',
+                                priority: val.priority,
+                                action:   '',
+                              },
+                      'children':[]
+                    }
+                    this.subTasks.push(obj3)
+                });
+              }else{
+                this.subTasks = [];
+              }
+
                 let obj = {
                   'key': element.id,
                   'data': {
@@ -294,7 +365,7 @@ export const useCompanyStore = defineStore('workStation', {
                             priority: element.priority,
                             action:   '',
                           },
-                  'children': [],
+                  'children': this.subTasks,
                 }
                 this.tasks.push(obj)
             });
@@ -338,7 +409,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async createTask ({name, description, project_id}) {
+    async createTask ({name, description, project_id, parent_task_id}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
         method: 'POST',
@@ -349,6 +420,7 @@ export const useCompanyStore = defineStore('workStation', {
           'name' : name,
           'description' : description,
           'project_id' : project_id,
+          'parent_task_id' : parent_task_id,
           },
         });
        
