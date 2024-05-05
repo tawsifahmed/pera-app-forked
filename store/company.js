@@ -481,45 +481,6 @@ export const useCompanyStore = defineStore('workStation', {
 
       
     },
-    async getSingleTaskComments(id){
-      const token = useCookie('token'); 
-      console.log('token', token.value)
-      const { data, pending, error } = await useAsyncData(
-          'getSingleTaskComments',
-          () => $fetch(`http://188.166.212.40/pera/public/api/v1/comments/list/${id}`,{
-          headers: {
-              Authorization: `Bearer ${token.value}`,
-            },
-          }),
-      )
-      this.singleTaskComments = data.value?.data;
-      console.log('singleTaskComments', this.singleTaskComments)
-  },
-
-    async addTaskComment (id, comment) {
-      const token = useCookie('token'); 
-      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/comments/create`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-        body: {
-          'comment' : comment,
-          'commentable_id' : id,
-        },
-      });
-       
-        if(data.value?.app_message === 'success'){
-          
-          this.isTaskCommentCreated = true;
-          this.getSingleTaskComments(id);
-          // this.getCompanyList();
-          // this.getSpaceList();
-          console.log('test', data)
-          
-        }
-
-    },
 
     formatDate(dateString){
       const date = new Date(dateString);

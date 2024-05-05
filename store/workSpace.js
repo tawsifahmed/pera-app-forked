@@ -27,7 +27,6 @@ export const useWorkStation = defineStore('workstation', () => {
     }
 
     const getCompanyList = async () => {
-        
         const token = useCookie('token'); 
         const { data, pending, error } = await useAsyncData(
           'companyList',
