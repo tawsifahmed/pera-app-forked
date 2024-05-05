@@ -45,7 +45,7 @@
             </TreeTable>
         </div>
 
-        <!-- Create Modal -->
+        <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceFormInputs">
@@ -76,14 +76,14 @@
             </div>
         </Dialog>
 
-        <!-- Edit Modal -->
+        <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceEditFormInputs">
                     <h4 class="text-center text-primary">Task</h4>
                     <div>
                         <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskNameEditInput" />
+                            <InputText type="text" class="w-full px-2 py-2 shadow border task-edit" v-model="taskNameEditInput" />
                             <label>Set Task Name</label>
                         </FloatLabel>
                     </div>
@@ -125,32 +125,51 @@
                 </div>
             </div>
         </Dialog>
-
-        <!-- delete task -->
+    
+        <!-- Delete Task Modal -->
         <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
         </Dialog>
         
-        <!-- task detail modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <!-- Task Detail Modal -->
+        <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="grid">
                 <div class="col-12 lg:col-7">
                     <div class="task-detail">
-                        <h4>Task</h4>
-                        <div class="card w-full">
-
+                        <h5>Task Info</h5>
+                        <div class="card">
+                            <div class="mb-3">
+                                <label>Name: {{ taskNameEditInput }}</label>
+                            </div>
+                            <div class="field flex flex-column">
+                                <label for="name">Description:</label>
+                                <Textarea id="description" v-model="taskEditDescriptionInput"  rows="3" cols="20" />
+                            </div>
+                            <!-- <div class="mb-1">
+                                <label>Attachment:</label>
+                            </div>
+                            <form @submit.prevent="submitForm">
+                                <input type="file" ref="fileInput" @change="handleFileChange">
+                                <button type="submit">Upload</button>
+                              </form> -->
+                        
+                              
+                            
+                            
+                            <div class="flex justify-content-end ">
+                                <Button @click="handleAttachmentSubmit" label="Submit" />
+                            </div>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="col-12 lg:col-5">
                     <div>
-                        <h4 class="cmc">Comments</h4>
-                        <div class="comment-wrapper"  >
-                          
+                        <h5 class="cmc">Comments</h5>
+                        <div class="comment-wrapper card">
                                 <div class="comments">
-                                    
                                     <Card  class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                                         <template class="commentator-name" #title>{{ val.commentator_name }}</template>
                                         <template #content>
@@ -205,9 +224,7 @@ const btnLoading = ref(false);
 
 const { projects } = useRoute().params;
 const visible = ref(false);
-
 const refTaskId = ref(null);
-
 
 const openCreateSpace = () => {
     visible.value = true;
@@ -349,13 +366,15 @@ const visibleTaskDetailView = ref(false);
 
 const handleTaskDetailView = (task) => {
     refTaskId.value = task.key;
+    taskNameEditInput.value = task.data.name;
     getSingleTaskComments(task.key);
     visibleTaskDetailView.value = true;
 };
 
+
+
+
 const taskCommentInput = ref(null);
-
-
 const handleTaskComment = async () => {
     btnLoading.value = true;
     await addTaskComment(refTaskId.value, taskCommentInput.value);
@@ -438,8 +457,8 @@ watchEffect(() => {
 .comment-wrapper {
     overflow: hidden; 
     height: 70vh; 
-    border: 1px solid #e2e8f0;
-    border-radius: 5px;
+    //border: 1px solid #e2e8f0;
+    //border-radius: 5px;
     padding: 5px !important;
     background-color: #f7fafc;
 }
@@ -476,4 +495,15 @@ watchEffect(() => {
     font-size: 12px;
     color: gray;
 }
+
+.task-edit{
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+}
+
+
+.p-fileupload-buttonbar:last-child{
+    display: none !important;
+}
+
 </style>

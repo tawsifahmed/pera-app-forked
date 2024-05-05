@@ -3,7 +3,7 @@
 import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getCompanyList, getSingleCompany, deleteSpace } = useCompanyStore();
+const { getSingleCompany, deleteSpace } = useCompanyStore();
 const { singleCompany, isSpaceDeleted } = storeToRefs(useCompanyStore());
 
 definePageMeta({
