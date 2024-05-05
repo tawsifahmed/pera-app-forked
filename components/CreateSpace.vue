@@ -48,6 +48,7 @@ const handleCreateSpace = async () => {
             toast.add({ severity: 'success', summary: 'Space creation', detail: 'Space created successfully!', life: 3000 });
         }else{
             spaceFormInputs.value = true;
+            toast.add({ severity: 'error', summary: 'Space creation', detail: 'Space created Failed!', life: 3000 });
         }
     }
 }
