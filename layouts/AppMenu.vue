@@ -27,8 +27,21 @@ const setData = () =>{
     companyList.value[0]?.spaces.forEach(element => {
         const obj = {
             'label': element?.name,
-            'icon': 'pi pi-globe',
+            'icon': 'pi pi-list',
+            'color': element?.color,
             'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
+            'items':[]
+        }
+        if (element.projects.length > 0){
+            const project = []
+            element.projects.forEach(ele => {
+                const proObj = {
+                    'label': ele?.name,
+                    'icon': 'pi pi-list',
+                    'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
+                }
+                obj.items.push(proObj)
+            });
         }
         items.push(obj)
     });
