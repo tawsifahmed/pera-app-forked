@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pini
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 const { createCompany, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
 // const { isCompanyCreated } = storeToRefs(useCompanyStore());
-// const spaceFormInputs = isCompanyCreated
+const companyFormInputs = true
 // How large is your company?
 const  numEmployees = ref()
 const companyLargeAmount = ref([
@@ -159,10 +159,10 @@ const handleCreateWorkspace = async () => {
     }
 
 }
-const hideDialog = () => {
-    spaceFormInputs.value = false
-}
-const companyFormInputs = JSON.parse(localStorage.getItem('userCompany'))
+// const hideDialog = () => {
+//     companyFormInputs.value = false
+// }
+
 </script>
 
 

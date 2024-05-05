@@ -479,30 +479,6 @@ export const useCompanyStore = defineStore('workStation', {
       
     },
 
-    async getTaskAssignModalData(){
-      const token = useCookie('token'); 
-      const { data, pending, error } = await useAsyncData(
-        'companyList',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/users',{
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        
-        }), 
-      )
-
-      if(data.value?.data?.length > 0){
-        this.users = [];
-        data.value?.data.forEach(element => {
-              let obj = {
-                'id': element.id,
-                'name': element.name,
-              }
-              this.users.push(obj)
-          });
-      }
-
-    },
     formatDate(dateString){
       const date = new Date(dateString);
       return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
