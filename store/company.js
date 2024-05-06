@@ -85,7 +85,6 @@ export const useCompanyStore = defineStore('workStation', {
           'number_of_employees' : number_of_employees,
           'company_type' : company_type,
           'logo': logo,
-
         },
       });
        

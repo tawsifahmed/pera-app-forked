@@ -59,7 +59,7 @@ watchEffect(async() => {
     <div>
     <div class="mt-3" v-if="companyList">
         <div class="flex align-items-center">
-            <Button class="mr-2" severity="secondary" >S</Button>
+            <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{companyList[0]?.name?.charAt(0)}}</span>
             <h5 class="m-0 font-bold font-size-16">{{companyList[0]?.name}}</h5>
         </div>
     </div>
