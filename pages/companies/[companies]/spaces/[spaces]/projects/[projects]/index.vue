@@ -30,11 +30,11 @@
                     </div>
                 </template>
                 <template #empty> <p class="text-center">No Data found...</p> </template>
-                <Column class="cursor-pointer" field="name" header="Name" expander></Column>
-                <Column field="assignee" header="Assignee"></Column>
-                <Column field="dueDate" header="Due Date"></Column>
-                <Column field="priority" header="Priority"></Column>
-                <Column field="action" header="Action">
+                <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '600px' }"></Column>
+                <Column field="assignee" header="Assignee" :style="{ width: '150px' }"></Column>
+                <Column field="dueDate" header="Due Date" :style="{ width: '100px' }"></Column>
+                <Column field="priority" header="Priority" :style="{ width: '100px' }"></Column>
+                <Column field="action" header="Action" :style="{width: 'fit-content'}">
                     <template #body="slotProps">
                         <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
                         <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
