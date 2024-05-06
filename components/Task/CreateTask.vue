@@ -38,7 +38,7 @@ const errorHandler = ref(false);
 
 const taskNameInput = ref(null);
 
-const emit = defineEmits(["closeModal"]);
+const emit = defineEmits(["closeCreateModal"]);
 
 const handleCreateTask = async () => {
     btnLoading.value = true;
@@ -59,7 +59,7 @@ const handleCreateTask = async () => {
             spaceFormInputs.value = false;
             showFinalMsg.value = true;
             taskNameInput.value = null;
-            emit("closeModal", false);
+            emit("closeCreateModal", false);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });
             
         } else {

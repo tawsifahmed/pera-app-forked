@@ -48,13 +48,14 @@
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeModal="closeModal($event)" />
+            <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
             
         </Dialog>
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)"/>
+            <!-- <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceEditFormInputs">
                     <h4 class="text-center text-primary">Task</h4>
                     <div>
@@ -93,7 +94,7 @@
                 <div v-if="showEditFinalMsg">
                     <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
                 </div>
-            </div>
+            </div> -->
         </Dialog>
 
         <!-- Task Detail Modal -->
@@ -113,8 +114,8 @@
 import { storeToRefs } from 'pinia';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment } = useCompanyStore();
-const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
+const { getSingleProject, editTask, deleteTask, getTaskAssignModalData, addTaskComment } = useCompanyStore();
+const { singleProject, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
 
 const usersListStore = useCompanyStore();
 // Access users data
@@ -130,8 +131,6 @@ const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
 const singleTask = ref(null);
-
-
 
 const { projects } = useRoute().params;
 const visible = ref(false);
@@ -157,52 +156,6 @@ const openCreateSpace = (key, type) => {
     console.log('visible', visible.value);
 };
 
-// task create
-const spaceFormInputs = ref(true);
-const showFinalMsg = ref(false);
-const errorHandler = ref(false);
-
-const taskNameInput = ref(null);
-
-const taskDescriptionInput = ref(null);
-
-const handleCreateTask = async () => {
-    btnLoading.value = true;
-    if (taskNameInput.value === null) {
-        errorHandler.value = true;
-    } else {
-        errorHandler.value = false;
-        const createTaskData = {
-            name: taskNameInput.value,
-            description: taskDescriptionInput.value,
-            project_id: projects,
-            parent_task_id: taskId.value
-        };
-        await createTask(createTaskData);
-        if (isTaskCreated.value === true) {
-            btnLoading.value = false;
-            spaceFormInputs.value = false;
-            showFinalMsg.value = true;
-            visible.value = false;
-            taskNameInput.value = null;
-            taskDescriptionInput.value = null;
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });
-            spaceFormInputs.value = true;
-            showFinalMsg.value = false;
-        } else {
-            btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', life: 3000 });
-        }
-    }
-};
-
-const priorities = ref([
-    { name: 'Urgent', code: 'Urgent' },
-    { name: 'High', code: 'High' },
-    { name: 'Normal', code: 'Normal' },
-    { name: 'Low', code: 'Low' }
-]);
-
 const taskNameEditInput = ref(null);
 const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
@@ -213,8 +166,9 @@ const usersLists = ref([]);
 const visibleEdit = ref(false);
 
 const handleTaskEdit = async (task) => {
+    singleTask.value = task;
     // console.log(task);
-    visibleEdit.value = true;
+    
     await getTaskAssignModalData(); // Await the function call
     usersLists.value = usersListStore.users;
     refTaskIdForEdit.value = task.key;
@@ -223,43 +177,7 @@ const handleTaskEdit = async (task) => {
     priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
     assignees.value = task.data.assigneeObj;
     dueDate.value = task.data.dueDate;
-};
-
-const spaceEditFormInputs = ref(true);
-const showEditFinalMsg = ref(false);
-const EditErrorHandler = ref(false);
-
-const handleUpdateTask = async () => {
-    btnLoading.value = true;
-    if (taskNameEditInput.value === null) {
-        EditErrorHandler.value = true;
-        btnLoading.value = false;
-    } else {
-        EditErrorHandler.value = false;
-        const editTaskData = {
-            id: refTaskIdForEdit.value,
-            name: taskNameEditInput.value,
-            description: taskEditDescriptionInput.value,
-            priority: priority.value.name,
-            dueDate: dueDate.value,
-            assignees: assignees.value.map((obj) => obj.id),
-            project_id: projects
-        };
-
-        await editTask(editTaskData);
-        if (isTaskEdited.value === true) {
-            btnLoading.value = false;
-            spaceEditFormInputs.value = false;
-            showEditFinalMsg.value = true;
-            visibleEdit.value = false;
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
-            spaceEditFormInputs.value = true;
-            showEditFinalMsg.value = false;
-        } else {
-            btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });
-        }
-    }
+    visibleEdit.value = true;
 };
 
 const confirmDeleteTask = (taskId) => {
@@ -284,9 +202,6 @@ const deletingTask = async () => {
 };
 
 const visibleTaskDetailView = ref(false);
-
-
-
 const handleTaskDetailView = (task) => {
     console.log('task', task);
     singleTask.value = task;
@@ -296,19 +211,6 @@ const handleTaskDetailView = (task) => {
     visibleTaskDetailView.value = true;
 };
 
-const taskCommentInput = ref(null);
-const handleTaskComment = async () => {
-    btnLoading.value = true;
-    await addTaskComment(refTaskId.value, taskCommentInput.value);
-    if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
-        taskCommentInput.value = null;
-        btnLoading.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
-        btnLoading.value = false;
-    }
-};
 
 const initFilters = () => {
     filters.value = {
@@ -317,8 +219,12 @@ const initFilters = () => {
 };
 initFilters();
 
-const closeModal = (evn) => {
+const closeCreateModal = (evn) => {
   visible.value = evn;
+};
+
+const closeEditModal = (evn) => {
+  visibleEdit.value = evn;
 };
 
 watchEffect(() => {
