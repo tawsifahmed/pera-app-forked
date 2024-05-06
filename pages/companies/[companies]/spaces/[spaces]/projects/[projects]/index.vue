@@ -48,29 +48,8 @@
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-                <div v-if="spaceFormInputs">
-                    <h4 class="text-center text-primary">{{ createTaskTitle }}</h4>
-                    <InputText type="hidden" v-model="taskId" />
-
-                    <div>
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskNameInput" />
-                            <label>Set Task Name</label>
-                        </FloatLabel>
-                    </div>
-                    <br />
-                    <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
-                    <br />
-                    <div class="create-btn-wrappe">
-                        <Button @click="handleCreateTask" class="text-white py-2 px-6 tracking-wide" label="Create Task" :loading="btnLoading" />
-                    </div>
-                </div>
-
-                <div v-if="showFinalMsg">
-                    <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
-                </div>
-            </div>
+            <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeModal="closeModal($event)" />
+            
         </Dialog>
 
         <!-- Edit Task Modal -->
@@ -119,7 +98,7 @@
 
         <!-- Task Detail Modal -->
         <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="singleProject?.statuses[0]?.project_id"/>
+            <TaskDetail :singleTask="singleTask" :projID="projects"/>
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -150,25 +129,32 @@ const filters = ref({});
 const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
+const singleTask = ref(null);
 
 
 
 const { projects } = useRoute().params;
 const visible = ref(false);
+
 const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
 
 const openCreateSpace = (key, type) => {
     if (key) {
-        taskId.value = key;
+        taskId.value = key;  
     }
+    else{
+        taskId.value = '';
+    }
+    console.log('taskId', taskId.value);
     if (type == 'sub-task') {
         createTaskTitle.value = 'Create Sub Task';
     } else {
         createTaskTitle.value = 'Create Task';
     }
     visible.value = true;
+    console.log('visible', visible.value);
 };
 
 // task create
@@ -299,7 +285,7 @@ const deletingTask = async () => {
 
 const visibleTaskDetailView = ref(false);
 
-const singleTask = ref(null);
+
 
 const handleTaskDetailView = (task) => {
     console.log('task', task);
@@ -331,6 +317,10 @@ const initFilters = () => {
 };
 initFilters();
 
+const closeModal = (evn) => {
+  visible.value = evn;
+};
+
 watchEffect(() => {
     getSingleProject(projects);
     loading.value = false;
@@ -359,10 +349,8 @@ watchEffect(() => {
 }
 
 .stabd {
-    td {
-        border-left: none !important;
-        border-right: none !important;
-    }
+    //font-size: 14px !important;
+    
 }
 
 .create-space-btn-wrapper {
