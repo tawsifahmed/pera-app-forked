@@ -52,21 +52,6 @@ const changeColor = (event) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const handleCreateSpace = async () => {
         if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
             errorHandler.value = true
@@ -84,8 +69,6 @@ const handleCreateSpace = async () => {
           }
           console.log('spaceData', createSpaceData)
 
-          
-          
           await createSpace(createSpaceData);
 
           if(isSpaceCreated.value === true){
@@ -103,17 +86,7 @@ const handleCreateSpace = async () => {
         // formData.append('size', wPeople.value)
         // formData.append('number_of_employees', numEmployees.value)
         // formData.append('company_role', rRole.value)
-
-        
     }
-
-
-onMounted(() => {
-  // dynamicDiv.value.style.border = '2px solid black';
-  // dynamicDiv.value.style.color = 'black';
-  // spaceColorPreview.value.style.border = '2px solid black';
-  // spaceColorPreview.value.style.color = 'black';
-});
 
 
 </script>

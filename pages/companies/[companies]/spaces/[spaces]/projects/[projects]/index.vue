@@ -14,7 +14,10 @@
                 <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
             </div>
         </div>
+
+        <!-- Datatable -->
         <div class="card">
+            <!-- <pre>{{singleProject.statuses[0].project_id}}</pre> -->
             <TreeTable class="stabd" v-model:filters="filters" :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
                 <template #header>
                     <div class="flex justify-content-end">
@@ -44,146 +47,17 @@
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-                <div v-if="spaceFormInputs">
-                    <h4 class="text-center text-primary">{{ createTaskTitle }}</h4>
-                    <InputText type="hidden" v-model="taskId" />
-
-                    <div>
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskNameInput" />
-                            <label>Set Task Name</label>
-                        </FloatLabel>
-                    </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
-                    <br />
-                    <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
-                    <br />
-                    <div class="create-btn-wrappe">
-                        <Button @click="handleCreateTask" class="text-white py-2 px-6 tracking-wide" label="Create Task" :loading="btnLoading" />
-                    </div>
-                </div>
-
-                <div v-if="showFinalMsg">
-                    <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
-                </div>
-            </div>
+            <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-                <div v-if="spaceEditFormInputs">
-                    <h4 class="text-center text-primary">Task</h4>
-                    <div>
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-2 py-2 shadow border task-edit" v-model="taskNameEditInput" />
-                            <label>Set Task Name</label>
-                        </FloatLabel>
-                    </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskEditDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
-                            <label>Select Assignee</label>
-                        </FloatLabel>
-                    </div>
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <Calendar v-model="due_date" class="w-full" />
-                            <label>Due Date</label>
-                        </FloatLabel>
-                    </div>
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
-                            <label>Selete Priority</label>
-                        </FloatLabel>
-                    </div>
-
-                    <br />
-                    <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields</p>
-                    <br />
-                    <div class="create-btn-wrappe">
-                        <Button @click="handleUpdateTask" class="text-white py-2 px-6 tracking-wide" label="Save" :loading="btnLoading" />
-                    </div>
-                </div>
-
-                <div v-if="showEditFinalMsg">
-                    <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
-                </div>
-            </div>
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="grid">
-                <div class="col-12 lg:col-7">
-                    <div class="task-detail">
-                        <h5>Task Info</h5>
-                        <div class="card">
-                            <div class="mb-3">
-                                <label>Name: {{ taskNameEditInput }}</label>
-                            </div>
-                            <div class="field flex flex-column">
-                                <label for="name">Description:</label>
-                                <Textarea id="description" v-model="taskEditDescriptionInput" rows="3" cols="20" />
-                            </div>
-                            <!-- <div class="mb-1">
-                                <label>Attachment:</label>
-                            </div>
-                            <form @submit.prevent="submitForm">
-                                <input type="file" ref="fileInput" @change="handleFileChange">
-                                <button type="submit">Upload</button>
-                              </form> -->
-
-                            <div class="flex justify-content-end">
-                                <Button @click="handleAttachmentSubmit" label="Submit" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 lg:col-5">
-                    <div>
-                        <h5 class="cmc">Comments</h5>
-                        <div class="comment-wrapper card">
-                            <div class="comments">
-                                <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                                    <template class="commentator-name" #title>{{ val.commentator_name }}</template>
-                                    <template #content>
-                                        <p class="m-0">
-                                            {{ val.comment }}
-                                        </p>
-                                        <i class="float-right"> {{ val.time }} </i>
-                                    </template>
-                                </Card>
-                            </div>
-
-                            <div class="comment-add">
-                                <form @submit.prevent="handleTaskComment" class="formgroup-inline">
-                                    <div class="field">
-                                        <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
-                                    </div>
-
-                                    <Button type="submit" label="Add" :loading="btnLoading" />
-
-                                    <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <TaskDetail :singleTask="singleTask" :projID="projects" />
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -198,8 +72,8 @@
 import { storeToRefs } from 'pinia';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getSingleTaskComments } = useCompanyStore();
-const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
+const { getSingleProject, editTask, deleteTask, getTaskAssignModalData, addTaskComment } = useCompanyStore();
+const { singleProject, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
 
 const usersListStore = useCompanyStore();
 // Access users data
@@ -214,9 +88,11 @@ const filters = ref({});
 const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
+const singleTask = ref(null);
 
 const { projects } = useRoute().params;
 const visible = ref(false);
+
 const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
@@ -224,123 +100,41 @@ const createTaskTitle = ref(null);
 const openCreateSpace = (key, type) => {
     if (key) {
         taskId.value = key;
+    } else {
+        taskId.value = '';
     }
+    console.log('taskId', taskId.value);
     if (type == 'sub-task') {
         createTaskTitle.value = 'Create Sub Task';
     } else {
         createTaskTitle.value = 'Create Task';
     }
     visible.value = true;
+    console.log('visible', visible.value);
 };
-
-// task create
-const spaceFormInputs = ref(true);
-const showFinalMsg = ref(false);
-const errorHandler = ref(false);
-
-const taskNameInput = ref(null);
-
-const taskDescriptionInput = ref(null);
-
-const handleCreateTask = async () => {
-    btnLoading.value = true;
-    if (taskNameInput.value === null) {
-        errorHandler.value = true;
-    } else {
-        errorHandler.value = false;
-        const createTaskData = {
-            name: taskNameInput.value,
-            description: taskDescriptionInput.value,
-            project_id: projects,
-            parent_task_id: taskId.value
-        };
-        await createTask(createTaskData);
-        if (isTaskCreated.value === true) {
-            btnLoading.value = false;
-            spaceFormInputs.value = false;
-            showFinalMsg.value = true;
-            visible.value = false;
-            taskNameInput.value = null;
-            taskDescriptionInput.value = null;
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });
-            spaceFormInputs.value = true;
-            showFinalMsg.value = false;
-        } else {
-            btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', life: 3000 });
-        }
-    }
-};
-
-const priorities = ref([
-    { name: 'Urgent', code: 'Urgent' },
-    { name: 'High', code: 'High' },
-    { name: 'Normal', code: 'Normal' },
-    { name: 'Low', code: 'Low' }
-]);
 
 const taskNameEditInput = ref(null);
 const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
-const due_date = ref(null);
+const dueDate = ref(null);
 const assignees = ref([]);
 const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const visibleEdit = ref(false);
 
 const handleTaskEdit = async (task) => {
+    singleTask.value = task;
+    // console.log(task);
+
     await getTaskAssignModalData(); // Await the function call
-    console.log(formatDate(task.data.dueDate));
     usersLists.value = usersListStore.users;
-    visibleEdit.value = true;
     refTaskIdForEdit.value = task.key;
     taskNameEditInput.value = task.data.name;
     taskEditDescriptionInput.value = task.data.description;
     priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
     assignees.value = task.data.assigneeObj;
-    due_date.value = task.data.dueDate ? formatDate(task.data.dueDate) : '';
-};
-
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
-};
-
-const spaceEditFormInputs = ref(true);
-const showEditFinalMsg = ref(false);
-const EditErrorHandler = ref(false);
-
-const handleUpdateTask = async () => {
-    btnLoading.value = true;
-    if (taskNameEditInput.value === null) {
-        EditErrorHandler.value = true;
-        btnLoading.value = false;
-    } else {
-        EditErrorHandler.value = false;
-        const editTaskData = {
-            id: refTaskIdForEdit.value,
-            name: taskNameEditInput.value,
-            description: taskEditDescriptionInput.value,
-            priority: priority.value.name,
-            due_date: due_date.value,
-            assignees: assignees.value.map((obj) => obj.id),
-            project_id: projects
-        };
-
-        await editTask(editTaskData);
-        if (isTaskEdited.value === true) {
-            btnLoading.value = false;
-            spaceEditFormInputs.value = false;
-            showEditFinalMsg.value = true;
-            visibleEdit.value = false;
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
-            spaceEditFormInputs.value = true;
-            showEditFinalMsg.value = false;
-        } else {
-            btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });
-        }
-    }
+    dueDate.value = task.data.dueDate;
+    visibleEdit.value = true;
 };
 
 const confirmDeleteTask = (taskId) => {
@@ -365,26 +159,13 @@ const deletingTask = async () => {
 };
 
 const visibleTaskDetailView = ref(false);
-
 const handleTaskDetailView = (task) => {
+    console.log('task', task);
+    singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    getSingleTaskComments(task.key);
+    // getSingleTaskComments(task.key);
     visibleTaskDetailView.value = true;
-};
-
-const taskCommentInput = ref(null);
-const handleTaskComment = async () => {
-    btnLoading.value = true;
-    await addTaskComment(refTaskId.value, taskCommentInput.value);
-    if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
-        taskCommentInput.value = null;
-        btnLoading.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
-        btnLoading.value = false;
-    }
 };
 
 const initFilters = () => {
@@ -393,6 +174,14 @@ const initFilters = () => {
     };
 };
 initFilters();
+
+const closeCreateModal = (evn) => {
+    visible.value = evn;
+};
+
+const closeEditModal = (evn) => {
+    visibleEdit.value = evn;
+};
 
 watchEffect(() => {
     getSingleProject(projects);
@@ -422,10 +211,7 @@ watchEffect(() => {
 }
 
 .stabd {
-    td {
-        border-left: none !important;
-        border-right: none !important;
-    }
+    //font-size: 14px !important;
 }
 
 .create-space-btn-wrapper {

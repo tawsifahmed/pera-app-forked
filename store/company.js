@@ -265,111 +265,14 @@ export const useCompanyStore = defineStore('workStation', {
           headers: {
               Authorization: `Bearer ${token.value}`,
           },
-          
           }),
         )
+
         this.singleProject = data.value?.data;
 
-        // if(this.singleProject?.tasks?.length > 0){
-        //   this.tasks = [];
-        //     this.singleProject?.tasks.forEach(element => {
-        //       if(element?.assignee.length > 0){
-        //         this.asngUsers = [];
-        //         element?.assignee.forEach(val => {
-        //             let obj2 = {
-        //                 'id': val.id,
-        //                 'name': val.name,
-        //             }
-        //             this.asngUsers.push(obj2)
-        //         });
-        //       }else{
-        //         this.asngUsers = [];
-        //       }
-        //         let obj = {
-        //           'key': element.id,
-        //           'data': {
-        //                     name: element.name,
-        //                     description: element.description,
-        //                     assigneeObj: this.asngUsers,
-        //                     assignee: this.asngUsers.map((obj) => obj.name).join(", "),
-        //                     dueDate: element.due_date? this.formatDate(element.due_date) : '',
-        //                     priority: element.priority,
-        //                     action:   '',
-        //                   },
-        //           'children': [],
-        //         }
-        //         this.tasks.push(obj)
-        //     });
-        // }
-        this.getTaskList();
+        this.tasks = data.value?.tasks;
     },
 
-    async getTaskList(){
-      const token = useCookie('token'); 
-      const { data, pending, error } = await useAsyncData(
-          'companyList',
-          () => $fetch(`http://188.166.212.40/pera/public/api/v1/tasks/list`,{
-          headers: {
-              Authorization: `Bearer ${token.value}`,
-          },
-          
-          }),
-        )
-
-        if(data.value?.data?.length > 0){
-          this.tasks = [];
-          data.value?.data.forEach(element => {
-              if(element?.assignee.length > 0){
-                this.asngUsers = [];
-                element?.assignee.forEach(val => {
-                    let obj2 = {
-                        'id': val.id,
-                        'name': val.name,
-                    }
-                    this.asngUsers.push(obj2)
-                });
-              }else{
-                this.asngUsers = [];
-              }
-
-              if(element.sub_task.length > 0){
-                element.sub_task.forEach(val => {
-                    let obj3 = {
-                      'key': val.id,
-                      'data': {
-                                name: val.name,
-                                description: val.description,
-                                assigneeObj: "",
-                                assignee: "",
-                                dueDate: val.due_date? this.formatDate(val.due_date) : '',
-                                priority: val.priority,
-                                action:   '',
-                              },
-                      'children':[]
-                    }
-                    this.subTasks.push(obj3)
-                });
-              }else{
-                this.subTasks = [];
-              }
-
-                let obj = {
-                  'key': element.id,
-                  'data': {
-                            name: element.name,
-                            description: element.description,
-                            assigneeObj: this.asngUsers,
-                            assignee: this.asngUsers.map((obj) => obj.name).join(", "),
-                            dueDate: element.due_date? this.formatDate(element.due_date) : '',
-                            priority: element.priority,
-                            action:   '',
-                          },
-                  'children': this.subTasks,
-                }
-                this.tasks.push(obj)
-            });
-        }
-    },
     async createProject ({name, description, space_id, statuses}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
@@ -446,7 +349,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async editTask ({id, name, description, project_id, due_date, priority, assignees}) {
+    async editTask ({id, name, description, project_id, dueDate, priority, assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -457,14 +360,16 @@ export const useCompanyStore = defineStore('workStation', {
           'id' : id,
           'name' : name,
           'description' : description,
-          'due_date' : due_date,
+          'due_date' : dueDate,
           'priority' : priority,
           'assignees' : assignees,
           'projectId' : project_id,
+          // 'attachments' : attachments,
         },
       });
        
         if(data.value?.app_message === 'success'){
+          console.log('dataAttach', data)
           this.isTaskEdited = true;
           this.getSingleProject(project_id);
         }
@@ -494,17 +399,17 @@ export const useCompanyStore = defineStore('workStation', {
           });
       }
     },
-    async getSingleTaskComments(id){
+    async getTaskDetails(id){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
           'getSingleTaskComments',
-          () => $fetch(`http://188.166.212.40/pera/public/api/v1/comments/list/${id}`,{
+          () => $fetch(`http://188.166.212.40/pera/public/api/v1/tasks/show/${id}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
             },
           }),
       )
-      this.singleTaskComments = data.value?.data;
+      this.singleTaskComments = data.value?.data.comments;
   },
 
     async addTaskComment (id, comment) {
@@ -522,7 +427,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskCommentCreated = true;
-          this.getSingleTaskComments(id);
+          this.getTaskDetails(id);
           // this.getCompanyList();
           // this.getSpaceList();
         }
