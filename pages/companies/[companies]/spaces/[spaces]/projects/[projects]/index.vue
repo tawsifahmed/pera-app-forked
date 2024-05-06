@@ -1,6 +1,5 @@
 <template>
     <div class="card">
-        
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
@@ -15,7 +14,7 @@
                 <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
             </div>
         </div>
-        
+
         <!-- Datatable -->
         <div class="card">
             <!-- <pre>{{singleProject.statuses[0].project_id}}</pre> -->
@@ -49,57 +48,16 @@
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
-            
         </Dialog>
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)"/>
-            <!-- <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-                <div v-if="spaceEditFormInputs">
-                    <h4 class="text-center text-primary">Task</h4>
-                    <div>
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-2 py-2 shadow border task-edit" v-model="taskNameEditInput" />
-                            <label>Set Task Name</label>
-                        </FloatLabel>
-                    </div>
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
-                            <label>Select Assignee</label>
-                        </FloatLabel>
-                    </div>
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <Calendar v-model="dueDate" class="w-full" />
-                            <label>Due Date</label>
-                        </FloatLabel>
-                    </div>
-                    <div class="mt-4">
-                        <FloatLabel class="mb-2">
-                            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
-                            <label>Selete Priority</label>
-                        </FloatLabel>
-                    </div>
-
-                    <br />
-                    <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields</p>
-                    <br />
-                    <div class="create-btn-wrappe">
-                        <Button @click="handleUpdateTask" class="text-white py-2 px-6 tracking-wide" label="Save" :loading="btnLoading" />
-                    </div>
-                </div>
-
-                <div v-if="showEditFinalMsg">
-                    <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Task created successfully</h3>
-                </div>
-            </div> -->
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="projects"/>
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskDetail :singleTask="singleTask" :projID="projects" />
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -141,9 +99,8 @@ const createTaskTitle = ref(null);
 
 const openCreateSpace = (key, type) => {
     if (key) {
-        taskId.value = key;  
-    }
-    else{
+        taskId.value = key;
+    } else {
         taskId.value = '';
     }
     console.log('taskId', taskId.value);
@@ -168,7 +125,7 @@ const visibleEdit = ref(false);
 const handleTaskEdit = async (task) => {
     singleTask.value = task;
     // console.log(task);
-    
+
     await getTaskAssignModalData(); // Await the function call
     usersLists.value = usersListStore.users;
     refTaskIdForEdit.value = task.key;
@@ -211,7 +168,6 @@ const handleTaskDetailView = (task) => {
     visibleTaskDetailView.value = true;
 };
 
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
@@ -220,11 +176,11 @@ const initFilters = () => {
 initFilters();
 
 const closeCreateModal = (evn) => {
-  visible.value = evn;
+    visible.value = evn;
 };
 
 const closeEditModal = (evn) => {
-  visibleEdit.value = evn;
+    visibleEdit.value = evn;
 };
 
 watchEffect(() => {
@@ -256,7 +212,6 @@ watchEffect(() => {
 
 .stabd {
     //font-size: 14px !important;
-    
 }
 
 .create-space-btn-wrapper {
