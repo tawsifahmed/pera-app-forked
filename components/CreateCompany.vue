@@ -1,11 +1,10 @@
 
 <script setup>
-
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createCompany, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
-// const { isCompanyCreated } = storeToRefs(useCompanyStore());
-const companyFormInputs = true
+import { storeToRefs } from 'pinia';
+import { useCompanyStore } from '~/store/company';
+const { createCompany } = useCompanyStore();
+const { singleSpace, isCompanyCreated } = storeToRefs(useCompanyStore());
+const companyFormInputs = ref(true)
 // How large is your company?
 const  numEmployees = ref()
 const companyLargeAmount = ref([
@@ -106,10 +105,10 @@ const invite = ref(null)
 const validateEmail = (mail) => {
     return String(mail)
         .toLowerCase()
-        .match(
+    .match(
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
-    }
+    );
+}
 
 const showValidEmail = ref(null)
 const validEmailStatus = ref(null)
@@ -147,21 +146,19 @@ const handleCreateWorkspace = async () => {
         }
         await createCompany(workspaceData);
         if(isCompanyCreated.value === true){
-            spaceFormInputs.value = false;
-            showFinalMsg.value = true;
+            companyFormInputs.value = false;
             numEmployees.value = null;
             sSolution.value = null;
             invite.value = null;
             workSpaceName.value = null;
+            toast.add({ severity: 'success', summary: 'Company creation', detail: 'Company created successfully!', life: 3000 });
         }else{
-            console.log('company not created')
+            companyFormInputs.value = true;
+            toast.add({ severity: 'error', summary: 'Company creation', detail: 'Company created Failed!', life: 3000 });
         }
     }
 
 }
-// const hideDialog = () => {
-//     companyFormInputs.value = false
-// }
 
 </script>
 
@@ -187,7 +184,6 @@ const handleCreateWorkspace = async () => {
         </div>
         <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
         <template #footer>
-            <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
             <Button label="Save" icon="pi pi-check" text="" @click="handleCreateWorkspace" />
         </template>
     </Dialog>

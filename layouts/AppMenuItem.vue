@@ -72,10 +72,6 @@ const items = ref([
         label: 'Settings',
         items: [
             {
-                label: 'Create Space',
-                icon: 'pi pi-plus'
-            },
-            {
                 label: 'Manage Space',
                 icon: 'pi pi-th-large'
             },
@@ -108,11 +104,10 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-<!--        <CreateCompany/>-->
-        <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
-            <span class="layout-menuitem-text">{{ item.label }}</span>
-            <i v-if="item.items" class="pi pi-fw pi-plus layout-submenu-toggler"></i>
+        <a class="p-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+            <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
+            <span class="layout-menuitem-text">{{ item.label }}  </span>
+            <i v-if="item.items.length > 0" class="text-2xl pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
             <i :class="item.icon" class="layout-menuitem-icon"></i>

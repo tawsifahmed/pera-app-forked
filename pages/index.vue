@@ -382,9 +382,8 @@ watch(
                 </div>
             </div> -->
         </div>
-
-        <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <div v-if="visibleCreateCompany">
             <CreateCompany/>
-        </Dialog>
+        </div>
     </div>
 </template>

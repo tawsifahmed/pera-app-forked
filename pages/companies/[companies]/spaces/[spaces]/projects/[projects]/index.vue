@@ -1,5 +1,6 @@
 <template>
     <div class="card">
+        
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
@@ -11,13 +12,11 @@
                 <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
             </div>
             <div class="create-btn-wrapper">
-                <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
-
-                
-
-                
+                <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
             </div>
         </div>
+        
+        <!-- Datatable -->
         <div class="card">
             <!-- <pre>{{singleProject.statuses[0].project_id}}</pre> -->
             <TreeTable class="stabd" v-model:filters="filters" :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
@@ -38,8 +37,9 @@
                 <Column field="priority" header="Priority"></Column>
                 <Column field="action" header="Action">
                     <template #body="slotProps">
-                        <Button icon="pi pi-bars" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
-                        <Button icon="pi pi-plus" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
+                        <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
+                        <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
+                        <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
                         <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
                     </template>
                 </Column>
@@ -50,19 +50,15 @@
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
                 <div v-if="spaceFormInputs">
-                    <h4 class="text-center text-primary">Create Task</h4>
+                    <h4 class="text-center text-primary">{{ createTaskTitle }}</h4>
+                    <InputText type="hidden" v-model="taskId" />
+
                     <div>
                         <FloatLabel class="mt-4 mb-2">
                             <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskNameInput" />
                             <label>Set Task Name</label>
                         </FloatLabel>
                     </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
                     <br />
                     <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
                     <br />
@@ -88,12 +84,6 @@
                             <label>Set Task Name</label>
                         </FloatLabel>
                     </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskEditDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
                     <div class="mt-4">
                         <FloatLabel class="mb-2">
                             <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
@@ -102,7 +92,7 @@
                     </div>
                     <div class="mt-4">
                         <FloatLabel class="mb-2">
-                            <Calendar v-model="due_date" class="w-full" />
+                            <Calendar v-model="dueDate" class="w-full" />
                             <label>Due Date</label>
                         </FloatLabel>
                     </div>
@@ -126,27 +116,81 @@
                 </div>
             </div>
         </Dialog>
-    
+
+        <!-- Task Detail Modal -->
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <div class="grid">
+                <div class="col-12 lg:col-7">
+                    <div class="task-detail">
+                        <h5>Task Info</h5>
+                        <div class="card">
+                            <div class="mb-3">
+                                <label>Name: {{ taskNameEditInput }}</label>
+                            </div>
+                            <div class="field flex flex-column">
+                                <label for="name">Description:</label>
+                                <Textarea id="description" v-model="taskEditDescriptionInput" rows="3" cols="20" />
+                            </div>
+                            <!-- <div class="mb-1">
+                                <label>Attachment:</label>
+                            </div>
+                            <form @submit.prevent="submitForm">
+                                <input type="file" ref="fileInput" @change="handleFileChange">
+                                <button type="submit">Upload</button>
+                              </form> -->
+
+                            <div class="flex justify-content-end">
+                                <Button @click="handleAttachmentSubmit" label="Submit" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 lg:col-5">
+                    <div>
+                        <h5 class="cmc">Comments</h5>
+                        <div class="comment-wrapper card">
+                            <div class="comments">
+                                <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                                    <template class="commentator-name" #title>{{ val.commentator_name }}</template>
+                                    <template #content>
+                                        <p class="m-0">
+                                            {{ val.comment }}
+                                        </p>
+                                        <i class="float-right"> {{ val.time }} </i>
+                                    </template>
+                                </Card>
+                            </div>
+
+                            <div class="comment-add">
+                                <form @submit.prevent="handleTaskComment" class="formgroup-inline">
+                                    <div class="field">
+                                        <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
+                                    </div>
+
+                                    <Button type="submit" label="Add" :loading="btnLoading" />
+
+                                    <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
+
         <!-- Delete Task Modal -->
         <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
         </Dialog>
-        
-        <!-- Task Detail Modal -->
-        <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="singleProject?.statuses[0]?.project_id"/>
-        </Dialog>
-      
-       
     </div>
 </template>
 <script setup>
 import { storeToRefs } from 'pinia';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getSingleTaskComments } = useCompanyStore();
+const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getTaskDetails } = useCompanyStore();
 const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
 
 const usersListStore = useCompanyStore();
@@ -168,8 +212,18 @@ const btnLoading = ref(false);
 const { projects } = useRoute().params;
 const visible = ref(false);
 const refTaskId = ref(null);
+const taskId = ref(null);
+const createTaskTitle = ref(null);
 
-const openCreateSpace = () => {
+const openCreateSpace = (key, type) => {
+    if (key) {
+        taskId.value = key;
+    }
+    if (type == 'sub-task') {
+        createTaskTitle.value = 'Create Sub Task';
+    } else {
+        createTaskTitle.value = 'Create Task';
+    }
     visible.value = true;
 };
 
@@ -191,9 +245,9 @@ const handleCreateTask = async () => {
         const createTaskData = {
             name: taskNameInput.value,
             description: taskDescriptionInput.value,
-            project_id: projects
+            project_id: projects,
+            parent_task_id: taskId.value
         };
-        // return
         await createTask(createTaskData);
         if (isTaskCreated.value === true) {
             btnLoading.value = false;
@@ -222,28 +276,23 @@ const priorities = ref([
 const taskNameEditInput = ref(null);
 const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
-const due_date = ref(null);
+const dueDate = ref(null);
 const assignees = ref([]);
 const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const visibleEdit = ref(false);
 
 const handleTaskEdit = async (task) => {
-    await getTaskAssignModalData(); // Await the function call
-    console.log(formatDate(task.data.dueDate));
-    usersLists.value = usersListStore.users;
+    // console.log(task);
     visibleEdit.value = true;
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
     refTaskIdForEdit.value = task.key;
     taskNameEditInput.value = task.data.name;
     taskEditDescriptionInput.value = task.data.description;
     priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
     assignees.value = task.data.assigneeObj;
-    due_date.value = task.data.dueDate ? formatDate(task.data.dueDate) : '';
-};
-
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+    dueDate.value = task.data.dueDate;
 };
 
 const spaceEditFormInputs = ref(true);
@@ -262,7 +311,7 @@ const handleUpdateTask = async () => {
             name: taskNameEditInput.value,
             description: taskEditDescriptionInput.value,
             priority: priority.value.name,
-            due_date: due_date.value,
+            dueDate: dueDate.value,
             assignees: assignees.value.map((obj) => obj.id),
             project_id: projects
         };
@@ -275,7 +324,7 @@ const handleUpdateTask = async () => {
             visibleEdit.value = false;
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
             spaceEditFormInputs.value = true;
-            showEditFinalMsg.value = false; 
+            showEditFinalMsg.value = false;
         } else {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });
@@ -304,7 +353,6 @@ const deletingTask = async () => {
     }
 };
 
-
 const visibleTaskDetailView = ref(false);
 
 const singleTask = ref(null);
@@ -313,10 +361,23 @@ const handleTaskDetailView = (task) => {
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    // getSingleTaskComments(task.key);
+    getTaskDetails(task.key);
     visibleTaskDetailView.value = true;
 };
 
+const taskCommentInput = ref(null);
+const handleTaskComment = async () => {
+    btnLoading.value = true;
+    await addTaskComment(refTaskId.value, taskCommentInput.value);
+    if (isTaskCommentCreated.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
+        taskCommentInput.value = null;
+        btnLoading.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
+        btnLoading.value = false;
+    }
+};
 
 const initFilters = () => {
     filters.value = {
@@ -329,7 +390,6 @@ watchEffect(() => {
     getSingleProject(projects);
     loading.value = false;
 });
-
 </script>
 
 <style lang="scss" scoped>
@@ -376,17 +436,16 @@ watchEffect(() => {
     }
 }
 
-.task-detail{
-    
+.task-detail {
 }
 
-.cmc{
+.cmc {
     text-wrap: nowrap;
 }
 
 .comment-wrapper {
-    overflow: hidden; 
-    height: 70vh; 
+    overflow: hidden;
+    height: 70vh;
     //border: 1px solid #e2e8f0;
     //border-radius: 5px;
     padding: 5px !important;
@@ -394,22 +453,21 @@ watchEffect(() => {
 }
 
 .comments {
-    overflow-y: auto; 
-    height: 90%; 
+    overflow-y: auto;
+    height: 90%;
     padding: 5px;
-    
 }
 
 .comment-add {
     padding: 20px;
     margin-bottom: 15px;
-    border-top: 1px solid #e2e8f0; 
+    border-top: 1px solid #e2e8f0;
     padding: 10px;
     width: 100%;
     position: relative;
 }
 
-.formgroup-inline{
+.formgroup-inline {
     flex-wrap: nowrap;
 }
 .formgroup-inline .field {
@@ -417,23 +475,21 @@ watchEffect(() => {
 }
 
 .formgroup-inline .field input {
-    width: 100% !important; 
+    width: 100% !important;
 }
 
-.float-right{
+.float-right {
     float: right;
     font-size: 12px;
     color: gray;
 }
 
-.task-edit{
+.task-edit {
     padding-left: 0.7rem !important;
     padding-right: 0.7rem !important;
 }
 
-
-.p-fileupload-buttonbar:last-child{
+.p-fileupload-buttonbar:last-child {
     display: none !important;
 }
-
 </style>

@@ -27,8 +27,21 @@ const setData = () =>{
     companyList.value[0]?.spaces.forEach(element => {
         const obj = {
             'label': element?.name,
-            'icon': 'pi pi-globe',
+            'icon': 'pi pi-list',
+            'color': element?.color,
             'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
+            'items':[]
+        }
+        if (element.projects.length > 0){
+            const project = []
+            element.projects.forEach(ele => {
+                const proObj = {
+                    'label': ele?.name,
+                    'icon': 'pi pi-list',
+                    'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
+                }
+                obj.items.push(proObj)
+            });
         }
         items.push(obj)
     });
@@ -36,8 +49,8 @@ const setData = () =>{
 }
 
 watchEffect(async() => {
-    // await getCompanyList()
-    // setData()
+    await getCompanyList()
+    setData()
 })
 
 </script>
@@ -46,7 +59,7 @@ watchEffect(async() => {
     <div>
     <div class="mt-3" v-if="companyList">
         <div class="flex align-items-center">
-            <Button class="mr-2" severity="secondary" >S</Button>
+            <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{companyList[0]?.name?.charAt(0)}}</span>
             <h5 class="m-0 font-bold font-size-16">{{companyList[0]?.name}}</h5>
         </div>
     </div>
