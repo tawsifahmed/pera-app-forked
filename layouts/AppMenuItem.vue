@@ -104,10 +104,15 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-        <a class="p-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
-            <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
-            <span class="layout-menuitem-text">{{ item.label }}  </span>
-            <i v-if="item.items.length > 0" class="text-2xl pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+        <a class="p-2 flex justify-content-between" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+            <div class="flex align-items-center">
+                <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
+                <span class="layout-menuitem-text">{{ item.label }}  </span>
+            </div>
+            <div class="flex align-items-center">
+                <i v-if="item.items.length > 0" class="text-xl pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+                <CreateSpecificProject :singleSpace="item" />
+            </div>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
