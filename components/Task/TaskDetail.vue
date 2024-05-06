@@ -2,105 +2,107 @@
     <div class="grid">
         <div class="col-12 lg:col-7">
             <form @submit.prevent="handleTaskDetailSubmit" class="task-detail">
-                <h5> <span class="pi pi-angle-double-right"></span> Task: <i>{{ singleTask.data.name }}</i></h5>
+                <h5>
+                    {{ singleTask.data.name }}
+                </h5>
                 <!-- <pre>{{singleTask}}</pre> -->
                 <div class="card">
-                   
                     <div class="flex my-2 justify-content-start gap-5 align-items-center">
                         <div class="flex justify-content-start gap-2 align-items-center">
                             <span class="pi pi-user"></span>
                             <p>Assignee:</p>
                         </div>
-                        <div> {{ singleTask.data.assignee }}</div>
+                        <div>{{ singleTask.data.assignee }}</div>
                     </div>
                     <div class="flex mt-2 mb-3 justify-content-start gap-5 align-items-center">
                         <div class="flex justify-content-start gap-2 align-items-center">
                             <span class="pi pi-calendar"></span>
                             <p>Due Date:</p>
                         </div>
-                        <div> {{ singleTask.data.dueDate }}</div>
+                        <div>{{ singleTask.data.dueDate }}</div>
                     </div>
                     <div class="field mt-2 flex flex-column">
                         <label for="name" class="ml-1">Description:</label>
-                        <Textarea id="description" v-model="taskEditDescriptionInput"  rows="3" cols="20" />
+                        <Textarea id="description" v-model="description" rows="3" cols="20" />
                     </div>
-                  
-                    <div class="flex justify-content-end ">
-                        <Button type="submit" label="Submit" />
+
+                    <div class="flex justify-content-end">
+                        <Button type="submit" label="Save" />
                     </div>
                 </div>
             </form>
-            
+
             <!-- tab for details, sub task  -->
             <TabView class="mt-3">
                 <TabPanel header="Detail">
-                    <p class="m-0">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
+                    <p class="m-0"></p>
                 </TabPanel>
                 <TabPanel header="Sub Tasks">
-                    <p class="m-0">
-                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
-                        ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-                    </p>
-                </TabPanel>
-                <TabPanel header="Header III">
-                    <p class="m-0">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui
-                        officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-                    </p>
+                    <TreeTable class="stabd" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                        <template #empty> <p class="text-center">No Data found...</p> </template>
+                        <Column class="cursor-pointer" field="name" header="Name" expander></Column>
+                        <Column field="assignee" header="Assignee"></Column>
+                        <Column field="dueDate" header="Due Date"></Column>
+                        <Column field="priority" header="Priority"></Column>
+                        <Column field="action" header="Action">
+                            <template #body="slotProps">
+                                <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
+                                <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
+                                <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
+                                <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
+                            </template>
+                        </Column>
+                    </TreeTable>
                 </TabPanel>
             </TabView>
-            
         </div>
         <div class="col-12 lg:col-5">
             <div>
                 <h5 class="cmc">Comments</h5>
                 <div class="comment-wrapper card">
-                        <div class="comments">
-                            <Card  class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                                <template class="commentator-name" #title>{{ val.commentator_name }}</template>
-                                <template #content>
-                                    <p class="m-0">
-                                     {{ val.comment }}
-                                    </p>
-                                    <i class="float-right "> {{ val.time }} </i>
-                                </template>
-                            </Card>
-                        </div>
-                    
-                    
-                    <div class="comment-add">                        
+                    <div class="comments">
+                        <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                            <template class="commentator-name" #title>{{ val.commentator_name }}</template>
+                            <template #content>
+                                <p class="m-0">
+                                    {{ val.comment }}
+                                </p>
+                                <i class="float-right"> {{ val.time }} </i>
+                            </template>
+                        </Card>
+                    </div>
+
+                    <div class="comment-add">
                         <form @submit.prevent="handleTaskComment" class="formgroup-inline">
                             <div class="field">
                                 <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
                             </div>
-    
+
                             <Button type="submit" label="Add" :loading="btnLoading" />
-    
+
                             <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    
     </div>
 </template>
 
-
 <script setup>
-
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
+
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
-const {singleTask, projID} = defineProps(['singleTask', 'projID']);
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
+const { singleTask, projID } = defineProps(['singleTask', 'projID']);
+
 const toast = useToast();
 const btnLoading = ref(false);
-const taskEditDescriptionInput = ref(null);
+const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
+const selectedfile = ref();
+
 const handleTaskComment = async () => {
     btnLoading.value = true;
     await addTaskComment(singleTask.key, taskCommentInput.value);
@@ -114,113 +116,59 @@ const handleTaskComment = async () => {
     }
 };
 
-const fileInput = ref();
+const handleTaskDetailSubmit = async () => {
+    const taskDetailData = {
+        id: singleTask.key,
+        name: singleTask.data.name,
+        description: description.value,
+        project_id: projID,
+        due_date: singleTask.data.due_date,
+        priority: singleTask.data.priority,
+        assignees: singleTask.data.assignees
+    };
+    await editTask(taskDetailData);
 
-const selectedfile = ref();
-
-const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        selectedfile.value = file;
-        // console.log('selectedfile', selectedfile.value);
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Edited Successfully', life: 3000 });
+        taskEditDescriptionInput.value = null;
+        selectedfile.value = null;
     } else {
-        console.error('No file selected.');
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit task', life: 3000 });
     }
 };
-
-const handleTaskDetailSubmit = async () => {
-   const fd = new FormData();
-   if(selectedfile.value){
-    fd.append('file', selectedfile.value);
-    fd.append('nm', 'asd');
-    if(fd.has('nm')) {
-    console.log('The FormData object has a property called "file".');
-    const file = fd.get('file');
-    console.log('File:', file);
-
-    } else {
-        console.log('The FormData object does not have a property called "file".');
-    } 
-   }
-   
-//    const fil11e = fd.get('file');
-//    console.log('file', fil11e);
-   
-//    console.log('formData', fd);
-//    return
-
-   let attachmentArray = [];
-   let attachmentObj = {
-         file : selectedfile.value
-   } 
-   attachmentArray.push(attachmentObj);
-   const taskDetailData = {
-         'id' : singleTask.key,
-         'name' : singleTask.data.name,
-         'description': taskEditDescriptionInput.value,
-         'project_id' : projID, 
-         'due_date': singleTask.data.due_date,
-         'priority' : singleTask.data.priority,
-         'assignees' : singleTask.data.assignees,
-         'attachments': selectedfile.value
-    
-   }
-   console.log('taskDetailData', taskDetailData);
-//    return
-   await editTask(taskDetailData);
-   if(isTaskEdited.value === true){
-       toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Edited Successfully', life: 3000 });
-       taskEditDescriptionInput.value = null;
-       selectedfile.value = null;
-   }else{
-         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit task', life: 3000 });
-    }    
-};
-
-watchEffect(async () => {
+onMounted(() => {
     getTaskDetails(singleTask.key);
-
 });
-
-
-
-
 </script>
 
 <style lang="scss" scoped>
-
-.task-detail{
-    
-}
-
-.cmc{
+.cmc {
     text-wrap: nowrap;
 }
 
 .comment-wrapper {
-    overflow: hidden; 
-    height: 70vh; 
+    overflow: hidden;
+    height: 70vh;
     padding: 5px !important;
     background-color: #f7fafc;
 }
 
 .comments {
-    overflow-y: auto; 
-    height: 90%; 
+    overflow-y: auto;
+    height: 90%;
     padding: 5px;
-    
 }
 
 .comment-add {
     padding: 20px;
     margin-bottom: 15px;
-    border-top: 1px solid #e2e8f0; 
+    border-top: 1px solid #e2e8f0;
     padding: 10px;
     width: 100%;
     position: relative;
 }
 
-.formgroup-inline{
+.formgroup-inline {
     flex-wrap: nowrap;
 }
 .formgroup-inline .field {
@@ -228,23 +176,25 @@ watchEffect(async () => {
 }
 
 .formgroup-inline .field input {
-    width: 100% !important; 
+    width: 100% !important;
 }
 
-.float-right{
+.float-right {
     float: right;
     font-size: 12px;
     color: gray;
 }
 
-.task-edit{
+.task-edit {
     padding-left: 0.7rem !important;
     padding-right: 0.7rem !important;
 }
 
-
-.p-fileupload-buttonbar:last-child{
+.p-fileupload-buttonbar:last-child {
     display: none !important;
 }
 
+.stabd {
+    font-size: 12px !important;
+}
 </style>

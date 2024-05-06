@@ -410,6 +410,7 @@ export const useCompanyStore = defineStore('workStation', {
           }),
       )
       this.singleTaskComments = data.value?.data.comments;
+      this.subTasks = data.value?.subTasks;
   },
 
     async addTaskComment (id, comment) {
