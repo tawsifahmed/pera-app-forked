@@ -92,12 +92,8 @@ const edittProject = (id) =>{
                 <p class="text cursor-pointer">Space - {{singleSpace?.name}}</p>
             </div>
             <div class="create-btn-wrapper">
-              <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Project +" />
-              <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                  <CreateSpecificProject :singleSpace="singleSpace" />
-              </Dialog>
-              <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
-          </div>
+                <CreateSpecificProject :singleSpace="singleSpace" />
+            </div>
         </div>
         <DataTable v-model:filters="filters" :value="singleSpace?.projects" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #header>
