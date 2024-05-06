@@ -1,5 +1,6 @@
 <template>
     <div class="card">
+        
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
@@ -14,6 +15,8 @@
                 <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
             </div>
         </div>
+        
+        <!-- Datatable -->
         <div class="card">
             <TreeTable class="stabd" v-model:filters="filters" :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
                 <template #header>
@@ -55,12 +58,6 @@
                             <label>Set Task Name</label>
                         </FloatLabel>
                     </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
                     <br />
                     <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
                     <br />
@@ -86,12 +83,6 @@
                             <label>Set Task Name</label>
                         </FloatLabel>
                     </div>
-                    <!-- <div class="">
-                        <FloatLabel class="mt-4 mb-2">
-                            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="taskEditDescriptionInput" />
-                            <label>Set Task Description</label>
-                        </FloatLabel>
-                    </div> -->
                     <div class="mt-4">
                         <FloatLabel class="mb-2">
                             <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
@@ -100,7 +91,7 @@
                     </div>
                     <div class="mt-4">
                         <FloatLabel class="mb-2">
-                            <Calendar v-model="due_date" class="w-full" />
+                            <Calendar v-model="dueDate" class="w-full" />
                             <label>Due Date</label>
                         </FloatLabel>
                     </div>
@@ -198,7 +189,7 @@
 import { storeToRefs } from 'pinia';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getSingleTaskComments } = useCompanyStore();
+const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getTaskDetails } = useCompanyStore();
 const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
 
 const usersListStore = useCompanyStore();
@@ -282,28 +273,23 @@ const priorities = ref([
 const taskNameEditInput = ref(null);
 const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
-const due_date = ref(null);
+const dueDate = ref(null);
 const assignees = ref([]);
 const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const visibleEdit = ref(false);
 
 const handleTaskEdit = async (task) => {
-    await getTaskAssignModalData(); // Await the function call
-    console.log(formatDate(task.data.dueDate));
-    usersLists.value = usersListStore.users;
+    // console.log(task);
     visibleEdit.value = true;
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
     refTaskIdForEdit.value = task.key;
     taskNameEditInput.value = task.data.name;
     taskEditDescriptionInput.value = task.data.description;
     priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
     assignees.value = task.data.assigneeObj;
-    due_date.value = task.data.dueDate ? formatDate(task.data.dueDate) : '';
-};
-
-const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+    dueDate.value = task.data.dueDate;
 };
 
 const spaceEditFormInputs = ref(true);
@@ -322,7 +308,7 @@ const handleUpdateTask = async () => {
             name: taskNameEditInput.value,
             description: taskEditDescriptionInput.value,
             priority: priority.value.name,
-            due_date: due_date.value,
+            dueDate: dueDate.value,
             assignees: assignees.value.map((obj) => obj.id),
             project_id: projects
         };
@@ -369,7 +355,7 @@ const visibleTaskDetailView = ref(false);
 const handleTaskDetailView = (task) => {
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    getSingleTaskComments(task.key);
+    getTaskDetails(task.key);
     visibleTaskDetailView.value = true;
 };
 
