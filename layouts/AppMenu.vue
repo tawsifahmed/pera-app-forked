@@ -29,6 +29,8 @@ const setData = () =>{
             'label': element?.name,
             'icon': 'pi pi-list',
             'color': element?.color,
+            'id': element?.id,
+            'name': element?.name,
             'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
             'items':[]
         }
@@ -37,6 +39,7 @@ const setData = () =>{
             element.projects.forEach(ele => {
                 const proObj = {
                     'label': ele?.name,
+                    'id': element?.id,
                     'icon': 'pi pi-list',
                     'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
                 }
