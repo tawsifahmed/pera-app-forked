@@ -2,28 +2,56 @@
     <div class="grid">
         <div class="col-12 lg:col-7">
             <form @submit.prevent="handleTaskDetailSubmit" class="task-detail">
-                <h5>Task Infos</h5>
+                <h5> <span class="pi pi-angle-double-right"></span> Task: <i>{{ singleTask.data.name }}</i></h5>
                 <!-- <pre>{{singleTask}}</pre> -->
                 <div class="card">
-                    <div class="mb-3">
-                        <label>Name: {{ singleTask.data.name }}</label>
+                   
+                    <div class="flex my-2 justify-content-start gap-5 align-items-center">
+                        <div class="flex justify-content-start gap-2 align-items-center">
+                            <span class="pi pi-user"></span>
+                            <p>Assignee:</p>
+                        </div>
+                        <div> {{ singleTask.data.assignee }}</div>
                     </div>
-                    <div class="field flex flex-column">
-                        <label for="name">Description:</label>
+                    <div class="flex mt-2 mb-3 justify-content-start gap-5 align-items-center">
+                        <div class="flex justify-content-start gap-2 align-items-center">
+                            <span class="pi pi-calendar"></span>
+                            <p>Due Date:</p>
+                        </div>
+                        <div> {{ singleTask.data.dueDate }}</div>
+                    </div>
+                    <div class="field mt-2 flex flex-column">
+                        <label for="name" class="ml-1">Description:</label>
                         <Textarea id="description" v-model="taskEditDescriptionInput"  rows="3" cols="20" />
                     </div>
-                    <div class="mb-1">
-                        <label>Attachment:</label>
-                    </div>
-                    <div>
-                        <input type="file" ref="fileInput" @change="handleFileChange">
-                        <!-- <button type="submit">Upload</button> -->
-                    </div>
+                  
                     <div class="flex justify-content-end ">
                         <Button type="submit" label="Submit" />
                     </div>
                 </div>
             </form>
+            
+            <!-- tab for details, sub task  -->
+            <TabView class="mt-3">
+                <TabPanel header="Detail">
+                    <p class="m-0">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                </TabPanel>
+                <TabPanel header="Sub Tasks">
+                    <p class="m-0">
+                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
+                        ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+                    </p>
+                </TabPanel>
+                <TabPanel header="Header III">
+                    <p class="m-0">
+                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui
+                        officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
+                    </p>
+                </TabPanel>
+            </TabView>
             
         </div>
         <div class="col-12 lg:col-5">
