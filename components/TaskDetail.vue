@@ -3,7 +3,7 @@
         <div class="col-12 lg:col-7">
             <form @submit.prevent="handleTaskDetailSubmit" class="task-detail">
                 <h5>Task Infos</h5>
-                <pre>{{singleTask}}</pre>
+                <!-- <pre>{{singleTask}}</pre> -->
                 <div class="card">
                     <div class="mb-3">
                         <label>Name: {{ singleTask.data.name }}</label>
@@ -19,10 +19,6 @@
                         <input type="file" ref="fileInput" @change="handleFileChange">
                         <!-- <button type="submit">Upload</button> -->
                     </div>
-                
-                      
-                    
-                    
                     <div class="flex justify-content-end ">
                         <Button type="submit" label="Submit" />
                     </div>
@@ -70,7 +66,7 @@
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { editTask, addTaskComment, getSingleTaskComments } = useCompanyStore();
+const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
 const {singleTask, projID} = defineProps(['singleTask', 'projID']);
 const toast = useToast();
@@ -154,7 +150,7 @@ const handleTaskDetailSubmit = async () => {
 };
 
 watchEffect(async () => {
-    getSingleTaskComments(singleTask.key);
+    getTaskDetails(singleTask.key);
 
 });
 

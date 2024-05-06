@@ -364,7 +364,7 @@ export const useCompanyStore = defineStore('workStation', {
           'priority' : priority,
           'assignees' : assignees,
           'projectId' : project_id,
-          'attachments' : attachments,
+          // 'attachments' : attachments,
         },
       });
        
@@ -427,7 +427,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isTaskCommentCreated = true;
-          this.getSingleTaskComments(id);
+          this.getTaskDetails(id);
           // this.getCompanyList();
           // this.getSpaceList();
         }

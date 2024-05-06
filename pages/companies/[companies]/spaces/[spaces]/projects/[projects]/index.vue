@@ -118,64 +118,8 @@
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <div class="grid">
-                <div class="col-12 lg:col-7">
-                    <div class="task-detail">
-                        <h5>Task Info</h5>
-                        <div class="card">
-                            <div class="mb-3">
-                                <label>Name: {{ taskNameEditInput }}</label>
-                            </div>
-                            <div class="field flex flex-column">
-                                <label for="name">Description:</label>
-                                <Textarea id="description" v-model="taskEditDescriptionInput" rows="3" cols="20" />
-                            </div>
-                            <!-- <div class="mb-1">
-                                <label>Attachment:</label>
-                            </div>
-                            <form @submit.prevent="submitForm">
-                                <input type="file" ref="fileInput" @change="handleFileChange">
-                                <button type="submit">Upload</button>
-                              </form> -->
-
-                            <div class="flex justify-content-end">
-                                <Button @click="handleAttachmentSubmit" label="Submit" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 lg:col-5">
-                    <div>
-                        <h5 class="cmc">Comments</h5>
-                        <div class="comment-wrapper card">
-                            <div class="comments">
-                                <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                                    <template class="commentator-name" #title>{{ val.commentator_name }}</template>
-                                    <template #content>
-                                        <p class="m-0">
-                                            {{ val.comment }}
-                                        </p>
-                                        <i class="float-right"> {{ val.time }} </i>
-                                    </template>
-                                </Card>
-                            </div>
-
-                            <div class="comment-add">
-                                <form @submit.prevent="handleTaskComment" class="formgroup-inline">
-                                    <div class="field">
-                                        <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
-                                    </div>
-
-                                    <Button type="submit" label="Add" :loading="btnLoading" />
-
-                                    <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <Dialog  v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskDetail :singleTask="singleTask" :projID="singleProject?.statuses[0]?.project_id"/>
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -190,8 +134,8 @@
 import { storeToRefs } from 'pinia';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getTaskDetails } = useCompanyStore();
-const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated, singleTaskComments } = storeToRefs(useCompanyStore());
+const { getSingleProject, createTask, editTask, deleteTask, getTaskAssignModalData, addTaskComment } = useCompanyStore();
+const { singleProject, isTaskCreated, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
 
 const usersListStore = useCompanyStore();
 // Access users data
@@ -358,10 +302,11 @@ const visibleTaskDetailView = ref(false);
 const singleTask = ref(null);
 
 const handleTaskDetailView = (task) => {
+    console.log('task', task);
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    getTaskDetails(task.key);
+    // getSingleTaskComments(task.key);
     visibleTaskDetailView.value = true;
 };
 
