@@ -40,17 +40,17 @@
                 <TabPanel header="Sub Tasks">
                     <TreeTable class="stabd" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                         <template #empty> <p class="text-center">No Data found...</p> </template>
-                        <Column class="cursor-pointer" field="name" header="Name" expander></Column>
+                        <Column class="cursor-pointer" field="name" :style="{ width: '200px' }" header="Name" expander></Column>
                         <Column field="assignee" header="Assignee"></Column>
                         <Column field="dueDate" header="Due Date"></Column>
                         <Column field="priority" header="Priority"></Column>
                         <Column field="action" header="Action">
-                            <template #body="slotProps">
+                            <!-- <template #body="slotProps">
                                 <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
                                 <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
                                 <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
                                 <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
-                            </template>
+                            </template> -->
                         </Column>
                     </TreeTable>
                 </TabPanel>
