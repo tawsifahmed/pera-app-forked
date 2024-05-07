@@ -3,9 +3,10 @@ import { ref } from 'vue';
 import AppMenuItem from './AppMenuItem.vue';
 
 import { storeToRefs } from 'pinia';
-import { useCompanyStore } from '~/store/company';
-const { getCompanyList } = useCompanyStore();
-const { companyList } = storeToRefs(useCompanyStore());
+import { useActiveCompanyStore } from '~/store/workCompany';
+const companies = useActiveCompanyStore()
+companies.getCompany()
+const { menu,company } = storeToRefs(useActiveCompanyStore());
 
 const model = ref([
     {
@@ -18,60 +19,32 @@ const model = ref([
     {
         label: 'Spaces',
         option:'space_option',
-        items: []
+        items: menu
     }
 ])
 
-const setData = () =>{
-    const items = []
-    companyList.value[0]?.spaces.forEach(element => {
-        const obj = {
-            'label': element?.name,
-            'icon': 'pi pi-list',
-            'color': element?.color,
-            'id': element?.id,
-            'name': element?.name,
-            'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
-            'items':[]
-        }
-        if (element.projects.length > 0){
-            const project = []
-            element.projects.forEach(ele => {
-                const proObj = {
-                    'label': ele?.name,
-                    'id': element?.id,
-                    'icon': 'pi pi-list',
-                    'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
-                }
-                obj.items.push(proObj)
-            });
-        }
-        items.push(obj)
-    });
-    model.value[1].items = items.reverse();
-}
-
 watchEffect(async() => {
-    await getCompanyList()
-    setData()
+
 })
 
 </script>
 
 <template>
     <div>
-    <div class="mt-3" v-if="companyList">
-        <div class="flex align-items-center">
-            <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{companyList[0]?.name?.charAt(0)}}</span>
-            <h5 class="m-0 font-bold font-size-16">{{companyList[0]?.name}}</h5>
+        <div class="mt-3" v-if="company">
+            <div class="flex align-items-center">
+                <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{company?.charAt(0)}}</span>
+                <h5 class="m-0 font-bold font-size-16">{{company}}</h5>
+            </div>
         </div>
-    </div>
-    <ul class="layout-menu">
-        <template v-for="(item, i) in model" :key="item">
-            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-            <li v-if="item.separator" class="menu-separator"></li>
-        </template>
-    </ul>
+        <hr>
+        <ul class="layout-menu">
+            <template v-for="(item, i) in model" :key="item.id">
+                <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
+                <li v-if="item.separator" class="menu-separator"></li>
+            </template>
+        </ul>
+
     </div>
 </template>
 

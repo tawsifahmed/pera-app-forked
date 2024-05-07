@@ -60,7 +60,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleCompany(company){
         const token = useCookie('token');
         const { data, pending, error } = await useAsyncData(
-            'companyList',
+            'getSingleCompany',
             () => $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`,{
             headers: {
                 Authorization: `Bearer ${token.value}`,

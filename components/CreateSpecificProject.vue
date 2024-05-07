@@ -1,6 +1,91 @@
+<script setup>
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import ColorPicker from 'primevue/colorpicker';
+import { useWorkProjectStore } from '../store/workProjects';
+const project = useWorkProjectStore(); // use authenticateUser action from  auth store
+const { save } = storeToRefs(useWorkProjectStore());
+const {singleSpace} = defineProps(['singleSpace']);
+const companyFormInputs = ref(false);
+const errorHandler = ref(false);
+
+const taskStatusName = ref('');
+
+const taskStatusList = ref([
+    {
+        'taskStatusName': 'Open',
+        'taskStatusColor': `#6466f1`
+    },
+    {
+        'taskStatusName': 'Doing',
+        'taskStatusColor': `#ff0084`
+    },
+    {
+        'taskStatusName': 'Dev Done',
+        'taskStatusColor': `#12955d`
+    },
+]);
+
+const colorHEX = ref('6466f1');
+const taskStatusNullCheck = ref(null);
+const addTaskSTatusError= ref(false);
+const projectNameInput = ref(null);
+const projectDescriptionInput = ref(null);
+
+const showDialog = () => {
+    companyFormInputs.value = true
+}
+const hideDialog = () => {
+    companyFormInputs.value = false
+}
+const addTaskStatus = () => {
+    taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
+    if(taskStatusName?.value?.length > 0){
+        const newTaskStatusList = {
+            taskStatusName: taskStatusName.value,
+            taskStatusColor: `#${colorHEX.value}`
+        }
+        taskStatusList.value.push(newTaskStatusList);
+        taskStatusName.value = '';
+    }else{
+        addTaskSTatusError.value = true;
+    }
+
+    if(taskStatusList.value.length > 0){
+        taskStatusNullCheck.value = true;
+    }
+};
+
+const handleDeleteTask = (index) => {
+    taskStatusList.value.splice(index, 1);
+    if (taskStatusList.value.length == 0){
+        taskStatusNullCheck.value = false;
+    }
+};
+
+const handleCreateProject = async () => {
+    if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0){
+        errorHandler.value = true
+    }else{
+        errorHandler.value = false
+        const createProjectData = {
+            'name': projectNameInput.value,
+            'description': projectDescriptionInput.value,
+            'space_id': singleSpace.id,
+            'statuses': taskStatusList.value,
+        }
+        await project.createProjects(createProjectData);
+        if(save.value === true){
+            companyFormInputs.value = false
+        }else{
+            console.log('space not created')
+        }
+    }
+}
+</script>
+
 <template>
     <div>
-        <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
+        <Button icon="pi pi-plus" class="p-button-sm  w-2rem h-2rem " @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
         <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Project" :modal="true" class="p-fluid">
             <div class="field">
                 <label for="name">Create project for <strong>{{singleSpace?.name}}</strong> space</label>
@@ -70,99 +155,7 @@
     </div>
 </template>
 
-<script setup>
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createProject } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isProjectCreated } = storeToRefs(useCompanyStore()); 
-import ColorPicker from 'primevue/colorpicker';
-import InputSwitch from 'primevue/inputswitch';
 
-const {singleSpace} = defineProps(['singleSpace']);
-const companyFormInputs = ref(false);
-const showFinalMsg = ref(false);
-const errorHandler = ref(false);
-
-const taskStatusName = ref('');
-
-const taskStatusList = ref([
-  {
-    'taskStatusName': 'Open',
-    'taskStatusColor': `#6466f1`
-  },
-  {
-    'taskStatusName': 'Doing',
-    'taskStatusColor': `#ff0084`
-  },
-  {
-    'taskStatusName': 'Dev Done',
-    'taskStatusColor': `#12955d`
-  },
-]);
-
-const colorHEX = ref('6466f1');
-const taskStatusNullCheck = ref(null);
-const addTaskSTatusError= ref(false);
-const projectNameInput = ref(null);
-const projectDescriptionInput = ref(null);
-
-const showDialog = () => {
-    companyFormInputs.value = true
-}
-const hideDialog = () => {
-    companyFormInputs.value = false
-}
-const addTaskStatus = () => {
-  taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
-  if(taskStatusName?.value?.length > 0){
-    
-    const newTaskStatusList = {
-    taskStatusName: taskStatusName.value,
-    taskStatusColor: `#${colorHEX.value}`
-   }
-   taskStatusList.value.push(newTaskStatusList);
-   taskStatusName.value = '';
-  }else{
-    addTaskSTatusError.value = true;
-  }
-
-  if(taskStatusList.value.length > 0){
-    taskStatusNullCheck.value = true;
-  }
-};
-
-const handleDeleteTask = (index) => {
-  taskStatusList.value.splice(index, 1);
-  if (taskStatusList.value.length == 0){
-    taskStatusNullCheck.value = false;
-  }
-};
-
-const handleCreateProject = async () => {
-    if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0){
-        errorHandler.value = true
-        // return
-    }else{
-        errorHandler.value = false
-        const createProjectData = {
-          'name': projectNameInput.value,
-          'description': projectDescriptionInput.value,
-          'space_id': singleSpace.id,
-          'statuses': taskStatusList.value,
-      }
-      await createProject(createProjectData);
-
-      if(isProjectCreated.value === true){
-          companyFormInputs.value = false
-          showFinalMsg.value = true
-      }else{
-          console.log('space not created')
-      }
-    }
-}
-
-
-</script>
 
 <style lang="scss">
 .color-pick{

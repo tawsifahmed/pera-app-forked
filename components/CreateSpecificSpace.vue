@@ -1,29 +1,19 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createSpace } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceCreated } = storeToRefs(useCompanyStore()); 
-import ColorPicker from 'primevue/colorpicker';
-import InputSwitch from 'primevue/inputswitch';
-
+const { createSpace,getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
+const { isSpaceCreated } = storeToRefs(useCompanyStore());
 const {singleCompany} = defineProps(['singleCompany']);
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
 
 const progress = ref(12.5);
-
 const dynamicDiv = ref(null);
-
 const spaceAvatarPreview = ref(null);
-
 const spaceNameInput = ref(null);
-
 const spaceDescripInput = ref(null);
-
 const spaceColorPreview = ref(null);
-
-console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
 const changeColor = (event) => {
   if(dynamicDiv.value.style.backgroundColor === event.target.id){
@@ -44,8 +34,6 @@ const changeColor = (event) => {
       color: 'white' 
     }
     spaceAvatarPreview.value = storeAvatarData.bgcolor;
-    // console.log('storeAvatarData', spaceAvatarPreview.value);
-
     spaceColorPreview.value.style.backgroundColor = event.target.id;
     spaceColorPreview.value.style.color = 'white';
     spaceColorPreview.value.style.border = 'none';
@@ -53,40 +41,28 @@ const changeColor = (event) => {
 };
 
 const handleCreateSpace = async () => {
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
-            errorHandler.value = true
-            return
-        }else{
-            const createSpaceData = {
-              'name': spaceNameInput.value,
-              'description': spaceDescripInput.value,
-              'company_id': singleCompany.id,
-              'color': spaceAvatarPreview.value,
-              // 'shared_status': selectedShareSpace.value,
-              // 'task_statuses': taskStatusList.value,
-              // 'features': selectedFeatures.value,
-              // 'views': checkedViews,
-          }
-          console.log('spaceData', createSpaceData)
+    if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
+        errorHandler.value = true
+        return
+    }else{
+        const createSpaceData = {
+          'name': spaceNameInput.value,
+          'description': spaceDescripInput.value,
+          'company_id': singleCompany.id,
+          'color': spaceAvatarPreview.value,
+      }
+      await createSpace(createSpaceData);
+      if(isSpaceCreated.value === true){
+          spaceFormInputs.value = false
+          showFinalMsg.value = true
+      }else{
 
-          await createSpace(createSpaceData);
-
-          if(isSpaceCreated.value === true){
-              spaceFormInputs.value = false
-              showFinalMsg.value = true   
-
-              console.log('space created')
-          }else{
-              console.log('space not created')
-          }
-        }
-
-        // const formData = new FormData()
-        // formData.append('name', workSpaceName.value)
-        // formData.append('size', wPeople.value)
-        // formData.append('number_of_employees', numEmployees.value)
-        // formData.append('company_role', rRole.value)
+      }
     }
+}
+watchEffect(() => {
+    getCompanyList();
+});
 
 
 </script>
