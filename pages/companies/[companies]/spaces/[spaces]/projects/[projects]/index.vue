@@ -30,10 +30,10 @@
                     </div>
                 </template>
                 <template #empty> <p class="text-center">No Data found...</p> </template>
-                <Column class="cursor-pointer" field="name" header="Name" expander></Column>
-                <Column field="assignee" header="Assignee"></Column>
-                <Column field="dueDate" header="Due Date"></Column>
-                <Column field="priority" header="Priority"></Column>
+                <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '400px' }"></Column>
+                <Column field="assignee" header="Assignee" :style="{ width: '150px' }"></Column>
+                <Column field="dueDate" header="Due Date" :style="{ width: '100px' }"></Column>
+                <Column field="priority" header="Priority" :style="{ width: '100px' }"></Column>
                 <Column field="action" header="Action">
                     <template #body="slotProps">
                         <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
@@ -69,21 +69,22 @@
     </div>
 </template>
 <script setup>
-import { storeToRefs } from 'pinia';
-import Dialog from 'primevue/dialog';
-import { useCompanyStore } from '~/store/company';
-const { getSingleProject, editTask, deleteTask, getTaskAssignModalData, addTaskComment } = useCompanyStore();
-const { singleProject, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
-
-const usersListStore = useCompanyStore();
 // Access users data
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 
+import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
+import Dialog from 'primevue/dialog';
+import { useCompanyStore } from '~/store/company';
+
+const usersListStore = useCompanyStore();
+const { getSingleProject, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getTaskDetails } = useCompanyStore();
+const { singleProject, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
+
 const filters = ref({});
 const loading = ref(true);
 const toast = useToast();
@@ -97,22 +98,6 @@ const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
 
-const openCreateSpace = (key, type) => {
-    if (key) {
-        taskId.value = key;
-    } else {
-        taskId.value = '';
-    }
-    console.log('taskId', taskId.value);
-    if (type == 'sub-task') {
-        createTaskTitle.value = 'Create Sub Task';
-    } else {
-        createTaskTitle.value = 'Create Task';
-    }
-    visible.value = true;
-    console.log('visible', visible.value);
-};
-
 const taskNameEditInput = ref(null);
 const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
@@ -121,10 +106,25 @@ const assignees = ref([]);
 const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const visibleEdit = ref(false);
+const deleteTaskDialog = ref(false);
+const visibleTaskDetailView = ref(false);
+
+const openCreateSpace = (key, type) => {
+    if (key) {
+        taskId.value = key;
+    } else {
+        taskId.value = '';
+    }
+    if (type == 'sub-task') {
+        createTaskTitle.value = 'Create Sub Task';
+    } else {
+        createTaskTitle.value = 'Create Task';
+    }
+    visible.value = true;
+};
 
 const handleTaskEdit = async (task) => {
     singleTask.value = task;
-    // console.log(task);
 
     await getTaskAssignModalData(); // Await the function call
     usersLists.value = usersListStore.users;
@@ -143,7 +143,6 @@ const confirmDeleteTask = (taskId) => {
     deleteTaskDialog.value = true;
 };
 
-const deleteTaskDialog = ref(false);
 
 const deletingTask = async () => {
     btnLoading.value = true;
@@ -158,13 +157,11 @@ const deletingTask = async () => {
     }
 };
 
-const visibleTaskDetailView = ref(false);
 const handleTaskDetailView = (task) => {
-    console.log('task', task);
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    // getSingleTaskComments(task.key);
+    // getTaskDetails(task.key);
     visibleTaskDetailView.value = true;
 };
 
