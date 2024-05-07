@@ -1,15 +1,17 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
-const { createSpace, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceCreated, companyList } = storeToRefs(useCompanyStore());
+import { useActiveCompanyStore } from '~/store/workCompany';
+import { useWorkSpaceStore } from '../store/workSpace';
+const companies = useActiveCompanyStore()
+companies.getCompany()
+const { company_id } = storeToRefs(useActiveCompanyStore());
+const space = useWorkSpaceStore()
+const { save } = storeToRefs(useWorkSpaceStore());
 const spaceFormInputs = ref(false);
 const spaceNameError = ref(false);
 const spaceDescriptionError = ref(false);
-const dynamicDiv = ref(null);
-
 const spaceNameInput = ref(null);
 const spaceDescripInput = ref(null);
 const spaceAvatarPreview = ref('#8080805c');
@@ -33,13 +35,13 @@ const handleCreateSpace = async () => {
         const createSpaceData = {
             'name': spaceNameInput.value,
             'description': spaceDescripInput.value,
-            'company_id': companyList.value[0].id,
+            'company_id': company_id,
             'color': spaceAvatarPreview.value,
         }
         // return
-        await createSpace(createSpaceData);
+        await space.createSpace(createSpaceData);
         
-        if(isSpaceCreated.value == true){
+        if(save.value == true){
             spaceFormInputs.value = false;
             spaceNameInput.value = null;
             spaceDescripInput.value = null;
@@ -53,9 +55,6 @@ const handleCreateSpace = async () => {
     }
 }
 
-watchEffect(() => {
-    getCompanyList();
-});
 const showDialog = () => {
     spaceFormInputs.value = true
 }
@@ -68,7 +67,7 @@ const hideDialog = () => {
 
 <template>
     <div>
-    <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
+    <Button icon="pi pi-plus" class="p-button-sm  w-2rem h-2rem " @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
     <Dialog v-model:visible="spaceFormInputs" :style="{ width: '450px' }" header="Create Space" :modal="true" class="p-fluid">
         <div class="field">
             <label for="name">Space Name</label>
@@ -85,14 +84,18 @@ const hideDialog = () => {
                     <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl">S</div>
                     <div class="ml-2">
                         <div class="flex">
-                            <div id="crimson" class='color' @click="changeColor('crimson')"></div>
-                            <div id="skyblue" class='color' @click="changeColor('skyblue')"></div>
-                            <div id="orange" class='color' @click="changeColor('orange')"></div>
-                            <div id="purple" class='color' @click="changeColor('purple')"></div>
-                            <div id="cadetblue" class='color' @click="changeColor('cadetblue')"></div>
-                            <div id="burlywood" class='color' @click="changeColor('burlywood')"></div>
-                            <div id="pink" class='color' @click="changeColor('pink')"></div>
-                            <div id="lightseagreen" class='color' @click="changeColor('lightseagreen')"></div>
+                            <div id="white" class='color' @click="changeColor('#ffffff')"></div>
+                            <div id="gray" class='color' @click="changeColor('#9e9e9e')"></div>
+                            <div id="orange" class='color' @click="changeColor('#ff9800')"></div>
+                            <div id="purple" class='color' @click="changeColor('#9c27b0')"></div>
+                            <div id="cadetblue" class='color' @click="changeColor('#e91e63')"></div>
+                            <div id="burlywood" class='color' @click="changeColor('#4caf50')"></div>
+                            <div id="pink" class='color' @click="changeColor('#f44336')"></div>
+                            <div id="lightseagreen" class='color' @click="changeColor('#009688')"></div>
+                            <div id="brown" class='color' @click="changeColor('#795548')"></div>
+                            <div id="cyan" class='color' @click="changeColor('#00bcd4')"></div>
+                            <div id="amber" class='color' @click="changeColor('#ffc107')"></div>
+                            <div id="indigo" class='color' @click="changeColor('#3f51b5')"></div>
                         </div>
                     </div>
                 </div>
@@ -112,48 +115,63 @@ const hideDialog = () => {
     height: 55px;
     width: 55px;
     border-radius: 10px;
-    color: white;
+    color:#dddd;
     display: flex;
+    border: 1px solid #ededed;
 }
 
 .color{
-  margin-left: 10px;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  cursor: pointer;
+    margin-left: 6px;
+    height: 24px;
+    width: 23px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 1px solid #ededed;
 }
 
-#crimson{
-  background-color: crimson;
+#white{
+  background-color: #ffff;
+
 }
 
-#skyblue{
-  background-color: skyblue;
+#gray{
+  background-color: #9e9e9e;
 }
 
 #orange{
-  background-color: orange
+  background-color: #ff9800
 }
 
 #purple{
-  background-color: purple;
+  background-color: #9c27b0;
 }
 
 #cadetblue{
-  background-color: cadetblue;
+  background-color: #e91e63;
 }
 
 #burlywood{
-  background-color: burlywood;
+  background-color: #4caf50;
 }
 
 #pink{
-  background-color: pink;
+  background-color: #f44336;
 }
 
 #lightseagreen{
-  background-color: lightseagreen;
+  background-color: #009688;
+}
+#brown{
+  background-color: #795548;
+}
+#cyan{
+  background-color: #00bcd4;
+}
+#amber{
+  background-color: #ffc107;
+}
+#indigo{
+  background-color: #3f51b5;
 }
 
 

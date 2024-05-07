@@ -1,19 +1,19 @@
 import { defineStore } from 'pinia'
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore()
-export const useWorkSpaceStore = defineStore('workSpace', {
+export const useWorkProjectStore = defineStore('workProjects', {
     state: () => ({
-        isSpaceCreated: null,
+        isProjectCreated: null,
     }),
     getters: {
         save(state) {
-            return state.isSpaceCreated
+            return state.isProjectCreated
         }
     },
     actions: {
-        async createSpace ({name, description, company_id, color}) {
+        async createProjects ({name, description, space_id, statuses}) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/create`, {
+            const { data, pending } = await  useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -21,12 +21,13 @@ export const useWorkSpaceStore = defineStore('workSpace', {
                 body: {
                     'name' : name,
                     'description' : description,
-                    'company_id' : company_id,
-                    'color' : color,
+                    'space_id' : space_id,
+                    'statuses' : statuses,
                 },
             });
+
             if(data.value.app_message === 'success'){
-                this.isSpaceCreated = true;
+                this.isProjectCreated = true;
                 await companies.getCompany()
             }
         },

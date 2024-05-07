@@ -96,21 +96,22 @@ const toggle = (event) => {
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
+
             <div v-if="item.option == 'space_option'">
                 <div class="flex">
-                    <Button type="button" icon="pi pi-ellipsis-h" class="p-button-sm" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                    <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
                     <CreateSpace/>
                 </div>
             </div>
         </div>
-        <a class="p-2 flex justify-content-between" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
-            <div class="flex align-items-center">
+        <a class="pl-1 pr-1 pt-2 pb-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+             <div class="flex align-items-center">
                 <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
                 <span class="layout-menuitem-text">{{ item.label }}  </span>
             </div>
-            <div class="flex align-items-center">
-                <i v-if="item.items.length > 0" class="text-xl pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+            <div class="flex align-items-center ml-auto">
+                <i v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject :singleSpace="item" />
             </div>
         </a>
