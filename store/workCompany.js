@@ -62,7 +62,8 @@ export const useActiveCompanyStore = defineStore('ActiveCompany',{
             },
           }),
       )
+      // console.log('process.env.API_URL=>',process.env.API_URL)
       this.activeCompany = await data.value?.data;
     },
-  },
+  }
 });

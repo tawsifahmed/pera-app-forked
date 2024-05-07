@@ -73,6 +73,9 @@ const handleCreateProject = async () => {
             'space_id': singleSpace.id,
             'statuses': taskStatusList.value,
         }
+
+        console.log('createProjectData', createProjectData)
+        return
         await project.createProjects(createProjectData);
         if(save.value === true){
             companyFormInputs.value = false
