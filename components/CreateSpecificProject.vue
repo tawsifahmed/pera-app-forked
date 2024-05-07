@@ -74,8 +74,8 @@ const handleCreateProject = async () => {
             'statuses': taskStatusList.value,
         }
 
-        console.log('createProjectData', createProjectData)
-        return
+        //console.log('createProjectData', createProjectData)
+        //return
         await project.createProjects(createProjectData);
         if(save.value === true){
             companyFormInputs.value = false
