@@ -1,9 +1,14 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
+import { useCompanyStore } from '~/store/company';
 const companies = useActiveCompanyStore()
+const { company_id } = storeToRefs(useActiveCompanyStore());
+const single = useCompanyStore()
+
 export const useWorkSpaceStore = defineStore('workSpace', {
     state: () => ({
         isSpaceCreated: null,
+        comID: company_id
     }),
     getters: {
         save(state) {
@@ -26,8 +31,10 @@ export const useWorkSpaceStore = defineStore('workSpace', {
                 },
             });
             if(data.value.app_message === 'success'){
+                console.log('company_id', company_id)
                 this.isSpaceCreated = true;
                 await companies.getCompany()
+                await single.getSingleCompany(this.comID)
             }
         },
     },

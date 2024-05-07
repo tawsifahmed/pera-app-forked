@@ -5,7 +5,7 @@ import AppMenuItem from './AppMenuItem.vue';
 import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore()
-companies.getCompany()
+// companies.getCompany()
 const { menu,company } = storeToRefs(useActiveCompanyStore());
 
 const model = ref([

@@ -105,7 +105,7 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-        <a class="pl-1 pr-1 pt-2 pb-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+        <a class="p-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
              <div class="flex align-items-center">
                 <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
                 <span class="layout-menuitem-text">{{ item.label }}  </span>
