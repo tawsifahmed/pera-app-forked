@@ -92,7 +92,7 @@ const edittProject = (id) =>{
                 <p class="text cursor-pointer">Space - {{singleSpace?.name}}</p>
             </div>
             <div class="create-btn-wrapper">
-                <CreateSpecificProject :singleSpace="singleSpace" />
+                <CreateSpecificProject :singleSpace="singleSpace" :spaces="spaces" />
             </div>
         </div>
         <DataTable v-model:filters="filters" :value="singleSpace?.projects" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
