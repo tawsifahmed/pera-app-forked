@@ -43,7 +43,7 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { editTask, getTaskAssignModalData } = useCompanyStore();
+const { editTask } = useCompanyStore();
 const { isTaskEdited } = storeToRefs(useCompanyStore());
 const {singleTask, usersLists, projects} = defineProps(['singleTask', 'usersLists', 'projects']);
 const toast = useToast();

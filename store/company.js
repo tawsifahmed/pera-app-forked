@@ -311,7 +311,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async createTask ({name, description, project_id, parent_task_id}) {
+    async createTask ({name,description, project_id, parent_task_id, dueDate, priority, assignees}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
         method: 'POST',
@@ -320,9 +320,12 @@ export const useCompanyStore = defineStore('workStation', {
         },
         body: {
           'name' : name,
-          'description' : description,
           'project_id' : project_id,
           'parent_task_id' : parent_task_id,
+          'due_date' : dueDate,
+          'priority' : priority,
+          'assignees' : assignees,
+          'description' : description,
           },
         });
        
@@ -330,24 +333,6 @@ export const useCompanyStore = defineStore('workStation', {
           this.isTaskCreated = true;
           this.getSingleProject(project_id);
         }
-    },
-    async deleteTask (taskID, projectId) {
-      const token = useCookie('token'); 
-      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-        body: {
-          'id' : taskID,
-        },
-      });
-        if(data.value?.app_message === 'success'){
-          this.isTaskDeleted = true;
-          // this.getSpaceList();
-          this.getSingleProject(projectId);
-        }
-
     },
     async editTask ({id, name, description, project_id, dueDate, priority, assignees}) {
       const token = useCookie('token'); 
@@ -372,6 +357,24 @@ export const useCompanyStore = defineStore('workStation', {
           console.log('dataAttach', data)
           this.isTaskEdited = true;
           this.getSingleProject(project_id);
+        }
+
+    },
+    async deleteTask (taskID, projectId) {
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : taskID,
+        },
+      });
+        if(data.value?.app_message === 'success'){
+          this.isTaskDeleted = true;
+          // this.getSpaceList();
+          this.getSingleProject(projectId);
         }
 
     },

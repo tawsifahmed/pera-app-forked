@@ -45,12 +45,12 @@
                         <Column field="dueDate" header="Due Date"></Column>
                         <Column field="priority" header="Priority"></Column>
                         <Column field="action" header="Action">
-                            <!-- <template #body="slotProps">
-                                <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
-                                <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
-                                <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
-                                <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
-                            </template> -->
+                            <template #body="slotProps">
+                                <Button icon="pi pi-plus" class="mr-2" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                                <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                <Button icon="pi pi-cog" class="mr-2" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                            </template>
                         </Column>
                     </TreeTable>
                 </TabPanel>
@@ -96,6 +96,8 @@ import { useCompanyStore } from '~/store/company';
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
 const { singleTask, projID } = defineProps(['singleTask', 'projID']);
+
+const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
 const toast = useToast();
 const btnLoading = ref(false);

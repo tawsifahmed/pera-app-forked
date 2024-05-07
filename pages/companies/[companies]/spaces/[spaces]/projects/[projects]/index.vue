@@ -17,47 +17,22 @@
 
         <!-- Datatable -->
         <div class="card">
-            <!-- <pre>{{singleProject.statuses[0].project_id}}</pre> -->
-            <TreeTable class="stabd" v-model:filters="filters" :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
-                <template #header>
-                    <div class="flex justify-content-end">
-                        <IconField iconPosition="right">
-                            <InputIcon>
-                                <i class="pi pi-search" />
-                            </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                        </IconField>
-                    </div>
-                </template>
-                <template #empty> <p class="text-center">No Data found...</p> </template>
-                <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '400px' }"></Column>
-                <Column field="assignee" header="Assignee" :style="{ width: '150px' }"></Column>
-                <Column field="dueDate" header="Due Date" :style="{ width: '100px' }"></Column>
-                <Column field="priority" header="Priority" :style="{ width: '100px' }"></Column>
-                <Column field="action" header="Action">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-plus" class="mr-2" severity="success" @click="openCreateSpace(slotProps.node.key, 'sub-task')" rounded />
-                        <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="handleTaskEdit(slotProps.node)" rounded />
-                        <Button icon="pi pi-cog" class="mr-2" severity="info" @click="handleTaskDetailView(slotProps.node)" rounded />
-                        <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteTask(slotProps.node.key)" />
-                    </template>
-                </Column>
-            </TreeTable>
+            <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
         </div>
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskCreateTask :createTaskTitle="createTaskTitle" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
+            <TaskCreateTask :createTaskTitle="createTaskTitle" :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
+            <TaskEditTask :singleTask="singleTask" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="projects" />
+            <TaskDetail :singleTask="singleTask" :projID="projects" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)" />
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -77,13 +52,12 @@ definePageMeta({
 
 import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
-import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
 
 const usersListStore = useCompanyStore();
-const { getSingleProject, editTask, deleteTask, getTaskAssignModalData, addTaskComment, getTaskDetails } = useCompanyStore();
-const { singleProject, isTaskDeleted, isTaskEdited, tasks, isTaskCommentCreated } = storeToRefs(useCompanyStore());
+const { getSingleProject, deleteTask, getTaskAssignModalData } = useCompanyStore();
+const { singleProject, isTaskDeleted, tasks } = storeToRefs(useCompanyStore());
 
 const filters = ref({});
 const loading = ref(true);
@@ -143,7 +117,6 @@ const confirmDeleteTask = (taskId) => {
     deleteTaskDialog.value = true;
 };
 
-
 const deletingTask = async () => {
     btnLoading.value = true;
     await deleteTask(refTaskId.value, projects);
@@ -158,6 +131,11 @@ const deletingTask = async () => {
 };
 
 const handleTaskDetailView = (task) => {
+    console.log(visibleTaskDetailView.value);
+
+    if (visibleTaskDetailView.value) {
+        visibleTaskDetailView.value = false;
+    }
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
