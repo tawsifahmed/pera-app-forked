@@ -4,7 +4,7 @@ import ColorPicker from 'primevue/colorpicker';
 import { useWorkProjectStore } from '../store/workProjects';
 const project = useWorkProjectStore(); // use authenticateUser action from  auth store
 const { save } = storeToRefs(useWorkProjectStore());
-const {singleSpace} = defineProps(['singleSpace']);
+const {singleSpace, spaces} = defineProps(['singleSpace', 'spaces']);
 const companyFormInputs = ref(false);
 const errorHandler = ref(false);
 
@@ -70,7 +70,7 @@ const handleCreateProject = async () => {
         const createProjectData = {
             'name': projectNameInput.value,
             'description': projectDescriptionInput.value,
-            'space_id': singleSpace.id,
+            'space_id': spaces,
             'statuses': taskStatusList.value,
         }
 
