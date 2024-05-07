@@ -60,7 +60,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleCompany(company){
         const token = useCookie('token');
         const { data, pending, error } = await useAsyncData(
-            'getSingleCompany',
+            'singleCompany',
             () => $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`,{
             headers: {
                 Authorization: `Bearer ${token.value}`,
@@ -170,7 +170,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleSpace(space){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-          'companyList',
+          'singleSpace',
           () => $fetch(`http://188.166.212.40/pera/public/api/v1/space/show/${space}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
@@ -246,7 +246,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getProjectList(){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-        'spaceList',
+        'projectList',
         () => $fetch('http://188.166.212.40/pera/public/api/v1/space/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
@@ -260,7 +260,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getSingleProject(projectID){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-          'companyList',
+          'singleProject',
           () => $fetch(`http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
@@ -379,7 +379,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getTaskAssignModalData(){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-        'companyList',
+        'taskAssignModalData',
         () => $fetch('http://188.166.212.40/pera/public/api/v1/users/list',{
           headers: {
             Authorization: `Bearer ${token.value}`,
@@ -402,7 +402,7 @@ export const useCompanyStore = defineStore('workStation', {
     async getTaskDetails(id){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
-          'getSingleTaskComments',
+          'taskDetails',
           () => $fetch(`http://188.166.212.40/pera/public/api/v1/tasks/show/${id}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
