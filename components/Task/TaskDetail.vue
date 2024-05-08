@@ -220,11 +220,11 @@ const handleTaskDetailSubmit = async () => {
     await editTask(taskDetailData);
 
     if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Edited Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
         // taskEditDescriptionInput.value = null;
         selectedfile.value = null;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit task', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
     }
 };
 
