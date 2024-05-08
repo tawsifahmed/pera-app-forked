@@ -57,7 +57,7 @@
                                     <Button  label="Upload" />
                                 </div>
                             </TabPanel>
-                            <TabPanel :header="`Sub Tasks ${subTasks.length}`">
+                            <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
                                 <TreeTable class="stabd" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty> <p class="text-center">No Data found...</p> </template>
                                     <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
@@ -67,7 +67,7 @@
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px;" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%;" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                                                 <div class="action-dropdown-content">
                                                     <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
                                                     <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
@@ -166,9 +166,14 @@ const handleTaskDetailSubmit = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit task', life: 3000 });
     }
 };
+
 onMounted(() => {
     getTaskDetails(singleTask.key);
 });
+
+// watchEffect(() => {
+//     getTaskDetails(singleTask.key);
+// });
 </script>
 
 <style lang="scss" scoped>
