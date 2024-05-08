@@ -83,7 +83,7 @@ const visibleEdit = ref(false);
 const deleteTaskDialog = ref(false);
 const visibleTaskDetailView = ref(false);
 
-const openCreateSpace = (key, type) => {
+const openCreateSpace = async (key, type) => {
     if (key) {
         taskId.value = key;
     } else {
@@ -95,6 +95,8 @@ const openCreateSpace = (key, type) => {
         createTaskTitle.value = 'Create Task';
     }
     visible.value = true;
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
 };
 
 const handleTaskEdit = async (task) => {
@@ -129,14 +131,16 @@ const deletingTask = async () => {
     }
 };
 
-const handleTaskDetailView = (task) => {
+const handleTaskDetailView = async (task) => {
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    getTaskDetails(task.key);
+    // getTaskDetails(task.key);
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
     visibleTaskDetailView.value = true;
 };
 

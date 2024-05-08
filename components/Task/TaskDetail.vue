@@ -17,8 +17,8 @@
                                             <span class="pi pi-user"></span>
                                             <p>Assignee:</p>
                                         </div>
-                                        <FloatLabel class=" input-fields">
-                                            <MultiSelect style="width: 120px;" v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="1" class="w-full" />
+                                        <FloatLabel style="width: 164.94px;" class="input-fields">
+                                            <MultiSelect  v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
                                     <div
@@ -29,7 +29,7 @@
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar style="width: 120px;" v-model="dueDate" showIcon iconDisplay="input"
+                                            <Calendar style="width: 164.94px;" v-model="dueDate" showIcon iconDisplay="input"
                                                  />
                                             <!-- <Calendar v-model="dueDate" class="w-full" /> -->
 
@@ -38,7 +38,7 @@
                                 </div>
                                 <div>
                                     <div
-                                        class="flex justify-content-between gap-5 align-items-center task-detail-wrapper">
+                                        class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
@@ -46,25 +46,25 @@
                                         </div>
                                         <FloatLabel class="input-fields">
                                             <Dropdown v-model="priority" :options="priorities" optionLabel="name"
-                                                placeholder="" class="w-full" />
+                                                placeholder=""/>
                                         </FloatLabel>
                                     </div>
                                     <div
-                                        class="flex mt-2 justify-content-between gap-5 align-items-center task-detail-wrapper">
+                                        class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start gap-2 align-items-center task-detail-property">
-                                            <span class="pi pi-flag"></span>
-                                            <p>Priority:</p>
+                                            <span class="pi pi-stopwatch"></span>
+                                            <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Dropdown v-model="priority" :options="priorities" optionLabel="name"
-                                                placeholder="" class="w-full" />
+                                            <Dropdown disabled="" :options="priorities" optionLabel="name"
+                                             placeholder="0:00"/>
                                         </FloatLabel>
                                     </div>
                                 </div>
 
                             </div>
-                            <div class="field mt-2 flex flex-column">
+                            <div class="field mt-3 flex flex-column">
                                 <div
                                     class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
                                     <span class="pi pi-sliders-h"></span>
@@ -91,7 +91,7 @@
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <TreeTable class="stabd" :value="subTasks" :lazy="true"
+                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
                                     :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
@@ -176,8 +176,11 @@ const btnLoading = ref(false);
 
 const assignees = ref(singleTask?.data?.assigneeObj);
 const dueDate = ref(singleTask?.data?.dueDate);
+
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
+const timeTrack = ref(['00:00:00']);
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -210,15 +213,15 @@ const handleTaskDetailSubmit = async () => {
         name: singleTask.data.name,
         description: description.value,
         project_id: projID,
-        due_date: singleTask.data.due_date,
-        priority: singleTask.data.priority,
-        assignees: singleTask.data.assignees
+        due_date: dueDate.value,
+        priority: priority.value.name,
+        assignees: assignees.value.map((obj) => obj.id)
     };
     await editTask(taskDetailData);
 
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Edited Successfully', life: 3000 });
-        taskEditDescriptionInput.value = null;
+        // taskEditDescriptionInput.value = null;
         selectedfile.value = null;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit task', life: 3000 });
@@ -296,7 +299,7 @@ onMounted(() => {
     display: none !important;
 }
 
-.stabd {
+.tree-table {
     font-size: 11.5px !important;
     width: 100% !important;
 }
@@ -386,9 +389,13 @@ input[type=file]::file-selector-button:hover {
     background: #059669;
 }
 
-.input-fields {
-    .p-inputtext {
+.input-fields  {
+    .p-inputtext  {
         padding: 0.35rem 0.75rem !important;
+    }
+    .p-multiselect .p-multiselect-label{
+        padding: 0.35rem 0.75rem !important;
+    
     }
 }
 
