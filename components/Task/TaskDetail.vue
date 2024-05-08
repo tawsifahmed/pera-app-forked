@@ -1,82 +1,126 @@
 <template>
     <div class="grid">
-        <div class="col-12 lg:col-7" >
-            <div >
+        <div class="col-12 lg:col-7">
+            <div>
                 <h5>
                     {{ singleTask.data.name }}
                 </h5>
                 <div class="task-wrapper card">
                     <div class="task-det">
-                        <form @submit.prevent="handleTaskDetailSubmit" class="task-detail">
+                        <form @submit.prevent="handleTaskDetailSubmit" class=" mt-2 task-detail ml-2">
                             <!-- <pre>{{singleTask}}</pre> -->
-                            <div class="">
-                                <div class="flex my-2 justify-content-start gap-5 align-items-centertask-detail-wrapper">
-                                    <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
-                                        <span class="pi pi-user"></span>
-                                        <p>Assignee:</p>
+                            <div class="flex justify-content-start gap-7 align-items-center">
+                                <div>
+                                    <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-user"></span>
+                                            <p>Assignee:</p>
+                                        </div>
+                                        <FloatLabel class=" input-fields">
+                                            <MultiSelect style="width: 120px;" v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="1" class="w-full" />
+                                        </FloatLabel>
                                     </div>
-                                    <div>{{ singleTask.data.assignee }}</div>
-                                </div>
-                                <div class="flex mt-2 mb-3 justify-content-start gap-5 align-items-center task-detail-wrapper">
-                                    <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
-                                        <span class="pi pi-calendar"></span>
-                                        <p>Due Date:</p>
+                                    <div
+                                        class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-calendar"></span>
+                                            <p class="text-nowrap">Due Date:</p>
+                                        </div>
+                                        <FloatLabel class="input-fields">
+                                            <Calendar style="width: 120px;" v-model="dueDate" showIcon iconDisplay="input"
+                                                 />
+                                            <!-- <Calendar v-model="dueDate" class="w-full" /> -->
+
+                                        </FloatLabel>
                                     </div>
-                                    <div>{{ singleTask.data.dueDate }}</div>
                                 </div>
-                                <div class="flex mt-2 mb-3 justify-content-start gap-5 align-items-center task-detail-wrapper">
-                                    <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
-                                        <span class="pi pi-flag"></span>
-                                        <p>Priority:</p>
+                                <div>
+                                    <div
+                                        class="flex justify-content-between gap-5 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-flag"></span>
+                                            <p>Priority:</p>
+                                        </div>
+                                        <FloatLabel class="input-fields">
+                                            <Dropdown v-model="priority" :options="priorities" optionLabel="name"
+                                                placeholder="" class="w-full" />
+                                        </FloatLabel>
                                     </div>
-                                    <div>{{ singleTask.data.priority }}</div>
-                                </div>
-                                <div class="field mt-2 flex flex-column">
-                                    <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
-                                        <span class="pi pi-sliders-h"></span>
-                                        <p>Description:</p>
+                                    <div
+                                        class="flex mt-2 justify-content-between gap-5 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-flag"></span>
+                                            <p>Priority:</p>
+                                        </div>
+                                        <FloatLabel class="input-fields">
+                                            <Dropdown v-model="priority" :options="priorities" optionLabel="name"
+                                                placeholder="" class="w-full" />
+                                        </FloatLabel>
                                     </div>
-                                    <Textarea id="description" v-model="description" rows="4" cols="20" />
                                 </div>
-            
-                                <div class="flex justify-content-end">
-                                    <Button type="submit" label="Save" />
+
+                            </div>
+                            <div class="field mt-2 flex flex-column">
+                                <div
+                                    class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                    <span class="pi pi-sliders-h"></span>
+                                    <p>Description:</p>
                                 </div>
+                                <Textarea id="description" v-model="description" rows="4" cols="20" />
+                            </div>
+
+                            <div class="flex justify-content-end">
+                                <Button type="submit" label="Save" />
                             </div>
                         </form>
-            
+
                         <!-- tab for details, sub task  -->
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
                                 <div style="height: 50px;">
-            
+
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
                                     <input class="float-right" type="file" placeholder="+">
-                                    <Button  label="Upload" />
+                                    <Button label="Upload" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <TreeTable class="stabd" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
-                                    <template #empty> <p class="text-center">No Data found...</p> </template>
-                                    <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
+                                <TreeTable class="stabd" :value="subTasks" :lazy="true"
+                                    :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                                    <template #empty>
+                                        <p class="text-center">No Data found...</p>
+                                    </template>
+                                    <Column class="cursor-pointer" field="name" header="Name" expander
+                                        :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
                                     <Column field="dueDate" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%;" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%;"
+                                                    icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                                                 <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                                                        rounded />
+                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
+                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning"
+                                                        rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
-                                    </Column>                                    
+                                    </Column>
                                 </TreeTable>
                             </TabPanel>
                         </TabView>
@@ -123,15 +167,29 @@ import { useCompanyStore } from '~/store/company';
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
-const { singleTask, projID } = defineProps(['singleTask', 'projID']);
+const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
 const toast = useToast();
 const btnLoading = ref(false);
+
+const assignees = ref(singleTask?.data?.assigneeObj);
+const dueDate = ref(singleTask?.data?.dueDate);
+const priority = ref(null);
+priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
+const priorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+]);
+
 const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
 const selectedfile = ref();
+
 
 const handleTaskComment = async () => {
     btnLoading.value = true;
@@ -176,12 +234,12 @@ onMounted(() => {
 // });
 </script>
 
-<style lang="scss" scoped>
-.task-detail-wrapper{
+<style lang="scss">
+.task-detail-wrapper {
     width: 100%;
 }
 
-.task-detail-property{
+.task-detail-property {
     width: 20%;
 }
 
@@ -214,6 +272,7 @@ onMounted(() => {
 .formgroup-inline {
     flex-wrap: nowrap;
 }
+
 .formgroup-inline .field {
     width: 90% !important;
 }
@@ -242,17 +301,17 @@ onMounted(() => {
     width: 100% !important;
 }
 
-.task-wrapper{
+.task-wrapper {
     overflow: hidden;
     height: 70vh;
     padding: 5px !important;
-    
+
 }
 
-.task-det{
+.task-det {
     overflow-y: auto;
     height: 100%;
-    padding: 5px; 
+    padding: 5px;
 }
 
 .action-dropdown {
@@ -265,7 +324,7 @@ onMounted(() => {
     position: absolute;
     background-color: #f9f9f9;
     min-width: 160px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
@@ -274,7 +333,7 @@ onMounted(() => {
     text-align: left;
     padding: 10px;
     border: none;
-    
+
 }
 
 .action-dropdown:hover .action-dropdown-content {
@@ -289,13 +348,14 @@ onMounted(() => {
     border-radius: 5px;
 }
 
-.ac-btn{
+.ac-btn {
     height: 30px !important;
     width: 30px !important;
     font-size: 11px !important;
-    .pi{
+
+    .pi {
         font-size: 11px !important;
-    
+
     }
 }
 
@@ -326,4 +386,13 @@ input[type=file]::file-selector-button:hover {
     background: #059669;
 }
 
+.input-fields {
+    .p-inputtext {
+        padding: 0.35rem 0.75rem !important;
+    }
+}
+
+.text-nowrap {
+    text-wrap: nowrap;
+}
 </style>

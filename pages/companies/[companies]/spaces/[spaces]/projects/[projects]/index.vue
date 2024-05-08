@@ -32,7 +32,7 @@
 
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="projects" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)" />
+            <TaskDetail :singleTask="singleTask" :usersLists="usersLists" :projID="projects" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)" />
         </Dialog>
 
         <!-- Delete Task Modal -->
