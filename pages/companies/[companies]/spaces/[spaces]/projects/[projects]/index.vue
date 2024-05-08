@@ -186,9 +186,6 @@ watchEffect(() => {
     }
 }
 
-.stabd {
-    //font-size: 14px !important;
-}
 
 .create-space-btn-wrapper {
     display: flex;
@@ -206,8 +203,6 @@ watchEffect(() => {
     }
 }
 
-.task-detail {
-}
 
 .cmc {
     text-wrap: nowrap;
