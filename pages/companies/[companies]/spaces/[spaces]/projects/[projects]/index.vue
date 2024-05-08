@@ -6,7 +6,7 @@
                 <p class="pi pi-angle-right font-bold"></p>
                 <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Company - {{ singleProject?.space_name }}</NuxtLink>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Space - {{ singleProject?.space_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
                 <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
             </div>
