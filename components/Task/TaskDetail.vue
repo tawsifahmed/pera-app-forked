@@ -42,12 +42,38 @@
                                         <div
                                             class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
+                                            <p>Status:</p>
+                                        </div>
+                                        <Dropdown v-model="selectedCountry" :options="countries" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
+                                            <template #value="slotProps">
+                                                <div v-if="slotProps.value" class="flex align-items-center">
+                                                    <!-- <img :alt="slotProps.value.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-1 flag flag-${slotProps.value.code.toLowerCase()}`" style="width: 18px" /> -->
+                                                    <div :style="{ backgroundColor: slotProps.value.color }"  style="color: white; border-radius: 50%;" :class="`p-1 pi ${slotProps.value.logo}`"></div>
+                                                    <div style="font-size: 11px; margin-left: 3px;">{{ slotProps.value.label }}</div>
+                                                </div>
+                                                <span v-else>
+                                                    {{ slotProps.placeholder }}
+                                                </span>
+                                            </template>
+                                            <template #optiongroup="slotProps">
+                                                <div class="flex align-items-center">
+                                                    <div class="flex align-items-center">
+                                                        <!-- <img :alt="slotProps.option.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`" style="width: 18px; height: fit-content" /> -->
+                                                        <div :style="{ backgroundColor: slotProps.option.color }" style="color: white; border-radius: 50%;" :class="`p-1 mr-1 pi ${slotProps.option.logo}`"></div>
+                                                    </div>
+                                                    <div style="font-size: 12px;">{{ slotProps.option.name }}</div>
+                                                </div>
+                                            </template>
+                                        </Dropdown>
+                                        <!-- <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-flag"></span>
                                             <p>Priority:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
                                             <Dropdown v-model="priority" :options="priorities" optionLabel="name"
                                                 placeholder=""/>
-                                        </FloatLabel>
+                                        </FloatLabel> -->
                                     </div>
                                     <div
                                         class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -187,6 +213,36 @@ const priorities = ref([
     { name: 'High', code: 'High' },
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
+]);
+
+const selectedCountry = ref();
+const countries = ref([
+    { name: 'Not Started',
+      code: 'DE',
+      logo: 'pi-circle',
+      color: '#314ebe',
+      items: [
+            { label: 'Open', value: 'Berlin', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
+        ]
+    },
+    { name: 'Active', 
+      code: 'US',
+      logo: 'pi-chart-pie',
+      color: '#f59e0b',
+      items: [
+            { label: 'Doing', value: 'Chicago', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
+        ]
+    },
+    { name: 'Done',
+      code: 'JP',
+      logo: 'pi-check-circle',
+      color: '#10b981',
+      items: [
+            { label: 'Dev Done', value: 'Dev Done', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+            { label: 'QA Status', value: 'QA Status', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+            { label: 'Dev Complete', value: 'Dev Complete', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+        ]
+    },
 ]);
 
 const description = ref(singleTask?.data?.description);
@@ -401,5 +457,9 @@ input[type=file]::file-selector-button:hover {
 
 .text-nowrap {
     text-wrap: nowrap;
+}
+
+.p-dropdown-item-label{
+    font-size: 13px !important;
 }
 </style>
