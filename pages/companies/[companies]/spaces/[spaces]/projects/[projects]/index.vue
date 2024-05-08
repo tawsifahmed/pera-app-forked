@@ -27,7 +27,7 @@
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskEditTask :singleTask="singleTask" :projects="projects" @closeEditModal="closeEditModal($event)" />
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
@@ -56,7 +56,7 @@ import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
 
 const usersListStore = useCompanyStore();
-const { getSingleProject, deleteTask, getTaskAssignModalData } = useCompanyStore();
+const { getSingleProject, deleteTask, getTaskAssignModalData, getTaskDetails } = useCompanyStore();
 const { singleProject, isTaskDeleted, tasks } = storeToRefs(useCompanyStore());
 
 const filters = ref({});
@@ -113,7 +113,6 @@ const handleTaskEdit = async (task) => {
 
 const confirmDeleteTask = (taskId) => {
     refTaskId.value = taskId;
-    console.log('refCompanyId', refTaskId.value);
     deleteTaskDialog.value = true;
 };
 
@@ -131,15 +130,13 @@ const deletingTask = async () => {
 };
 
 const handleTaskDetailView = (task) => {
-    console.log(visibleTaskDetailView.value);
-
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    // getTaskDetails(task.key);
+    getTaskDetails(task.key);
     visibleTaskDetailView.value = true;
 };
 
