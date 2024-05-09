@@ -11,18 +11,23 @@
             </div>
         </template>
         <template #empty> <p class="text-center">No Data found...</p> </template>
-            <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column>
-            <Column field="assignee" header="Assignee" :style="{ width: '10%' }"></Column>
-            <Column field="dueDate" header="Due Date" :style="{ width: '10%' }"></Column>
-            <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
-            <Column field="action" header="Action" :style="{ width: '20%' }">
-                <template #body="slotProps">
-                    <Button icon="pi pi-plus" class="mr-2" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                    <Button icon="pi pi-cog" class="mr-2" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
-                </template>
-            </Column>
+        <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
+        <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
+            <template #body="slotProps">
+                <span><i class="pi pi-chevron-circle-down mr-2" style="font-size: 14px"></i>{{ slotProps.node.data.name }}</span>
+            </template>
+        </Column>
+        <Column field="assignee" header="Assignee" :style="{ width: '10%' }"></Column>
+        <Column field="dueDate" header="Due Date" :style="{ width: '10%' }"></Column>
+        <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
+        <Column field="action" header="Action" :style="{ width: '20%' }">
+            <template #body="slotProps">
+                <Button icon="pi pi-plus" class="mr-2" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                <Button icon="pi pi-pencil" class="mr-2" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                <Button icon="pi pi-cog" class="mr-2" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+            </template>
+        </Column>
     </TreeTable>
 </template>
 <script setup>
@@ -48,7 +53,7 @@ initFilters();
 </script>
 
 <style>
-.stabd{
+.stabd {
     width: 100% !important;
 }
 </style>
