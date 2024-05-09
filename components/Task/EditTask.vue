@@ -1,43 +1,30 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
-            <h4 class="text-center text-primary">Task</h4>
-            <div>
-                <FloatLabel class="mt-4 mb-2">
-                    <InputText type="text" class="w-full px-2 py-2 shadow border task-edit" v-model="taskNameEditInput" />
-                    <label>Set Task Name</label>
-                </FloatLabel>
+            <div class="field">
+                <label for="company">Set Task Name</label>
+                <InputText v-model="taskNameEditInput" class="w-full" />
             </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
-                    <label>Select Assignee</label>
-                </FloatLabel>
+            <div class="field">
+                <label>Select Assignee</label>
+                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
             </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <Calendar v-model="dueDate" class="w-full" />
-                    <label>Due Date</label>
-                </FloatLabel>
+            <div class="field">
+                <label>Due Date</label>
+                <Calendar v-model="dueDate" class="w-full" />
             </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
-                    <label>Selete Priority</label>
-                </FloatLabel>
+            <div class="field">
+                <label>Selete Priority</label>
+                <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
             </div>
 
             <br />
             <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields</p>
-            <br />
-            <div class="create-btn-wrappe">
-                <Button @click="handleUpdateTask" class="text-white py-2 px-6 tracking-wide" label="Save" :loading="btnLoading" />
+            <div class="create-btn-wrapper">
+                <Button label="Update" icon="pi pi-check" text="" @click="handleUpdateTask" />
             </div>
         </div>
-
-        
     </div>
-
 </template>
 
 <script setup>
@@ -45,7 +32,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { editTask } = useCompanyStore();
 const { isTaskEdited } = storeToRefs(useCompanyStore());
-const {singleTask, usersLists, projects} = defineProps(['singleTask', 'usersLists', 'projects']);
+const { singleTask, usersLists, projects } = defineProps(['singleTask', 'usersLists', 'projects']);
 const toast = useToast();
 const btnLoading = ref(false);
 
@@ -66,7 +53,7 @@ const priorities = ref([
 
 const EditErrorHandler = ref(false);
 
-const emit = defineEmits(["closeEditModal"]);
+const emit = defineEmits(['closeEditModal']);
 
 const handleUpdateTask = async () => {
     btnLoading.value = true;
@@ -85,14 +72,13 @@ const handleUpdateTask = async () => {
             project_id: projects
         };
         console.log('editTaskData', editTaskData);
-       
 
         await editTask(editTaskData);
         if (isTaskEdited.value === true) {
             btnLoading.value = false;
-            emit("closeEditModal", false);
+            emit('closeEditModal', false);
 
-            emit("visibleEdit", 'visibleEdit');
+            emit('visibleEdit', 'visibleEdit');
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
         } else {
             btnLoading.value = false;
@@ -100,13 +86,11 @@ const handleUpdateTask = async () => {
         }
     }
 };
-
 </script>
 
 <style lang="scss" scoped>
-.create-btn-wrappe {
-display: flex;
-margin-bottom: 15px;
-justify-content: center;
+.create-btn-wrapper {
+    display: flex;
+    justify-content: end;
 }
 </style>

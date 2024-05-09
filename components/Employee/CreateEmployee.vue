@@ -23,7 +23,7 @@
         </div>
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
-        <div class="create-btn-wrappe">
+        <div class="create-btn-wrapper">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>
@@ -94,7 +94,7 @@ const handleSubmitData = async () => {
     color: red;
 }
 
-.create-btn-wrappe {
+.create-btn-wrapper {
     display: flex;
     justify-content: end;
 }

@@ -1,39 +1,26 @@
 <template>
-    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-        <div>
-            <h4 class="text-center text-primary">{{ createTaskTitle }}</h4>
-            <InputText type="hidden" v-model="tskId" />
-            <!-- <p>{{taskId}}</p> -->
-            <div>
-                <FloatLabel class="mt-4 mb-2">
-                    <InputText type="text" class="w-full px-2 py-2 shadow border task-edit" v-model="name" />
-                    <label>Set Task Name</label>
-                </FloatLabel>
-            </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <MultiSelect v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
-                    <label>Select Assignee</label>
-                </FloatLabel>
-            </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <Calendar v-model="dueDate" class="w-full" />
-                    <label>Due Date</label>
-                </FloatLabel>
-            </div>
-            <div class="mt-4">
-                <FloatLabel class="mb-2">
-                    <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
-                    <label>Selete Priority</label>
-                </FloatLabel>
-            </div>
-            <br />
-            <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
-            <br />
-            <div class="create-btn-wrappe">
-                <Button @click="handleCreateTask" class="text-white py-2 px-6 tracking-wide" label="Create Task" :loading="btnLoading" />
-            </div>
+    <div>
+        <InputText type="hidden" v-model="tskId" />
+        <div class="field">
+            <label for="company">Set Task Name</label>
+            <InputText v-model="name" class="w-full" />
+        </div>
+        <div class="field">
+            <label>Select Assignee</label>
+            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
+        </div>
+        <div class="field">
+            <label>Due Date</label>
+            <Calendar v-model="dueDate" class="w-full" />
+        </div>
+        <div class="field">
+            <label>Selete Priority</label>
+            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
+        </div>
+        <br />
+        <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
+        <div class="create-btn-wrapper">
+            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" />
         </div>
     </div>
 </template>
@@ -100,9 +87,8 @@ const handleCreateTask = async () => {
 </script>
 
 <style lang="scss" scoped>
-.create-btn-wrappe {
+.create-btn-wrapper {
     display: flex;
-    margin-bottom: 15px;
-    justify-content: center;
+    justify-content: end;
 }
 </style>

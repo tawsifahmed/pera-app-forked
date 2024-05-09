@@ -124,7 +124,7 @@ initFilters();
             </div>
             <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Employee +" />
         </div>
-        
+
         <!-- DataTable -->
         <DataTable v-model:filters="filters" :value="usersLists" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #header>
@@ -149,6 +149,7 @@ initFilters();
                     <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
                 </template>
             </Column>
+            <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
         </DataTable>
 
         <!-- Create -->
