@@ -18,7 +18,7 @@
                                             <p>Assignee:</p>
                                         </div>
                                         <FloatLabel style="width: 164.94px;" class="input-fields">
-                                            <MultiSelect  v-model="assignees" :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
+                                            <MultiSelect display="chip"  v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
                                     <div
@@ -31,7 +31,6 @@
                                         <FloatLabel class="input-fields">
                                             <Calendar style="width: 164.94px;" v-model="dueDate" showIcon iconDisplay="input"
                                                  />
-                                            <!-- <Calendar v-model="dueDate" class="w-full" /> -->
 
                                         </FloatLabel>
                                     </div>
@@ -47,7 +46,6 @@
                                         <Dropdown v-model="selectedCountry" :options="countries" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
                                             <template #value="slotProps">
                                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                                    <!-- <img :alt="slotProps.value.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-1 flag flag-${slotProps.value.code.toLowerCase()}`" style="width: 18px" /> -->
                                                     <div :style="{ backgroundColor: slotProps.value.color }"  style="color: white; border-radius: 50%;" :class="`p-1 pi ${slotProps.value.logo}`"></div>
                                                     <div style="font-size: 11px; margin-left: 3px;">{{ slotProps.value.label }}</div>
                                                 </div>
@@ -58,22 +56,12 @@
                                             <template #optiongroup="slotProps">
                                                 <div class="flex align-items-center">
                                                     <div class="flex align-items-center">
-                                                        <!-- <img :alt="slotProps.option.label" src="https://primefaces.org/cdn/primevue/images/flag/flag_placeholder.png" :class="`mr-2 flag flag-${slotProps.option.code.toLowerCase()}`" style="width: 18px; height: fit-content" /> -->
                                                         <div :style="{ backgroundColor: slotProps.option.color }" style="color: white; border-radius: 50%;" :class="`p-1 mr-1 pi ${slotProps.option.logo}`"></div>
                                                     </div>
                                                     <div style="font-size: 12px;">{{ slotProps.option.name }}</div>
                                                 </div>
                                             </template>
                                         </Dropdown>
-                                        <!-- <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
-                                            <span class="pi pi-flag"></span>
-                                            <p>Priority:</p>
-                                        </div>
-                                        <FloatLabel class="input-fields">
-                                            <Dropdown v-model="priority" :options="priorities" optionLabel="name"
-                                                placeholder=""/>
-                                        </FloatLabel> -->
                                     </div>
                                     <div
                                         class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -177,8 +165,6 @@
                             </div>
 
                             <Button type="submit" label="Add" :loading="btnLoading" />
-
-                            <!-- <Button type="submit" label="Add" v-tooltip="'Click to proceed'" /> -->
                         </form>
                     </div>
                 </div>
@@ -288,9 +274,6 @@ onMounted(() => {
     getTaskDetails(singleTask.key);
 });
 
-// watchEffect(() => {
-//     getTaskDetails(singleTask.key);
-// });
 </script>
 
 <style lang="scss">
@@ -325,7 +308,6 @@ onMounted(() => {
     border-top: 1px solid #e2e8f0;
     padding: 10px;
     width: 100%;
-    //position: relative;
 }
 
 .formgroup-inline {
