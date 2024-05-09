@@ -34,6 +34,8 @@ export const useCompanyStore = defineStore('workStation', {
 
     subTasks:[],
 
+    taskStatus:[],
+
     users: [],
     priorityList: [],
 
@@ -414,6 +416,18 @@ export const useCompanyStore = defineStore('workStation', {
       )
       this.singleTaskComments = data.value?.data.comments;
       this.subTasks = data.value?.subTasks;
+      this.taskStatus = [];
+      let status = data.value?.taskStatus;
+
+      if (status && status.length > 0) {
+          status.forEach(element => {
+              let obj = {
+                  name: element.name,
+                  code: element.id,
+              };
+              this.taskStatus.push(obj);
+          });
+      }
   },
 
     async addTaskComment (id, comment) {
