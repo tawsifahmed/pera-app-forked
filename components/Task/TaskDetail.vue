@@ -190,7 +190,7 @@ onMounted(() => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="selectedCountry" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown v-model="selectedStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                     <div
                                         class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -257,16 +257,10 @@ onMounted(() => {
                                                 <Button style="width: 30px; height: 30px; border-radius: 50%;"
                                                     icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                                                 <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                                                        rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
-                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning"
-                                                        rounded
-                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -284,7 +278,7 @@ onMounted(() => {
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="▼ Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-400 border-gray-200 text-surface-900"/>
+                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns"/>
                         </div>
                         <div v-if="activityDiv">
                             <h5 class="text-center text-gray-600">Activity Log</h5>
@@ -300,7 +294,7 @@ onMounted(() => {
                                 <li>2</li>
                             </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="▲ Hide" class="py-1 bg-gray-400 border-gray-200 text-surface-900"/>
+                                <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns"/>
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
@@ -504,7 +498,15 @@ input[type=file]::file-selector-button:hover {
 }
 
 
+.activity-btns{
+    color: #444 !important;
+    background-color: rgb(102, 102, 102);
+}
 
+.activity-btns:hover{
+    background-color: #6bd4b1 !important;
+    color: white;
+}
 
 .attach-detail{
     border-top: 1px solid #e2e8f0;
