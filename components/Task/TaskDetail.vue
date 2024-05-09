@@ -1,11 +1,11 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-import { useFileUploaderStore } from '~/store/fileUpload'; 
+import { useFileUploaderStore } from '~/store/fileUpload';
 const { fileUpload } = useFileUploaderStore();
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus } = storeToRefs(useCompanyStore());
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
 const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
@@ -14,7 +14,9 @@ const toast = useToast();
 const btnLoading = ref(false);
 
 const assignees = ref(singleTask?.data?.assigneeObj);
+
 const dueDate = ref(singleTask?.data?.dueDate);
+const status = ref(taskDetails?.status);
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
@@ -59,18 +61,17 @@ const handleTaskComment = async () => {
 };
 
 const formattedTime = (time) => {
-      const date = new Date(time);
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const month = monthNames[date.getMonth()];
-      const day = date.getDate();
-      const year = date.getFullYear().toString().substr(-2);
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 || 12;
-      const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-      return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
-   
+    const date = new Date(time);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear().toString().substr(-2);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
 };
 
 const handleTaskDetailSubmit = async () => {
@@ -95,27 +96,50 @@ const handleTaskDetailSubmit = async () => {
     }
 };
 
-
-const file = ref(null)
+const file = ref(null);
 
 const onFileChange = (e) => {
-    file.value = e.target.files[0]
-}
+    file.value = e.target.files[0];
+};
 
-const uploadFile = async() => {
-    if(file.value){
-        console.log('file =>', file.value)
-        console.log('task_id =>', singleTask.key)
+const uploadFile = async () => {
+    if (file.value) {
+        console.log('file =>', file.value);
+        console.log('task_id =>', singleTask.key);
     }
-    await fileUpload(singleTask.key, file.value)
-}
+    await fileUpload(singleTask.key, file.value);
+};
+
+watch(status, (newValue, oldValue) => {
+    changeStatusData(newValue);
+});
 
 onMounted(() => {
     getTaskDetails(singleTask.key);
 });
 
-</script>
+async function changeStatusData(status) {
+    try {
+        const token = useCookie('token');
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            },
+            body: {
+                status: status.code
+            }
+        });
 
+        if (data.value?.app_message === 'success') {
+            getTaskDetails(singleTask.key);
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+</script>
 
 <template>
     <div class="grid">
@@ -126,62 +150,50 @@ onMounted(() => {
                 </h5>
                 <div class="task-wrapper card">
                     <div class="task-det">
-                        <form @submit.prevent="handleTaskDetailSubmit" class=" mt-2 task-detail ml-2">
+                        <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <!-- <pre>{{singleTask}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-user"></span>
                                             <p>Assignee:</p>
                                         </div>
-                                        <FloatLabel style="width: 164.94px;" class="input-fields">
-                                            <MultiSelect display="chip"  v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
+                                        <FloatLabel style="width: 164.94px" class="input-fields">
+                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
-                                    <div
-                                        class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-calendar"></span>
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar style="width: 164.94px;" v-model="dueDate" showIcon iconDisplay="input"
-                                                 />
-
+                                            <Calendar style="width: 164.94px" v-model="dueDate" showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
                                 <div>
-                                    <div
-                                        class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="selectedStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
-                                    <div
-                                        class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Dropdown disabled="" :options="priorities" optionLabel="name"
-                                             placeholder="0:00"/>
+                                            <Dropdown disabled="" :options="priorities" optionLabel="name" placeholder="0:00" />
                                         </FloatLabel>
                                     </div>
                                 </div>
-
                             </div>
                             <div class="field mt-3 flex flex-column">
-                                <div
-                                    class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
@@ -197,42 +209,38 @@ onMounted(() => {
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
-                                <div class="my-3 flex">
-                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc;">
+                                <div class="my-3 flex align-items-center justify-content-start gap-2">
+                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
-                                    <input @change="onFileChange" class="float-right" type="file" placeholder="+">
+                                    <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
                                     <Button @click="uploadFile" label="Upload" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
-                                    :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                                <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer" field="name" header="Name" expander
-                                        :style="{ width: '30%' }"></Column>
+                                    <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
                                     <Column field="dueDate" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%;"
-                                                    icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                                                 <div class="action-dropdown-content">
                                                     <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
                                                     <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
                                                     <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -250,7 +258,7 @@ onMounted(() => {
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns"/>
+                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
                             <h5 class="text-center text-gray-600">Activity Log</h5>
@@ -266,7 +274,7 @@ onMounted(() => {
                                 <li>2</li>
                             </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns"/>
+                                <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
@@ -275,7 +283,7 @@ onMounted(() => {
                                 <p class="m-0">
                                     {{ val.comment }}
                                 </p>
-                                <i style="line-height: 0;" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
@@ -365,7 +373,6 @@ onMounted(() => {
     overflow: hidden;
     height: 70vh;
     padding: 5px !important;
-
 }
 
 .task-det {
@@ -393,7 +400,6 @@ onMounted(() => {
     text-align: left;
     padding: 10px;
     border: none;
-
 }
 
 .action-dropdown:hover .action-dropdown-content {
@@ -415,12 +421,10 @@ onMounted(() => {
 
     .pi {
         font-size: 11px !important;
-
     }
 }
 
-
-input[type=file] {
+input[type='file'] {
     width: 300px;
     max-width: 100%;
     color: #444;
@@ -430,7 +434,7 @@ input[type=file] {
     border: 0.5px solid #b8b8b8;
 }
 
-input[type=file]::file-selector-button {
+input[type='file']::file-selector-button {
     margin-right: 20px;
     border: none;
     background: #10b981;
@@ -439,20 +443,19 @@ input[type=file]::file-selector-button {
     color: #fff;
     font-weight: bold;
     cursor: pointer;
-    transition: background .2s ease-in-out;
+    transition: background 0.2s ease-in-out;
 }
 
-input[type=file]::file-selector-button:hover {
+input[type='file']::file-selector-button:hover {
     background: #059669;
 }
 
-.input-fields  {
-    .p-inputtext  {
+.input-fields {
+    .p-inputtext {
         padding: 0.35rem 0.75rem !important;
     }
-    .p-multiselect .p-multiselect-label{
+    .p-multiselect .p-multiselect-label {
         padding: 0.35rem 0.75rem !important;
-    
     }
 }
 
@@ -460,7 +463,7 @@ input[type=file]::file-selector-button:hover {
     text-wrap: nowrap;
 }
 
-.p-dropdown-item-label{
+.p-dropdown-item-label {
     font-size: 13px !important;
 }
 
@@ -469,18 +472,17 @@ input[type=file]::file-selector-button:hover {
     padding: 0.5rem 0.75rem !important;
 }
 
-
-.activity-btns{
+.activity-btns {
     color: #444 !important;
     background-color: rgb(102, 102, 102);
 }
 
-.activity-btns:hover{
+.activity-btns:hover {
     background-color: #6bd4b1 !important;
     color: white;
 }
 
-.attach-detail{
+.attach-detail {
     border-top: 1px solid #e2e8f0;
     font-weight: 600;
 }

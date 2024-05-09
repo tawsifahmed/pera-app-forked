@@ -31,7 +31,7 @@
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '100rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TaskDetail
                 :singleTask="singleTask"
                 :usersLists="usersLists"

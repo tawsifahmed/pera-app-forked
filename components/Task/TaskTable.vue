@@ -19,10 +19,10 @@
                     {{ slotProps.node.data.name }}</span>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '10%' }"></Column>
+        <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
         <Column field="dueDate" header="Due Date" :style="{ width: '10%' }"></Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
-        <Column field="action" header="Action" :style="{ width: '20%' }">
+        <Column field="action" header="Action" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div class="action-dropdown">
                     <Button style="width: 30px; height: 30px; border-radius: 50%;"
