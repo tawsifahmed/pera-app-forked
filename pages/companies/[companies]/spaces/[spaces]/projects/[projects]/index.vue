@@ -6,7 +6,7 @@
                 <p class="pi pi-angle-right font-bold"></p>
                 <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Company - {{ singleProject?.space_name }}</NuxtLink>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Space - {{ singleProject?.space_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
                 <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
             </div>
@@ -32,7 +32,7 @@
 
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '80rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail :singleTask="singleTask" :projID="projects" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)" />
+            <TaskDetail :singleTask="singleTask" :usersLists="usersLists" :projID="projects" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)" />
         </Dialog>
 
         <!-- Delete Task Modal -->
@@ -83,7 +83,7 @@ const visibleEdit = ref(false);
 const deleteTaskDialog = ref(false);
 const visibleTaskDetailView = ref(false);
 
-const openCreateSpace = (key, type) => {
+const openCreateSpace = async (key, type) => {
     if (key) {
         taskId.value = key;
     } else {
@@ -95,6 +95,8 @@ const openCreateSpace = (key, type) => {
         createTaskTitle.value = 'Create Task';
     }
     visible.value = true;
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
 };
 
 const handleTaskEdit = async (task) => {
@@ -129,14 +131,16 @@ const deletingTask = async () => {
     }
 };
 
-const handleTaskDetailView = (task) => {
+const handleTaskDetailView = async (task) => {
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
     singleTask.value = task;
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
-    getTaskDetails(task.key);
+    // getTaskDetails(task.key);
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
     visibleTaskDetailView.value = true;
 };
 
@@ -182,9 +186,6 @@ watchEffect(() => {
     }
 }
 
-.stabd {
-    //font-size: 14px !important;
-}
 
 .create-space-btn-wrapper {
     display: flex;
@@ -202,8 +203,6 @@ watchEffect(() => {
     }
 }
 
-.task-detail {
-}
 
 .cmc {
     text-wrap: nowrap;
