@@ -1,3 +1,125 @@
+<script setup>
+import { storeToRefs } from 'pinia';
+import { useCompanyStore } from '~/store/company';
+import { useFileUploaderStore } from '~/store/fileUpload'; 
+const { fileUpload } = useFileUploaderStore();
+
+const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
+const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
+
+const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
+
+const toast = useToast();
+const btnLoading = ref(false);
+
+const assignees = ref(singleTask?.data?.assigneeObj);
+const dueDate = ref(singleTask?.data?.dueDate);
+
+const priority = ref(null);
+priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
+const timeTrack = ref(['00:00:00']);
+
+const priorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+]);
+
+const selectedCountry = ref();
+const countries = ref([
+    { name: 'Not Started',
+      code: 'DE',
+      logo: 'pi-circle',
+      color: '#314ebe',
+      items: [
+            { label: 'Open', value: 'Berlin', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
+        ]
+    },
+    { name: 'Active', 
+      code: 'US',
+      logo: 'pi-chart-pie',
+      color: '#f59e0b',
+      items: [
+            { label: 'Doing', value: 'Chicago', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
+        ]
+    },
+    { name: 'Done',
+      code: 'JP',
+      logo: 'pi-check-circle',
+      color: '#10b981',
+      items: [
+            { label: 'Dev Done', value: 'Dev Done', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+            { label: 'QA Status', value: 'QA Status', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+            { label: 'Dev Complete', value: 'Dev Complete', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
+        ]
+    },
+]);
+
+const description = ref(singleTask?.data?.description);
+const taskCommentInput = ref(null);
+const selectedfile = ref();
+
+
+const handleTaskComment = async () => {
+    btnLoading.value = true;
+    await addTaskComment(singleTask.key, taskCommentInput.value);
+    if (isTaskCommentCreated.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
+        taskCommentInput.value = null;
+        btnLoading.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
+        btnLoading.value = false;
+    }
+};
+
+const handleTaskDetailSubmit = async () => {
+    const taskDetailData = {
+        id: singleTask.key,
+        name: singleTask.data.name,
+        description: description.value,
+        project_id: projID,
+        due_date: dueDate.value,
+        priority: priority.value.name,
+        assignees: assignees.value.map((obj) => obj.id)
+    };
+
+    await editTask(taskDetailData);
+
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
+        // taskEditDescriptionInput.value = null;
+        selectedfile.value = null;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
+    }
+};
+
+
+const file = ref(null)
+
+const onFileChange = (e) => {
+    file.value = e.target.files[0]
+}
+
+const uploadFile = async() => {
+    if(file.value){
+        console.log('file =>', file.value)
+        console.log('task_id =>', singleTask.key)
+    }
+    await fileUpload(singleTask.key, file.value)
+}
+
+onMounted(() => {
+    getTaskDetails(singleTask.key);
+});
+
+</script>
+
+
 <template>
     <div class="grid">
         <div class="col-12 lg:col-7">
@@ -100,8 +222,8 @@
 
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
-                                    <input class="float-right" type="file" placeholder="+">
-                                    <Button label="Upload" />
+                                    <input @change="onFileChange" class="float-right" type="file" placeholder="+">
+                                    <Button @click="uploadFile" label="Upload" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
@@ -172,109 +294,6 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import { storeToRefs } from 'pinia';
-import { useCompanyStore } from '~/store/company';
-
-const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
-const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
-
-const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-
-const toast = useToast();
-const btnLoading = ref(false);
-
-const assignees = ref(singleTask?.data?.assigneeObj);
-const dueDate = ref(singleTask?.data?.dueDate);
-
-const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
-
-const timeTrack = ref(['00:00:00']);
-
-const priorities = ref([
-    { name: 'Urgent', code: 'Urgent' },
-    { name: 'High', code: 'High' },
-    { name: 'Normal', code: 'Normal' },
-    { name: 'Low', code: 'Low' }
-]);
-
-const selectedCountry = ref();
-const countries = ref([
-    { name: 'Not Started',
-      code: 'DE',
-      logo: 'pi-circle',
-      color: '#314ebe',
-      items: [
-            { label: 'Open', value: 'Berlin', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
-        ]
-    },
-    { name: 'Active', 
-      code: 'US',
-      logo: 'pi-chart-pie',
-      color: '#f59e0b',
-      items: [
-            { label: 'Doing', value: 'Chicago', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
-        ]
-    },
-    { name: 'Done',
-      code: 'JP',
-      logo: 'pi-check-circle',
-      color: '#10b981',
-      items: [
-            { label: 'Dev Done', value: 'Dev Done', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'QA Status', value: 'QA Status', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'Dev Complete', value: 'Dev Complete', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-        ]
-    },
-]);
-
-const description = ref(singleTask?.data?.description);
-const taskCommentInput = ref(null);
-const selectedfile = ref();
-
-
-const handleTaskComment = async () => {
-    btnLoading.value = true;
-    await addTaskComment(singleTask.key, taskCommentInput.value);
-    if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
-        taskCommentInput.value = null;
-        btnLoading.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
-        btnLoading.value = false;
-    }
-};
-
-const handleTaskDetailSubmit = async () => {
-    const taskDetailData = {
-        id: singleTask.key,
-        name: singleTask.data.name,
-        description: description.value,
-        project_id: projID,
-        due_date: dueDate.value,
-        priority: priority.value.name,
-        assignees: assignees.value.map((obj) => obj.id)
-    };
-    await editTask(taskDetailData);
-
-    if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
-        // taskEditDescriptionInput.value = null;
-        selectedfile.value = null;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
-    }
-};
-
-onMounted(() => {
-    getTaskDetails(singleTask.key);
-});
-
-</script>
 
 <style lang="scss">
 .task-detail-wrapper {

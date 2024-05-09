@@ -335,6 +335,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
     },
     async editTask ({id, name, description, project_id, dueDate, priority, assignees}) {
+      
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
