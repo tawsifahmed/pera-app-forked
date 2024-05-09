@@ -2,13 +2,14 @@ import { defineStore } from 'pinia';
 
 export const useFileUploaderStore = defineStore('fileUpload', () => {
     
+    const isFileUpload = ref(false)
+
     async function fileUpload(id, file) {
 
         const formdata = new FormData()
 
         formdata.append('task_id', id)
         formdata.append('attachments', file)
-
         const token = useCookie('token')
 
         try {
@@ -22,6 +23,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
 
             if (!response.ok) {
                 throw new Error('Network response was not ok')
+
             }
 
             const data = await response.json()

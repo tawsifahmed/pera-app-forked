@@ -28,14 +28,14 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
-const selectedCountry = ref();
-const countries = ref([
+const selectedStatus = ref();
+const statuses = ref([
     { name: 'Not Started',
       code: 'DE',
       logo: 'pi-circle',
       color: '#314ebe',
       items: [
-            { label: 'Open', value: 'Berlin', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
+            { label: 'Open', value: 'Open', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
         ]
     },
     { name: 'Active', 
@@ -43,7 +43,7 @@ const countries = ref([
       logo: 'pi-chart-pie',
       color: '#f59e0b',
       items: [
-            { label: 'Doing', value: 'Chicago', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
+            { label: 'Doing', value: 'Doing', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
         ]
     },
     { name: 'Done',
@@ -74,6 +74,21 @@ const handleTaskComment = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
         btnLoading.value = false;
     }
+};
+
+const formattedTime = (time) => {
+      const date = new Date(time);
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = monthNames[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear().toString().substr(-2);
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = hours % 12 || 12;
+      const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+      return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
+   
 };
 
 const handleTaskDetailSubmit = async () => {
@@ -165,7 +180,7 @@ onMounted(() => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="selectedCountry" :options="countries" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
+                                        <Dropdown v-model="selectedStatus" :options="statuses" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
                                             <template #value="slotProps">
                                                 <div v-if="slotProps.value" class="flex align-items-center">
                                                     <div :style="{ backgroundColor: slotProps.value.color }"  style="color: white; border-radius: 50%;" :class="`p-1 pi ${slotProps.value.logo}`"></div>
@@ -218,7 +233,11 @@ onMounted(() => {
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
-                                <div style="height: 50px;">
+                                <div class="my-3 flex">
+                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-3">
+                                        <div class="pi pi-file text-6xl"></div>
+                                        <div class="text-xs">asdme.ext</div>
+                                    </div>
 
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
@@ -269,13 +288,16 @@ onMounted(() => {
                 <h5 class="cmc">Comments</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
+                        <div class="my-2">
+                            <Button label="Show More" class="py-1 btn btn-secondary"/>
+                        </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template class="commentator-name" #title>{{ val.commentator_name }}</template>
                             <template #content>
                                 <p class="m-0">
                                     {{ val.comment }}
                                 </p>
-                                <i class="float-right"> {{ val.time }} </i>
+                                <i class="float-right">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
@@ -462,5 +484,10 @@ input[type=file]::file-selector-button:hover {
 
 .p-dropdown-item-label{
     font-size: 13px !important;
+}
+
+.p-card .p-card-body {
+    gap: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
 }
 </style>
