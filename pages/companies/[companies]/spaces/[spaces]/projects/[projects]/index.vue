@@ -21,8 +21,8 @@
         </div>
 
         <!-- Create Task Modal -->
-        <Dialog v-model:visible="visible" modal header="Create Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskCreateTask :createTaskTitle="createTaskTitle" :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskCreateTask :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
