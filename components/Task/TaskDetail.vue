@@ -29,34 +29,6 @@ const priorities = ref([
 ]);
 
 const selectedStatus = ref();
-const statuses = ref([
-    { name: 'Not Started',
-      code: 'DE',
-      logo: 'pi-circle',
-      color: '#314ebe',
-      items: [
-            { label: 'Open', value: 'Open', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
-        ]
-    },
-    { name: 'Active', 
-      code: 'US',
-      logo: 'pi-chart-pie',
-      color: '#f59e0b',
-      items: [
-            { label: 'Doing', value: 'Doing', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
-        ]
-    },
-    { name: 'Done',
-      code: 'JP',
-      logo: 'pi-check-circle',
-      color: '#10b981',
-      items: [
-            { label: 'Dev Done', value: 'Dev Done', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'QA Status', value: 'QA Status', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'Dev Complete', value: 'Dev Complete', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-        ]
-    },
-]);
 
 const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
