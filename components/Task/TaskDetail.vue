@@ -297,7 +297,7 @@ onMounted(() => {
                                 <p class="m-0">
                                     {{ val.comment }}
                                 </p>
-                                <i class="float-right">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0;" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
