@@ -5,7 +5,7 @@ import { useFileUploaderStore } from '~/store/fileUpload';
 const { fileUpload } = useFileUploaderStore();
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus } = storeToRefs(useCompanyStore());
 const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
@@ -62,6 +62,16 @@ const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
 const selectedfile = ref();
 
+const showActivitiyBtn = ref(true);
+const activityDiv = ref(false);
+const showActivitiy = () => {
+    activityDiv.value = true;
+    showActivitiyBtn.value = false;
+};
+const hideActivity = () => {
+    activityDiv.value = false;
+    showActivitiyBtn.value = true;
+};
 
 const handleTaskComment = async () => {
     btnLoading.value = true;
@@ -180,25 +190,7 @@ onMounted(() => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="selectedStatus" :options="statuses" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
-                                            <template #value="slotProps">
-                                                <div v-if="slotProps.value" class="flex align-items-center">
-                                                    <div :style="{ backgroundColor: slotProps.value.color }"  style="color: white; border-radius: 50%;" :class="`p-1 pi ${slotProps.value.logo}`"></div>
-                                                    <div style="font-size: 11px; margin-left: 3px;">{{ slotProps.value.label }}</div>
-                                                </div>
-                                                <span v-else>
-                                                    {{ slotProps.placeholder }}
-                                                </span>
-                                            </template>
-                                            <template #optiongroup="slotProps">
-                                                <div class="flex align-items-center">
-                                                    <div class="flex align-items-center">
-                                                        <div :style="{ backgroundColor: slotProps.option.color }" style="color: white; border-radius: 50%;" :class="`p-1 mr-1 pi ${slotProps.option.logo}`"></div>
-                                                    </div>
-                                                    <div style="font-size: 12px;">{{ slotProps.option.name }}</div>
-                                                </div>
-                                            </template>
-                                        </Dropdown>
+                                        <Dropdown v-model="selectedCountry" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                     <div
                                         class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -234,9 +226,12 @@ onMounted(() => {
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
                                 <div class="my-3 flex">
-                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-3">
-                                        <div class="pi pi-file text-6xl"></div>
-                                        <div class="text-xs">asdme.ext</div>
+                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc;">
+                                        <div class="pi pi-file text-6xl attach-icon"></div>
+                                        <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div class="text-xs">asdasd....asdme.extng</div>
+                                            <div class="text-xs">9 MAy, 2024</div>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -288,8 +283,25 @@ onMounted(() => {
                 <h5 class="cmc">Comments</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
-                        <div class="my-2">
-                            <Button label="Show More" class="py-1 btn btn-secondary"/>
+                        <div class="my-2 text-surface-800">
+                            <Button @click="showActivitiy" label="▼ Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-400 border-gray-200 text-surface-900"/>
+                        </div>
+                        <div v-if="activityDiv">
+                            <h5 class="text-center text-gray-600">Activity Log</h5>
+                            <ul>
+                                <li>1</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                            </ul>
+                            <div class="my-2 text-surface-800">
+                                <Button @click="hideActivity" label="▲ Hide" class="py-1 bg-gray-400 border-gray-200 text-surface-900"/>
+                            </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template class="commentator-name" #title>{{ val.commentator_name }}</template>
@@ -489,5 +501,13 @@ input[type=file]::file-selector-button:hover {
 .p-card .p-card-body {
     gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
+}
+
+
+
+
+.attach-detail{
+    border-top: 1px solid #e2e8f0;
+    font-weight: 600;
 }
 </style>
