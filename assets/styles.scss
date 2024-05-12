@@ -6,3 +6,11 @@ $gutter: 1rem; //for primeflex grid system
 /* Demos */
 @import '@/assets/demo/styles/flags/flags.css';
 @import '@/assets/demo/styles/badges.scss';
+
+
+.close-btn {
+    border-radius: 100%;
+    top: -5px;
+    right: -5px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
