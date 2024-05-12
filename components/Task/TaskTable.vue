@@ -1,10 +1,40 @@
+<script setup>
+    definePageMeta({
+        middleware: 'auth',
+        layout: 'default'
+    });
+    const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
+
+    const { tasks } = defineProps(['tasks']);
+
+    import { FilterMatchMode } from 'primevue/api';
+    import Column from 'primevue/column';
+
+    const filterAssignees = ref();
+
+    const filterPriorities = ref();
+
+    const filterStatus = ref();
+
+    const filterDueDate = ref();
+
+    const filters = ref({});
+
+    const initFilters = () => {
+        filters.value = {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        };
+    };
+    initFilters();
+</script>
+
 <template>
-    <Fieldset legend="Filters" class="justify-between" toggleable="true">
-        <MultiSelect v-model="filterAssignees" :options="cities" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mr-2" />
-        <Dropdown v-model="filterPriorities" :options="cities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mr-2" />
-        <Dropdown v-model="filterStatus" :options="cities" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mr-2" />
-        <Calendar v-model="filterDueDate" placeholder="Select Due date" class="w-full md:w-17rem mr-2" />
-    </Fieldset>
+    <div class="filter-wrapper pb-4 mb-4">
+        <MultiSelect v-model="filterAssignees" :options="cities" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem" />
+        <Dropdown v-model="filterPriorities" :options="cities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem" />
+        <Dropdown v-model="filterStatus" :options="cities" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem" />
+        <Calendar v-model="filterDueDate" placeholder="Select Due date" class="w-full md:w-17rem" />
+    </div>
     <Toolbar class="border-0 px-0">
         <template #start>
             <Button icon="pi pi-plus" label="Create" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
@@ -51,35 +81,6 @@
         </Column>
     </TreeTable>
 </template>
-<script setup>
-definePageMeta({
-    middleware: 'auth',
-    layout: 'default'
-});
-const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-
-const { tasks } = defineProps(['tasks']);
-
-import { FilterMatchMode } from 'primevue/api';
-import Column from 'primevue/column';
-
-const filterAssignees = ref();
-
-const filterPriorities = ref();
-
-const filterStatus = ref();
-
-const filterDueDate = ref();
-
-const filters = ref({});
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-initFilters();
-</script>
 
 <style>
 .action-dropdown {
@@ -133,5 +134,12 @@ initFilters();
 }
 .table-st thead tr {
     background: #ededed;
+}
+.filter-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 0.5px solid rgb(230, 229, 229);
 }
 </style>

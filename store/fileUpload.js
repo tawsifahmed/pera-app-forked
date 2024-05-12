@@ -45,8 +45,35 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
     }
 
     async function fileDelete(id) {
-        
+        const isFileDeleted = ref(false)
+
+        const token = useCookie('token')
+
+        try {
+            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`,
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+
+            const data = await response.json()
+            console.log('upload data =>', data)
+
+            if (data?.user_message === 'success') {
+                isFileDeleted.value = true
+            }else {
+                isFileDeleted.value = false
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error)
+            isFileDeleted.value = false
+        }
     }
   
-    return { fileUpload, isFileUpload, isLoading }
+    return { fileUpload, fileDelete, isFileUpload, isLoading, isFileDeleted }
 })
