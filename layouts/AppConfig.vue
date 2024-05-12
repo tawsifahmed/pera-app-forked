@@ -96,7 +96,7 @@ const onCompactMaterialChange = (value) => {
     compactMaterial.value = value;
 
     if (layoutConfig.theme.value.startsWith('md')) {
-        let tokens = layoutConfig.theme.value.split('-');
+        let tokens = layoutConfig.theme.value?.split('-');
 
         changeTheme(tokens[0].substring(0, 2), tokens[2]);
     }

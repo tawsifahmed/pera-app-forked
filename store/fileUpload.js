@@ -3,8 +3,11 @@ import { defineStore } from 'pinia';
 export const useFileUploaderStore = defineStore('fileUpload', () => {
     
     const isFileUpload = ref(false)
+    const isLoading = ref(false)
 
     async function fileUpload(id, file) {
+
+        isLoading.value = true
 
         const formdata = new FormData()
 
@@ -27,10 +30,19 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
 
             const data = await response.json()
             console.log('upload data =>', data)
+            if (data?.user_message === 'success') {
+                isFileUpload.value = true
+            }else {
+                isFileUpload.value = false
+            }
+
+            isLoading.value = false
         } catch (error) {
             console.error('Error uploading file:', error)
+            isFileUpload.value = false
+            isLoading.value = false
         }
     }
   
-    return { fileUpload }
+    return { fileUpload, isFileUpload, isLoading }
 })

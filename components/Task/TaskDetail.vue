@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
 const { fileUpload } = useFileUploaderStore();
+const { isFileUpload, isLoading } = storeToRefs(useFileUploaderStore());
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
@@ -108,6 +109,13 @@ const uploadFile = async () => {
         console.log('task_id =>', singleTask.key);
     }
     await fileUpload(singleTask.key, file.value);
+    console.log('isFileUpload =>', isFileUpload)
+    if(isFileUpload.value === true){
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', life: 3000 });
+        getTaskDetails(singleTask.key);
+    }else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', life: 3000 });
+    }
 };
 
 const commentAttachment = ref(false);
@@ -148,6 +156,32 @@ async function changeStatusData(status) {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+}
+
+const setFileUrl = (url) => {
+    const urlString = url
+    const partsOfString = urlString.split('/')
+    const lastPartOfString = partsOfString[ partsOfString.length - 1 ] 
+    return lastPartOfString
+}
+
+const setDateFormat = (dateUrl) => {
+    const monthAbbreviations = ['Jan', 'Feb', 'Mar', 'Apr', 'MAy', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+    const dateString = dateUrl
+    const date = new Date(dateString)
+
+    const options = { year: 'numeric', month: 'long', day: 'numeric' }
+    const formattedDate = date.toLocaleDateString('en-US', options)
+
+    const parts = formattedDate.split(' ')
+    const monthIndex = monthAbbreviations.indexOf(parts[0])
+    if (monthIndex !== -1) {
+        parts[0] = monthAbbreviations[monthIndex]
+    }
+    const finalFormattedDate = parts.join(' ')
+
+    return finalFormattedDate
 }
 </script>
 
@@ -218,19 +252,26 @@ async function changeStatusData(status) {
                         <!-- tab for details, sub task  -->
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
-                                <p class="m-0">Attachments: 0</p>
-                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll; ">
-                                    <div class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                <p class="m-0">Attachments: {{ taskDetails?.attachments && taskDetails?.attachments?.length > 0 ? taskDetails?.attachments?.length : 0 }}</p>
+                                <div  class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll; ">
+                                    <div v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
+                                    <div v-else v-for="item in taskDetails?.attachments" :key="item" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                        <div class="pi pi-file text-6xl attach-icon"></div>
+                                        <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                            <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
                                     <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
-                                    <Button @click="uploadFile" label="Upload" />
+                                    <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">

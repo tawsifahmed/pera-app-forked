@@ -5,6 +5,8 @@ import { useCompanyStore } from '~/store/company';
 const { createCompany } = useCompanyStore();
 const { singleSpace, isCompanyCreated } = storeToRefs(useCompanyStore());
 const companyFormInputs = ref(true)
+
+const toast = useToast();
 // How large is your company?
 const  numEmployees = ref()
 const companyLargeAmount = ref([
