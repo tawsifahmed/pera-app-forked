@@ -33,6 +33,10 @@ export const useCompanyStore = defineStore('workStation', {
     asngUsers: [],
 
     subTasks:[],
+    
+    taskDetails:[],
+
+    taskStatus:[],
 
     users: [],
     priorityList: [],
@@ -335,6 +339,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
     },
     async editTask ({id, name, description, project_id, dueDate, priority, assignees}) {
+      
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
@@ -412,8 +417,21 @@ export const useCompanyStore = defineStore('workStation', {
             },
           }),
       )
+      this.taskDetails = data.value?.data;
       this.singleTaskComments = data.value?.data.comments;
       this.subTasks = data.value?.subTasks;
+      this.taskStatus = [];
+      let status = data.value?.taskStatus;
+
+      if (status && status.length > 0) {
+          status.forEach(element => {
+              let obj = {
+                  name: element.name,
+                  code: element.id,
+              };
+              this.taskStatus.push(obj);
+          });
+      }
   },
 
     async addTaskComment (id, comment) {

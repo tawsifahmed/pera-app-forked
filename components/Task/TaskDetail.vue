@@ -1,3 +1,146 @@
+<script setup>
+import { storeToRefs } from 'pinia';
+import { useCompanyStore } from '~/store/company';
+import { useFileUploaderStore } from '~/store/fileUpload';
+const { fileUpload } = useFileUploaderStore();
+
+const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
+const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
+
+const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
+
+const toast = useToast();
+const btnLoading = ref(false);
+
+const assignees = ref(singleTask?.data?.assigneeObj);
+
+const dueDate = ref(singleTask?.data?.dueDate);
+const status = ref(taskDetails?.status);
+
+const priority = ref(null);
+priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
+const timeTrack = ref(['00:00:00']);
+
+const priorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+]);
+
+const selectedStatus = ref();
+
+const description = ref(singleTask?.data?.description);
+const taskCommentInput = ref(null);
+const selectedfile = ref();
+
+const showActivitiyBtn = ref(true);
+const activityDiv = ref(false);
+const showActivitiy = () => {
+    activityDiv.value = true;
+    showActivitiyBtn.value = false;
+};
+const hideActivity = () => {
+    activityDiv.value = false;
+    showActivitiyBtn.value = true;
+};
+
+const handleTaskComment = async () => {
+    btnLoading.value = true;
+    await addTaskComment(singleTask.key, taskCommentInput.value);
+    if (isTaskCommentCreated.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
+        taskCommentInput.value = null;
+        btnLoading.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
+        btnLoading.value = false;
+    }
+};
+
+const formattedTime = (time) => {
+    const date = new Date(time);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear().toString().substr(-2);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
+};
+
+const handleTaskDetailSubmit = async () => {
+    const taskDetailData = {
+        id: singleTask.key,
+        name: singleTask.data.name,
+        description: description.value,
+        project_id: projID,
+        due_date: dueDate.value,
+        priority: priority.value.name,
+        assignees: assignees.value.map((obj) => obj.id)
+    };
+
+    await editTask(taskDetailData);
+
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
+        // taskEditDescriptionInput.value = null;
+        selectedfile.value = null;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
+    }
+};
+
+const file = ref(null);
+
+const onFileChange = (e) => {
+    file.value = e.target.files[0];
+};
+
+const uploadFile = async () => {
+    if (file.value) {
+        console.log('file =>', file.value);
+        console.log('task_id =>', singleTask.key);
+    }
+    await fileUpload(singleTask.key, file.value);
+};
+
+watch(status, (newValue, oldValue) => {
+    changeStatusData(newValue);
+});
+
+onMounted(() => {
+    getTaskDetails(singleTask.key);
+});
+
+async function changeStatusData(status) {
+    try {
+        const token = useCookie('token');
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            },
+            body: {
+                status: status.code
+            }
+        });
+
+        if (data.value?.app_message === 'success') {
+            getTaskDetails(singleTask.key);
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+</script>
+
 <template>
     <div class="grid">
         <div class="col-12 lg:col-7">
@@ -7,80 +150,50 @@
                 </h5>
                 <div class="task-wrapper card">
                     <div class="task-det">
-                        <form @submit.prevent="handleTaskDetailSubmit" class=" mt-2 task-detail ml-2">
+                        <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <!-- <pre>{{singleTask}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-user"></span>
                                             <p>Assignee:</p>
                                         </div>
-                                        <FloatLabel style="width: 164.94px;" class="input-fields">
-                                            <MultiSelect display="chip"  v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
+                                        <FloatLabel style="width: 164.94px" class="input-fields">
+                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
-                                    <div
-                                        class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-calendar"></span>
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar style="width: 164.94px;" v-model="dueDate" showIcon iconDisplay="input"
-                                                 />
-
+                                            <Calendar style="width: 164.94px" v-model="dueDate" showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
                                 <div>
-                                    <div
-                                        class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="selectedCountry" :options="countries" optionLabel="label" optionGroupLabel="label" optionGroupChildren="items" placeholder="Select Status" class="" style="width: 146.41px;">
-                                            <template #value="slotProps">
-                                                <div v-if="slotProps.value" class="flex align-items-center">
-                                                    <div :style="{ backgroundColor: slotProps.value.color }"  style="color: white; border-radius: 50%;" :class="`p-1 pi ${slotProps.value.logo}`"></div>
-                                                    <div style="font-size: 11px; margin-left: 3px;">{{ slotProps.value.label }}</div>
-                                                </div>
-                                                <span v-else>
-                                                    {{ slotProps.placeholder }}
-                                                </span>
-                                            </template>
-                                            <template #optiongroup="slotProps">
-                                                <div class="flex align-items-center">
-                                                    <div class="flex align-items-center">
-                                                        <div :style="{ backgroundColor: slotProps.option.color }" style="color: white; border-radius: 50%;" :class="`p-1 mr-1 pi ${slotProps.option.logo}`"></div>
-                                                    </div>
-                                                    <div style="font-size: 12px;">{{ slotProps.option.name }}</div>
-                                                </div>
-                                            </template>
-                                        </Dropdown>
+                                        <Dropdown v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
-                                    <div
-                                        class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Dropdown disabled="" :options="priorities" optionLabel="name"
-                                             placeholder="0:00"/>
+                                            <Dropdown disabled="" :options="priorities" optionLabel="name" placeholder="0:00" />
                                         </FloatLabel>
                                     </div>
                                 </div>
-
                             </div>
                             <div class="field mt-3 flex flex-column">
-                                <div
-                                    class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
@@ -96,41 +209,38 @@
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
-                                <div style="height: 50px;">
-
+                                <div class="my-3 flex align-items-center justify-content-start gap-2">
+                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                        <div class="pi pi-file text-6xl attach-icon"></div>
+                                        <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div class="text-xs">asdasd....asdme.extng</div>
+                                            <div class="text-xs">9 MAy, 2024</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
-                                    <input class="float-right" type="file" placeholder="+">
-                                    <Button label="Upload" />
+                                    <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
+                                    <Button @click="uploadFile" label="Upload" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
-                                    :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                                <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer" field="name" header="Name" expander
-                                        :style="{ width: '30%' }"></Column>
+                                    <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
                                     <Column field="dueDate" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%;"
-                                                    icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                                                 <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                                                        rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
-                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class=" ac-btn" severity="warning"
-                                                        rounded
-                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -147,13 +257,33 @@
                 <h5 class="cmc">Comments</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
+                        <div class="my-2 text-surface-800">
+                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
+                        </div>
+                        <div v-if="activityDiv">
+                            <h5 class="text-center text-gray-600">Activity Log</h5>
+                            <ul>
+                                <li>1</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                                <li>2</li>
+                            </ul>
+                            <div class="my-2 text-surface-800">
+                                <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
+                        </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template class="commentator-name" #title>{{ val.commentator_name }}</template>
                             <template #content>
                                 <p class="m-0">
                                     {{ val.comment }}
                                 </p>
-                                <i class="float-right"> {{ val.time }} </i>
+                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
@@ -172,109 +302,6 @@
         </div>
     </div>
 </template>
-
-<script setup>
-import { storeToRefs } from 'pinia';
-import { useCompanyStore } from '~/store/company';
-
-const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks } = storeToRefs(useCompanyStore());
-const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
-
-const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-
-const toast = useToast();
-const btnLoading = ref(false);
-
-const assignees = ref(singleTask?.data?.assigneeObj);
-const dueDate = ref(singleTask?.data?.dueDate);
-
-const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
-
-const timeTrack = ref(['00:00:00']);
-
-const priorities = ref([
-    { name: 'Urgent', code: 'Urgent' },
-    { name: 'High', code: 'High' },
-    { name: 'Normal', code: 'Normal' },
-    { name: 'Low', code: 'Low' }
-]);
-
-const selectedCountry = ref();
-const countries = ref([
-    { name: 'Not Started',
-      code: 'DE',
-      logo: 'pi-circle',
-      color: '#314ebe',
-      items: [
-            { label: 'Open', value: 'Berlin', code: 'DE', logo: 'pi-circle', color: '#314ebe' },
-        ]
-    },
-    { name: 'Active', 
-      code: 'US',
-      logo: 'pi-chart-pie',
-      color: '#f59e0b',
-      items: [
-            { label: 'Doing', value: 'Chicago', code: 'US', logo: 'pi-chart-pie', color: '#f59e0b' },
-        ]
-    },
-    { name: 'Done',
-      code: 'JP',
-      logo: 'pi-check-circle',
-      color: '#10b981',
-      items: [
-            { label: 'Dev Done', value: 'Dev Done', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'QA Status', value: 'QA Status', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-            { label: 'Dev Complete', value: 'Dev Complete', code: 'JP', logo: 'pi-check-circle', color: '#10b981'},
-        ]
-    },
-]);
-
-const description = ref(singleTask?.data?.description);
-const taskCommentInput = ref(null);
-const selectedfile = ref();
-
-
-const handleTaskComment = async () => {
-    btnLoading.value = true;
-    await addTaskComment(singleTask.key, taskCommentInput.value);
-    if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
-        taskCommentInput.value = null;
-        btnLoading.value = false;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
-        btnLoading.value = false;
-    }
-};
-
-const handleTaskDetailSubmit = async () => {
-    const taskDetailData = {
-        id: singleTask.key,
-        name: singleTask.data.name,
-        description: description.value,
-        project_id: projID,
-        due_date: dueDate.value,
-        priority: priority.value.name,
-        assignees: assignees.value.map((obj) => obj.id)
-    };
-    await editTask(taskDetailData);
-
-    if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
-        // taskEditDescriptionInput.value = null;
-        selectedfile.value = null;
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
-    }
-};
-
-onMounted(() => {
-    getTaskDetails(singleTask.key);
-});
-
-</script>
 
 <style lang="scss">
 .task-detail-wrapper {
@@ -346,7 +373,6 @@ onMounted(() => {
     overflow: hidden;
     height: 70vh;
     padding: 5px !important;
-
 }
 
 .task-det {
@@ -374,7 +400,6 @@ onMounted(() => {
     text-align: left;
     padding: 10px;
     border: none;
-
 }
 
 .action-dropdown:hover .action-dropdown-content {
@@ -396,12 +421,10 @@ onMounted(() => {
 
     .pi {
         font-size: 11px !important;
-
     }
 }
 
-
-input[type=file] {
+input[type='file'] {
     width: 300px;
     max-width: 100%;
     color: #444;
@@ -411,7 +434,7 @@ input[type=file] {
     border: 0.5px solid #b8b8b8;
 }
 
-input[type=file]::file-selector-button {
+input[type='file']::file-selector-button {
     margin-right: 20px;
     border: none;
     background: #10b981;
@@ -420,20 +443,19 @@ input[type=file]::file-selector-button {
     color: #fff;
     font-weight: bold;
     cursor: pointer;
-    transition: background .2s ease-in-out;
+    transition: background 0.2s ease-in-out;
 }
 
-input[type=file]::file-selector-button:hover {
+input[type='file']::file-selector-button:hover {
     background: #059669;
 }
 
-.input-fields  {
-    .p-inputtext  {
+.input-fields {
+    .p-inputtext {
         padding: 0.35rem 0.75rem !important;
     }
-    .p-multiselect .p-multiselect-label{
+    .p-multiselect .p-multiselect-label {
         padding: 0.35rem 0.75rem !important;
-    
     }
 }
 
@@ -441,7 +463,27 @@ input[type=file]::file-selector-button:hover {
     text-wrap: nowrap;
 }
 
-.p-dropdown-item-label{
+.p-dropdown-item-label {
     font-size: 13px !important;
+}
+
+.p-card .p-card-body {
+    gap: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
+}
+
+.activity-btns {
+    color: #444 !important;
+    background-color: rgb(102, 102, 102);
+}
+
+.activity-btns:hover {
+    background-color: #6bd4b1 !important;
+    color: white;
+}
+
+.attach-detail {
+    border-top: 1px solid #e2e8f0;
+    font-weight: 600;
 }
 </style>
