@@ -105,14 +105,14 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-        <a class="p-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+        <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
              <div class="flex align-items-center">
-                <span :style="{ background: [item.color?item.color:'#3b82f6'] }" class="border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-white">{{item.label?.charAt(0)}}</span>
-                <span class="layout-menuitem-text">{{ item.label }}  </span>
+                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small"  :style="{ 'background-color': [item.color?item.color:'#3b82f6'], 'color': ['#ededed']}" />
+                 <span class="layout-menuitem-text">{{ item.label }}  </span>
             </div>
             <div class="flex align-items-center ml-auto">
                 <i v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-                <CreateSpecificProject :singleSpace="item" />
+                <CreateSpecificProject :singleSpace="item" :spaces="item.id" />
             </div>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
@@ -121,11 +121,21 @@ const toggle = (event) => {
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
-            <ul v-show="root ? true : isActiveMenu" class="layout-submenu">
+            <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1">
                 <app-menu-item v-for="(child, i) in item.items" :key="child" :index="i" :item="child" :parentItemKey="itemKey" :root="false"></app-menu-item>
+<!--                <CreateSpace/>-->
             </ul>
         </Transition>
     </li>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.p-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.layout-menu ul a {
+    padding: 0.65rem 0.75rem;
+    border-radius: 6px;
+}
+</style>

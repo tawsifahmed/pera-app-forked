@@ -67,7 +67,7 @@ const hideDialog = () => {
 
 <template>
     <div>
-    <Button icon="pi pi-plus" class="p-button-sm  w-2rem h-2rem " @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
+    <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text  />
     <Dialog v-model:visible="spaceFormInputs" :style="{ width: '450px' }" header="Create Space" :modal="true" class="p-fluid">
         <div class="field">
             <label for="name">Space Name</label>
