@@ -17,7 +17,7 @@ const btnLoading = ref(false);
 const assignees = ref(singleTask?.data?.assigneeObj);
 
 const dueDate = ref(singleTask?.data?.dueDate);
-const status = ref(taskDetails?.status);
+const status = ref();
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
@@ -128,12 +128,20 @@ const closeCommentAttachment = () => {
     commentAttachment.value = false;
 };
 
-watch(status, (newValue, oldValue) => {
-    changeStatusData(newValue);
-});
+// watch(status, (newValue, oldValue) => {
+//     console.log('status =>', newValue)
+//     changeStatusData(newValue)
+// });
 
-onMounted(() => {
-    getTaskDetails(singleTask.key);
+onMounted(async () => {
+    await getTaskDetails(singleTask.key)
+    console.log('singleTask =>', taskDetails.value.status_name)
+    console.log('singleTask =>', taskDetails.value.status)
+    const obg = {
+        "name": taskDetails.value.status_name,
+        "code": taskDetails.value.status
+    }
+    status.value = obg;
 });
 
 async function changeStatusData(status) {
@@ -195,7 +203,7 @@ const setDateFormat = (dateUrl) => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{singleTask}}</pre> -->
+                            <!-- <pre>{{taskDetails?.status_name}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
@@ -223,7 +231,7 @@ const setDateFormat = (dateUrl) => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown @change="changeStatusData(status)" v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                     <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
@@ -261,11 +269,14 @@ const setDateFormat = (dateUrl) => {
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-                                    <div v-else v-for="item in taskDetails?.attachments" :key="item" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                    <div v-else v-for="item in taskDetails?.attachments" :key="item" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                             <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                        </div>
+                                        <div @click="" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
+                                            <i class="pi pi-times text-xs"></i>
                                         </div>
                                     </div>
                                 </div>

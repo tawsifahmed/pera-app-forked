@@ -43,6 +43,10 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
             isLoading.value = false
         }
     }
+
+    async function fileDelete(id) {
+        
+    }
   
     return { fileUpload, isFileUpload, isLoading }
 })
