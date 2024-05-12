@@ -10,9 +10,6 @@
                 <p class="pi pi-angle-right font-bold"></p>
                 <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
             </div>
-            <div class="create-btn-wrapper">
-                <Button @click="openCreateSpace('', 'task')" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Task +" />
-            </div>
         </div>
 
         <!-- Datatable -->
