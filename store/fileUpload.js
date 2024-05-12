@@ -4,6 +4,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
     
     const isFileUpload = ref(false)
     const isLoading = ref(false)
+    const isFileDeleted = ref(false)
 
     async function fileUpload(id, file) {
 
@@ -45,13 +46,12 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
     }
 
     async function fileDelete(id) {
-        const isFileDeleted = ref(false)
 
         const token = useCookie('token')
 
         try {
             const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-delete/${id}`, {
-                method: 'POST',
+                method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
                 }
@@ -62,7 +62,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
             }
 
             const data = await response.json()
-            console.log('upload data =>', data)
+            console.log('delete data =>', data)
 
             if (data?.user_message === 'success') {
                 isFileDeleted.value = true

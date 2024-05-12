@@ -434,17 +434,21 @@ export const useCompanyStore = defineStore('workStation', {
       }
   },
 
-    async addTaskComment (id, comment) {
+    async addTaskComment (id, comment, file) {
+
+      const formData = new FormData()
+      
+      formData.append('comment', comment)
+      formData.append('commentable_id', id)
+      formData.append('file', file)
+
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/comments/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
-        body: {
-          'comment' : comment,
-          'commentable_id' : id,
-        },
+        body: formData
       });
        
         if(data.value?.app_message === 'success'){

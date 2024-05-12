@@ -2,8 +2,8 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
-const { fileUpload } = useFileUploaderStore();
-const { isFileUpload, isLoading } = storeToRefs(useFileUploaderStore());
+const { fileUpload, fileDelete } = useFileUploaderStore();
+const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
@@ -50,11 +50,12 @@ const hideActivity = () => {
 
 const handleTaskComment = async () => {
     btnLoading.value = true;
-    await addTaskComment(singleTask.key, taskCommentInput.value);
+    await addTaskComment(singleTask.key, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
         taskCommentInput.value = null;
         btnLoading.value = false;
+        commentFile.value = null
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
         btnLoading.value = false;
@@ -106,10 +107,8 @@ const onFileChange = (e) => {
 const uploadFile = async () => {
     if (file.value) {
         console.log('file =>', file.value);
-        console.log('task_id =>', singleTask.key);
     }
     await fileUpload(singleTask.key, file.value);
-    console.log('isFileUpload =>', isFileUpload)
     if(isFileUpload.value === true){
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', life: 3000 });
         getTaskDetails(singleTask.key);
@@ -135,8 +134,6 @@ const closeCommentAttachment = () => {
 
 onMounted(async () => {
     await getTaskDetails(singleTask.key)
-    console.log('singleTask =>', taskDetails.value.status_name)
-    console.log('singleTask =>', taskDetails.value.status)
     const obg = {
         "name": taskDetails.value.status_name,
         "code": taskDetails.value.status
@@ -190,6 +187,32 @@ const setDateFormat = (dateUrl) => {
     const finalFormattedDate = parts.join(' ')
 
     return finalFormattedDate
+}
+
+const deleteFile = async(id) => {
+
+    await fileDelete(id)
+
+    if(isFileDeleted.value === true){
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', life: 3000 });
+        getTaskDetails(singleTask.key);
+    }else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', life: 3000 });
+    }
+}
+const fileInput = ref(null)
+const commentFile = ref(null)
+const commenFileName = ref('')
+
+const  handleFileChange = (event) =>{
+    commentFile.value = event.target.files[0]
+    commenFileName.value = commentFile.value ? commentFile.value.name : ''
+} 
+const handleFileUpload = () => {
+    fileInput.value.click()
+}
+const handleCloseCommetFile = () => {
+    commentFile.value = null
 }
 </script>
 
@@ -269,16 +292,16 @@ const setDateFormat = (dateUrl) => {
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-                                    <div v-else v-for="item in taskDetails?.attachments" :key="item" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" style="background-color: #f7fafc">
+                                    <a v-for="item in taskDetails?.attachments" :key="item" :href="item?.file" target="_blank" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                             <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                         </div>
-                                        <div @click="" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
+                                        <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs"></i>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
                                     <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
@@ -342,29 +365,37 @@ const setDateFormat = (dateUrl) => {
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template class="commentator-name" #title>{{ val.commentator_name }}</template>
                             <template #content>
+                                <div class="flex justify-content-end">
+                                <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                        <div class="pi pi-file text-3xl attach-icon"></div>
+                                        <div class="attach-detail flex flex-column justify-content-center align-items-center">
+                                            <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
+                                        </div>
+                                    </a>
+                                </div>
                                 <p class="m-0">
-                                    {{ val.comment }}
+                                    {{ val?.comment ? val?.comment : '' }}
+                                    
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
-
                     <form @submit.prevent="handleTaskComment" class="comment-add">
-                        <div v-if="commentAttachment" class="flex gap-2 w-full justify-content-center mb-3" style="height: 30px;">
-                            <input style="padding: 1.5px; font-size: 11px;" @change="onFileChange" class="float-right" type="file" placeholder="+" />
-                            <Button @click="uploadFile" label="Upload" class="" />
-                            <Button @click="closeCommentAttachment" label="X" class="bg-red-500 border-none" />
-                        </div>
-                        <div class="formgroup-inline">
-                            <div class="field">
-                                <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
+                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
+                            <div>
+                                <span class="pi pi-file-import mr-2"></span> <sapn>{{commenFileName}}</sapn>
                             </div>
-                            <Button @click="handleCommentAttachment" class="pi pi-paperclip mr-2 py-2" style="height: 33px; padding-left: 18px;" />
-                            <Button type="submit" label="Add" :loading="btnLoading" />
+                            <div @click="handleCloseCommetFile" class="close-comment">
+                                <i class="pi pi-times"></i>
+                            </div>
                         </div>
-                        
-                        
+                        <div class="comment-form">
+                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" />
+                            <input class="hidden" type="file" ref="fileInput" @change="handleFileChange">
+                            <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
+                            <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
+                        </div>
                     </form>
                 </div>
             </div>
@@ -407,15 +438,9 @@ const setDateFormat = (dateUrl) => {
 }
 
 .formgroup-inline {
-    flex-wrap: nowrap;
-}
-
-.formgroup-inline .field {
-    width: 90% !important;
-}
-
-.formgroup-inline .field input {
-    width: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .float-right {
@@ -477,6 +502,7 @@ const setDateFormat = (dateUrl) => {
 
 .attachment-wrapper{
     margin-bottom: 0px !important;
+    color: #444;
 }
 
 .action-dropdown {
@@ -583,5 +609,23 @@ input[type='file']::file-selector-button:hover {
 .attach-detail {
     border-top: 1px solid #e2e8f0;
     font-weight: 600;
+}
+.comment-form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.comment-form input {
+    width: 75%;
+}
+.close-comment {
+    position: absolute;
+    top: 7px;
+    right: 10px;
+    cursor: pointer;
+}
+.comment-file {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 5px;
 }
 </style>
