@@ -30,7 +30,7 @@ export const useWorkSpaceStore = defineStore('workSpace', {
                     'color' : color,
                 },
             });
-            if(data.value.app_message === 'success'){
+            if(data.value?.app_message === 'success'){
                 console.log('company_id', company_id)
                 this.isSpaceCreated = true;
                 await companies.getCompany()

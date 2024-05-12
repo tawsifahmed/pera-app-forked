@@ -120,7 +120,7 @@ const handleCreateProject = async () => {
                         </InputGroupAddon>
                     </InputGroup>
 
-                    <p v-if="addTaskSTatusError" class="text-danger text-small" >
+                    <p v-if="addTaskSTatusError" class="text-red-600 text-small" >
                         Please Type task name!
                     </p>
 

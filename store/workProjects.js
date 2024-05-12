@@ -26,7 +26,7 @@ export const useWorkProjectStore = defineStore('workProjects', {
                 },
             });
 
-            if(data.value.app_message === 'success'){
+            if(data.value?.app_message === 'success'){
                 this.isProjectCreated = true;
                 await companies.getCompany()
             }

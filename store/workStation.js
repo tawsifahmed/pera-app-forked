@@ -61,7 +61,7 @@ export const useWorkStation = defineStore('workStation', {
         },
       });
        
-        if(data.value.app_message === 'success'){
+        if(data.value?.app_message === 'success'){
           this.iscompanyCreated = true;
           this.getCompanyList();
           // console.log('test')

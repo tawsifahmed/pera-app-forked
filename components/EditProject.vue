@@ -64,7 +64,7 @@
                         </div>
                         <p
                           v-if="addTaskSTatusError"
-                          class="text-danger text-small"
+                          class="text-red-600 text-small"
                         >
                           Please Type task name!
                         </p>

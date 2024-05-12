@@ -92,7 +92,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
       });
        
-        if(data.value.app_message === 'success'){
+        if(data.value?.app_message === 'success'){
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
           await this.getCompanyList();
@@ -200,7 +200,7 @@ export const useCompanyStore = defineStore('workStation', {
           },
         });
        
-        if(data.value.app_message === 'success'){
+        if(data.value?.app_message === 'success'){
           this.isSpaceCreated = true;
           await this.getCompanyList()
         }
@@ -292,7 +292,7 @@ export const useCompanyStore = defineStore('workStation', {
           },
         });
        
-        if(data.value.app_message === 'success'){
+        if(data.value?.app_message === 'success'){
           this.isProjectCreated = true;
           this.getSingleSpace(space_id);
         }
@@ -333,7 +333,7 @@ export const useCompanyStore = defineStore('workStation', {
           },
         });
        
-        if(data.value.app_message === 'success'){
+        if(data.value?.app_message === 'success'){
           this.isTaskCreated = true;
           this.getSingleProject(project_id);
         }
