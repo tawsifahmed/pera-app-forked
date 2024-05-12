@@ -110,6 +110,16 @@ const uploadFile = async () => {
     await fileUpload(singleTask.key, file.value);
 };
 
+const commentAttachment = ref(false);
+
+const handleCommentAttachment = () => {
+    commentAttachment.value = true;
+};
+
+const closeCommentAttachment = () => {
+    commentAttachment.value = false;
+};
+
 watch(status, (newValue, oldValue) => {
     changeStatusData(newValue);
 });
@@ -209,8 +219,8 @@ async function changeStatusData(status) {
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: 0</p>
-                                <div class="my-3 flex align-items-center justify-content-start gap-2">
-                                    <div class="card cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll; ">
+                                    <div class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
@@ -288,15 +298,22 @@ async function changeStatusData(status) {
                         </Card>
                     </div>
 
-                    <div class="comment-add">
-                        <form @submit.prevent="handleTaskComment" class="formgroup-inline">
+                    <form @submit.prevent="handleTaskComment" class="comment-add">
+                        <div v-if="commentAttachment" class="flex gap-2 w-full justify-content-center mb-3" style="height: 30px;">
+                            <input style="padding: 1.5px; font-size: 11px;" @change="onFileChange" class="float-right" type="file" placeholder="+" />
+                            <Button @click="uploadFile" label="Upload" class="" />
+                            <Button @click="closeCommentAttachment" label="X" class="bg-red-500 border-none" />
+                        </div>
+                        <div class="formgroup-inline">
                             <div class="field">
                                 <InputText v-model="taskCommentInput" type="text" required placeholder="Add comment" />
                             </div>
-
+                            <Button @click="handleCommentAttachment" class="pi pi-paperclip mr-2 py-2" style="height: 33px; padding-left: 18px;" />
                             <Button type="submit" label="Add" :loading="btnLoading" />
-                        </form>
-                    </div>
+                        </div>
+                        
+                        
+                    </form>
                 </div>
             </div>
         </div>
@@ -325,7 +342,7 @@ async function changeStatusData(status) {
 
 .comments {
     overflow-y: auto;
-    height: 90%;
+    height: 80%;
     padding: 5px;
 }
 
@@ -379,6 +396,35 @@ async function changeStatusData(status) {
     overflow-y: auto;
     height: 100%;
     padding: 5px;
+}
+
+.attach-sec{
+    overflow-x: scroll;
+    white-space: nowrap; /* Prevents wrapping of child elements */
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.attach-sec::-webkit-scrollbar {
+    width: 10px; /* Width of the scrollbar */
+    height: 10px; /* Height of the scrollbar */
+}
+
+.attach-sec::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+}
+
+.attach-sec::-webkit-scrollbar-thumb {
+    background: #888; /* Thumb color */
+}
+
+.attach-sec::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Hover state color */
+}
+
+.attachment-wrapper{
+    margin-bottom: 0px !important;
 }
 
 .action-dropdown {
