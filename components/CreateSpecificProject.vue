@@ -2,6 +2,8 @@
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import ColorPicker from 'primevue/colorpicker';
 import { useWorkProjectStore } from '../store/workProjects';
+import { useToast } from 'primevue/usetoast';
+const toast = useToast();
 const project = useWorkProjectStore(); // use authenticateUser action from  auth store
 const { save } = storeToRefs(useWorkProjectStore());
 const {singleSpace, spaces} = defineProps(['singleSpace', 'spaces']);
@@ -73,13 +75,12 @@ const handleCreateProject = async () => {
             'space_id': spaces,
             'statuses': taskStatusList.value,
         }
-
-        // console.log('createProjectData', createProjectData)
         await project.createProjects(createProjectData);
         if(save.value === true){
             companyFormInputs.value = false
+            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project create successfully!', life: 3000 });
         }else{
-            console.log('space not created')
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project create Failed!', life: 3000 });
         }
     }
 }

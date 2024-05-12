@@ -117,36 +117,37 @@ initFilters();
 <template>
     <div class="card">
         <div class="d-flex create-btn-wrapper mr-2">
-            <div class="breadCrumWrap">
-                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
-                <p class="pi pi-angle-right"></p>
-                <p class="text">Employee</p>
-            </div>
-            <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Employee +" />
+            <h4 class="mb-0">Create Employee</h4>
         </div>
-
-        <!-- DataTable -->
-        <DataTable v-model:filters="filters" :value="usersLists" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-            <template #header>
-                <div class="flex justify-content-end">
-                    <IconField iconPosition="right">
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                    </IconField>
-                </div>
+        <Toolbar class="border-0 px-0">
+            <template #start>
+                <Button icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal"  class="mr-2" severity="secondary" />
+                <Button icon="pi pi-file-excel"  label="" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-upload" label=""  class="mr-2"  severity="secondary" />
+                <Button icon="pi pi-users" label="Invite a guest"  severity="secondary" />
             </template>
+
+            <template #end>
+                <IconField iconPosition="right" raised>
+                    <InputIcon>
+                        <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                </IconField>
+            </template>
+        </Toolbar>
+
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows  paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
-            <template #loading> Loading data. Please wait. </template>
+            <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="id" header="ID" sortable></Column>
-            <Column field="name" header="Employee Name" sortable></Column>
-            <Column field="email" sortable header="Email"></Column>
-            <Column field="phone" sortable header="phone"></Column>
-            <Column header="Action">
+            <Column field="name" sortable header="Employee Name"></Column>
+            <Column field="email" sortable header="Email Address"></Column>
+            <Column field="phone" sortable header="Phone Number"></Column>
+            <Column field="action"  header="Action" class="p-0">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
+                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
@@ -171,41 +172,50 @@ initFilters();
 </template>
 
 <style lang="scss">
-.header-con {
-    display: flex;
-    justify-content: center;
-
-    .header-text {
-        border-radius: 10px;
-    }
+.table-st{
+    border: 1px solid #ededed;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.table-st thead tr{
+   background:#ededed;
 }
 
-.p-fieldset-legend-text {
-    border: 1px solid rgb(39, 39, 39) !important;
-    border-radius: 7px !important;
-    background: rgb(248, 248, 248);
-    font-size: large;
-}
-
-.p-fieldset {
-    border: 1px solid rgb(39, 39, 39) !important;
-    padding-left: 10px !important;
-}
-
-.create-btn-wrapper {
-    display: flex;
-    margin-bottom: 15px;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.breadCrumWrap {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    align-items: start;
-    .text {
-        line-height: 1;
-    }
-}
+//.header-con {
+//    display: flex;
+//    justify-content: center;
+//
+//    .header-text {
+//        border-radius: 10px;
+//    }
+//}
+//
+//.p-fieldset-legend-text {
+//    border: 1px solid rgb(39, 39, 39) !important;
+//    border-radius: 7px !important;
+//    background: rgb(248, 248, 248);
+//    font-size: large;
+//}
+//
+//.p-fieldset {
+//    border: 1px solid rgb(39, 39, 39) !important;
+//    padding-left: 10px !important;
+//}
+//
+//.create-btn-wrapper {
+//    display: flex;
+//    margin-bottom: 15px;
+//    justify-content: space-between;
+//    align-items: center;
+//}
+//
+//.breadCrumWrap {
+//    display: flex;
+//    justify-content: center;
+//    gap: 5px;
+//    align-items: start;
+//    .text {
+//        line-height: 1;
+//    }
+//}
 </style>
