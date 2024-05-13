@@ -1,53 +1,3 @@
-<template>
-    <div class="card">
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-            <div class="breadCrumWrap">
-                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
-                <p class="pi pi-angle-right font-bold"></p>
-                <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
-                <p class="pi pi-angle-right font-bold"></p>
-                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Space - {{ singleProject?.space_name }}</NuxtLink>
-                <p class="pi pi-angle-right font-bold"></p>
-                <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
-            </div>
-        </div>
-
-        <!-- Datatable -->
-        <div class="card">
-            <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
-        </div>
-
-        <!-- Create Task Modal -->
-        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskCreateTask :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
-        </Dialog>
-
-        <!-- Edit Task Modal -->
-        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
-        </Dialog>
-
-        <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '100rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDetail
-                :singleTask="singleTask"
-                :usersLists="usersLists"
-                :projID="projects"
-                @openCreateSpace="openCreateSpace"
-                @handleTaskEdit="handleTaskEdit($event)"
-                @handleTaskDetailView="handleTaskDetailView($event)"
-                @confirmDeleteTask="confirmDeleteTask($event)"
-            />
-        </Dialog>
-
-        <!-- Delete Task Modal -->
-        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
-            <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
-        </Dialog>
-    </div>
-</template>
 <script setup>
 // Access users data
 definePageMeta({
@@ -169,6 +119,57 @@ watchEffect(() => {
     loading.value = false;
 });
 </script>
+
+<template>
+    <div class="card">
+        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+            <div class="breadCrumWrap">
+                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
+                <p class="pi pi-angle-right font-bold"></p>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
+                <p class="pi pi-angle-right font-bold"></p>
+                <NuxtLink :to="`/companies/${singleProject?.company_id}/spaces/${singleProject?.space_id}`" class="text"> Space - {{ singleProject?.space_name }}</NuxtLink>
+                <p class="pi pi-angle-right font-bold"></p>
+                <p class="text cursor-pointer">Project - {{ singleProject?.name }}</p>
+            </div>
+        </div>
+
+        <!-- Datatable -->
+        <div class="card">
+            <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
+        </div>
+
+        <!-- Create Task Modal -->
+        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskCreateTask :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
+        </Dialog>
+
+        <!-- Edit Task Modal -->
+        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
+        </Dialog>
+
+        <!-- Task Detail Modal -->
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '100rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskDetail
+                :singleTask="singleTask"
+                :usersLists="usersLists"
+                :projID="projects"
+                @openCreateSpace="openCreateSpace"
+                @handleTaskEdit="handleTaskEdit($event)"
+                @handleTaskDetailView="handleTaskDetailView($event)"
+                @confirmDeleteTask="confirmDeleteTask($event)"
+            />
+        </Dialog>
+
+        <!-- Delete Task Modal -->
+        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
+            <p>Are you sure you want to delete?</p>
+            <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
+            <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />
+        </Dialog>
+    </div>
+</template>
 
 <style lang="scss" scoped>
 .create-btn-wrapper {

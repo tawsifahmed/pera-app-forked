@@ -365,8 +365,8 @@ const handleCloseCommetFile = () => {
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template class="commentator-name" #title>{{ val.commentator_name }}</template>
                             <template #content>
-                                <div class="flex justify-content-end">
-                                <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
+                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-3xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
