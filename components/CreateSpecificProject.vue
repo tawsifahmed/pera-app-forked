@@ -79,6 +79,22 @@ const handleCreateProject = async () => {
         if(save.value === true){
             companyFormInputs.value = false
             toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project create successfully!', life: 3000 });
+            projectNameInput.value = null;
+            projectDescriptionInput.value = null;
+            taskStatusList.value = [
+                {
+                    'taskStatusName': 'Open',
+                    'taskStatusColor': `#6466f1`
+                },
+                {
+                    'taskStatusName': 'Doing',
+                    'taskStatusColor': `#ff0084`
+                },
+                {
+                    'taskStatusName': 'Dev Done',
+                    'taskStatusColor': `#12955d`
+                },
+            ];
         }else{
             toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project create Failed!', life: 3000 });
         }

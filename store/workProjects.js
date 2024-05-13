@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { useActiveCompanyStore } from '~/store/workCompany';
+import { useCompanyStore } from '~/store/Company';
 const companies = useActiveCompanyStore()
+const spaces = useCompanyStore()
 export const useWorkProjectStore = defineStore('workProjects', {
     state: () => ({
         isProjectCreated: null,
@@ -29,6 +31,7 @@ export const useWorkProjectStore = defineStore('workProjects', {
             if(data.value?.app_message === 'success'){
                 this.isProjectCreated = true;
                 await companies.getCompany()
+                await spaces.getSingleSpace(space_id)
             }
         },
     },

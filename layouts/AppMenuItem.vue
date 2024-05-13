@@ -41,9 +41,11 @@ watch(
 );
 
 const itemClick = (event, item) => {
+    console.log('clicked');
+    console.log('item', item);
     if (item.disabled) {
         event.preventDefault();
-
+        console.log('clicked ids');
         return;
     }
 
@@ -96,6 +98,7 @@ const toggle = (event) => {
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
+            
 
             <div v-if="item.option == 'space_option'">
                 <div class="flex">
@@ -105,13 +108,13 @@ const toggle = (event) => {
                 </div>
             </div>
         </div>
-        <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+        <a  class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false"  :class="item.class" :target="item.target" tabindex="0">
              <div class="flex align-items-center">
                  <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small"  :style="{ 'background-color': [item.color?item.color:'#3b82f6'], 'color': ['#ededed']}" />
-                 <span class="layout-menuitem-text">{{ item.label }}  </span>
+                 <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text">{{ item.label }}  </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
-                <i v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+                <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject :singleSpace="item" :spaces="item.id" />
             </div>
         </a>
