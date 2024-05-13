@@ -2,8 +2,12 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
+import { useClockStore } from '~/store/clock';
+
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
+
+const { getTaskTimerData } = useClockStore()
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
@@ -20,6 +24,15 @@ const assignees = ref(singleTask?.data?.assigneeObj);
 
 const dueDate = ref(singleTask?.data?.dueDate);
 const status = ref();
+
+const clickClock = ref(false)
+
+const handleClickClock = async() => {
+    if(clickClock) {
+        await getTaskTimerData('start', taskDetails.value?.id)
+    }
+    clickClock.value = !clickClock.value
+}
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
@@ -213,9 +226,10 @@ const  handleFileChange = (event) =>{
 const handleFileUpload = () => {
     fileInput.value.click()
 }
-const handleCloseCommetFile = () => {
+const handleCloseCommetFile = async() => {
     commentFile.value = null
 }
+
 </script>
 
 <template>
@@ -263,9 +277,12 @@ const handleCloseCommetFile = () => {
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
-                                        <FloatLabel class="input-fields">
-                                            <Dropdown disabled="" :options="priorities" optionLabel="name" placeholder="0:00" />
-                                        </FloatLabel>
+                                        <div class="clock-wrapper">
+                                            <div class="text-sm">00.00.00</div>
+                                            <div :class="`clock-btn ${clickClock ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
+                                                <i :class="`pi ${clickClock ? 'pi-stop stop' : 'pi-play start'}`"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -386,7 +403,7 @@ const handleCloseCommetFile = () => {
                     <form @submit.prevent="handleTaskComment" class="comment-add">
                         <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
                             <div>
-                                <span class="pi pi-file-import mr-2"></span> <sapn>{{commenFileName}}</sapn>
+                                <span class="pi pi-file-import mr-2"></span> <span>{{commenFileName}}</span>
                             </div>
                             <div @click="handleCloseCommetFile" class="close-comment">
                                 <i class="pi pi-times"></i>
@@ -629,5 +646,35 @@ input[type='file']::file-selector-button:hover {
 .comment-file {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border-radius: 5px;
+}
+.clock-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.clock-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+.clock-btn:hover {
+    box-shadow: none;
+}  
+.stop {
+    color: white; 
+    font-size: 8px; 
+    margin-top: 1px; 
+    margin-left: -1px;
+}
+.start {
+    color: white; 
+    font-size: 12px; 
+    margin-left: 1px;
 }
 </style>
