@@ -318,9 +318,9 @@ const handleCloseCommetFile = async() => {
                                             <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                             <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                         </div>
-                                        <a href=" " @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
+                                        <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs"></i>
-                                        </a>
+                                        </div>
                                     </a>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
