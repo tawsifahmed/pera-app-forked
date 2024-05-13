@@ -7,7 +7,7 @@ const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderSt
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
-const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
+const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
 const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
@@ -222,6 +222,7 @@ const handleCloseCommetFile = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
+                <!-- <pre>{{taskActivity}}</pre> -->
                 <h5>
                     {{ singleTask.data.name }}
                 </h5>
@@ -287,7 +288,7 @@ const handleCloseCommetFile = () => {
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: {{ taskDetails?.attachments && taskDetails?.attachments?.length > 0 ? taskDetails?.attachments?.length : 0 }}</p>
                                 <div  class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll; ">
-                                    <div v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4" style="background-color: #f7fafc">
+                                    <div v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 attch-w" style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
@@ -300,9 +301,9 @@ const handleCloseCommetFile = () => {
                                             <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                             <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                         </div>
-                                        <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
+                                        <a href=" " @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs"></i>
-                                        </div>
+                                        </a>
                                     </a>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
@@ -341,24 +342,17 @@ const handleCloseCommetFile = () => {
         </div>
         <div class="col-12 lg:col-5">
             <div>
-                <h5 class="cmc">Comments</h5>
+                <h5 class="cmc">Activities</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
                             <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
-                            <h5 class="text-center text-gray-600">Activity Log</h5>
-                            <ul>
-                                <li>1</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
-                                <li>2</li>
+                            
+                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px;">
+                                <li v-html="act.title"></li>
+                              
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
@@ -369,7 +363,7 @@ const handleCloseCommetFile = () => {
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
                                     <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
-                                        <div class="pi pi-file text-3xl attach-icon"></div>
+                                        <div class="pi pi-file attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
                                         </div>
@@ -519,6 +513,7 @@ const handleCloseCommetFile = () => {
     min-width: 160px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
+    padding: 10px 5px; 
 }
 
 .action-dropdown-content button {
@@ -536,7 +531,7 @@ const handleCloseCommetFile = () => {
     gap: 3px;
     padding: 10px 5px;
     top: -10px;
-    left: -162px;
+    left: -158px;
     border-radius: 5px;
 }
 
@@ -629,5 +624,9 @@ input[type='file']::file-selector-button:hover {
 .comment-file {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border-radius: 5px;
+}
+
+.attch-w{
+    visibility: hidden;
 }
 </style>

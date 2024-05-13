@@ -35,6 +35,7 @@ export const useCompanyStore = defineStore('workStation', {
     subTasks:[],
     
     taskDetails:[],
+    taskActivity:[],
 
     taskStatus:[],
 
@@ -422,6 +423,7 @@ export const useCompanyStore = defineStore('workStation', {
           }),
       )
       this.taskDetails = data.value?.data;
+      this.taskActivity = data.value?.taskActivity;
       this.singleTaskComments = data.value?.data.comments;
       this.subTasks = data.value?.subTasks;
       this.taskStatus = [];
