@@ -15,8 +15,6 @@ export const useClockStore = defineStore('clock', () => {
                 url = `set-task-time-traker?action=${action}&task_id=${taskId}`
             }
 
-            console.log('url =>', url)
-            
             const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/${url}`, {
                 method: 'GET',
                 headers: {
@@ -29,8 +27,7 @@ export const useClockStore = defineStore('clock', () => {
             }
 
             const data = await response.json()
-
-            console.log('upload data =>', data)
+            return data;
 
         } catch (error) {
             console.error('Error uploading file:', error)

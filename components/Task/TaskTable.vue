@@ -1,53 +1,53 @@
 <script setup>
-    definePageMeta({
-        middleware: 'auth',
-        layout: 'default'
-    });
+definePageMeta({
+    middleware: 'auth',
+    layout: 'default'
+});
 
-    import { storeToRefs } from 'pinia';
-    import { useCompanyStore } from '~/store/company';
+import { storeToRefs } from 'pinia';
+import { useCompanyStore } from '~/store/company';
 
-    const { taskStatus, statuslist  } = storeToRefs(useCompanyStore());
-    const { getSingleProject } = useCompanyStore();
+const { taskStatus, statuslist } = storeToRefs(useCompanyStore());
+const { getSingleProject } = useCompanyStore();
 
-    const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
+const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
-    const { tasks } = defineProps(['tasks']);
+const { tasks } = defineProps(['tasks']);
 
-    import { FilterMatchMode } from 'primevue/api';
-    import Column from 'primevue/column';
+import { FilterMatchMode } from 'primevue/api';
+import Column from 'primevue/column';
 
-    const filterAssignees = ref();
+const filterAssignees = ref();
 
-    const filterPriorities = ref();
+const filterPriorities = ref();
 
-    const filterStatus = ref();
+const filterStatus = ref();
 
-    const filterDueDate = ref();
+const filterDueDate = ref();
 
-    const filters = ref({});
+const filters = ref({});
 
-    const initFilters = () => {
-        filters.value = {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-        };
+const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
-    initFilters();
+};
+initFilters();
 
-    const selectedCountry = ref()
+const selectedCountry = ref();
 
-    // const countries = ref([
-    //     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
-    //     { name: 'Doing', code: 'BR', logo: 'pi-circle', color: '#f59e0b' },
-    //     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
-    // ])
+// const countries = ref([
+//     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
+//     { name: 'Doing', code: 'BR', logo: 'pi-circle', color: '#f59e0b' },
+//     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
+// ])
 
-    const route = useRoute()
+const route = useRoute();
 
-    onMounted(async () => {
-        const id = route.params?.projects
-        await getSingleProject(id)
-    })
+onMounted(async () => {
+    const id = route.params?.projects;
+    await getSingleProject(id);
+});
 </script>
 
 <template>
@@ -80,25 +80,25 @@
         <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
             <template #body="slotProps">
                 <div class="inline-block">
-                        <div class="task-status">
-                            <Dropdown class="mr-1 flex justify-content-center align-items-center" v-model="selectedCountry" :options="statuslist" optionLabel="name">
-                                <template #value="slotProps">
-                                    <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
-                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
-                                    </div>
-                                    <span v-else>
-                                        {{ slotProps.placeholder }}
-                                    </span>
-                                </template>
-                                <template #option="slotProps">
-                                    <div class="flex align-items-center">
-                                        <div :style="{ backgroundColor: slotProps.option.color_code }" style=" width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
-                                        <div>{{ slotProps.option.name }}</div>
-                                    </div>
-                                </template>
-                            </Dropdown>
-                        </div>
-                    <span>{{ slotProps.node.data.name }}</span>
+                    <div class="task-status">
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" v-model="selectedCountry" :options="statuslist" optionLabel="name">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
+                                    <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                    </div>
+                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)">{{ slotProps.node.data.name }}</span>
                 </div>
             </template>
         </Column>
@@ -185,15 +185,15 @@
     display: inline-block;
     margin-right: 5px;
 }
-.task-status .p-dropdown-trigger{
+.task-status .p-dropdown-trigger {
     display: none;
 }
-.task-status .p-dropdown{
+.task-status .p-dropdown {
     border-radius: 50%;
     width: 15px;
     height: 15px;
 }
-.task-status .status-bg{
+.task-status .status-bg {
     position: absolute;
     top: -1px;
     left: -1px;
@@ -202,8 +202,11 @@
     border-radius: 50%;
     z-index: 1;
 }
-.task-status .p-dropdown-label{
+.task-status .p-dropdown-label {
     margin-top: -4px;
 }
+.taskTitle:hover {
+    color: #00c8ff;
+    font-weight: 500;
+}
 </style>
-

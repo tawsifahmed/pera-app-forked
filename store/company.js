@@ -7,6 +7,7 @@ export const useCompanyStore = defineStore('workStation', {
     isCompanyDeleted: false,
     isCompanyEdited: false,
     companyList: null,
+    companyId: null,
     singleCompany: null,
     singleCompanyName: null,
 
@@ -98,6 +99,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id))
           this.isCompanyCreated = true;
+          this.companyId = data.value?.data?.id;
           await this.getCompanyList();
         } 
     },

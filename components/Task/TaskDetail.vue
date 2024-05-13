@@ -1,13 +1,13 @@
 <script setup>
 import { storeToRefs } from 'pinia';
+import { useClockStore } from '~/store/clock';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
-import { useClockStore } from '~/store/clock';
 
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData } = useClockStore()
+const { getTaskTimerData } = useClockStore();
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
@@ -25,19 +25,23 @@ const assignees = ref(singleTask?.data?.assigneeObj);
 const dueDate = ref(singleTask?.data?.dueDate);
 const status = ref();
 
-const clickClock = ref(false)
+const clickClock = ref(false);
 
-const handleClickClock = async() => {
-    if(clickClock) {
-        await getTaskTimerData('start', taskDetails.value?.id)
+const handleClickClock = async () => {
+    if (clickClock) {
+        const responseData = await getTaskTimerData('start', taskDetails.value?.id);
+        timeTrack.value = responseData.data;
+    } else {
+        const responseData = await getTaskTimerData('stop', taskDetails.value?.id);
+        timeTrack.value = responseData.data;
     }
-    clickClock.value = !clickClock.value
-}
+    clickClock.value = !clickClock.value;
+};
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
-const timeTrack = ref(['00:00:00']);
+const timeTrack = ref('00:00:00');
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -70,7 +74,7 @@ const handleTaskComment = async () => {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
         taskCommentInput.value = null;
         btnLoading.value = false;
-        commentFile.value = null
+        commentFile.value = null;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
         btnLoading.value = false;
@@ -124,10 +128,10 @@ const uploadFile = async () => {
         console.log('file =>', file.value);
     }
     await fileUpload(singleTask.key, file.value);
-    if(isFileUpload.value === true){
+    if (isFileUpload.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', life: 3000 });
         getTaskDetails(singleTask.key);
-    }else {
+    } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', life: 3000 });
     }
 };
@@ -148,11 +152,11 @@ const closeCommentAttachment = () => {
 // });
 
 onMounted(async () => {
-    await getTaskDetails(singleTask.key)
+    await getTaskDetails(singleTask.key);
     const obg = {
-        "name": taskDetails.value.status_name,
-        "code": taskDetails.value.status
-    }
+        name: taskDetails.value.status_name,
+        code: taskDetails.value.status
+    };
     status.value = obg;
 });
 
@@ -179,57 +183,55 @@ async function changeStatusData(status) {
 }
 
 const setFileUrl = (url) => {
-    const urlString = url
-    const partsOfString = urlString.split('/')
-    const lastPartOfString = partsOfString[ partsOfString.length - 1 ] 
-    return lastPartOfString
-}
+    const urlString = url;
+    const partsOfString = urlString.split('/');
+    const lastPartOfString = partsOfString[partsOfString.length - 1];
+    return lastPartOfString;
+};
 
 const setDateFormat = (dateUrl) => {
-    const monthAbbreviations = ['Jan', 'Feb', 'Mar', 'Apr', 'MAy', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const monthAbbreviations = ['Jan', 'Feb', 'Mar', 'Apr', 'MAy', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const dateString = dateUrl
-    const date = new Date(dateString)
+    const dateString = dateUrl;
+    const date = new Date(dateString);
 
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    const formattedDate = date.toLocaleDateString('en-US', options)
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = date.toLocaleDateString('en-US', options);
 
-    const parts = formattedDate.split(' ')
-    const monthIndex = monthAbbreviations.indexOf(parts[0])
+    const parts = formattedDate.split(' ');
+    const monthIndex = monthAbbreviations.indexOf(parts[0]);
     if (monthIndex !== -1) {
-        parts[0] = monthAbbreviations[monthIndex]
+        parts[0] = monthAbbreviations[monthIndex];
     }
-    const finalFormattedDate = parts.join(' ')
+    const finalFormattedDate = parts.join(' ');
 
-    return finalFormattedDate
-}
+    return finalFormattedDate;
+};
 
-const deleteFile = async(id) => {
+const deleteFile = async (id) => {
+    await fileDelete(id);
 
-    await fileDelete(id)
-
-    if(isFileDeleted.value === true){
+    if (isFileDeleted.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', life: 3000 });
         getTaskDetails(singleTask.key);
-    }else {
+    } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', life: 3000 });
     }
-}
-const fileInput = ref(null)
-const commentFile = ref(null)
-const commenFileName = ref('')
+};
+const fileInput = ref(null);
+const commentFile = ref(null);
+const commenFileName = ref('');
 
-const  handleFileChange = (event) =>{
-    commentFile.value = event.target.files[0]
-    commenFileName.value = commentFile.value ? commentFile.value.name : ''
-} 
+const handleFileChange = (event) => {
+    commentFile.value = event.target.files[0];
+    commenFileName.value = commentFile.value ? commentFile.value.name : '';
+};
 const handleFileUpload = () => {
-    fileInput.value.click()
-}
-const handleCloseCommetFile = async() => {
-    commentFile.value = null
-}
-
+    fileInput.value.click();
+};
+const handleCloseCommetFile = async () => {
+    commentFile.value = null;
+};
 </script>
 
 <template>
@@ -279,10 +281,10 @@ const handleCloseCommetFile = async() => {
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <div class="clock-wrapper">
-                                            <div class="text-sm">00.00.00</div>
                                             <div :class="`clock-btn ${clickClock ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
                                                 <i :class="`pi ${clickClock ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
+                                            <div class="text-sm">{{ timeTrack }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -304,15 +306,26 @@ const handleCloseCommetFile = async() => {
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
                                 <p class="m-0">Attachments: {{ taskDetails?.attachments && taskDetails?.attachments?.length > 0 ? taskDetails?.attachments?.length : 0 }}</p>
-                                <div  class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll; ">
-                                    <div v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 attch-w" style="background-color: #f7fafc">
+                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
+                                    <div
+                                        v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
+                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 attch-w"
+                                        style="background-color: #f7fafc"
+                                    >
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-                                    <a v-for="item in taskDetails?.attachments" :key="item" :href="item?.file" target="_blank" class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" style="background-color: #f7fafc">
+                                    <a
+                                        v-for="item in taskDetails?.attachments"
+                                        :key="item"
+                                        :href="item?.file"
+                                        target="_blank"
+                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative"
+                                        style="background-color: #f7fafc"
+                                    >
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
@@ -359,17 +372,15 @@ const handleCloseCommetFile = async() => {
         </div>
         <div class="col-12 lg:col-5">
             <div>
-                <h5 class="cmc">Activities</h5>
+                <h5 class="cmc">Activity</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
                             <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
-                            
-                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px;">
+                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px">
                                 <li v-html="act.title"></li>
-                              
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
@@ -388,7 +399,6 @@ const handleCloseCommetFile = async() => {
                                 </div>
                                 <p class="m-0">
                                     {{ val?.comment ? val?.comment : '' }}
-                                    
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
                             </template>
@@ -397,7 +407,7 @@ const handleCloseCommetFile = async() => {
                     <form @submit.prevent="handleTaskComment" class="comment-add">
                         <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
                             <div>
-                                <span class="pi pi-file-import mr-2"></span> <span>{{commenFileName}}</span>
+                                <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
                             </div>
                             <div @click="handleCloseCommetFile" class="close-comment">
                                 <i class="pi pi-times"></i>
@@ -405,7 +415,7 @@ const handleCloseCommetFile = async() => {
                         </div>
                         <div class="comment-form">
                             <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" />
-                            <input class="hidden" type="file" ref="fileInput" @change="handleFileChange">
+                            <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
                             <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
                         </div>
@@ -488,7 +498,7 @@ const handleCloseCommetFile = async() => {
     padding: 5px;
 }
 
-.attach-sec{
+.attach-sec {
     overflow-x: scroll;
     white-space: nowrap; /* Prevents wrapping of child elements */
     border: 1px solid #ddd;
@@ -513,7 +523,7 @@ const handleCloseCommetFile = async() => {
     background: #555; /* Hover state color */
 }
 
-.attachment-wrapper{
+.attachment-wrapper {
     margin-bottom: 0px !important;
     color: #444;
 }
@@ -530,7 +540,7 @@ const handleCloseCommetFile = async() => {
     min-width: 160px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
-    padding: 10px 5px; 
+    padding: 10px 5px;
 }
 
 .action-dropdown-content button {
@@ -660,20 +670,20 @@ input[type='file']::file-selector-button:hover {
 }
 .clock-btn:hover {
     box-shadow: none;
-}  
+}
 .stop {
-    color: white; 
-    font-size: 8px; 
-    margin-top: 1px; 
+    color: white;
+    font-size: 8px;
+    margin-top: 1px;
     margin-left: -1px;
 }
 .start {
-    color: white; 
-    font-size: 12px; 
+    color: white;
+    font-size: 12px;
     margin-left: 1px;
 }
 
-.attch-w{
+.attch-w {
     visibility: hidden;
 }
 </style>
