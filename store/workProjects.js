@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useActiveCompanyStore } from '~/store/workCompany';
-import { useCompanyStore } from '~/store/Company';
+import { useCompanyStore } from '~/store/company';
 const companies = useActiveCompanyStore()
 const spaces = useCompanyStore()
 export const useWorkProjectStore = defineStore('workProjects', {
