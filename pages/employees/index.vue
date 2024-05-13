@@ -116,7 +116,7 @@ initFilters();
 
 <template>
     <div class="card">
-        <div class="d-flex create-btn-wrapper mr-2">
+        <div class="d-flex mr-2">
             <h4 class="mb-0">Create Employee</h4>
         </div>
         <Toolbar class="border-0 px-0">
@@ -139,12 +139,12 @@ initFilters();
 
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows  paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
-            <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
+            <template #loading> <ProgressSpinner style="width: 50px; height: 50px;" /> </template>
             <Column field="id" header="ID" sortable></Column>
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
             <Column field="phone" sortable header="Phone Number"></Column>
-            <Column field="action"  header="Action" class="p-0">
+            <Column field="action"  header="Action">
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
                     <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
@@ -171,7 +171,7 @@ initFilters();
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .table-st{
     border: 1px solid #ededed;
     border-radius: 10px;
@@ -180,42 +180,4 @@ initFilters();
 .table-st thead tr{
    background:#ededed;
 }
-
-//.header-con {
-//    display: flex;
-//    justify-content: center;
-//
-//    .header-text {
-//        border-radius: 10px;
-//    }
-//}
-//
-//.p-fieldset-legend-text {
-//    border: 1px solid rgb(39, 39, 39) !important;
-//    border-radius: 7px !important;
-//    background: rgb(248, 248, 248);
-//    font-size: large;
-//}
-//
-//.p-fieldset {
-//    border: 1px solid rgb(39, 39, 39) !important;
-//    padding-left: 10px !important;
-//}
-//
-//.create-btn-wrapper {
-//    display: flex;
-//    margin-bottom: 15px;
-//    justify-content: space-between;
-//    align-items: center;
-//}
-//
-//.breadCrumWrap {
-//    display: flex;
-//    justify-content: center;
-//    gap: 5px;
-//    align-items: start;
-//    .text {
-//        line-height: 1;
-//    }
-//}
 </style>

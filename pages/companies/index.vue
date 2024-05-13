@@ -92,30 +92,34 @@ initFilters();
                 <CreateCompany />
             </Dialog> -->
         </div>
-        <DataTable v-model:filters="filters" :value="companyList" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-            <template #header>
-                <div class="flex justify-content-end">
-                    <IconField iconPosition="right">
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                    </IconField>
-                </div>
-            </template>
+      
+        <div class="flex mb-2 justify-content-end">
+            <IconField iconPosition="right">
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+            </IconField>
+        </div>
+        <DataTable v-model:filters="filters" class="table-st" :value="companyList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+           
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="id" header="ID" sortable></Column>
-            <Column field="name" header="Company Name" sortable></Column>
+            <Column field="name" header="Company Name" sortable>
+              <template #body="slotProps" >
+                <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
+                  <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps?.data?.name }}</p>
+                </NuxtLink>
+              </template>
+            </Column>
             <Column field="number_of_employees" sortable header="Number of Employees"></Column>
             <Column field="company_type" sortable header="Type"></Column>
-            <Column header="Action">
+            <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <NuxtLink :to="`/companies/${slotProps.data.id}`">
-                        <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
-                    </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                   
+                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
+                    <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -132,7 +136,7 @@ initFilters();
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .header-con {
     display: flex;
     justify-content: center;
@@ -173,6 +177,23 @@ initFilters();
         line-height: 1;
     }
 }
+
+.table-st{
+    border: 1px solid #ededed;
+    border-radius: 10px;
+    overflow: hidden;
+    td {
+  
+      padding: 0.15rem 1rem !important;
+    }
+  }
+  .table-st thead tr{
+   background:#ededed;
+  }
+
+    .com-name{
+        color: #3c3c3c !important;
+    }
 
 //.breadc{
 // margin-top: 0 !important;

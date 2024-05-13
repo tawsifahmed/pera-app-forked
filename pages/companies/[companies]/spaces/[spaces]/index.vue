@@ -95,31 +95,36 @@ const edittProject = (id) =>{
                 <CreateSpecificProject v-tooltip="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
             </div>
         </div>
-        <DataTable v-model:filters="filters" :value="singleSpace?.projects" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-            <template #header>
-                <div class="flex justify-content-end">
-                    <IconField iconPosition="right">
-                        <InputIcon>
-                            <i class="pi pi-search" />
-                        </InputIcon>
-                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                    </IconField>
-                </div>
-            </template>
-            <template #empty> No Data found... </template>
+        <div class="flex justify-content-end mb-2">
+            <IconField iconPosition="right">
+                <InputIcon>
+                    <i class="pi pi-search" />
+                </InputIcon>
+                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+            </IconField>
+        </div>
+        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpace?.projects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+            
+            <template #empty> <p class="py-2 text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="id" header="ID"></Column>
-            <Column field="name" header="Project Name"></Column>
+            <Column field="name" header="Project Name">
+              <template #body="slotProps">
+                <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
+                    <p class="cursor-pointer proj-name hover:text-primary font-semibold">{{slotProps.data.name}}</p> 
+                </NuxtLink>
+              </template>
+            </Column>
             <Column field="space_name" header="Under the Space of"></Column>
             <!-- <Column field="teams.length" header="Teams"></Column> -->
             <!-- <Column field="color" header="Space Color"></Column> -->
             <Column header="Action">
                 <template #body="slotProps">
-                    <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
+                    <!-- <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
-                    </NuxtLink>
-                    <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click=edittProject(slotProps.data) />
-                    <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
+                    </NuxtLink> -->
+                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click=edittProject(slotProps.data) />
+                    <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -139,29 +144,47 @@ const edittProject = (id) =>{
 </template>
   
   
-  <style scoped>
+<style lang="scss">
 
-  .create-btn-wrapper{
-    display: flex;
-    margin-bottom: 15px;
-    justify-content: flex-end;
-  }
-  /* Add your custom styles here */
+.create-btn-wrapper{
+display: flex;
+margin-bottom: 15px;
+justify-content: flex-end;
+}
+/* Add your custom styles here */
 
-  .create-space-btn-wrapper{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.create-space-btn-wrapper{
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
 
 
-  .breadCrumWrap{
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    align-items: start;
-    .text{
-      line-height: 1;
-    }
-  }
-  </style>
+.breadCrumWrap{
+display: flex;
+justify-content: center;
+gap: 5px;
+align-items: start;
+.text{
+    line-height: 1;
+}
+}
+
+.table-dsp{
+border: 1px solid #ededed;
+border-radius: 10px;
+overflow: hidden;
+td {
+
+    padding: 0.15rem 1rem !important;
+}
+}
+.table-dsp thead tr{
+background:#ededed;
+}
+
+.proj-name{
+    color: #3c3c3c !important;
+}
+
+</style>

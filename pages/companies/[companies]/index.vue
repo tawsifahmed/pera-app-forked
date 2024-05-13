@@ -122,39 +122,39 @@ watchEffect(() => {
             <p class="pi pi-angle-right"></p>
             <p class="text">Company - {{singleCompany?.name}}</p>
            </div>
-          <div class="create-btn-wrapper">
-              <CreateSpace/>
-<!--            <Button @click="openCreateSpace" class="cursor-pointer text-white px-3 py-2 mr-2" label="Create Space +" />-->
-<!--            <Dialog v-model:visible="visible" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">-->
-<!--                <CreateSpecificSpace :singleCompany="singleCompany" />-->
-<!--            </Dialog>-->
-            <!-- <Button label="Create Space +" class=" mr-2 next-btn bg-primary border border-primary text-white px-3 py-2 text-xl mt-6 "/> -->
+          <div class="create-btn-wrapper ">
+              <CreateSpace v-tooltip="{ value: 'Create Space' }"/>
         </div>
       </div>
-      <DataTable v-model:filters="filters" :value="singleCompany?.spaces" showGridlines paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-          <template #header>
-              <div class="flex justify-content-end">
-                  <IconField iconPosition="right">
-                      <InputIcon>
-                          <i class="pi pi-search" />
-                      </InputIcon>
-                      <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-                  </IconField>
-              </div>
-          </template>
-          <template #empty> No Data found... </template>
+      
+      <div class="flex justify-content-end mb-2">
+          <IconField iconPosition="right">
+              <InputIcon>
+                  <i class="pi pi-search" />
+              </InputIcon>
+              <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+          </IconField>
+      </div>
+      <DataTable v-model:filters="filters" class="table-dco" :value="singleCompany?.spaces" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+          <template #empty><p class="py-2 text-center">No Data found...</p> </template>
           <template #loading> Loading data. Please wait. </template>
           <Column field="id" header="ID"></Column>
-          <Column field="name" header="Space Name"></Column>
+          <Column field="name" header="Space Name">
+            <template #body="slotProps">
+              <NuxtLink :to="`/companies/${companies}/spaces/${slotProps.data.id}`">
+                <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps.data.name }}</p>
+              </NuxtLink>
+            </template>  
+          </Column>
           <Column field="description" header="Description"></Column>
           <Column field="color" header="Space Color"></Column>
-          <Column header="Action">
+          <Column field="action" header="Action">
               <template #body="slotProps">
-                  <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
+                  <!-- <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
-                  </NuxtLink>
-                  <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
-                  <Button icon="pi pi-trash" class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
+                  </NuxtLink> -->
+                  <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
+                  <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
               </template>
           </Column>
       </DataTable>
@@ -173,7 +173,7 @@ watchEffect(() => {
 </template>
   
   
-<style lang="scss" scoped>
+<style lang="scss" >
 
 .create-btn-wrapper{
   display: flex;
@@ -197,4 +197,24 @@ watchEffect(() => {
     line-height: 1;
   }
 }
+
+.table-dco{
+  border: 1px solid #ededed;
+  border-radius: 10px;
+  overflow: hidden;
+  td {
+
+    padding: 0.15rem 1rem !important;
+  }
+}
+.table-dco thead tr{
+ background:#ededed;
+}
+
+
+.com-name{
+  color: #3c3c3c !important;
+}
+
+
 </style>
