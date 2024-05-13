@@ -6,7 +6,9 @@ const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
+
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails } = storeToRefs(useCompanyStore());
+
 const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
@@ -533,8 +535,8 @@ const handleCloseCommetFile = () => {
     align-items: center;
     gap: 3px;
     padding: 10px 5px;
-    top: -50px;
-    left: -124px;
+    top: -10px;
+    left: -162px;
     border-radius: 5px;
 }
 

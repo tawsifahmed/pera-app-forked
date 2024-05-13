@@ -3,6 +3,13 @@
         middleware: 'auth',
         layout: 'default'
     });
+
+    import { storeToRefs } from 'pinia';
+    import { useCompanyStore } from '~/store/company';
+
+    const { taskStatus, statuslist  } = storeToRefs(useCompanyStore());
+    const { getSingleProject } = useCompanyStore();
+
     const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
     const { tasks } = defineProps(['tasks']);
@@ -26,6 +33,21 @@
         };
     };
     initFilters();
+
+    const selectedCountry = ref()
+
+    // const countries = ref([
+    //     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
+    //     { name: 'Doing', code: 'BR', logo: 'pi-circle', color: '#f59e0b' },
+    //     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
+    // ])
+
+    const route = useRoute()
+
+    onMounted(async () => {
+        const id = route.params?.projects
+        await getSingleProject(id)
+    })
 </script>
 
 <template>
@@ -57,10 +79,27 @@
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
         <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
             <template #body="slotProps">
-                <span>
-                    <!-- <i @click="showTaskStatuses" class="pi pi-chevron-circle-down mr-2" style="font-size: 14px;"></i> -->
-                    {{ slotProps.node.data.name }}</span
-                >
+                <div class="inline-block">
+                        <div class="task-status">
+                            <Dropdown class="mr-1 flex justify-content-center align-items-center" v-model="selectedCountry" :options="statuslist" optionLabel="name">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
+                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
+                                    </div>
+                                    <span v-else>
+                                        {{ slotProps.placeholder }}
+                                    </span>
+                                </template>
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center">
+                                        <div :style="{ backgroundColor: slotProps.option.color_code }" style=" width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                        </div>
+                    <span>{{ slotProps.node.data.name }}</span>
+                </div>
             </template>
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
@@ -142,4 +181,29 @@
     justify-content: space-between;
     border-bottom: 0.5px solid rgb(230, 229, 229);
 }
+.task-status {
+    display: inline-block;
+    margin-right: 5px;
+}
+.task-status .p-dropdown-trigger{
+    display: none;
+}
+.task-status .p-dropdown{
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+}
+.task-status .status-bg{
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 1;
+}
+.task-status .p-dropdown-label{
+    margin-top: -4px;
+}
 </style>
+

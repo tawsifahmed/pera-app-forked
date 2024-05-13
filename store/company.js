@@ -43,6 +43,8 @@ export const useCompanyStore = defineStore('workStation', {
 
     singleTaskComments: null,
     isTaskCommentCreated: false,
+
+    statuslist: []
     
   }),
   
@@ -261,6 +263,7 @@ export const useCompanyStore = defineStore('workStation', {
 
       this.spaceList = data.value?.data;
     },
+
     async getSingleProject(projectID){
       const token = useCookie('token'); 
       const { data, pending, error } = await useAsyncData(
@@ -273,8 +276,9 @@ export const useCompanyStore = defineStore('workStation', {
         )
 
         this.singleProject = data.value?.data;
-
         this.tasks = data.value?.tasks;
+
+        this.statuslist = data.value?.taskStatus
     },
 
     async createProject ({name, description, space_id, statuses}) {
