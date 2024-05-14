@@ -196,16 +196,6 @@ const handleCreateProject = async () => {
 
     
 }
-
-
-onMounted(() => {
-  // dynamicDiv.value.style.border = '2px solid black';
-  // dynamicDiv.value.style.color = 'black';
-  // spaceColorPreview.value.style.border = '2px solid black';
-  // spaceColorPreview.value.style.color = 'black';
-});
-
-
 </script>
 
 <style lang="scss" scoped>
