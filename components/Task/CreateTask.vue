@@ -10,16 +10,16 @@
             <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div> -->
         <div class="field">
-            <label>Select Assignee</label>
-            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
+            <label>Assignees</label>
+            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
             <label>Due Date</label>
-            <Calendar v-model="dueDate" class="w-full" />
+            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
         </div>
         <div class="field">
-            <label>Selete Priority</label>
-            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
+            <label>Priority</label>
+            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority" class="w-full" />
         </div>
         <br />
         <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
