@@ -37,7 +37,7 @@ const handleCreateSpace = async () => {
         const createSpaceData = {
             name: spaceNameInput.value,
             description: spaceDescripInput.value,
-            company_id: companyId,
+            company_id: company_id,
             color: spaceAvatarPreview.value
         };
         // return
