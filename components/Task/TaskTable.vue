@@ -7,8 +7,9 @@ definePageMeta({
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 
+const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
+
 const { taskStatus, statuslist } = storeToRefs(useCompanyStore());
-const { getSingleProject } = useCompanyStore();
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
@@ -17,15 +18,21 @@ const { tasks } = defineProps(['tasks']);
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 
+const usersListStore = useCompanyStore();
+
 const filterAssignees = ref();
 
 const filterPriorities = ref();
 
 const filterStatus = ref();
 
-const filterDueDate = ref();
+const filterStartDueDate = ref();
+
+const filterEndDueDate = ref();
 
 const filters = ref({});
+
+const usersLists = ref({});
 
 const initFilters = () => {
     filters.value = {
@@ -42,20 +49,47 @@ const selectedCountry = ref();
 //     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
 // ])
 
+const priorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+]);
+
 const route = useRoute();
 
+const id = route.params?.projects;
+
+
+async function changeAttribute(type, value) {
+    if (type == 'assignee') {
+        const userIds = value.map((item) => item.id);
+        sendFilterParams(userIds, filterPriorities.value, filterStatus.value, filterStartDueDate, filterEndDueDate);
+    }
+}
+
+const sendFilterParams = (assignees, priority, status, start, end) => {
+    getSingleProject(id, assignees, priority, status, start, end);
+};
+
 onMounted(async () => {
-    const id = route.params?.projects;
     await getSingleProject(id);
+    getUserlist();
 });
+
+const getUserlist = async () => {
+    await getTaskAssignModalData(); // Await the function call
+    usersLists.value = usersListStore.users;
+};
 </script>
 
 <template>
     <div class="filter-wrapper pb-4 mb-4">
-        <MultiSelect v-model="filterAssignees" :options="cities" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem" />
-        <Dropdown v-model="filterPriorities" :options="cities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem" />
-        <Dropdown v-model="filterStatus" :options="cities" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem" />
-        <Calendar v-model="filterDueDate" placeholder="Select Due date" class="w-full md:w-17rem" />
+        <MultiSelect @change="changeAttribute('assignee', filterAssignees)" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <Dropdown v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
+        <Dropdown v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
+        <Calendar v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
+        <Calendar v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>

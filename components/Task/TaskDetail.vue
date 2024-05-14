@@ -23,6 +23,7 @@ const btnLoading = ref(false);
 const assignees = ref(singleTask?.data?.assigneeObj);
 
 const dueDate = ref(singleTask?.data?.dueDate);
+
 const status = ref();
 
 const clickClock = ref(false);
@@ -146,10 +147,6 @@ const closeCommentAttachment = () => {
     commentAttachment.value = false;
 };
 
-// watch(status, (newValue, oldValue) => {
-//     console.log('status =>', newValue)
-//     changeStatusData(newValue)
-// });
 
 onMounted(async () => {
     await getTaskDetails(singleTask.key);
