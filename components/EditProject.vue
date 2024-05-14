@@ -239,25 +239,7 @@ const handleCreateProject = async () => {
               console.log('space not created')
           }
         }
-
-        // const formData = new FormData()
-        // formData.append('name', workSpaceName.value)
-        // formData.append('size', wPeople.value)
-        // formData.append('number_of_employees', numEmployees.value)
-        // formData.append('company_role', rRole.value)
-
-        
     }
-
-
-onMounted(() => {
-  // dynamicDiv.value.style.border = '2px solid black';
-  // dynamicDiv.value.style.color = 'black';
-  // spaceColorPreview.value.style.border = '2px solid black';
-  // spaceColorPreview.value.style.color = 'black';
-});
-
-
 </script>
 
 <style lang="scss" scoped>

@@ -1,4 +1,7 @@
 import { defineStore } from 'pinia';
+import { useActiveCompanyStore } from '~/store/workCompany';
+const companies = useActiveCompanyStore()
+
 export const useCompanyStore = defineStore('workStation', {
   state: () => ({
     loading: false,
@@ -101,6 +104,7 @@ export const useCompanyStore = defineStore('workStation', {
           this.isCompanyCreated = true;
           this.companyId = data.value?.data?.id;
           await this.getCompanyList();
+          await companies.getCompany()
         } 
     },
     async editCompany ({id, name, email, address, contact_number, number_of_employees, company_type, logo}) {

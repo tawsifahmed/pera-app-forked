@@ -7,10 +7,7 @@ export const useAuthStore = defineStore('auth', {
     userCreated: false,
     loading: false,
     userProfile: null,
-    createCompany: null,
-    iscompanyCreated: false,
-    companyList: null,
-    userCompany: null
+    userCompany: null,
   }),
   
   actions: {
