@@ -232,7 +232,8 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isSpaceEdited = true;
-          this.getSpaceList();
+          // this.getSpaceList();
+          await companies.getCompany()
           this.getSingleCompany(company_id);
         }
 
@@ -251,7 +252,8 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isSpaceDeleted = true;
-          this.getSpaceList();
+          // this.getSpaceList();
+          await companies.getCompany()
           this.getSingleCompany(companyId);
         }
 
@@ -310,6 +312,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isProjectCreated = true;
+          await companies.getCompany()
           this.getSingleSpace(space_id);
         }
     },
@@ -327,6 +330,7 @@ export const useCompanyStore = defineStore('workStation', {
        
         if(data.value?.app_message === 'success'){
           this.isProjectDeleted = true;
+          await companies.getCompany()
           this.getSingleSpace(spaceId);
         }
 
