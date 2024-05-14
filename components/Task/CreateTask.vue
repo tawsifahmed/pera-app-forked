@@ -1,10 +1,14 @@
 <template>
     <div>
         <InputText type="hidden" v-model="tskId" />
-        <div class="field">
-            <label for="company">Set Task Name</label>
-            <InputText v-model="name" class="w-full" />
+        <div class="field flex flex-column">
+            <label for="name">Set Task Name</label>
+            <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div>
+        <!-- <div class="field">
+            <label for="company">Set Task Name</label>
+            <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
+        </div> -->
         <div class="field">
             <label>Select Assignee</label>
             <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
