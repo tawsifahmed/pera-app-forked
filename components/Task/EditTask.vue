@@ -1,21 +1,25 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
-            <div class="field">
+            <div class="field flex flex-column">
+                <label for="name">Edit Task Name</label>
+                <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15" :invalid="spaceDescriptionError" />
+            </div>
+            <!-- <div class="field">
                 <label for="company">Set Task Name</label>
                 <InputText v-model="taskNameEditInput" class="w-full" />
-            </div>
+            </div> -->
             <div class="field">
-                <label>Select Assignee</label>
-                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="" :maxSelectedLabels="3" class="w-full" />
+                <label>Assignees</label>
+                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" />
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
             </div>
             <div class="field">
-                <label>Selete Priority</label>
-                <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="" class="w-full" />
+                <label>Priority</label>
+                <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority" class="w-full" />
             </div>
 
             <br />
