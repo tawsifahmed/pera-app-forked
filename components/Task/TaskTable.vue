@@ -60,17 +60,12 @@ const route = useRoute();
 
 const id = route.params?.projects;
 
-
-async function changeAttribute(type, value) {
-    if (type == 'assignee') {
-        const userIds = value.map((item) => item.id);
-        sendFilterParams(userIds, filterPriorities.value, filterStatus.value, filterStartDueDate, filterEndDueDate);
-    }
+async function changeAttribute() {
+    const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
+    const priority = filterPriorities.value ? filterPriorities.value.code : '';
+    console.log(filterStartDueDate.value);
+    getSingleProject(id, userIds, priority, filterStatus.value, filterStartDueDate.value, filterEndDueDate.value);
 }
-
-const sendFilterParams = (assignees, priority, status, start, end) => {
-    getSingleProject(id, assignees, priority, status, start, end);
-};
 
 onMounted(async () => {
     await getSingleProject(id);
@@ -85,11 +80,11 @@ const getUserlist = async () => {
 
 <template>
     <div class="filter-wrapper pb-4 mb-4">
-        <MultiSelect @change="changeAttribute('assignee', filterAssignees)" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
-        <Dropdown v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <Calendar v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" />
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
+        <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
+        <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
