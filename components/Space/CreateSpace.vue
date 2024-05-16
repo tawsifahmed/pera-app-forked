@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pini
 import { useToast } from 'primevue/usetoast';
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
-import { useWorkSpaceStore } from '../store/workSpace';
+import { useWorkSpaceStore } from '~/store/workSpace';
 const toast = useToast();
 const companies = useActiveCompanyStore();
 companies.getCompany();

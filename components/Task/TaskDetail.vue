@@ -306,7 +306,7 @@ const handleCloseCommetFile = async () => {
                                 <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
                                     <div
                                         v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
-                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 attch-w"
+                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-5 attch-w"
                                         style="background-color: #f7fafc"
                                     >
                                         <div class="pi pi-file text-6xl attach-icon"></div>
@@ -315,23 +315,25 @@ const handleCloseCommetFile = async () => {
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-                                    <a
+                                    <div
                                         v-for="item in taskDetails?.attachments"
                                         :key="item"
-                                        :href="item?.file"
+                                        
                                         target="_blank"
-                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative"
+                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                         style="background-color: #f7fafc"
                                     >
-                                        <div class="pi pi-file text-6xl attach-icon"></div>
-                                        <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
-                                            <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
-                                            <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
-                                        </div>
+                                        <a class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="item?.file">
+                                            <div class="pi pi-file text-6xl attach-icon"></div>
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
                                         <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs"></i>
                                         </div>
-                                    </a>
+                                    </div>
                                 </div>
                                 <div class="flex gap-2 w-full justify-content-center">
                                     <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
@@ -376,11 +378,11 @@ const handleCloseCommetFile = async () => {
                             <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
-                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px">
-                                <li v-html="act.title"></li>
+                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px;">
+                                <li v-html="act.title" style="font-size: small;"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑  Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
+                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">

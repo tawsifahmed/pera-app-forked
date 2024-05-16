@@ -92,7 +92,7 @@ const edittProject = (id) =>{
                 <p class="text cursor-pointer">Space - {{singleSpace?.name}}</p>
             </div>
             <div class="create-btn-wrapper">
-                <CreateSpecificProject v-tooltip="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
+                <CreateSpecificProject v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
             </div>
         </div>
         <div class="flex justify-content-end mb-2">

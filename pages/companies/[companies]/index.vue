@@ -123,7 +123,7 @@ watchEffect(() => {
             <p class="text">Company - {{singleCompany?.name}}</p>
            </div>
           <div class="create-btn-wrapper ">
-              <CreateSpace v-tooltip="{ value: 'Create Space' }"/>
+              <SpaceCreateSpace v-tooltip.left="{ value: 'Create Space' }"/>
         </div>
       </div>
       
@@ -166,8 +166,8 @@ watchEffect(() => {
         <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" /> 
       </Dialog>
       <Dialog v-model:visible="visibleEditSpace" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <EditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"/>
-    </Dialog>
+        <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"/>
+      </Dialog>
   </div>
 
 </template>
