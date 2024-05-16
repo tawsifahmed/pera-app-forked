@@ -86,30 +86,9 @@ watchEffect(() => {
   console.log('company,', companies)
 })
 
-
-
-// const getBackgroundColor = (color) => {
-//   if (color === 'crimson') {
-//     return '#ffa2b3';
-//   } else if (color === 'skyblue') {
-//     return '#e1f6ff';
-//   } else if (color === 'orange') {
-//     return '#ffdc9b';
-//   } else if (color === 'purple') {
-//     return '#ffbdff';
-//   } else if (color === 'cadetblue') {
-//     return '#aae0e1';
-//   } else if (color === 'burlywood') {
-//     return '#ffe9cd';
-//   } else if (color === 'pink') {
-//     return '#ffd5dd';
-//   } else if (color === 'lightseagreen') {
-//     return '#a8e1de';
-//   } else {
-//     // Default color or additional conditions can be set here
-//     return color;
-//   }
-// };
+const closeEditSpace = (evn) => {
+  visibleEditSpace.value = evn;
+};
 </script>
 
 <template>
@@ -166,7 +145,7 @@ watchEffect(() => {
         <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" /> 
       </Dialog>
       <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"/>
+        <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany" @closeEditSpace="closeEditSpace($event)"/>
       </Dialog>
   </div>
 

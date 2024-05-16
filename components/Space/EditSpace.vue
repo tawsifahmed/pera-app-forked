@@ -9,10 +9,9 @@ import InputSwitch from 'primevue/inputswitch';
 
 const {refSpaceId, singleCompany} = defineProps(['refSpaceId', 'singleCompany']);
 const spaceFormInputs = ref(true);
-const showFinalMsg = ref(false);
 const errorHandler = ref(false);
+const toast = useToast();
 
-const dynamicDiv = ref(null);
 
 const spaceAvatarPreview = ref(refSpaceId?.color);
 
@@ -27,6 +26,9 @@ console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 const changeColor = (color) => {
     spaceAvatarPreview.value = color;
 };
+
+const emit = defineEmits(['closeEditSpace']);
+
 
 
 const handleEditSpace = async () => {
@@ -52,11 +54,15 @@ const handleEditSpace = async () => {
 
           if(isSpaceEdited.value === true){
               spaceFormInputs.value = false
-              showFinalMsg.value = true   
+              
+              emit('closeEditSpace', false);
+              toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Updated Successfully', life: 3000 });   
 
               console.log('space created')
           }else{
+              toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update space', life: 3000 });
               console.log('space not created')
+              
           }
         }
     }
@@ -111,16 +117,7 @@ const handleEditSpace = async () => {
       </div>
 
 
-      <div v-if="showFinalMsg">
-        <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Space edited successfully</h3>
-           
-        <div class="centering">
-            <FloatLabel>
-                <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
-                <p class="text-center mb-2">You can close the modal now.</p>
-            </FloatLabel>
-        </div>
-    </div>
+     
 
     </div>
 </template>
