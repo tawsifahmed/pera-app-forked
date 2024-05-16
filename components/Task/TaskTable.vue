@@ -79,7 +79,7 @@ const getUserlist = async () => {
 </script>
 
 <template>
-    <div class="filter-wrapper pb-4 mb-4">
+    <div class="filter-wrapper pb-2 mb-1">
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
