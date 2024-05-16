@@ -139,10 +139,10 @@ const getUserlist = async () => {
                 <div class="action-dropdown">
                     <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                     <div class="action-dropdown-content">
-                        <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                        <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                        <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                        <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                        <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                        <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                        <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                        <Button icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                     </div>
                 </div>
             </template>
