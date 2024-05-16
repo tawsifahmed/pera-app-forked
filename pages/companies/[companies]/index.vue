@@ -165,7 +165,7 @@ watchEffect(() => {
         <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
         <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" /> 
       </Dialog>
-      <Dialog v-model:visible="visibleEditSpace" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+      <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"/>
       </Dialog>
   </div>

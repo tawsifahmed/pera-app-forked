@@ -34,7 +34,7 @@ watchEffect(async () => {});
         <div class="mt-3" v-if="company">
             <div class="flex align-items-center">
                 <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{ company?.charAt(0) }}</span>
-                <h5 class="m-0 font-bold font-size-16">{{ company }}</h5>
+                <h6 class="m-0 font-bold font-size-16">{{ company }}</h6>
             </div>
         </div>
         <hr />

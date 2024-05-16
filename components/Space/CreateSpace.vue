@@ -19,8 +19,6 @@ const spaceDescripInput = ref(null);
 const spaceAvatarPreview = ref('#8080805c');
 const spaceColorPreview = ref(null);
 
-const company = ref(null);
-
 const changeColor = (color) => {
     spaceAvatarPreview.value = color;
 };
@@ -68,7 +66,7 @@ const hideDialog = () => {
 <template>
     <div>
         <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text />
-        <Dialog v-model:visible="spaceFormInputs" :style="{ width: '450px' }" header="Create Space" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid">
             <div class="field">
                 <label for="name">Space Name</label>
                 <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
@@ -81,10 +79,10 @@ const hideDialog = () => {
                 <label for="name">Space Color</label>
                 <div class="m-0 d-flex colorpicker-wrapper">
                     <div class="flex justify-center align-items-center">
-                        <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl">S</div>
+                        <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0) : 'S'}}</div>
                         <div class="ml-2">
                             <div class="flex">
-                                <div id="white" class="color" @click="changeColor('#ffffff')"></div>
+                                <div id="white" class="color" @click="changeColor('#e5ded4')"></div>
                                 <div id="gray" class="color" @click="changeColor('#9e9e9e')"></div>
                                 <div id="orange" class="color" @click="changeColor('#ff9800')"></div>
                                 <div id="purple" class="color" @click="changeColor('#9c27b0')"></div>
@@ -129,7 +127,7 @@ const hideDialog = () => {
 }
 
 #white {
-    background-color: #ffff;
+    background-color: #e5ded4;
 }
 
 #gray {

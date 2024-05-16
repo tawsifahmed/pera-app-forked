@@ -14,7 +14,7 @@ const errorHandler = ref(false);
 
 const dynamicDiv = ref(null);
 
-const spaceAvatarPreview = ref(null);
+const spaceAvatarPreview = ref(refSpaceId?.color);
 
 const spaceNameInput = ref(refSpaceId?.name);
 
@@ -24,31 +24,8 @@ const spaceColorPreview = ref(null);
 
 console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
-const changeColor = (event) => {
-  if(dynamicDiv.value.style.backgroundColor === event.target.id){
-    dynamicDiv.value.style.border = '2px solid black';
-    dynamicDiv.value.style.backgroundColor = null;
-    dynamicDiv.value.style.color = null;
-    spaceAvatarPreview.value = null;
-    spaceColorPreview.value.style.border = '2px solid black';
-    spaceColorPreview.value.style.backgroundColor = null;
-    spaceColorPreview.value.style.color = null;
-
-  }else{
-    dynamicDiv.value.style.backgroundColor = event.target.id;
-    dynamicDiv.value.style.color = 'white';
-    dynamicDiv.value.style.border = 'none';
-    let storeAvatarData = {
-      bgcolor: event.target.id,
-      color: 'white' 
-    }
-    spaceAvatarPreview.value = storeAvatarData.bgcolor;
-    // console.log('storeAvatarData', spaceAvatarPreview.value);
-
-    spaceColorPreview.value.style.backgroundColor = event.target.id;
-    spaceColorPreview.value.style.color = 'white';
-    spaceColorPreview.value.style.border = 'none';
-  }
+const changeColor = (color) => {
+    spaceAvatarPreview.value = color;
 };
 
 
@@ -86,45 +63,45 @@ const handleEditSpace = async () => {
 </script>
 
 <template>
-    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-      <div v-if="spaceFormInputs">
-        <h4 class="text-center text-primary">Edit Space</h4>
-          
+    <div class="">
+      <div v-if="spaceFormInputs">  
         <!-- <pre>{{refSpaceId}}</pre> -->
               <!-- <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div> -->
-            <FloatLabel class="w-full md:w-50rem mt-3 mb-2">
-              <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="spaceNameInput" />
-              <label>Set Space Name</label>
-              
-          </FloatLabel>
-         
-          <FloatLabel class="w-full md:w-50rem mt-4 mb-3">
-            <InputText type="text" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="spaceDescripInput"/>
-            <label>Set Space Description</label>
-            
-          </FloatLabel>
-          
-          <h4 class="text-slate-700 mb-4 text-center font-semibold tracking-wide left-3">Set Space Color</h4>
-          <div class="m-0 pb-3 d-flex justify-content-center colorpicker-wrapper">
-            <div class="flex justify-center items-start">
-              <div id="dynamic-div" ref="dynamicDiv" class="d-flex align-items-center justify-content-center text-3xl">S</div>
-              <div class="ml-2">
-                <p class="text-xs ml-2 mb-1">COLORS</p>
-                <div class="flex">
-                    <div id="crimson" class='color' @click="changeColor"></div>
-                    <div id="skyblue" class='color' @click="changeColor"></div>
-                    <div id="orange" class='color' @click="changeColor"></div>
-                    <div id="purple" class='color' @click="changeColor"></div>
-                    <div id="cadetblue" class='color' @click="changeColor"></div>
-                    <div id="burlywood" class='color' @click="changeColor"></div>
-                    <div id="pink" class='color' @click="changeColor"></div>
-                    <div id="lightseagreen" class='color' @click="changeColor"></div>
-                </div>
-              </div>
-            </div>
+          <div class="field flex flex-column">
+              <label for="name">Space Name</label>
+              <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
           </div>
+          <div class="field flex flex-column">
+              <label for="name">Space Description</label>
+              <Textarea id="description" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
+          </div>
+          
+          <div class="field">
+            <label for="name">Space Color</label>
+            <div class="m-0 d-flex colorpicker-wrapper">
+                <div class="flex justify-center align-items-center">
+                    <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0) : 'S'}}</div>
+                    <div class="ml-2">
+                        <div class="flex">
+                            <div id="white" class="color" @click="changeColor('#e5ded4')"></div>
+                            <div id="gray" class="color" @click="changeColor('#9e9e9e')"></div>
+                            <div id="orange" class="color" @click="changeColor('#ff9800')"></div>
+                            <div id="purple" class="color" @click="changeColor('#9c27b0')"></div>
+                            <div id="cadetblue" class="color" @click="changeColor('#e91e63')"></div>
+                            <div id="burlywood" class="color" @click="changeColor('#4caf50')"></div>
+                            <div id="pink" class="color" @click="changeColor('#f44336')"></div>
+                            <div id="lightseagreen" class="color" @click="changeColor('#009688')"></div>
+                            <div id="brown" class="color" @click="changeColor('#795548')"></div>
+                            <div id="cyan" class="color" @click="changeColor('#00bcd4')"></div>
+                            <div id="amber" class="color" @click="changeColor('#ffc107')"></div>
+                            <div id="indigo" class="color" @click="changeColor('#3f51b5')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
           <br>
           <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
           <br>
@@ -151,52 +128,63 @@ const handleEditSpace = async () => {
 <style scoped>
 
 #dynamic-div{
-  height: 70px;
-  width: 70px;
-  border-radius: 18px;
-  border: 2px solid black;
-  color: black;
+  height: 55px;
+  width: 55px;
+  border-radius: 10px;
   display: flex;
 }
 
 .color{
-  margin-left: 10px;
-  height: 20px;
-  width: 20px;
+  margin-left: 6px;
+  height: 24px;
+  width: 23px;
   border-radius: 50%;
   cursor: pointer;
+  border: 1px solid #ededed;
 }
 
-#crimson{
-  background-color: crimson;
+#white {
+  background-color: #e5ded4;
 }
 
-#skyblue{
-  background-color: skyblue;
+#gray {
+  background-color: #9e9e9e;
 }
 
-#orange{
-  background-color: orange
+#orange {
+  background-color: #ff9800;
 }
 
-#purple{
-  background-color: purple;
+#purple {
+  background-color: #9c27b0;
 }
 
-#cadetblue{
-  background-color: cadetblue;
+#cadetblue {
+  background-color: #e91e63;
 }
 
-#burlywood{
-  background-color: burlywood;
+#burlywood {
+  background-color: #4caf50;
 }
 
-#pink{
-  background-color: pink;
+#pink {
+  background-color: #f44336;
 }
 
-#lightseagreen{
-  background-color: lightseagreen;
+#lightseagreen {
+  background-color: #009688;
+}
+#brown {
+  background-color: #795548;
+}
+#cyan {
+  background-color: #00bcd4;
+}
+#amber {
+  background-color: #ffc107;
+}
+#indigo {
+  background-color: #3f51b5;
 }
 
 
