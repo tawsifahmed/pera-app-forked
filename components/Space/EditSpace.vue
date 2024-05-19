@@ -88,7 +88,7 @@ const handleEditSpace = async () => {
             <label for="name">Space Color</label>
             <div class="m-0 d-flex colorpicker-wrapper">
                 <div class="flex justify-center align-items-center">
-                    <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0) : 'S'}}</div>
+                    <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S'}}</div>
                     <div class="ml-2">
                         <div class="flex">
                             <div id="white" class="color" @click="changeColor('#e5ded4')"></div>
