@@ -282,7 +282,7 @@ const handleCloseCommetFile = async () => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <pre>{{taskDetails}}</pre>
+                            <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
