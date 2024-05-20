@@ -689,6 +689,7 @@ input[type='file']::file-selector-button:hover {
 
 .activity-btns {
     color: #444 !important;
+    font-size: 11px;
     background-color: rgb(102, 102, 102);
 }
 
