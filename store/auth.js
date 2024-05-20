@@ -63,6 +63,37 @@ export const useAuthStore = defineStore('auth', {
         }
       }
     },
+    async registerInviteUser({ id,userName, email, password, confirmPass }) {
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          'id' : id,
+          'name' : userName,
+          'email' : email,
+          'password' : password,
+          'password_confirmation' : confirmPass
+        },
+      });
+      if (data.value) {
+        this.userCreated = true;
+        if(this.userCreated) {
+          const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
+              email,
+              password,
+            },
+          });
+          if (data.value) {
+            const token = useCookie('token'); 
+            token.value = data?.value?.access_token; 
+            this.authenticated = true; //  authenticated state value to true
+          }
+        }
+      }
+    },
     logUserOut() {
       const token = useCookie('token');
       localStorage.removeItem('userCompany')

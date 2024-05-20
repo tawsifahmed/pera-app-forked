@@ -14,6 +14,8 @@ import CreateEmployee from '@/components/Employee/CreateEmployee.vue';
 
 import EditEmployee from '@/components/Employee/EditEmployee.vue';
 
+import InviteGuest from '@/components/Employee/InviteGuest.vue';
+
 const filters = ref();
 
 const loading = ref(true);
@@ -23,6 +25,8 @@ const toast = useToast();
 import Dialog from 'primevue/dialog';
 
 const visibleCreateEmployee = ref(false);
+
+const visibleInviteUser = ref(false);
 
 const visibleEditEmployee = ref(false);
 
@@ -53,6 +57,14 @@ const closeEditModal = (evn) => {
 const handleCreateCompanyModal = () => {
     visibleCreateEmployee.value = true;
     init();
+};
+
+const handleInviteUserModal = () => {
+    visibleInviteUser.value = true;
+};
+
+const closeInviteModal = (evn) => {
+    visibleInviteUser.value = false;
 };
 
 const editEmployee = (data) => {
@@ -121,10 +133,10 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal"  class="mr-2" severity="secondary" />
-                <Button icon="pi pi-file-excel"  label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label=""  class="mr-2"  severity="secondary" />
-                <Button icon="pi pi-users" label="Invite a guest"  severity="secondary" />
+                <Button icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
 
             <template #end>
@@ -137,14 +149,14 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows  paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
-            <template #loading> <ProgressSpinner style="width: 50px; height: 50px;" /> </template>
+            <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="id" header="ID" sortable></Column>
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
             <Column field="phone" sortable header="Phone Number"></Column>
-            <Column field="action"  header="Action">
+            <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
                     <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
@@ -168,16 +180,21 @@ initFilters();
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteEmployee = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" />
         </Dialog>
+
+        <!-- Invite User -->
+        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <InviteGuest @closeInviteModal="closeInviteModal($event)" />
+        </Dialog>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.table-st{
+.table-st {
     border: 1px solid #ededed;
     border-radius: 10px;
     overflow: hidden;
 }
-.table-st thead tr{
-   background:#ededed;
+.table-st thead tr {
+    background: #ededed;
 }
 </style>
