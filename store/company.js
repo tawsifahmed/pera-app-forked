@@ -437,7 +437,9 @@ export const useCompanyStore = defineStore('workStation', {
             },
           }),
       )
+      console.log('details', data.value)
       this.taskDetails = data.value?.data;
+      // console.log('taskDetails', this.taskDetails)
       this.taskActivity = data.value?.taskActivity;
       this.singleTaskComments = data.value?.data.comments;
       this.subTasks = data.value?.subTasks;

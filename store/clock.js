@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 
 export const useClockStore = defineStore('clock', () => {
 
+    const trackedTime = ref(null)
+
     async function getTaskTimerData(action, taskId, timerId) {
 
         const token = useCookie('token')
@@ -14,6 +16,7 @@ export const useClockStore = defineStore('clock', () => {
             }else {
                 url = `set-task-time-traker?action=${action}&task_id=${taskId}`
             }
+            console.log('Saction', action)
 
             const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/${url}`, {
                 method: 'GET',
@@ -27,6 +30,8 @@ export const useClockStore = defineStore('clock', () => {
             }
 
             const data = await response.json()
+            trackedTime.value = data
+            console.log('timerDAta', data)
             return data;
 
         } catch (error) {
@@ -34,5 +39,5 @@ export const useClockStore = defineStore('clock', () => {
         }
     }
   
-    return { getTaskTimerData }
+    return { getTaskTimerData, trackedTime }
 })

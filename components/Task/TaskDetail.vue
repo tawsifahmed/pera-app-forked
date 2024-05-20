@@ -8,6 +8,7 @@ const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { getTaskTimerData } = useClockStore();
+const {trackedTime} = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
@@ -28,30 +29,36 @@ const status = ref();
 
 const clickClock = ref(false);
 
+const timeTrack = ref('00:00:00');
+
 const handleClickClock = async () => {
-    if (clickClock) {
-        const responseData = await getTaskTimerData('start', taskDetails.value?.id);
-        timeTrack.value = responseData.data;
-    } else {
-        const responseData = await getTaskTimerData('stop', taskDetails.value?.id);
-        timeTrack.value = responseData.data;
-    }
     clickClock.value = !clickClock.value;
+    if (clickClock.value === true) {
+        const responseData = await getTaskTimerData('start', taskDetails.value?.id);
+        await getTaskDetails(singleTask.key);
+        timeTrack.value = responseData?.data;
+    } else{
+        const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
+        await getTaskDetails(singleTask.key);
+        timeTrack.value = responseData?.data;
+    }
+    
 };
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
-const timeTrack = ref('00:00:00');
 
-const priorities = ref([
-    { name: 'Urgent', code: 'Urgent' },
-    { name: 'High', code: 'High' },
-    { name: 'Normal', code: 'Normal' },
-    { name: 'Low', code: 'Low' }
+
+
+
+const bouneStatus = ref([
+    { name: 'No', code: 'No', value: null },
+    { name: 'Yes', code: 'Yes', value: 1 },
+
 ]);
 
-const selectedStatus = ref();
+const selectedBncStatus = ref();
 
 const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
@@ -174,10 +181,43 @@ async function changeStatusData(status) {
             getTaskDetails(singleTask.key);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
         }
+        else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
+        }
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
+
+async function changeBounceStatusData(bounceStatus) {
+    console.log('bounceStatus', bounceStatus);
+    try {
+        const token = useCookie('token');
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            },
+            body: {
+                bounceStatus: bounceStatus.code
+            }
+        });
+
+        console.log('dataBO', data);
+
+        if (data.value?.app_message === 'success') {
+            getTaskDetails(singleTask.key);
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', life: 3000 });
+        }
+        else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', life: 3000 });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+
 
 const setFileUrl = (url) => {
     const urlString = url;
@@ -242,7 +282,7 @@ const handleCloseCommetFile = async () => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{taskDetails?.status_name}}</pre> -->
+                            <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
@@ -270,6 +310,7 @@ const handleCloseCommetFile = async () => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
+                                        <!-- <pre>stat: {{taskStatus}}</pre> -->
                                         <Dropdown @change="changeStatusData(status)" v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                     <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -281,8 +322,10 @@ const handleCloseCommetFile = async () => {
                                             <div :class="`clock-btn ${clickClock ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
                                                 <i :class="`pi ${clickClock ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
-                                            <div class="text-sm">{{ timeTrack }}</div>
+                                            <div  class="text-sm">{{ taskDetails?.taskTimer?.title ? taskDetails?.taskTimer?.title : timeTrack }}</div>
+                                            <!-- <div v-else class="text-sm">{{ timeTrack }}</div> -->
                                         </div>
+                                        <!-- <pre>time ={{taskDetails?.taskTimer?.title}}</pre> -->
                                     </div>
                                 </div>
                             </div>
@@ -364,6 +407,17 @@ const handleCloseCommetFile = async () => {
                                     </Column>
                                 </TreeTable>
                             </TabPanel>
+                            <TabPanel :header="`Bounce`">
+                                <div class="card">
+                                    <div class="flex justify-content-start align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
+                                            <span class="pi pi-flag"></span>
+                                            <p class="text-nowrap">Bounce Status:</p>
+                                        </div>
+                                        <Dropdown @change="changeBounceStatusData(selectedBncStatus)" v-model="selectedBncStatus" :options="bouneStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                    </div>
+                                </div>
+                            </TabPanel>
                         </TabView>
                     </div>
                 </div>
@@ -431,6 +485,10 @@ const handleCloseCommetFile = async () => {
 }
 
 .task-detail-property {
+    width: 20%;
+}
+
+.bounce-detail-property {
     width: 20%;
 }
 
@@ -674,12 +732,12 @@ input[type='file']::file-selector-button:hover {
     color: white;
     font-size: 8px;
     margin-top: 1px;
-    margin-left: -1px;
+    margin-left: 1px;
 }
 .start {
     color: white;
     font-size: 12px;
-    margin-left: 1px;
+    margin-left: 2px;
 }
 
 .attch-w {
