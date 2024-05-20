@@ -10,6 +10,7 @@ const { registerInviteUser } = useAuthStore(); // use authenticateUser action fr
 const { authenticated } = storeToRefs(useAuthStore());
 const toast = useToast();
 const route = useRoute();
+const router = useRouter();
 const { layoutConfig } = useLayout();
 const users = ref();
 const loading = ref(true);
