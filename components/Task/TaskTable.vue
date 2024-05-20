@@ -9,6 +9,8 @@ import { useCompanyStore } from '~/store/company';
 
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 
+const toast = useToast();
+
 const { taskStatus, statuslist } = storeToRefs(useCompanyStore());
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
@@ -41,7 +43,7 @@ const initFilters = () => {
 };
 initFilters();
 
-const selectedCountry = ref();
+const selectedStatus = ref();
 
 // const countries = ref([
 //     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
@@ -63,7 +65,7 @@ const id = route.params?.projects;
 async function changeAttribute() {
     const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
-    console.log(filterStartDueDate.value);
+    // console.log(filterStartDueDate.value);
     getSingleProject(id, userIds, priority, filterStatus.value, filterStartDueDate.value, filterEndDueDate.value);
 }
 
@@ -71,6 +73,35 @@ onMounted(async () => {
     await getSingleProject(id);
     getUserlist();
 });
+
+
+async function handleTaskStatus(status, task_id) {
+    try {
+        const token = useCookie('token');
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${task_id}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            },
+            body: {
+                status: status?.id
+            }
+        });
+        console.log('Status Changed', data);
+        // return
+
+        if (data.value?.app_message === 'success') {
+            // getTaskDetails(singleTask.key);
+            console.log('Status Changed', data);
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+        }
+        else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
 
 const getUserlist = async () => {
     await getTaskAssignModalData(); // Await the function call
@@ -80,11 +111,12 @@ const getUserlist = async () => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
+        <!-- <pre v-for="task in tasks">{{task.data}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" />
+        <!-- <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
+        <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" /> -->
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
@@ -102,6 +134,7 @@ const getUserlist = async () => {
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </template>
+        
     </Toolbar>
     <TreeTable class="table-st" v-model:filters="filters" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
@@ -109,8 +142,8 @@ const getUserlist = async () => {
         <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
             <template #body="slotProps">
                 <div class="inline-block">
-                    <div class="task-status">
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center" v-model="selectedCountry" :options="statuslist" optionLabel="name">
+                    <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
                                     <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
@@ -127,6 +160,7 @@ const getUserlist = async () => {
                             </template>
                         </Dropdown>
                     </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                     <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)">{{ slotProps.node.data.name }}</span>
                 </div>
             </template>

@@ -16,7 +16,7 @@ const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskSt
 
 const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
 
-const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
+const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask', 'updateTaskTable']);
 
 const toast = useToast();
 const btnLoading = ref(false);
@@ -47,10 +47,6 @@ const handleClickClock = async () => {
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
-
-
-
-
 
 const bounceStatus = ref([
     { is_bounce: 'No', },
@@ -184,6 +180,7 @@ async function changeStatusData(status) {
         if (data.value?.app_message === 'success') {
             getTaskDetails(singleTask.key);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+            emit('updateTaskTable');
         }
         else{
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
@@ -289,7 +286,7 @@ const handleCloseCommetFile = async () => {
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <!-- <pre>{{singleTask}}</pre> -->
-                            <pre>{{taskDetails}}</pre>
+                            <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
@@ -397,7 +394,7 @@ const handleCloseCommetFile = async () => {
                                     </template>
                                     <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
-                                    <Column field="dueDate" header="Due Date" :style="{ width: '12.5%' }"></Column>
+                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">

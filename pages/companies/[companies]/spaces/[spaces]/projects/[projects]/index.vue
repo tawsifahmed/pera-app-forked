@@ -114,6 +114,11 @@ const closeEditModal = (evn) => {
     visibleEdit.value = evn;
 };
 
+const updateTaskTable = () => {
+    getSingleProject(projects);
+};
+
+
 watchEffect(() => {
     getSingleProject(projects);
     loading.value = false;
@@ -159,6 +164,7 @@ watchEffect(() => {
                 @handleTaskEdit="handleTaskEdit($event)"
                 @handleTaskDetailView="handleTaskDetailView($event)"
                 @confirmDeleteTask="confirmDeleteTask($event)"
+                @updateTaskTable="updateTaskTable"
             />
         </Dialog>
 
