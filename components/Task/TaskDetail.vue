@@ -370,7 +370,7 @@ const handleCloseCommetFile = async () => {
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                         style="background-color: #f7fafc"
                                     >
-                                        <a class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="item?.file">
+                                        <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="item?.file">
                                             <div class="pi pi-file text-6xl attach-icon"></div>
                                             <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
@@ -444,7 +444,13 @@ const handleCloseCommetFile = async () => {
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                            <template class="commentator-name" #title>{{ val.commentator_name }}</template>
+                           
+                            <template class="commentator-name" #title>
+                             <div class="flex justify-content-start align-items-center">
+                                <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small"  style="background-color: gray; color: #ededed; border-radius: 50%;" />
+                                <p> {{ val.commentator_name }}</p>
+                             </div>    
+                            </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
                                     <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
@@ -454,7 +460,7 @@ const handleCloseCommetFile = async () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p class="m-0">
+                                <p class="m-0 ml-1">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
@@ -471,7 +477,7 @@ const handleCloseCommetFile = async () => {
                             </div>
                         </div>
                         <div class="comment-form">
-                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" />
+                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required/>
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
                             <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
