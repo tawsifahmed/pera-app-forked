@@ -88,7 +88,10 @@ export const useAuthStore = defineStore('auth', {
           });
           if (data.value) {
             const token = useCookie('token'); 
-            token.value = data?.value?.access_token; 
+            token.value = data?.value?.access_token;
+            if(data.value?.user?.company_id){
+            localStorage.setItem('userCompany', JSON.stringify(data.value?.user?.company_id))
+            } 
             this.authenticated = true; //  authenticated state value to true
           }
         }
