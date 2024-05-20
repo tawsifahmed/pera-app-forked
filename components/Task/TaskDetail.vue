@@ -52,13 +52,12 @@ priority.value = singleTask.data.priority ? { name: singleTask.data.priority, co
 
 
 
-const bouneStatus = ref([
-    { name: 'No', code: 'No', value: null },
-    { name: 'Yes', code: 'Yes', value: 1 },
-
+const bounceStatus = ref([
+    { is_bounce: 'No', },
+    { is_bounce: 'Yes',},
 ]);
 
-const selectedBncStatus = ref();
+const vModelBncStatus = ref();
 
 const description = ref(singleTask?.data?.description);
 const taskCommentInput = ref(null);
@@ -162,6 +161,11 @@ onMounted(async () => {
         code: taskDetails.value.status
     };
     status.value = obg;
+    const bncObj ={
+        is_bounce: taskDetails.value.is_bounce
+    
+    }
+    vModelBncStatus.value = bncObj;
 });
 
 async function changeStatusData(status) {
@@ -189,8 +193,10 @@ async function changeStatusData(status) {
     }
 }
 
-async function changeBounceStatusData(bounceStatus) {
-    console.log('bounceStatus', bounceStatus);
+async function changeBounceStatusData(selectedBncStatus) {
+    console.log('bounceStatus', selectedBncStatus.is_bounce);
+    // return
+    // return;
     try {
         const token = useCookie('token');
         const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
@@ -199,7 +205,7 @@ async function changeBounceStatusData(bounceStatus) {
                 Authorization: `Bearer ${token.value}`
             },
             body: {
-                bounceStatus: bounceStatus.code
+                is_bounce : selectedBncStatus.is_bounce
             }
         });
 
@@ -282,7 +288,8 @@ const handleCloseCommetFile = async () => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{taskDetails}}</pre> -->
+                            <!-- <pre>{{singleTask}}</pre> -->
+                            <pre>{{taskDetails}}</pre>
                             <div class="flex justify-content-start gap-7 align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
@@ -414,7 +421,7 @@ const handleCloseCommetFile = async () => {
                                             <span class="pi pi-flag"></span>
                                             <p class="text-nowrap">Bounce Status:</p>
                                         </div>
-                                        <Dropdown @change="changeBounceStatusData(selectedBncStatus)" v-model="selectedBncStatus" :options="bouneStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown @change="changeBounceStatusData(vModelBncStatus)" v-model="vModelBncStatus" :options="bounceStatus" optionLabel="is_bounce" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                 </div>
                             </TabPanel>

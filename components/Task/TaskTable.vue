@@ -132,7 +132,7 @@ const getUserlist = async () => {
             </template>
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
-        <Column field="dueDate" header="Due Date" :style="{ width: '10%' }"></Column>
+        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }"></Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">
             <template #body="slotProps">

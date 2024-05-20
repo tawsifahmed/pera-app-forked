@@ -64,6 +64,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async registerInviteUser({ id,userName, email, password, confirmPass }) {
+  
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,11 +88,10 @@ export const useAuthStore = defineStore('auth', {
             },
           });
           if (data.value) {
+            this.userCompany = data?.value?.company?.id;
             const token = useCookie('token'); 
             token.value = data?.value?.access_token;
-            if(data.value?.user?.company_id){
-            localStorage.setItem('userCompany', JSON.stringify(data.value?.user?.company_id))
-            } 
+            localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
             this.authenticated = true; //  authenticated state value to true
           }
         }
