@@ -65,15 +65,15 @@ const id = route.params?.projects;
 async function changeAttribute() {
     const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
+    const status = filterStatus.value ? filterStatus.value.code : '';
     // console.log(filterStartDueDate.value);
-    getSingleProject(id, userIds, priority, filterStatus.value, filterStartDueDate.value, filterEndDueDate.value);
+    getSingleProject(id, userIds, priority, status, filterStartDueDate.value, filterEndDueDate.value);
 }
 
 onMounted(async () => {
     await getSingleProject(id);
     getUserlist();
 });
-
 
 async function handleTaskStatus(status, task_id) {
     try {
@@ -94,8 +94,7 @@ async function handleTaskStatus(status, task_id) {
             // getTaskDetails(singleTask.key);
             console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
-        }
-        else{
+        } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
         }
     } catch (error) {
@@ -134,7 +133,6 @@ const getUserlist = async () => {
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </template>
-        
     </Toolbar>
     <TreeTable class="table-st" v-model:filters="filters" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
