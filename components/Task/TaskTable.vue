@@ -54,11 +54,12 @@ const route = useRoute();
 
 const id = route.params?.projects;
 
-async function changeAttribute() {
+const changeAttribute = async () => {
     const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
-    const status = filterStatus.value ? filterStatus.value.code : '';
+    const status = filterStatus.value ? filterStatus.value.id : '';
     const query = filterSearch.value;
+
     // console.log(filterStartDueDate.value);
     getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
 }
@@ -101,10 +102,10 @@ const getUserlist = async () => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre v-for="task in tasks">{{task.data}}</pre> -->
+        <!-- <pre>{{statuslist}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="taskStatus" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="statuslist" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
         <!-- <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
         <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" /> -->
     </div>
