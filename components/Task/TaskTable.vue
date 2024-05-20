@@ -94,8 +94,26 @@ async function handleTaskStatus(status, task_id) {
     }
 }
 
+function getRandomDeepColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 10)]; 
+  }
+  return color;
+}
+
+function avatarStyle(index) {
+  return {
+    backgroundColor: getRandomDeepColor(),
+    color: 'white',
+    borderRadius: '50%',
+    border: '2px solid white',
+  };
+}
+
 const getUserlist = async () => {
-    await getTaskAssignModalData(); // Await the function call
+    await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
 };
 </script>
@@ -155,8 +173,27 @@ const getUserlist = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }"></Column>
+        <Column field="assignee" header="Assignee" :style="{ width: '20%' }">
+            <template #body="slotProps">
+              <div class="flex justify-content-start gap-1">
+                <span
+                  v-for="(assignee, index) in slotProps.node.data.assigneeObj"
+                  :key="index"
+                  class="flex justify-content-center assignee-wrapper"
+                  :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index, }"
+                >
+                  <Avatar v-tooltip.top="{ value: `${assignee.name}` }"
+                    :label="assignee.name.charAt(0)"
+                    class="mr-2 capitalize cursor-pointer"
+                    size="small"
+                    style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                    :style="avatarStyle(index)"
+                  />
+                </span>
+              </div>
+            </template>
+        </Column>
+        <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }"></Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">
             <template #body="slotProps">
@@ -231,7 +268,8 @@ const getUserlist = async () => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: start;
+    gap: 10px;
     border-bottom: 0.5px solid rgb(230, 229, 229);
 }
 .task-status {
@@ -262,4 +300,10 @@ const getUserlist = async () => {
     color: #00c8ff;
     font-weight: 500;
 }
+
+.assignee-wrapper {
+    position: relative;
+    z-index: 1;
+  }
+
 </style>

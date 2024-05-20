@@ -437,7 +437,7 @@ const handleCloseCommetFile = async () => {
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px;">
-                                <li v-html="act.title" style="font-size: small;"></li>
+                                <li v-html="act.title" style="font-size: smaller;"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
@@ -448,7 +448,7 @@ const handleCloseCommetFile = async () => {
                             <template class="commentator-name" #title>
                              <div class="flex justify-content-start align-items-center">
                                 <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small"  style="background-color: gray; color: #ededed; border-radius: 50%;" />
-                                <p> {{ val.commentator_name }}</p>
+                                <p class="text-lg"> {{ val.commentator_name }}</p>
                              </div>    
                             </template>
                             <template #content>
@@ -499,7 +499,7 @@ const handleCloseCommetFile = async () => {
 }
 
 .bounce-detail-property {
-    width: 20%;
+    width: 22%;
 }
 
 .cmc {
