@@ -433,14 +433,14 @@ const handleCloseCommetFile = async () => {
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
+                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px;">
                                 <li v-html="act.title" style="font-size: smaller;"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-100 border-gray-100 text-surface-900 activity-btns" />
+                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
@@ -694,8 +694,8 @@ input[type='file']::file-selector-button:hover {
 }
 
 .activity-btns:hover {
-    background-color: #6bd4b1 !important;
-    color: white;
+    background-color: #63ceaa !important;
+    color: white !important;
 }
 
 .attach-detail {
