@@ -273,7 +273,7 @@ export const useCompanyStore = defineStore('workStation', {
       this.spaceList = data.value?.data;
     },
 
-    async getSingleProject(projectID,assignees = '', priority = '', status = '', start = '', end = ''){
+    async getSingleProject(projectID, assignees = '', priority = '', status = '', start = '', end = ''){
       const token = useCookie('token'); 
       if(assignees){
         assignees = assignees.join(',');
