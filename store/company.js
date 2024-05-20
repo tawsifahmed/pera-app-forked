@@ -273,7 +273,7 @@ export const useCompanyStore = defineStore('workStation', {
       this.spaceList = data.value?.data;
     },
 
-    async getSingleProject(projectID,assignees = '', priority = '', status = '', start = '', end = ''){
+    async getSingleProject(projectID,assignees = '', priority = '', status = '', query='', start = '', end = ''){
       const token = useCookie('token'); 
       if(assignees){
         assignees = assignees.join(',');
@@ -282,7 +282,7 @@ export const useCompanyStore = defineStore('workStation', {
       const { data, pending, error } = await useAsyncData(
           'singleProject',
           () => $fetch(`
-          http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}?assignees=${assignees}&priority=${priority}&status=${status}&start=${start}&end=${end}`,{
+          http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}?assignees=${assignees}&priority=${priority}&status=${status}&search=${query}&start=${start}&end=${end}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
           },

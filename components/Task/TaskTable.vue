@@ -17,7 +17,6 @@ const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetail
 
 const { tasks } = defineProps(['tasks']);
 
-import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 
 const usersListStore = useCompanyStore();
@@ -32,16 +31,9 @@ const filterStartDueDate = ref();
 
 const filterEndDueDate = ref();
 
-const filters = ref({});
+const filterSearch = ref();
 
 const usersLists = ref({});
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-initFilters();
 
 const selectedStatus = ref();
 
@@ -66,8 +58,9 @@ async function changeAttribute() {
     const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
     const status = filterStatus.value ? filterStatus.value.code : '';
+    const query = filterSearch.value;
     // console.log(filterStartDueDate.value);
-    getSingleProject(id, userIds, priority, status, filterStartDueDate.value, filterEndDueDate.value);
+    getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
 }
 
 onMounted(async () => {
@@ -87,8 +80,6 @@ async function handleTaskStatus(status, task_id) {
                 status: status?.id
             }
         });
-        console.log('Status Changed', data);
-        // return
 
         if (data.value?.app_message === 'success') {
             // getTaskDetails(singleTask.key);
@@ -130,11 +121,11 @@ const getUserlist = async () => {
                 <InputIcon>
                     <i class="pi pi-search" />
                 </InputIcon>
-                <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
+                <InputText @keyup="changeAttribute()" v-model="filterSearch" placeholder="Keyword Search" />
             </IconField>
         </template>
     </Toolbar>
-    <TreeTable class="table-st" v-model:filters="filters" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
+    <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
         <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
