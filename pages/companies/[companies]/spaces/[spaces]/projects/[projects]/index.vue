@@ -1,5 +1,5 @@
 <script setup>
-// Access users data
+// Access users data 
 definePageMeta({
     middleware: 'auth',
     layout: 'default'

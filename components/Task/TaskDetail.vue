@@ -327,9 +327,10 @@ const handleCloseCommetFile = async () => {
                                                 <i :class="`pi ${clickClock ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
                                             <div  class="text-sm">{{ taskDetails?.taskTimer?.title ? taskDetails?.taskTimer?.title : timeTrack }}</div>
+                                            <!-- <pre>{{taskDetails?.taskTimer}}</pre> -->
                                             <!-- <div v-else class="text-sm">{{ timeTrack }}</div> -->
                                         </div>
-                                        <!-- <pre>time ={{taskDetails?.taskTimer?.title}}</pre> -->
+                                        <!-- <pre>time ={{taskDetails?.taskTimer}}</pre> -->
                                     </div>
                                 </div>
                             </div>

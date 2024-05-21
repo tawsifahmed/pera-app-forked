@@ -22,7 +22,11 @@ const model = ref([
     {
         label: 'Settings',
         option: 'settings_option',
-        items: [{ label: 'Employee', icon: 'pi pi-fw pi-users', to: '/employees' }]
+        items: [
+            { label: 'Employee', icon: 'pi pi-fw pi-users', to: '/employees' },
+            { label: 'Tags', icon: 'pi pi-fw pi-tags', to: '/tags' }
+        ],
+        
     }
 ]);
 
