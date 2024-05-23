@@ -24,6 +24,7 @@ const model = ref([
         option: 'settings_option',
         items: [
             { label: 'Employee', icon: 'pi pi-fw pi-users', to: '/employees' },
+            { label: 'Role', icon: 'pi pi-fw pi-user-edit', to: '/role' },
             { label: 'Tags', icon: 'pi pi-fw pi-tags', to: '/tags' }
         ],
         

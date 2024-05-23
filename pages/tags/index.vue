@@ -111,11 +111,11 @@ initFilters();
 <template>
     <div class="card">
         <div class="d-flex mr-2">
-            <h5 class="mb-1">Create Tags</h5>
+            <h5 class="mb-1">Tags</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-plus" label="Create Tags" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->

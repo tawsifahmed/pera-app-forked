@@ -1,0 +1,72 @@
+<template>
+    <div>
+        <div class="field">
+            <label for="company">Role Name</label>
+            <InputText v-model="name" class="w-full" placeholder="Edit role name"/>
+        </div>
+
+        <p v-if="errorHandler" style="color: red">Please enter tag name</p>
+        <div class="create-btn-wrappe">
+            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
+        </div>
+    </div>
+</template>
+<script setup>
+const props = defineProps({
+    param: {
+        type: Object,
+        required: true
+    }
+});
+const toast = useToast();
+
+const id = ref(props.param.id);
+
+const name = ref(props.param.name);
+
+const errorHandler = ref(false);
+
+const employeeForm = ref(true);
+
+const emit = defineEmits(['closeEditModal']);
+
+const handleSubmitData = async () => {
+    if (name.value === '') {
+        errorHandler.value = true;
+        return;
+    } else {
+        errorHandler.value = false;
+        if (!errorHandler.value) {
+            const token = useCookie('token');
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/update/${id.value}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`
+                },
+                body: {
+                    name: name.value,
+                }
+            });
+
+            if (data.value.code === 200) {
+                employeeForm.value = false;
+                emit('closeEditModal', false);
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', life: 3000 });
+            } else {
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Update Failed!', life: 3000 });
+            }
+        }
+    }
+};
+</script>
+
+<style lang="scss" scoped>
+.text-danger {
+    color: red;
+}
+
+.create-btn-wrappe {
+    display: flex;
+    justify-content: end;
+}
+</style>

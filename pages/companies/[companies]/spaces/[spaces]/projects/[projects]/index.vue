@@ -53,9 +53,9 @@ const openCreateSpace = async (key, type) => {
         createTaskTitle.value = 'Create Task';
     }
     visible.value = true;
-    await getTaskAssignModalData(); // Await the function call
+    await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
-    await getTagsAssignModalData(); // Await the function call
+    await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
 
 };
@@ -63,9 +63,9 @@ const openCreateSpace = async (key, type) => {
 const handleTaskEdit = async (task) => {
     singleTask.value = task;
 
-    await getTaskAssignModalData(); // Await the function call
+    await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
-    await getTagsAssignModalData(); // Await the function call
+    await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
     // refTaskIdForEdit.value = task.key;
     // taskNameEditInput.value = task.data.name;
