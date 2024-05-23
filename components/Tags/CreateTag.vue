@@ -23,14 +23,14 @@ const employeeForm = ref(true);
 const emit = defineEmits(['closeCreateModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '' || email.value === '' || password.value === '') {
+    if (name.value === '') {
         errorHandler.value = true;
         return;
     } else {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/create`, {
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
