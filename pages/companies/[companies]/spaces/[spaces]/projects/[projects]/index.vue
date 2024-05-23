@@ -67,13 +67,13 @@ const handleTaskEdit = async (task) => {
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData(); // Await the function call
     tagsLists.value = tagsListStore.tags;
-    refTaskIdForEdit.value = task.key;
-    taskNameEditInput.value = task.data.name;
-    taskEditDescriptionInput.value = task.data.description;
-    priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
+    // refTaskIdForEdit.value = task.key;
+    // taskNameEditInput.value = task.data.name;
+    // taskEditDescriptionInput.value = task.data.description;
+    // priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
     // assignees.value = task.data.assigneeObj;
     // tags.value = task.data.tagsObj;
-    dueDate.value = task.data.dueDate;
+    // dueDate.value = task.data.dueDate;
     visibleEdit.value = true;
 };
 
@@ -169,6 +169,7 @@ watchEffect(() => {
             <TaskDetail
                 :singleTask="singleTask"
                 :usersLists="usersLists"
+                :tagsLists="tagsLists"
                 :projID="projects"
                 @openCreateSpace="openCreateSpace"
                 @handleTaskEdit="handleTaskEdit($event)"

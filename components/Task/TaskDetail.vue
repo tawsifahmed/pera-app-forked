@@ -14,7 +14,7 @@ const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
-const { singleTask, usersLists, projID } = defineProps(['singleTask', 'usersLists', 'projID']);
+const { singleTask, usersLists, tagsLists, projID } = defineProps(['singleTask', 'usersLists', 'tagsLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask', 'updateTaskTable']);
 
@@ -22,6 +22,8 @@ const toast = useToast();
 const btnLoading = ref(false);
 
 const assignees = ref(singleTask?.data?.assigneeObj);
+
+const tags = ref(singleTask?.data?.tagsObj);
 
 const dueDate = ref(singleTask?.data?.dueDate);
 
@@ -106,7 +108,8 @@ const handleTaskDetailSubmit = async () => {
         project_id: projID,
         due_date: dueDate.value,
         priority: priority.value.name,
-        assignees: assignees.value.map((obj) => obj.id)
+        assignees: assignees.value.map((obj) => obj.id),
+        tags: tags.value.map((obj) => obj.id)
     };
 
     await editTask(taskDetailData);
@@ -287,7 +290,7 @@ const handleCloseCommetFile = async () => {
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <!-- <pre>{{singleTask}}</pre> -->
                             <!-- <pre>{{taskDetails}}</pre> -->
-                            <div class="flex justify-content-start gap-7 align-items-center">
+                            <div class="flex justify-content-between align-items-center">
                                 <div>
                                     <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
@@ -295,7 +298,7 @@ const handleCloseCommetFile = async () => {
                                             <p>Assignee:</p>
                                         </div>
                                         <FloatLabel style="width: 164.94px" class="input-fields">
-                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="" :maxSelectedLabels="2" class="w-full" />
+                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
                                     <div class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
@@ -333,6 +336,15 @@ const handleCloseCommetFile = async () => {
                                         <!-- <pre>time ={{taskDetails?.taskTimer}}</pre> -->
                                     </div>
                                 </div>
+                            </div>
+                            <div class="flex justify-content-start align-items-centertask-detail-wrapper mt-3" style="width: 100%;">
+                                <div class="flex justify-content-start gap-2 align-items-center task-detail-property" style="width: 10%;">
+                                    <span class="pi pi-tags"></span>
+                                    <p>Tags:</p>
+                                </div>
+                                <FloatLabel style="width: 90%" class="input-fields">
+                                    <MultiSelect display="chip" v-model="tags" filter :options="tagsLists" optionLabel="name" placeholder="Select Tags" class="w-full" />
+                                </FloatLabel>
                             </div>
                             <div class="field mt-3 flex flex-column">
                                 <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
