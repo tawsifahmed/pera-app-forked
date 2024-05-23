@@ -103,8 +103,10 @@ const handleTaskDetailView = async (task) => {
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
     // getTaskDetails(task.key);
-    await getTaskAssignModalData(); // Await the function call
+    await getTaskAssignModalData(); 
     usersLists.value = usersListStore.users;
+    await getTagsAssignModalData();
+    tagsLists.value = tagsListStore.tags;
     visibleTaskDetailView.value = true;
 };
 

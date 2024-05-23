@@ -25,6 +25,7 @@ const assignees = ref(singleTask?.data?.assigneeObj);
 
 const tags = ref(singleTask?.data?.tagsObj);
 
+
 const dueDate = ref(singleTask?.data?.dueDate);
 
 const status = ref();
@@ -281,7 +282,8 @@ const handleCloseCommetFile = async () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{taskActivity}}</pre> -->
+                <!-- <pre>{{tags}}</pre> -->
+                <!-- <pre>{{assignees}}</pre> -->
                 <h5>
                     {{ singleTask.data.name }}
                 </h5>
