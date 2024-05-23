@@ -1,6 +1,7 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
+            <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name</label>
                 <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15" :invalid="spaceDescriptionError" />
@@ -12,6 +13,10 @@
             <div class="field">
                 <label>Assignees</label>
                 <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
+            </div>
+            <div class="field">
+                <label>Tags</label>
+                <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name" placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
                 <label>Due Date</label>
@@ -36,7 +41,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { editTask } = useCompanyStore();
 const { isTaskEdited } = storeToRefs(useCompanyStore());
-const { singleTask, usersLists, projects } = defineProps(['singleTask', 'usersLists', 'projects']);
+const { singleTask, usersLists, tagsLists, projects } = defineProps(['singleTask', 'usersLists', 'tagsLists', 'projects']);
 const toast = useToast();
 const btnLoading = ref(false);
 
@@ -46,6 +51,8 @@ const taskNameEditInput = ref(singleTask?.data?.name);
 const dueDate = ref(singleTask?.data?.dueDate);
 
 const assignees = ref(singleTask?.data?.assigneeObj);
+const tags = ref(singleTask?.data?.tagsObj);
+
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 const priorities = ref([
@@ -73,6 +80,7 @@ const handleUpdateTask = async () => {
             priority: priority.value.name,
             dueDate: dueDate.value,
             assignees: assignees.value.map((obj) => obj.id),
+            tags: tags.value.map((obj) => obj.id),
             project_id: projects
         };
         console.log('editTaskData', editTaskData);

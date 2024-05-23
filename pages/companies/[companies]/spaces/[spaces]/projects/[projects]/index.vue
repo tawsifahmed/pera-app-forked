@@ -11,7 +11,8 @@ import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
 
 const usersListStore = useCompanyStore();
-const { getSingleProject, deleteTask, getTaskAssignModalData, getTaskDetails } = useCompanyStore();
+const tagsListStore = useCompanyStore();
+const { getSingleProject, deleteTask, getTaskAssignModalData, getTagsAssignModalData, getTaskDetails } = useCompanyStore();
 const { singleProject, isTaskDeleted, tasks } = storeToRefs(useCompanyStore());
 
 const filters = ref({});
@@ -32,8 +33,10 @@ const taskEditDescriptionInput = ref(null);
 const priority = ref(null);
 const dueDate = ref(null);
 const assignees = ref([]);
+const tags = ref([]);
 const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
+const tagsLists = ref([]);
 const visibleEdit = ref(false);
 const deleteTaskDialog = ref(false);
 const visibleTaskDetailView = ref(false);
@@ -52,6 +55,9 @@ const openCreateSpace = async (key, type) => {
     visible.value = true;
     await getTaskAssignModalData(); // Await the function call
     usersLists.value = usersListStore.users;
+    await getTagsAssignModalData(); // Await the function call
+    tagsLists.value = tagsListStore.tags;
+
 };
 
 const handleTaskEdit = async (task) => {
@@ -59,11 +65,14 @@ const handleTaskEdit = async (task) => {
 
     await getTaskAssignModalData(); // Await the function call
     usersLists.value = usersListStore.users;
+    await getTagsAssignModalData(); // Await the function call
+    tagsLists.value = tagsListStore.tags;
     refTaskIdForEdit.value = task.key;
     taskNameEditInput.value = task.data.name;
     taskEditDescriptionInput.value = task.data.description;
     priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
-    assignees.value = task.data.assigneeObj;
+    // assignees.value = task.data.assigneeObj;
+    // tags.value = task.data.tagsObj;
     dueDate.value = task.data.dueDate;
     visibleEdit.value = true;
 };
@@ -147,12 +156,12 @@ watchEffect(() => {
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskCreateTask :usersLists="usersLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
+            <TaskCreateTask :usersLists="usersLists" :tagsLists="tagsLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
         <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
+            <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :tagsLists="tagsLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->

@@ -14,6 +14,10 @@
             <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
+            <label>Tags</label>
+            <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name" placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
+        </div>
+        <div class="field">
             <label>Due Date</label>
             <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
         </div>
@@ -34,7 +38,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { createTask } = useCompanyStore();
 const { isTaskCreated } = storeToRefs(useCompanyStore());
-const { createTaskTitle, taskId, projects, usersLists } = defineProps(['createTaskTitle', 'taskId', 'projects', 'usersLists']);
+const { createTaskTitle, taskId, projects, usersLists, tagsLists } = defineProps(['createTaskTitle', 'taskId', 'projects', 'usersLists', 'tagsLists']);
 const toast = useToast();
 const btnLoading = ref(false);
 
@@ -48,6 +52,7 @@ const name = ref(null);
 const dueDate = ref(null);
 
 const assignees = ref(null);
+const tags = ref(null);
 const priority = ref(null);
 
 const priorities = ref([
@@ -70,6 +75,7 @@ const handleCreateTask = async () => {
             name: name.value,
             dueDate: dueDate.value,
             assignees: assignees.value.map((assignee) => assignee.id),
+            tags: tags.value.map((tag) => tag.id),
             priority: priority.value.name,
             project_id: projects,
             parent_task_id: taskId

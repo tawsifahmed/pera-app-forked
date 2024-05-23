@@ -44,6 +44,7 @@ export const useCompanyStore = defineStore('workStation', {
     taskStatus:[],
 
     users: [],
+    tags: [],
     priorityList: [],
 
     singleTaskComments: null,
@@ -335,7 +336,7 @@ export const useCompanyStore = defineStore('workStation', {
         }
 
     },
-    async createTask ({name,description, project_id, parent_task_id, dueDate, priority, assignees}) {
+    async createTask ({name,description, project_id, parent_task_id, dueDate, priority, assignees, tags}) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
         method: 'POST',
@@ -349,6 +350,7 @@ export const useCompanyStore = defineStore('workStation', {
           'due_date' : dueDate,
           'priority' : priority,
           'assignees' : assignees,
+          'tags' : tags,
           'description' : description,
           },
         });
@@ -358,7 +360,7 @@ export const useCompanyStore = defineStore('workStation', {
           this.getSingleProject(project_id);
         }
     },
-    async editTask ({id, name, description, project_id, dueDate, priority, assignees}) {
+    async editTask ({id, name, description, project_id, dueDate, priority, assignees, tags}) {
       
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
@@ -373,6 +375,7 @@ export const useCompanyStore = defineStore('workStation', {
           'due_date' : dueDate,
           'priority' : priority,
           'assignees' : assignees,
+          'tags' : tags,
           'projectId' : project_id,
           // 'attachments' : attachments,
         },
@@ -424,6 +427,29 @@ export const useCompanyStore = defineStore('workStation', {
                 'name': element.name,
               }
               this.users.push(obj)
+          });
+      }
+    },
+    async getTagsAssignModalData(){
+      const token = useCookie('token');
+      const { data, pending, error } = await useAsyncData(
+        'tagsAssignModalData',
+        () => $fetch('http://188.166.212.40/pera/public/api/v1/tag/list',{
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        
+        }),
+      )
+
+      if(data.value?.data?.length > 0){
+        this.tags = [];
+        data.value?.data.forEach(element => {
+              let obj = {
+                'id': element.id,
+                'name': element.name,
+              }
+              this.tags.push(obj)
           });
       }
     },
