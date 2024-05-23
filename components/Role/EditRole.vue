@@ -7,7 +7,7 @@
 
         <div class="field permission_selection">
             <label>Permissions</label>
-            <pre>{{slctdPermissions.value}}</pre>
+            <!-- <pre>{{selectedPermissions}}</pre> -->
             <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
@@ -55,7 +55,7 @@ const handleSubmitData = async () => {
                 },
                 body: {
                     name: name.value,
-                    permissions: selectedPermissions.value?.map((item) => item.id)
+                    permissions: selectedPermissions.value.map((item) => item.id)
                 }
             });
 
