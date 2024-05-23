@@ -5,22 +5,42 @@
             <InputText v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
-        <p v-if="errorHandler" style="color: red">Please enter tag name</p>
+        <div class="field permission_selection">
+            <label>Permissions</label>
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
+        </div>
+
+        <p v-if="errorHandler" style="color: red">Please enter role name</p>
         <div class="create-btn-wrapper">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>
 </template>
 <script setup>
+
+const props = defineProps({
+    param: {
+        type: Object,
+        required: true
+    }
+});
+
+
 const toast = useToast();
 
 const name = ref('');
+
+const permissionsList = ref(props.param.permissionsList);
+
+const selectedPermissions = ref([]);
 
 const errorHandler = ref(false);
 
 const employeeForm = ref(true);
 
 const emit = defineEmits(['closeCreateModal']);
+
+
 
 const handleSubmitData = async () => {
     if (name.value === '') {
@@ -30,17 +50,18 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/create`, {
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/roles/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
                     name: name.value,
+                    permissions: selectedPermissions.value.map((item) => item.id)
                 }
             });
 
-            if (data.value.code === 201) {
+            if (data.value?.code === 201) {
                 name.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
@@ -53,7 +74,7 @@ const handleSubmitData = async () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .text-danger {
     color: red;
 }
@@ -61,5 +82,24 @@ const handleSubmitData = async () => {
 .create-btn-wrapper {
     display: flex;
     justify-content: end;
+}
+
+.permission_selection{
+    .p-multiselect-label{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        .p-multiselect-token{
+            margin: 0 5px 5px 0 !important;
+        
+        }
+    }
+
+    .p-multiselect-trigger{
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding-top: 11px !important;
+    }
+    
 }
 </style>

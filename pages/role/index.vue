@@ -23,7 +23,11 @@ const visibleCreateRole = ref(false);
 
 const visibleEditRole = ref(false);
 
-const usersLists = ref([]);
+const rolesLists = ref([]);
+
+const permissionsList = ref([]);
+
+const slctdPermissions = ref([]);
 
 const visibleDeleteRole = ref(false);
 
@@ -53,9 +57,9 @@ const editRole = (data) => {
     visibleEditRole.value = true;
     id.value = data.id;
     name.value = data.name;
-    email.value = data.email;
-    phone.value = data.phone;
-    address.value = data.address;
+    permissionsList.value = permissionsList.value;
+    slctdPermissions.value = data.permissions;
+    console.log('permissionsList', permissionsList.value)
 };
 
 const deleteRole = (key) => {
@@ -84,14 +88,28 @@ const confirmDeleteRole = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+    }
+};
+
+const permissionList = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('permissionList', () =>
+        $fetch('http://188.166.212.40/pera/public/api/v1/permissions/list', {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        permissionsList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -102,6 +120,7 @@ const initFilters = () => {
 };
 onMounted(() => {
     init();
+    permissionList();
     loading.value = false;
 });
 
@@ -131,29 +150,35 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
             <Column field="name" sortable header="Role Name"></Column>
-            <Column field="email" sortable header="Permission"></Column>
+            <Column field="permissions" sortable header="Permission">
+            <template #body="slotProps">
+                <div v-for="perrmission in slotProps.data.permissions" :key="permission">
+                    <div class="">{{ perrmission.name }}</div>
+                </div>
+            </template>
+            </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editRole(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteRole(slotProps.data.id)" />
+                    <!-- <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteRole(slotProps.data.id)" /> -->
                 </template>
             </Column>
-            <!-- <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template> -->
+            <!-- <template #footer> In total there are {{ rolesLists ? rolesLists.length : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoleCreateRole @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoleCreateRole :param="{ permissionsList }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoleEditRole :param="{ id, name, address, phone, email }" @closeEditModal="closeEditModal($event)" />
+        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoleEditRole :param="{ id, name, permissionsList, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteRole" header=" " :style="{ width: '25rem' }">

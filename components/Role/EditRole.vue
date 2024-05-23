@@ -2,7 +2,13 @@
     <div>
         <div class="field">
             <label for="company">Role Name</label>
-            <InputText v-model="name" class="w-full" placeholder="Edit role name"/>
+            <InputText v-model="editName" class="w-full" placeholder="Edit role name"/>
+        </div>
+
+        <div class="field permission_selection">
+            <label>Permissions</label>
+            <pre>{{slctdPermissions.value}}</pre>
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -22,7 +28,11 @@ const toast = useToast();
 
 const id = ref(props.param.id);
 
-const name = ref(props.param.name);
+const editName = ref(props.param.name);
+
+const permissionsList = ref(props.param.permissionsList);
+
+const selectedPermissions = ref(props.param.slctdPermissions);
 
 const errorHandler = ref(false);
 
@@ -31,24 +41,25 @@ const employeeForm = ref(true);
 const emit = defineEmits(['closeEditModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '') {
+    if (editName.value === '') {
         errorHandler.value = true;
         return;
     } else {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/update/${id.value}`, {
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/roles/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
                     name: name.value,
+                    permissions: selectedPermissions.value?.map((item) => item.id)
                 }
             });
 
-            if (data.value.code === 200) {
+            if (data.value?.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', life: 3000 });

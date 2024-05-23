@@ -74,9 +74,9 @@ const handleCreateTask = async () => {
         const createTaskData = {
             name: name.value,
             dueDate: dueDate.value,
-            assignees: assignees.value.map((assignee) => assignee.id),
-            tags: tags.value.map((tag) => tag.id),
-            priority: priority.value.name,
+            assignees: assignees.value?.map((assignee) => assignee.id),
+            tags: tags.value?.map((tag) => tag.id),
+            priority: priority.value?.name,
             project_id: projects,
             parent_task_id: taskId
         };
