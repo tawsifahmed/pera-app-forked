@@ -58,8 +58,19 @@ const editRole = (data) => {
     id.value = data.id;
     name.value = data.name;
     permissionsList.value = permissionsList.value;
-    slctdPermissions.value = data.permissions;
-    console.log('permissionsList', permissionsList.value)
+    slctdPermissions.value = []
+    if(data.permissions?.length > 0){
+        data.permissions.map((item) => {
+            permissionsList.value.map((pItem) => {
+                if(item.id === pItem.id){
+                    slctdPermissions.value.push(pItem)
+                }
+            })
+        })
+    }
+    console.log('slctdPermissions', slctdPermissions.value)
+    // console.log('permissionsList', permissionsList.value)
+    
 };
 
 const deleteRole = (key) => {

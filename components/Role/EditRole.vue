@@ -54,7 +54,7 @@ const handleSubmitData = async () => {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value,
+                    name: editName.value,
                     permissions: selectedPermissions.value.map((item) => item.id)
                 }
             });

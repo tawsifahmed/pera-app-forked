@@ -161,6 +161,7 @@ onMounted(async () => {
         code: taskDetails.value.status
     };
     status.value = obg;
+    
     const bncObj ={
         is_bounce: taskDetails.value.is_bounce
     
