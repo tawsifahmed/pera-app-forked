@@ -59,7 +59,7 @@ const editRole = (data) => {
     name.value = data.name;
     permissionsList.value = permissionsList.value;
     slctdPermissions.value = []
-    if(data.permissions?.length > 0){
+    if(data?.permissions?.length > 0){
         data.permissions.map((item) => {
             permissionsList.value.map((pItem) => {
                 if(item.id === pItem.id){

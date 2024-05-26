@@ -30,23 +30,53 @@ const dueDate = ref(singleTask?.data?.dueDate);
 
 const status = ref();
 
-const clickClock = ref(false);
+// const clickClock = ref(taskDetails.value?.is_timer_start === 'false' ? false : true);
+
+// console.log('clickC', clickClock.value)
+console.log('clicasdsdkC', taskDetails.value?.is_timer_start)
+
+// if(taskDetails.value?.taskTimer?.is_timer_start === undefined){
+//     clickClock.value = false
+// }else{
+//     clickClock.value = taskDetails.value?.taskTimer?.is_timer_start;
+// }    
 
 const timeTrack = ref('00:00:00');
+let interval = null;
 
 const handleClickClock = async () => {
-    clickClock.value = !clickClock.value;
-    if (clickClock.value === true) {
+    const taskId = taskDetails.value.id;
+
+    if (taskDetails.value?.is_timer_start === 'false') {
+        localStorage.setItem(`timerStart_${taskId}`, Date.now());
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
-        await getTaskDetails(singleTask.key);
-        timeTrack.value = responseData?.data;
+        await getTaskDetails(singleTask.key);  
+        startTimer();
+        
+
     } else{
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(singleTask.key);
-        timeTrack.value = responseData?.data;
+        stopTimer();
+        
+
     }
-    
 };
+
+const startTimer = () => {
+    interval = setInterval(() => {
+        const taskId = taskDetails.value.id;
+        const startTime = localStorage.getItem(`timerStart_${taskId}`);
+        if (startTime) {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            timeTrack.value = secondsToHHMMSS(elapsedTime);
+        }
+    }, 1000);
+}
+
+const stopTimer = () => {
+    clearInterval(interval);
+}
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
@@ -161,12 +191,19 @@ onMounted(async () => {
         code: taskDetails.value.status
     };
     status.value = obg;
-    
+
     const bncObj ={
         is_bounce: taskDetails.value.is_bounce
     
     }
     vModelBncStatus.value = bncObj;
+    const taskId = taskDetails.value.id;
+
+    const startTime = localStorage.getItem(`timerStart_${taskId}`);
+    if (startTime && taskDetails.value?.is_timer_start === 'true') {
+        
+        startTimer();
+    }
 });
 
 async function changeStatusData(status) {
@@ -253,6 +290,13 @@ const setDateFormat = (dateUrl) => {
     return finalFormattedDate;
 };
 
+function secondsToHHMMSS(seconds) {
+    const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+}
+
 const deleteFile = async (id) => {
     await fileDelete(id);
 
@@ -320,7 +364,6 @@ const handleCloseCommetFile = async () => {
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <!-- <pre>stat: {{taskStatus}}</pre> -->
                                         <Dropdown @change="changeStatusData(status)" v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
                                     <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
@@ -329,14 +372,15 @@ const handleCloseCommetFile = async () => {
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <div class="clock-wrapper">
-                                            <div :class="`clock-btn ${clickClock ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
-                                                <i :class="`pi ${clickClock ? 'pi-stop stop' : 'pi-play start'}`"></i>
+                                            <div :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
+                                                <i :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
-                                            <div  class="text-sm">{{ taskDetails?.taskTimer?.title ? taskDetails?.taskTimer?.title : timeTrack }}</div>
-                                            <!-- <pre>{{taskDetails?.taskTimer}}</pre> -->
-                                            <!-- <div v-else class="text-sm">{{ timeTrack }}</div> -->
+                                            <div  class="text-sm">{{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}</div>
                                         </div>
-                                        <!-- <pre>time ={{taskDetails?.taskTimer}}</pre> -->
+                                        
+                                        <div>
+                                            <!-- {{ timeTrack }} -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -763,7 +807,7 @@ input[type='file']::file-selector-button:hover {
 }
 .start {
     color: white;
-    font-size: 12px;
+    font-size: 10px;
     margin-left: 2px;
 }
 
