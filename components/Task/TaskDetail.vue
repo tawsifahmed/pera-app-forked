@@ -27,20 +27,7 @@ const tags = ref(singleTask?.data?.tagsObj);
 
 
 const dueDate = ref(singleTask?.data?.dueDate);
-
 const status = ref();
-
-// const clickClock = ref(taskDetails.value?.is_timer_start === 'false' ? false : true);
-
-// console.log('clickC', clickClock.value)
-console.log('clicasdsdkC', taskDetails.value?.is_timer_start)
-
-// if(taskDetails.value?.taskTimer?.is_timer_start === undefined){
-//     clickClock.value = false
-// }else{
-//     clickClock.value = taskDetails.value?.taskTimer?.is_timer_start;
-// }    
-
 const timeTrack = ref('00:00:00');
 let interval = null;
 
@@ -64,19 +51,20 @@ const handleClickClock = async () => {
 };
 
 const startTimer = () => {
+    const taskId = taskDetails.value.id;
+    const startTime = new Date(taskDetails.value.taskTimer.start_time).getTime();
+    
     interval = setInterval(() => {
-        const taskId = taskDetails.value.id;
-        const startTime = localStorage.getItem(`timerStart_${taskId}`);
-        if (startTime) {
-            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            timeTrack.value = secondsToHHMMSS(elapsedTime);
-        }
+        const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+        timeTrack.value = secondsToHHMMSS(elapsedTime);
     }, 1000);
 }
 
 const stopTimer = () => {
     clearInterval(interval);
+    timeTrack.value = secondsToHHMMSS(taskDetails.value.total_duration);
 }
+
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
@@ -194,14 +182,10 @@ onMounted(async () => {
 
     const bncObj ={
         is_bounce: taskDetails.value.is_bounce
-    
     }
     vModelBncStatus.value = bncObj;
-    const taskId = taskDetails.value.id;
 
-    const startTime = localStorage.getItem(`timerStart_${taskId}`);
-    if (startTime && taskDetails.value?.is_timer_start === 'true') {
-        
+    if (taskDetails.value?.is_timer_start === 'true') {
         startTimer();
     }
 });
