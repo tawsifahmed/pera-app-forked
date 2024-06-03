@@ -43,7 +43,9 @@ export const useAuthStore = defineStore('auth', {
       if (data.value) {
         if(data.value.code === 200){
           this.userCompany = data?.value?.company?.id;
-          localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
+          if(this.userCompany){
+            localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
+          }
           const token = useCookie('token'); 
           token.value = data?.value?.access_token; 
           this.authenticated = true; //  authenticated state value to true
@@ -65,10 +67,6 @@ export const useAuthStore = defineStore('auth', {
           'password_confirmation' : confirmPass
         },
       });
-      console.log('data', data.value?.message)
-      console.log('data', data.value)
-      console.log('data', pending.value)
-      console.log('data', error.value)
       if (data.value?.message === 'Registration success.') {
         this.checkOTP = true;
       }
@@ -89,27 +87,50 @@ export const useAuthStore = defineStore('auth', {
       console.log('data', data.value)
       console.log('err', error.value)
       console.log('data', pending.value)
-      // return
-      if (data.value.message = 'email verifaction success.') {
-        this.authOtp = true;
-        this.userCreated = true;
-        if(this.userCreated) {
-          const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: {
-              email,
-              password,
-            },
-          });
-          if (data.value) {
-            
-            const token = useCookie('token'); 
-            token.value = data?.value?.access_token;
-            this.authOtp = true; 
-             //  authenticated state value to true
+      
+      if(error.value){
+       if(error.value.data.code === 403) {
+          this.authenticated = false;
+          this.resendOtpMsg = error.value.data.message;
+        }
+      }
+
+      else if(data.value){
+        if (data.value.code = 200) {
+          this.resendOtpMsg = data.value.message;
+        
+          this.userCreated = true;
+          if(this.userCreated) {
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: {
+                email,
+                password,
+              },
+            });
+            if (data.value) {
+              if(data.value.code === 200){
+                this.userCompany = data?.value?.company?.id;
+                if(this.userCompany){
+                  localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
+                }
+                const token = useCookie('token'); 
+                token.value = data?.value?.access_token; 
+                this.authenticated = true; //  authenticated state value to true
+              }else{
+                const token = useCookie('token');
+                this.authenticated = false;
+                token.value = '';
+              }
+             }
           }
         }
+      }
+      else{
+        this.resendOtpMsg = 'An error occured while verifying OTP, try again.';
+        this.authOtp = false;
+        this.authenticated = false;
       }
     },
     async resendOtp({ email }) {
@@ -125,10 +146,12 @@ export const useAuthStore = defineStore('auth', {
       
       console.log('error', error.value?.data?.code)
       // return
-      if(error.value.data.code === 404) {
-        this.resendOtpResponse = false;
-        this.resendOtpMsg = 'Email does not exist, register first.';
-        console.log('404')
+      if(error.value){
+        if(error.value.data.code === 404) {
+          this.resendOtpResponse = false;
+          this.resendOtpMsg = 'Email does not exist, register first.';
+          console.log('404')
+        }
       }
       else if(error.value){
         if (error.value.data.code === 500) {
@@ -156,25 +179,11 @@ export const useAuthStore = defineStore('auth', {
           'password_confirmation' : confirmPass
         },
       });
-      if (data.value) {
-        this.userCreated = true;
-        if(this.userCreated) {
-          const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: {
-              email,
-              password,
-            },
-          });
-          if (data.value) {
-            this.userCompany = data?.value?.company?.id;
-            const token = useCookie('token'); 
-            token.value = data?.value?.access_token;
-            localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
-            this.authenticated = true; //  authenticated state value to true
-          }
-        }
+      if (data.value?.message === 'User registered successfully') {
+        this.checkOTP = true;
+      }
+      else{
+        this.checkOTP = false;
       }
     },
     logUserOut() {

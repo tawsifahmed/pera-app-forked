@@ -62,7 +62,7 @@
                         </div>
 
                        
-                        <Button type="submit" label="Verify" :loading="regBtnHandle" class="w-full p-3 text-xl"></Button>
+                        <Button type="submit" label="Verify" :loading="loginBtnHandle" class="w-full p-3 text-xl"></Button>
                     </form>
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         <span v-if="timer > 0">Resend OTP in {{ timer }}s</span>
@@ -103,7 +103,7 @@ const verifyOTPForm = ref(false)
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { authenticateUser, otpVerify, resendOtp } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg } = storeToRefs(useAuthStore()); 
+const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp } = storeToRefs(useAuthStore()); 
 
 import Checkbox from 'primevue/checkbox' 
 import RadioButton from 'primevue/radiobutton';
@@ -184,21 +184,21 @@ const handleLoginSubmit = async () => {
 }
 
 const handleVerifySubmit = async () => {
+    loginBtnHandle.value = true;
     verifyUser.value.email ? errorData.value.emailError = false : errorData.value.emailError = true
     verifyUser.value.otp ? errorData.value.otpError = false : errorData.value.otpError = true
     if(errorData.value.emailError || errorData.value.otpError){
-        loading.value = false;
+        loginBtnHandle.value = false;
     }else{
-        loginBtnHandle.value = true
+        
         await otpVerify(verifyUser.value);
-        if(authOtp.value == true){
-            console.log('authOtp', authOtp.value)
-            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: '', life: 3000 });
-            setTimeout(() => {
-                router.push('/login')
-            }, 300);
+        if(authenticated.value == true){
+            console.log('authOtpPPP', authOtp.value)
+            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, life: 3000 });
+            // location.reload()
+            router.push('/login')
         }else{
-            toast.add({ severity: 'error', summary: 'Verification Failed', detail: '', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, life: 3000 });
         }
         loginBtnHandle.value = false
     }
