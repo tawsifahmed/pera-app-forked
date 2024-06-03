@@ -8,7 +8,7 @@ const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { getTaskTimerData } = useClockStore();
-const {trackedTime} = storeToRefs(useClockStore());
+const { trackedTime } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
 
@@ -25,7 +25,6 @@ const assignees = ref(singleTask?.data?.assigneeObj);
 
 const tags = ref(singleTask?.data?.tagsObj);
 
-
 const dueDate = ref(singleTask?.data?.dueDate);
 const status = ref();
 const timeTrack = ref('00:00:00');
@@ -37,42 +36,34 @@ const handleClickClock = async () => {
     if (taskDetails.value?.is_timer_start === 'false') {
         localStorage.setItem(`timerStart_${taskId}`, Date.now());
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
-        await getTaskDetails(singleTask.key);  
+        await getTaskDetails(singleTask.key);
         startTimer();
-        
-
-    } else{
+    } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(singleTask.key);
         stopTimer();
-        
-
     }
 };
 
 const startTimer = () => {
     const taskId = taskDetails.value.id;
     const startTime = new Date(taskDetails.value.taskTimer.start_time).getTime();
-    
+
     interval = setInterval(() => {
         const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
         timeTrack.value = secondsToHHMMSS(elapsedTime);
     }, 1000);
-}
+};
 
 const stopTimer = () => {
     clearInterval(interval);
     timeTrack.value = secondsToHHMMSS(taskDetails.value.total_duration);
-}
-
+};
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
-const bounceStatus = ref([
-    { is_bounce: 'No', },
-    { is_bounce: 'Yes',},
-]);
+const bounceStatus = ref([{ is_bounce: 'No' }, { is_bounce: 'Yes' }]);
 
 const vModelBncStatus = ref();
 
@@ -171,7 +162,6 @@ const closeCommentAttachment = () => {
     commentAttachment.value = false;
 };
 
-
 onMounted(async () => {
     await getTaskDetails(singleTask.key);
     const obg = {
@@ -180,9 +170,9 @@ onMounted(async () => {
     };
     status.value = obg;
 
-    const bncObj ={
+    const bncObj = {
         is_bounce: taskDetails.value.is_bounce
-    }
+    };
     vModelBncStatus.value = bncObj;
 
     if (taskDetails.value?.is_timer_start === 'true') {
@@ -207,8 +197,7 @@ async function changeStatusData(status) {
             getTaskDetails(singleTask.key);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
             emit('updateTaskTable');
-        }
-        else{
+        } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
         }
     } catch (error) {
@@ -228,7 +217,7 @@ async function changeBounceStatusData(selectedBncStatus) {
                 Authorization: `Bearer ${token.value}`
             },
             body: {
-                is_bounce : selectedBncStatus.is_bounce
+                is_bounce: selectedBncStatus.is_bounce
             }
         });
 
@@ -237,16 +226,13 @@ async function changeBounceStatusData(selectedBncStatus) {
         if (data.value?.app_message === 'success') {
             getTaskDetails(singleTask.key);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', life: 3000 });
-        }
-        else{
+        } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
-
-
 
 const setFileUrl = (url) => {
     const urlString = url;
@@ -275,8 +261,12 @@ const setDateFormat = (dateUrl) => {
 };
 
 function secondsToHHMMSS(seconds) {
-    const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const hrs = Math.floor(seconds / 3600)
+        .toString()
+        .padStart(2, '0');
+    const mins = Math.floor((seconds % 3600) / 60)
+        .toString()
+        .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${hrs}:${mins}:${secs}`;
 }
@@ -305,6 +295,26 @@ const handleFileUpload = () => {
 const handleCloseCommetFile = async () => {
     commentFile.value = null;
 };
+
+const handleShare = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/share/${singleTask.key}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (error.value) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
+        return;
+    } else {
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Shared successfully', life: 3000 });
+        navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
+        return;
+    }
+    console.log(data.value.shared_token);
+    console.log('error', error.value);
+};
 </script>
 
 <template>
@@ -313,13 +323,16 @@ const handleCloseCommetFile = async () => {
             <div>
                 <!-- <pre>{{tags}}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
-                <h5>
-                    {{ singleTask.data.name }}
-                </h5>
+                <div class="flex align-items-start gap-2 mb-3">
+                    <h5 class="m-0">
+                        {{ singleTask.data.name }}
+                    </h5>
+                    <span @click="handleShare" class="pi pi-share-alt my-auto cursor-pointer"></span>
+                </div>
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{singleTask}}</pre> -->
+                            <!-- <pre>{{ singleTask }}</pre> -->
                             <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-between align-items-center">
                                 <div>
@@ -359,17 +372,17 @@ const handleCloseCommetFile = async () => {
                                             <div :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
                                                 <i :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
-                                            <div  class="text-sm">{{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}</div>
+                                            <div class="text-sm">{{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}</div>
                                         </div>
-                                        
+
                                         <div>
                                             <!-- {{ timeTrack }} -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-content-start align-items-centertask-detail-wrapper mt-3" style="width: 100%;">
-                                <div class="flex justify-content-start gap-2 align-items-center task-detail-property" style="width: 10%;">
+                            <div class="flex justify-content-start align-items-centertask-detail-wrapper mt-3" style="width: 100%">
+                                <div class="flex justify-content-start gap-2 align-items-center task-detail-property" style="width: 10%">
                                     <span class="pi pi-tags"></span>
                                     <p>Tags:</p>
                                 </div>
@@ -409,7 +422,6 @@ const handleCloseCommetFile = async () => {
                                     <div
                                         v-for="item in taskDetails?.attachments"
                                         :key="item"
-                                        
                                         target="_blank"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                         style="background-color: #f7fafc"
@@ -480,20 +492,19 @@ const handleCloseCommetFile = async () => {
                             <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
-                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px;">
-                                <li v-html="act.title" style="font-size: smaller;"></li>
+                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
+                                <li v-html="act.title" style="font-size: smaller"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                           
                             <template class="commentator-name" #title>
-                             <div class="flex justify-content-start align-items-center">
-                                <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small"  style="background-color: gray; color: #ededed; border-radius: 50%;" />
-                                <p class="text-lg"> {{ val.commentator_name }}</p>
-                             </div>    
+                                <div class="flex justify-content-start align-items-center">
+                                    <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
+                                    <p class="text-lg">{{ val.commentator_name }}</p>
+                                </div>
                             </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
@@ -521,7 +532,7 @@ const handleCloseCommetFile = async () => {
                             </div>
                         </div>
                         <div class="comment-form">
-                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required/>
+                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required />
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
                             <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
