@@ -34,14 +34,7 @@ const filterEndDueDate = ref();
 const filterSearch = ref();
 
 const usersLists = ref({});
-
 const selectedStatus = ref();
-
-// const countries = ref([
-//     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
-//     { name: 'Doing', code: 'BR', logo: 'pi-circle', color: '#f59e0b' },
-//     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
-// ])
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -59,9 +52,18 @@ const changeAttribute = async () => {
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
     const status = filterStatus.value ? filterStatus.value.id : '';
     const query = filterSearch.value;
-
-    // console.log(filterStartDueDate.value);
-    getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
+    const start = filterStartDueDate.value;
+    const end = filterEndDueDate.value;
+    console.log(start,'start')
+    console.log(end,'end')
+}
+const startDateChange = (newDate) => {
+    filterStartDueDate.value = newDate
+    changeAttribute()
+}
+const endDateChange = (newDate) => {
+    filterEndDueDate.value = newDate
+    changeAttribute()
 }
 
 onMounted(async () => {
@@ -124,8 +126,8 @@ const getUserlist = async () => {
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="statuslist" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <!-- <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" /> -->
+        <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
+        <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="End Due date" class="w-full md:w-17rem" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
