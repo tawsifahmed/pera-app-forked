@@ -98,7 +98,7 @@ const confirmDeleteRole = async () => {
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
+    const { data, pending, error } = await useAsyncData('roleList', () =>
         $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`

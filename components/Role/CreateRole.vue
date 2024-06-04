@@ -65,9 +65,9 @@ const handleSubmitData = async () => {
                 name.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Created successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Role Created successfully!', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Creation Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Role Creation Failed!', life: 3000 });
             }
         }
     }

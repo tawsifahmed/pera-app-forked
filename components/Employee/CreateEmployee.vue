@@ -22,6 +22,11 @@
             <InputText type="password" v-model="password" class="w-full" />
         </div>
 
+        <div class="field flex flex-column">
+            <label>Roles</label>
+            <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
+
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
@@ -29,6 +34,16 @@
     </div>
 </template>
 <script setup>
+const props = defineProps({
+    param: {
+        type: Object,
+        required: true
+    }
+});
+const rolesLists = ref(props.param.rolesLists);
+
+const selectedRoles = ref([]);
+
 const toast = useToast();
 
 const name = ref('');
@@ -50,7 +65,7 @@ const employeeForm = ref(true);
 const emit = defineEmits(['closeCreateModal']);
 
 const handleSubmitData = async () => {
-    if (name.value === '' || email.value === '' || password.value === '') {
+    if (name.value === '' || email.value === '' || password.value === '' || selectedRoles.value.length === 0) {
         errorHandler.value = true;
         return;
     } else {
@@ -68,7 +83,8 @@ const handleSubmitData = async () => {
                     address: address.value,
                     phone: phone.value,
                     password: password.value,
-                    password_confirmation: password.value
+                    password_confirmation: password.value,
+                    role: selectedRoles.value.name
                 }
             });
 
@@ -97,5 +113,24 @@ const handleSubmitData = async () => {
 .create-btn-wrapper {
     display: flex;
     justify-content: end;
+}
+
+.permission_selection{
+    .p-multiselect-label{
+        display: flex !important;
+        flex-wrap: wrap !important;
+        .p-multiselect-token{
+            margin: 0 5px 5px 0 !important;
+        
+        }
+    }
+
+    .p-multiselect-trigger{
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding-top: 11px !important;
+    }
+    
 }
 </style>

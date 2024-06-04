@@ -48,6 +48,8 @@ export const useAuthStore = defineStore('auth', {
           }
           const token = useCookie('token'); 
           token.value = data?.value?.access_token; 
+          const rolePermission = useCookie('rolePermission');
+          rolePermission.value = data?.value?.company?.permissions;
           this.authenticated = true; //  authenticated state value to true
         }else{
           const token = useCookie('token');
@@ -69,6 +71,7 @@ export const useAuthStore = defineStore('auth', {
       });
       if (data.value?.message === 'Registration success.') {
         this.checkOTP = true;
+        this.resendOtp({ email })
       }
       else{
         this.checkOTP = false;
@@ -133,7 +136,8 @@ export const useAuthStore = defineStore('auth', {
                   localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
                 }
                 const token = useCookie('token'); 
-                token.value = data?.value?.access_token; 
+                token.value = data?.value?.access_token;
+                // const rolePermission
                 this.authenticated = true; //  authenticated state value to true
               }else{
                 const token = useCookie('token');
@@ -186,9 +190,11 @@ export const useAuthStore = defineStore('auth', {
     
     logUserOut() {
       const token = useCookie('token');
+      const rolePermission = useCookie('rolePermission');
       localStorage.removeItem('userCompany')
       this.authenticated = false; 
       token.value = null;
+      rolePermission.value = null;
     },
     async getUserProfile(){
       const token = useCookie('token'); 

@@ -5,6 +5,12 @@
             <InputText type="email" v-model="email" class="w-full" />
         </div>
 
+        <div class="field flex flex-column">
+            <label>Roles</label>
+            <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
+
+
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper">
             <Button v-if="isButtonLoading == 'false'" label="Send" icon="pi pi-check" text="" @click="handleSubmitData" />
@@ -13,6 +19,16 @@
     </div>
 </template>
 <script setup>
+const props = defineProps({
+    param: {
+        type: Object,
+        required: true
+    }
+});
+const rolesLists = ref(props.param.rolesLists);
+
+const selectedRoles = ref([]);
+
 const toast = useToast();
 
 const email = ref('');
@@ -26,7 +42,7 @@ const employeeForm = ref(true);
 const emit = defineEmits(['closeInviteModal']);
 
 const handleSubmitData = async () => {
-    if (email.value === '') {
+    if (email.value === '' || selectedRoles.value.length === 0) {
         errorHandler.value = true;
         return;
     } else {
@@ -40,7 +56,8 @@ const handleSubmitData = async () => {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    email: email.value
+                    email: email.value,
+                    role: selectedRoles.value.name
                 }
             });
 
