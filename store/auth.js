@@ -74,6 +74,27 @@ export const useAuthStore = defineStore('auth', {
         this.checkOTP = false;
       }
     },
+    async registerInviteUser({ id,userName, email, password, confirmPass }) {
+  
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          'id' : id,
+          'name' : userName,
+          'email' : email,
+          'password' : password,
+          'password_confirmation' : confirmPass
+        },
+      });
+      if (data.value?.message === 'User registered successfully') {
+        this.checkOTP = true;
+        this.resendOtp({ email })
+      }
+      else{
+        this.checkOTP = false;
+      }
+    },
     async otpVerify({ email, password, otp  }) {
       const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/verify-email`, {
         method: 'POST',
@@ -83,10 +104,6 @@ export const useAuthStore = defineStore('auth', {
           'otp' : otp,
         },
       });
-
-      console.log('data', data.value)
-      console.log('err', error.value)
-      console.log('data', pending.value)
       
       if(error.value){
        if(error.value.data.code === 403) {
@@ -166,26 +183,7 @@ export const useAuthStore = defineStore('auth', {
       console.log('resendOtpResponse', this.resendOtpResponse)
       
     },
-    async registerInviteUser({ id,userName, email, password, confirmPass }) {
-  
-      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: {
-          'id' : id,
-          'name' : userName,
-          'email' : email,
-          'password' : password,
-          'password_confirmation' : confirmPass
-        },
-      });
-      if (data.value?.message === 'User registered successfully') {
-        this.checkOTP = true;
-      }
-      else{
-        this.checkOTP = false;
-      }
-    },
+    
     logUserOut() {
       const token = useCookie('token');
       localStorage.removeItem('userCompany')

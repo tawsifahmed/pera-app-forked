@@ -195,7 +195,7 @@ const handleVerifySubmit = async () => {
         if(authenticated.value == true){
             console.log('authOtpPPP', authOtp.value)
             toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, life: 3000 });
-            // location.reload()
+            location.reload()
             router.push('/login')
         }else{
             toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, life: 3000 });
