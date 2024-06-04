@@ -5,6 +5,11 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getSingleCompany, deleteSpace } = useCompanyStore();
 const { singleCompany, isSpaceDeleted } = storeToRefs(useCompanyStore());
+import accessPermission from "~/composables/usePermission";
+
+const createSpaceP = ref(accessPermission('create_space'));
+const updateSpaceP = ref(accessPermission('update_space'));
+const deleteSpaceP = ref(accessPermission('delete_space'));
 
 definePageMeta({
   middleware: 'auth',
@@ -102,7 +107,7 @@ const closeEditSpace = (evn) => {
             <p class="text">Company - {{singleCompany?.name}}</p>
            </div>
           <div class="create-btn-wrapper ">
-              <SpaceCreateSpace v-tooltip.left="{ value: 'Create Space' }"/>
+              <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }"/>
         </div>
       </div>
       
@@ -132,8 +137,10 @@ const closeEditSpace = (evn) => {
                   <!-- <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink> -->
-                  <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
-                  <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
+                  <Button v-if="updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
+                  <Button v-if="deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
+                  <Button v-if="!updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success" style="visibility: hidden;" />
+                  <Button v-if="!deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning" style="visibility: hidden;" />
               </template>
           </Column>
       </DataTable>

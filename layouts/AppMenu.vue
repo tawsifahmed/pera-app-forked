@@ -16,11 +16,13 @@ const readRole = ref(accessPermission('read_role'))
 
 const readTags = ref(accessPermission('read_tags'))
 
+const readSpace = ref(accessPermission('read_space'))
+
 const model = ref([
     {
         label: 'Spaces',
         option: 'space_option',
-        items: menu
+        items: '',
     },
     {
         label: 'Settings',
@@ -30,6 +32,17 @@ const model = ref([
 
     }
 ]);
+
+if (readSpace.value) {
+    model.value = model.value.filter(item => item.option !== 'space_option');
+    model.value.unshift(
+        {
+        label: 'Spaces',
+        option: 'space_option',
+        items: menu,
+    },
+    );
+}
 
 if (readDashboard.value) {
     model.value.unshift(
@@ -61,6 +74,8 @@ if (readTags.value) {
         settings.items.push({ label: 'Tags', icon: 'pi pi-fw pi-tags', to: '/tags' });
     }
 }
+
+
 
 
 

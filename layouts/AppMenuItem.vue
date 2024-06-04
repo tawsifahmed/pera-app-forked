@@ -2,7 +2,13 @@
 import { ref, onBeforeMount, watch } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRoute } from 'vue-router';
+import accessPermission from "~/composables/usePermission";
+
 import Dialog from 'primevue/dialog';
+
+const createSpaceP = ref(accessPermission('create_space'));
+const createProjectP = ref(accessPermission('create_project'));
+ 
 
 const route = useRoute();
 const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout();
@@ -104,7 +110,7 @@ const toggle = (event) => {
                 <div class="flex">
                     <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
-                    <SpaceCreateSpace v-tooltip.top="{ value: 'Create Space' }" />
+                    <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
                 </div>
             </div>
         </div>
@@ -115,7 +121,7 @@ const toggle = (event) => {
             </div>
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-                <CreateSpecificProject  v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
+                <CreateSpecificProject v-if="createProjectP"  v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
             </div>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">

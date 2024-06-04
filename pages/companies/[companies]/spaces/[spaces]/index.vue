@@ -3,8 +3,13 @@
 import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
+import accessPermission from "~/composables/usePermission";
 const { getSingleSpace, deleteProject } = useCompanyStore();
 const { singleSpace, isProjectDeleted } = storeToRefs(useCompanyStore());
+
+const createProjectP = ref(accessPermission('create_project'));
+const updateProjectP = ref(accessPermission('update_project'));
+const deleteProjectP = ref(accessPermission('delete_project'));
 
 definePageMeta({
   middleware: 'auth',
@@ -92,7 +97,7 @@ const edittProject = (id) =>{
                 <p class="text cursor-pointer">Space - {{singleSpace?.name}}</p>
             </div>
             <div class="create-btn-wrapper">
-                <CreateSpecificProject v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
+                <CreateSpecificProject v-if="createProjectP" v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
             </div>
         </div>
         <div class="flex justify-content-end mb-2">
@@ -123,8 +128,10 @@ const edittProject = (id) =>{
                     <!-- <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink> -->
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click=edittProject(slotProps.data) />
-                    <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
+                    <Button v-if="updateProjectP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click=edittProject(slotProps.data) />
+                    <Button v-if="deleteProjectP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
+                    <Button v-if="!updateProjectP" icon="pi pi-pencil" text class="mr-2" severity="success" style="visibility: hidden;" />
+                    <Button v-if="!deleteProjectP" icon="pi pi-trash" text class="mt-2" severity="warning" style="visibility: hidden;"/>
                 </template>
             </Column>
         </DataTable>
