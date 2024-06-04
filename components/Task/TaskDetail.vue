@@ -500,7 +500,7 @@ const handleShare = async () => {
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                            <template class="commentator-name" #title>
+                            <template #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
                                     <p class="text-lg">{{ val.commentator_name }}</p>

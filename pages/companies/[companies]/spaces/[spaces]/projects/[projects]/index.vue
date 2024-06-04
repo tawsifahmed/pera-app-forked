@@ -1,5 +1,5 @@
 <script setup>
-// Access users data 
+// Access users data
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -57,7 +57,6 @@ const openCreateSpace = async (key, type) => {
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
-
 };
 
 const handleTaskEdit = async (task) => {
@@ -103,7 +102,7 @@ const handleTaskDetailView = async (task) => {
     refTaskId.value = task.key;
     taskNameEditInput.value = task.data.name;
     // getTaskDetails(task.key);
-    await getTaskAssignModalData(); 
+    await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
@@ -132,7 +131,6 @@ const updateTaskTable = () => {
 getSingleProject(projects);
 
 watchEffect(() => {
-    
     loading.value = false;
 });
 </script>
@@ -219,11 +217,13 @@ watchEffect(() => {
 
 .breadCrumWrap {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     gap: 5px;
     align-items: start;
+    flex-wrap: wrap;
     .text {
         line-height: 1;
+        text-wrap: nowrap;
     }
 }
 
