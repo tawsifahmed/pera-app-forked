@@ -137,6 +137,8 @@ export const useAuthStore = defineStore('auth', {
                 }
                 const token = useCookie('token'); 
                 token.value = data?.value?.access_token;
+                const rolePermission = useCookie('rolePermission');
+                rolePermission.value = data?.value?.company?.permissions;
                 // const rolePermission
                 this.authenticated = true; //  authenticated state value to true
               }else{

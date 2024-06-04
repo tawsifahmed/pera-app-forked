@@ -64,7 +64,7 @@ if (readEmployee.value) {
 if (readRole.value) {
     const settings = model.value.find(item => item.option === 'settings_option');
     if (settings) {
-        settings.items.push({ label: 'Roles', icon: 'pi pi-fw pi-user-edit', to: '/roles' });
+        settings.items.push({ label: 'Roles', icon: 'pi pi-fw pi-user-edit', to: '/role' });
     }
 }
 

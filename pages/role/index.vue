@@ -10,6 +10,12 @@ import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
 
+import accessPermission from "~/composables/usePermission";
+
+const readRole = ref(accessPermission('read_role'));
+const createRoleP = ref(accessPermission('create_role'));
+const updateRoleP = ref(accessPermission('update_role'));
+
 const filters = ref();
 
 const loading = ref(true);
@@ -139,13 +145,13 @@ initFilters();
 </script>
 
 <template>
-    <div class="card">
+    <div v-if="readRole" class="card">
         <div class="d-flex mr-2">
             <h5 class="mb-1">User Role</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create Role" @click="handleCreateRoleModal" class="mr-2" severity="secondary" />
+                <Button v-if="createRoleP" icon="pi pi-plus" label="Create Role" @click="handleCreateRoleModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -175,7 +181,8 @@ initFilters();
             </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editRole(slotProps.data)" />
+                    <Button v-if="updateRoleP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editRole(slotProps.data)" />
+                    <Button v-if="!updateRoleP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
                     <!-- <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteRole(slotProps.data.id)" /> -->
                 </template>
             </Column>

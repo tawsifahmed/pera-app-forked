@@ -6,6 +6,11 @@ definePageMeta({
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
+import accessPermission from "~/composables/usePermission";
+const createTaskP = ref(accessPermission('create_task'));
+const updateTaskP = ref(accessPermission('update_task'));
+const deleteTaskP = ref(accessPermission('delete_task'));
+const downloadTaskP = ref(accessPermission('download_task'));
 
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 
@@ -131,9 +136,9 @@ const getUserlist = async () => {
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
-            <Button icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-            <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
+            <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+            <Button v-if="downloadTaskP" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+            <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>
 
@@ -203,10 +208,13 @@ const getUserlist = async () => {
                 <div class="action-dropdown">
                     <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                     <div class="action-dropdown-content">
-                        <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                        <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                        <Button v-if="createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                        <Button v-if="!createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;"/>
+                        <Button v-if="updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                        <Button v-if="!updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;" />
                         <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                        <Button icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                        <Button v-if="deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                        <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden;" />
                     </div>
                 </div>
             </template>

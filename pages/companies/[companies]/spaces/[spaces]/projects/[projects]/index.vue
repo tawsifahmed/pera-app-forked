@@ -9,6 +9,11 @@ import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
+import accessPermission from "~/composables/usePermission";
+
+const readTask = ref(accessPermission('read_task'));
+
+
 
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
@@ -152,7 +157,7 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <div class="card">
+        <div v-if="readTask" class="card">
             <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
         </div>
 

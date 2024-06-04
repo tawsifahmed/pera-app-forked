@@ -16,6 +16,14 @@ import EditEmployee from '@/components/Employee/EditEmployee.vue';
 
 import InviteGuest from '@/components/Employee/InviteGuest.vue';
 
+import accessPermission from "~/composables/usePermission";
+
+const readUser = ref(accessPermission('read_user'));
+
+const createUserP = ref(accessPermission('create_user'));
+const updateUserP = ref(accessPermission('update_user'));
+const deleteUserP = ref(accessPermission('delete_user'));
+
 const filters = ref();
 
 const loading = ref(true);
@@ -160,17 +168,17 @@ initFilters();
 </script>
 
 <template>
-    <div class="card">
+    <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
             <pre>{{rolePermission}}</pre>
             <h4 class="mb-0">Create Employee</h4>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
+                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
+                <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
+                <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
 
             <template #end>
@@ -193,8 +201,10 @@ initFilters();
             <Column field="user_type" sortable header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
+                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
