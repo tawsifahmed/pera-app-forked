@@ -1,4 +1,10 @@
 <script setup>
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '~/store/user';
+
+const { getUserData } = useUserStore();
+const { userProfile } = storeToRefs(useUserStore());
+
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
@@ -6,15 +12,14 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+import { useAuthStore } from '~/store/auth';
 // import { useRoute } from 'vue-router';
 console.log('path', useRoute().path);
 
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
-
+const visibleProfile = ref(false);
 const logout = () => {
   logUserOut();
   router.push('/login');
@@ -72,6 +77,15 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+// Profile
+
+getUserData();
+
+const openProfile = () => {
+    visibleProfile.value = !visibleProfile.value;
+};
+
 </script>
 
 <template>
@@ -93,7 +107,7 @@ const isOutsideClicked = (event) => {
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            <button @click="openProfile" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
@@ -102,6 +116,10 @@ const isOutsideClicked = (event) => {
                 <span>Sign Out</span>
             </button>
         </div>
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Profile :userProfile="userProfile" />
+        </Dialog>
+
     </div>
 </template>
 
