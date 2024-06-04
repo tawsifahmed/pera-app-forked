@@ -334,10 +334,10 @@ const handleShare = async () => {
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <!-- <pre>{{ singleTask }}</pre> -->
                             <!-- <pre>{{taskDetails}}</pre> -->
-                            <div class="flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="flex justify-content-between gap-4 align-items-centertask-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                            <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
+                                <div class="w-full lg:w-fit">
+                                    <div class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
+                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-user"></span>
                                             <p>Assignee:</p>
                                         </div>
@@ -345,7 +345,7 @@ const handleShare = async () => {
                                             <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2" class="w-full" />
                                         </FloatLabel>
                                     </div>
-                                    <div class="flex mt-2 justify-content-between gap-4 align-items-center task-detail-wrapper">
+                                    <div class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-calendar"></span>
                                             <p class="text-nowrap">Due Date:</p>
@@ -355,16 +355,16 @@ const handleShare = async () => {
                                         </FloatLabel>
                                     </div>
                                 </div>
-                                <div>
-                                    <div class="flex justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                <div class="w-full lg:w-fit">
+                                    <div class="flex justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
                                         <Dropdown @change="changeStatusData(status)" v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
                                     </div>
-                                    <div class="flex mt-2 justify-content-between gap-6 align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
@@ -381,8 +381,8 @@ const handleShare = async () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-content-start align-items-centertask-detail-wrapper mt-3" style="width: 100%">
-                                <div class="flex justify-content-start gap-2 align-items-center task-detail-property" style="width: 10%">
+                            <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3" style="width: 100%">
+                                <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property" style="width: 10%">
                                     <span class="pi pi-tags"></span>
                                     <p>Tags:</p>
                                 </div>
