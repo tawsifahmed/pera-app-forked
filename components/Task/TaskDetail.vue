@@ -327,7 +327,7 @@ const handleShare = async () => {
                     <h5 class="m-0">
                         {{ singleTask.data.name }}
                     </h5>
-                    <span @click="handleShare" class="pi pi-share-alt my-auto cursor-pointer"></span>
+                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer"></span>
                 </div>
                 <div class="task-wrapper card">
                     <div class="task-det">

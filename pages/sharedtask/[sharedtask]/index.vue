@@ -2,7 +2,6 @@
 import Column from 'primevue/column';
 
 definePageMeta({
-    middleware: 'auth',
     layout: false
 });
 const { sharedtask } = useRoute().params;
@@ -15,13 +14,33 @@ const handleFetch = async () => {
     console.log(data.value.subTask);
 };
 handleFetch();
+
+const setFileUrl = (url) => {
+    const urlString = url;
+    const partsOfString = urlString.split('/');
+    const lastPartOfString = partsOfString[partsOfString.length - 1];
+    return lastPartOfString;
+};
+const formattedTime = (time) => {
+    const date = new Date(time);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear().toString().substr(-2);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
+};
 </script>
 
 <template>
-    <div class="card grid p-4 mx-auto justify-content-center">
+    <div class="shared-task lg:mx-auto card grid p-4 mx-auto justify-content-center">
         <div class="col-12 lg:col-7">
             <div>
-                <pre>{{ taskTable.children }}</pre>
+                <!-- <pre>{{ taskData }}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <h5 class="">Task: {{ taskData?.name }}</h5>
 
@@ -115,7 +134,7 @@ handleFetch();
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
+                                    <Column field="name" header="Name" expander :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
                                     <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
@@ -137,29 +156,34 @@ handleFetch();
         </div>
         <div class="col-12 lg:col-5">
             <div>
-                <h5 class="cmc">Activity</h5>
+                <h5 class="cmc">Comments</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
-                        <Card class="mb-2" v-for="val in subTask?.comments" :key="val.id">
-                            <template class="commentator-name" #title>
+                        <Card class="mb-2" v-for="comment in taskData?.comments" :key="comment.id">
+                            <template #title>
                                 <div class="flex justify-content-start align-items-center">
-                                    <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
-                                    <p class="text-lg">{{ val.commentator_name }}</p>
+                                    <Avatar :label="comment?.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
+                                    <p class="text-lg">{{ comment.commentator_name }}</p>
                                 </div>
                             </template>
                             <template #content>
-                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
-                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                <div v-if="setFileUrl(comment?.file)" class="flex justify-content-end">
+                                    <a
+                                        :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
+                                        target="_blank"
+                                        class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
+                                        style="background-color: #f7fafc"
+                                    >
                                         <div class="pi pi-file attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
-                                            <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
+                                            <div class="text-xs">{{ setFileUrl(comment?.file) }}</div>
                                         </div>
                                     </a>
                                 </div>
                                 <p class="m-0 ml-1">
-                                    {{ val?.comment ? val?.comment : '' }}
+                                    {{ comment?.comment ? comment?.comment : '' }}
                                 </p>
-                                <!-- <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i> -->
+                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(comment.created_at) }}</i>
                             </template>
                         </Card>
                     </div>
@@ -170,6 +194,11 @@ handleFetch();
 </template>
 
 <style lang="scss">
+.shared-task {
+    max-width: 100rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
 .task-detail-wrapper {
     width: 100%;
 }
