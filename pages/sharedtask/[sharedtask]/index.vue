@@ -1,23 +1,27 @@
 <script setup>
+import Column from 'primevue/column';
+
 definePageMeta({
     middleware: 'auth',
     layout: false
 });
 const { sharedtask } = useRoute().params;
 const taskData = ref();
+const taskTable = ref([]);
 const handleFetch = async () => {
     const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/shared/${sharedtask}`);
-    console.log(data, pending, error);
     taskData.value = data.value.data;
+    taskTable.value = data.value.subTask;
+    console.log(data.value.subTask);
 };
 handleFetch();
 </script>
 
 <template>
-    <div class="grid p-4 mx-auto justify-content-center">
+    <div class="card grid p-4 mx-auto justify-content-center">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{ taskData }}</pre> -->
+                <pre>{{ taskTable.children }}</pre>
                 <!-- <pre>{{assignees}}</pre> -->
                 <h5 class="">Task: {{ taskData?.name }}</h5>
 
@@ -42,7 +46,7 @@ handleFetch();
                                             <span class="pi pi-calendar"></span>
                                             <p class="text-nowrap font-bold">Due Date:</p>
                                         </div>
-                                        <p class="">{{ taskData?.due_date.split(' ')[0] }}</p>
+                                        <p class="">{{ taskData?.due_date }}</p>
                                     </div>
                                 </div>
                                 <div class="col-12 lg:col-6 p-0">
@@ -106,38 +110,23 @@ handleFetch();
                                     </div>
                                 </div>
                             </TabPanel>
-                            <TabPanel :header="`Sub Tasks ${taskData?.sub_task?.length ? taskData?.sub_task?.length : 0}`">
-                                <TreeTable class="tree-table" :value="taskData?.sub_task" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                            <TabPanel :header="`Sub Tasks ${taskTable?.children?.length ? taskTable?.children?.length : 0}`">
+                                <TreeTable class="tree-table" :value="taskTable?.children" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column field="name" header="Name" expander :style="{ width: '30%' }"> </Column>
+                                    <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '30%' }"></Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
                                     <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
-                                    <!-- <Column field="action" header="Action">
-                                        <template #body="slotProps">
-                                            <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
-                                                <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </Column> -->
                                 </TreeTable>
                             </TabPanel>
                             <TabPanel :header="`Bounce`">
                                 <div class="card">
-                                    <div class="flex justify-content-start align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
-                                            <span class="pi pi-flag"></span>
-                                            <p class="text-nowrap">Bounce Status:</p>
-                                        </div>
-                                        <Dropdown @change="changeBounceStatusData(vModelBncStatus)" v-model="vModelBncStatus" :options="bounceStatus" optionLabel="is_bounce" placeholder="Select Status" style="width: 146.41px" />
+                                    <div class="flex align-items-center gap-3">
+                                        <span class="pi pi-flag"></span>
+                                        <p class="text-nowrap my-auto">Bounce Status:</p>
+                                        <p class="text-nowrap my-auto">{{ taskData?.is_bounce }}</p>
                                     </div>
                                 </div>
                             </TabPanel>
@@ -146,23 +135,12 @@ handleFetch();
                 </div>
             </div>
         </div>
-        <!-- <div class="col-12 lg:col-5">
+        <div class="col-12 lg:col-5">
             <div>
                 <h5 class="cmc">Activity</h5>
                 <div class="comment-wrapper card">
                     <div class="comments">
-                        <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
-                        </div>
-                        <div v-if="activityDiv">
-                            <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
-                                <li v-html="act.title" style="font-size: smaller"></li>
-                            </ul>
-                            <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
-                            </div>
-                        </div>
-                        <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                        <Card class="mb-2" v-for="val in subTask?.comments" :key="val.id">
                             <template class="commentator-name" #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
@@ -181,29 +159,13 @@ handleFetch();
                                 <p class="m-0 ml-1">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
-                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
+                                <!-- <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i> -->
                             </template>
                         </Card>
                     </div>
-                    <form @submit.prevent="handleTaskComment" class="comment-add">
-                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
-                            <div>
-                                <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
-                            </div>
-                            <div @click="handleCloseCommetFile" class="close-comment">
-                                <i class="pi pi-times"></i>
-                            </div>
-                        </div>
-                        <div class="comment-form">
-                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required />
-                            <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
-                            <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
-                            <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </template>
 
