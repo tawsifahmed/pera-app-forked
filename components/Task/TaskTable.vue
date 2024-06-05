@@ -151,6 +151,7 @@ const getUserlist = async () => {
             </IconField>
         </template>
     </Toolbar>
+    <!-- <pre>{{tasks}}</pre> -->
     <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
@@ -169,7 +170,7 @@ const getUserlist = async () => {
                             </template>
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
                             </template>
@@ -201,6 +202,9 @@ const getUserlist = async () => {
             </template>
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }">
+            <template #body="slotProps">
+                <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
+            </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">

@@ -332,7 +332,7 @@ const handleShareTaskId = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{tags}}</pre> -->
+                <!-- <pre>{{singleTask}}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
                     <h5 class="m-0">
@@ -363,7 +363,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar style="width: 164.94px" v-model="dueDate" showIcon iconDisplay="input" />
+                                            <Calendar :style="`width: 164.94px; border: 1.5px solid ${singleTask?.data?.dueDateColor ? singleTask?.data?.dueDateColor : 'none'}; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -479,7 +479,7 @@ const handleShareTaskId = () => {
                                     </Column>
                                 </TreeTable>
                             </TabPanel>
-                            <TabPanel :header="`Bounce ${vModelBncStatus.is_bounce === 'Yes' ? '1' : ''}`">
+                            <TabPanel :header="`Bounce ${vModelBncStatus?.is_bounce === 'Yes' ? '1' : ''}`">
                                 <div class="card">
                                     <div class="flex justify-content-start align-items-center task-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
