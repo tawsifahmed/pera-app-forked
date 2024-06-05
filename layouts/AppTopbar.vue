@@ -8,6 +8,8 @@ const { userProfile } = storeToRefs(useUserStore());
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
+import Notification from '../components/Notification.vue';
+
 const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
