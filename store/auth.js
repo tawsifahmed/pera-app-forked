@@ -49,7 +49,7 @@ export const useAuthStore = defineStore('auth', {
           const token = useCookie('token'); 
           token.value = data?.value?.access_token; 
           const rolePermission = useCookie('rolePermission');
-          rolePermission.value = data?.value?.company?.permissions;
+          rolePermission.value = data?.value?.permissions;
           this.authenticated = true; //  authenticated state value to true
         }else{
           const token = useCookie('token');
@@ -138,7 +138,7 @@ export const useAuthStore = defineStore('auth', {
                 const token = useCookie('token'); 
                 token.value = data?.value?.access_token;
                 const rolePermission = useCookie('rolePermission');
-                rolePermission.value = data?.value?.company?.permissions;
+                rolePermission.value = data?.value?.permissions;
                 // const rolePermission
                 this.authenticated = true; //  authenticated state value to true
               }else{
@@ -198,24 +198,6 @@ export const useAuthStore = defineStore('auth', {
       token.value = null;
       rolePermission.value = null;
     },
-    async getUserProfile(){
-      const token = useCookie('token'); 
-      const { data, pending, error } = await useAsyncData(
-        'userProf',
-        () => $fetch('http://188.166.212.40/pera/public/api/v1/users/profile',{
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        
-        }), 
-        // {
-        //   watch: [this.userProfile]
-        // }
-      )
-      this.userProfile = data.value;
-      console.log('userProfile', this.userProfile)
-    }
-    
-    
+
   },
 });

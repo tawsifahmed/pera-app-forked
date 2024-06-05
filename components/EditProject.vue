@@ -1,138 +1,19 @@
-<template>
-    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-      
-      <div v-if="spaceFormInputs">
-        <!-- <pre>{{refProjectId}}</pre> -->
-              <div class="company-name flex justify-center text-center mb-5">
-                <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Space: {{singleSpace?.name}}</p>
-              </div>
-                <FloatLabel class="mt-4 mb-2">
-                  <InputText
-                    type="text"
-                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
-                    v-model="projectNameInput"
-                  />
-                  <label>Set Project Name</label>
-                </FloatLabel>
-                
-                <FloatLabel class="mt-5 mb-4">
-                  <InputText
-                    type="text"
-                    class="w-full px-4 py-2 shadow border border-green-700 focus:border-purple-500"
-                    v-model="projectDescriptionInput"
-                  />
-                  <label>Set Project Description</label>
-                </FloatLabel>
-                
-            <div class="mb-4">
-              <h4 class="text-slate-700 mb-2 text-center font-semibold tracking-wide left-3">Setup space task status</h4>
-              <div class="pb-3">
-                <div class="container">
-                  <div class="row">
-                    <div class="col-12" style="width: 80%; margin: 0 auto;">
-                      <!-- <p class="text-uppercase text-muted">Add task statuses</p> -->
-                      <div class="d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center gap-2 status-fields">
-                          <ColorPicker v-model="colorHEX" inputId="cp-hex" format="hex" />
-                          <InputGroup class="border rounded flex-grow-1">
-                            <InputText
-                              class="form-control"
-                              v-model="taskStatusName"
-                              placeholder="e.g., TO-DO, DOING"
-                            />
-                            <InputGroupAddon
-                              @click="addTaskStatus"
-                              class="btn btn-outline-secondary cursor-pointer"
-                            >
-                              <!-- <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="w-6 h-6"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M12 4.5v15m7.5-7.5h-15"
-                                />
-                              </svg> -->
-                              <p class="pi pi-plus-circle cursor-pointer"></p>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </div>
-                        <p
-                          v-if="addTaskSTatusError"
-                          class="text-red-600 text-small"
-                        >
-                          Please Type task name!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="row ps-4 wpp">
-                    <div class="col-12 d-flex flex-column gap-2 ghj">
-                      <div
-                        class="d-flex delete-task"
-                        v-for="(task, index) in taskStatusList"
-                        :key="index"
-                      >
-                        <div class="d-flex align-items-center border rounded flex-grow-1 status-length">
-                          <div
-                            class="status-colors"
-                            :style="{ backgroundColor: task.taskStatusColor }"
-                          ></div>
-                          <p class="text-uppercase text-muteds">
-                            {{ task.taskStatusName }}
-                          </p>
-                        </div>
-                        <div
-                          @click="handleDeleteTask(index)"
-                          class="cursor-pointer ms-1"
-                        >
-                          <p class="pi pi-trash"></p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          <br>
-          <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
-          <br>
-          <div class="create-btn-wrapper">
-            <Button @click="handleCreateProject" class="text-white py-2 px-6 tracking-wide" label="Create Project"/>
-          </div>
-      </div>
-
-      <div v-if="showFinalMsg">
-        <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Project created successfully</h3>
-           
-        <div class="centering">
-            <FloatLabel>
-                <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
-                <p class="text-center mb-2">You can close the modal now.</p>
-            </FloatLabel>
-        </div>
-    </div>
-
-    </div>
-</template>
-
-
-
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createProject } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isProjectCreated } = storeToRefs(useCompanyStore()); 
+const { editProject  } = useCompanyStore(); // use authenticateUser action from  auth store
+const { isProjectEdited } = storeToRefs(useCompanyStore()); 
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
+
 
 const {refProjectId, singleSpace} = defineProps(['singleSpace', 'refProjectId']);
+
+const emit = defineEmits(['closeEditProject']);
+
 const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 const errorHandler = ref(false);
@@ -146,22 +27,14 @@ const spaceAvatarPreview = ref(null);
 
 const taskStatusName = ref('');
 
-const taskStatusList = ref([
-  {
-    'taskStatusName': 'Open',
-    taskStatusColor: `#6466f1`
-  },
-  {
-    'taskStatusName': 'Doing',
-    taskStatusColor: `#ff0084`
-  },
-  {
-    'taskStatusName': 'Dev Done',
-    taskStatusColor: `#12955d`
-  },
-]);
+const taskStatusList = ref(refProjectId?.statuses);
 
-console.log('taskStatusList', taskStatusList.value);
+const dummyStatusList = ref([...taskStatusList.value]);
+
+console.log('dummyStatusList', dummyStatusList.value);
+
+// taskStatusList.value = refProjectId?.statuses;
+
 
 const colorHEX = ref('6466f1');
 
@@ -173,211 +46,221 @@ const projectNameInput = ref(refProjectId?.name);
 
 const projectDescriptionInput = ref(refProjectId?.description);
 
-const spaceDescripInput = ref(null);
-
-const spaceColorPreview = ref(null);
-
 
 const addTaskStatus = () => {
-  taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
-  if(taskStatusName?.value?.length > 0){
+  dummyStatusList.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
+  if(dummyStatusList?.value?.length > 0){
     
     const newTaskStatusList = {
-    taskStatusName: taskStatusName.value,
-    taskStatusColor: `#${colorHEX.value}`
+    name: taskStatusName.value,
+    color_code: `#${colorHEX.value}`,
+    is_closed_status: 0,
    }
-   taskStatusList.value.push(newTaskStatusList);
+   dummyStatusList.value.push(newTaskStatusList);
    taskStatusName.value = '';
-   console.log('taskStatusListType', typeof taskStatusList.value);
-   console.log('taskStatusList', taskStatusList.value);
   }else{
     addTaskSTatusError.value = true;
   }
 
-  if(taskStatusList.value.length > 0){
+  if(dummyStatusList.value.length > 0){
     taskStatusNullCheck.value = true;
   }
 };
 
+console.log('taskStatusList', taskStatusList.value);
+
 const handleDeleteTask = (index) => {
-  taskStatusList.value.splice(index, 1);
+  dummyStatusList.value.splice(index, 1);
   console.log('taskStatusList', taskStatusList.value);
   console.log('ss',taskStatusList.value.length);
-  if (taskStatusList.value.length == 0){
+  if (dummyStatusList.value.length == 0){
     taskStatusNullCheck.value = false;
   }
 };
 
+const selectedCloseStatus = ref(null);
+
+selectedCloseStatus.value = refProjectId?.statuses.find(status => status.is_closed_status === 1);
+
+watch(selectedCloseStatus, (newStatus) => {
+  if (newStatus) {
+    dummyStatusList.value.forEach(status => {
+          status.is_closed_status = status.name === newStatus.name ? 1 : 0;
+      });
+  }
+  console.log('taskStatusList', taskStatusList.value);
+});
+
+const transformKeys = (list) => {
+    return list.map(status => ({
+        taskStatusName: status.name,
+        taskStatusColor: status.color_code,
+        is_closed_status: status.is_closed_status
+    }));
+}
+
 const handleCreateProject = async () => {
-        if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0){
-            errorHandler.value = true
-            // return
+    if(projectNameInput.value === null || projectDescriptionInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null){
+        errorHandler.value = true
+    }else{
+        errorHandler.value = false
+        
+        dummyStatusList.value.forEach(status => {
+          const allowedKeys = ['color_code', 'name', 'is_closed_status'];
+          Object.keys(status).forEach(key => {
+            if (!allowedKeys.includes(key)) {
+              delete status[key];
+            }
+          });
+        });
+
+        const transformedTaskStatusList = transformKeys(dummyStatusList.value);
+
+        
+        const createProjectData = {
+            'id': refProjectId?.id,
+            'name': projectNameInput.value,
+            'description': projectDescriptionInput.value,
+            'space_id': refProjectId?.space_id,
+            'statuses': transformedTaskStatusList,
+        }
+
+      
+        await editProject(createProjectData);
+        if(isProjectEdited.value === true){
+            emit('closeEditProject', false);
+            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', life: 3000 });
         }else{
-            errorHandler.value = false
-            const createProjectData = {
-              'name': projectNameInput.value,
-              'description': projectDescriptionInput.value,
-              'space_id': singleSpace.id,
-              // 'color': spaceAvatarPreview.value,
-              // 'shared_status': selectedShareSpace.value,
-              'task_statuses': taskStatusList.value,
-              // 'features': selectedFeatures.value,
-              // 'views': checkedViews,
-          }
-          console.log('projectData', createProjectData)
-
-          // return
-          
-          await createProject(createProjectData);
-
-          if(isProjectCreated.value === true){
-              spaceFormInputs.value = false
-              showFinalMsg.value = true   
-
-              console.log('space created')
-          }else{
-              console.log('space not created')
-          }
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', life: 3000 });
         }
     }
-</script>
-
-<style lang="scss" scoped>
-
-#dynamic-div{
-  height: 70px;
-  width: 70px;
-  border-radius: 18px;
-  border: 2px solid black;
-  color: black;
-  display: flex;
 }
 
-.color{
-  margin-left: 10px;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-#crimson{
-  background-color: crimson;
-}
-
-#skyblue{
-  background-color: skyblue;
-}
-
-#orange{
-  background-color: orange
-}
-
-#purple{
-  background-color: purple;
-}
-
-#cadetblue{
-  background-color: cadetblue;
-}
-
-#burlywood{
-  background-color: burlywood;
-}
-
-#pink{
-  background-color: pink;
-}
-
-#lightseagreen{
-  background-color: lightseagreen;
-}
-
-
-.tskk{
-    color: transparent
-}
-
-.prog-bar {
-  top: 24px;
-}
-
-.modal-container{
+const hideDialog = () => {
+  emit('closeEditProject', false);
   
 }
 
-.company-name{
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-}
+onMounted(() => {
+  taskStatusList.value = refProjectId?.statuses;
+});
+
+</script>
+<template>
+    <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
+      
+      <div v-if="spaceFormInputs">
+        <div class="field">
+          <!-- <pre>{{refProjectId.statuses}}</pre> -->
+          <label for="name">Edit project: <strong>{{refProjectId?.name}}</strong></label>
+      </div>
+      <div class="field flex flex-column">
+          <label for="name">Project Name</label>
+          <InputText id="name" v-model="projectNameInput" required="true" />
+      </div>
+      <div class="field flex flex-column">
+          <label for="name">Space Description</label>
+          <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
+      </div>
+      <div class="mb-4">
+        <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status</p>
+          <div class="container">
+              <InputGroup>
+                  <InputGroupAddon>
+                      <ColorPicker class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
+                  </InputGroupAddon>
+                  <InputText
+                      class="form-control"
+                      v-model="taskStatusName"
+                      placeholder="e.g., TO-DO, DOING"
+                  />
+                  <InputGroupAddon
+                      @click="addTaskStatus"
+                      class="btn btn-outline-secondary cursor-pointer"
+                  >
+                      <p class="pi pi-plus  cursor-pointer"></p>
+                  </InputGroupAddon>
+              </InputGroup>
+
+              <p v-if="addTaskSTatusError" class="text-red-600 text-small" >
+                  Please Type task name!
+              </p>
 
 
-.colorpicker-wrapper{
-  display: flex;
-}
+              <div class="row mt-2">
+                  <div class="col-12 d-flex flex-column p-0">
+                      <div
+                          class="flex delete-task justify-content-between"
+                          v-for="(task, index) in dummyStatusList"
+                          :key="index"
+                      >
+                          <div class="flex align-items-center">
+                              <div class="status-colors"
+                                   :style="{ backgroundColor: task.color_code }"
+                              ></div>
+                              <p class="text-uppercase text-muteds">
+                                  {{ task.name }}
+                              </p>
+                          </div>
+                          <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1">
+                              <p class="pi pi-times"></p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="mb-4">
+        <p class="text-slate-700 mb-2 tracking-wide left-3">Set Close Status</p>
+          <div class="container">
+              <div class="field">
+                  
+                  <Dropdown v-model="selectedCloseStatus" :options="dummyStatusList" optionLabel="name" placeholder="Select Status" class="w-full" />
+              </div>
 
-.create-btn-wrapper{
-  display: flex;
-  justify-content: center;
-}
+              <p v-if="closeStatusError" class="text-red-600 text-small" >
+                  Please set close status!
+              </p>
+          </div>
+      </div>
+      <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
+      </div>
 
-.min-vh-30 {
-  min-height: 30rem;
-}
-.max-vh-100 {
-  max-height: 100%;
-}
-.cursor-pointer {
-  cursor: pointer;
-}
+      <div class="float-right">
+        <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
+        <Button label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
+      </div>
 
-.status-fields{
-  display: flex;
-  flex-direction: row;
-  height: fit-content;
-}
+    </div>
+</template>
 
-.status-length{
-  display: flex;
-  flex-direction: row;
-  border: 1px solid gray;
-  justify-content: center;
-  p{
-    padding: 0 3px;
-  }
-}
 
-.status-colors{
-  height: 24px;
-  width: 14px;
-}
 
+
+<style lang="scss">
+.color-pick{
+    .p-colorpicker-preview {
+        cursor: pointer;
+        width: 1.5rem !important;
+    }
+}
+.status-colors {
+    height: 24px;
+    width: 24px;
+    border-radius: 5px;
+    margin-right: 8px;
+}
 .delete-task{
-  width: fit-content;
-  display: flex;
-  gap: 4px;
-  font-size: 14px !important;
-  justify-content: center;
-  align-items: center;
+    border: 1px solid rgb(203 213 225);
+    padding: 5px;
+    margin: 3px 0;
+    border-radius: 5px;
+}
+.delete-task .cross-icon{
+    border: 1px solid rgb(203, 213, 225);
+    padding: 3px 5px;
+    margin:0;
+    border-radius: 5px;
 }
 
-.wpp{
-  width: 50%;
-  display: flex;
-  justify-content: center;
-}
-
-.ghj{
-  display: flex;
-    justify-content: center;
-    /* flex-direction: row; */
-    align-items: center;
-    margin-left: 180px;
-}
-.text-muteds{
-  width: 90px;
-  text-transform: uppercase;
-
-}  
 </style>

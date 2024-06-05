@@ -25,6 +25,7 @@ export const useCompanyStore = defineStore('workStation', {
     // projectapi
     projectList: null,
     isProjectCreated: false,
+    isProjectEdited: false,
     isProjectDeleted: false,
     singleProject: null,
 
@@ -317,6 +318,28 @@ export const useCompanyStore = defineStore('workStation', {
           this.getSingleSpace(space_id);
         }
     },
+    async editProject ({id, name, description, space_id, statuses}) {
+      const token = useCookie('token'); 
+      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/update/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: {
+          'id' : id,
+          'name' : name,
+          'description' : description,
+          'space_id' : space_id,
+          'statuses' : statuses,
+          },
+        });
+       
+        if(data.value?.app_message === 'success'){
+          this.isProjectEdited = true;
+          await companies.getCompany()
+          this.getSingleSpace(space_id);
+        }
+    },
     async deleteProject (projectID, spaceId) {
       const token = useCookie('token'); 
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/delete/${projectID}`, {
@@ -376,7 +399,7 @@ export const useCompanyStore = defineStore('workStation', {
           'priority' : priority,
           'assignees' : assignees,
           'tags' : tags,
-          'projectId' : project_id,
+          'project_id' : project_id,
           // 'attachments' : attachments,
         },
       });

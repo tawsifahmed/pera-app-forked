@@ -15,21 +15,25 @@ const taskStatusName = ref('');
 const taskStatusList = ref([
     {
         'taskStatusName': 'Open',
-        'taskStatusColor': `#6466f1`
+        'taskStatusColor': `#6466f1`,
+        'is_closed_status': 0,
     },
     {
         'taskStatusName': 'Doing',
-        'taskStatusColor': `#ff0084`
+        'taskStatusColor': `#ff0084`,
+        'is_closed_status': 0,
     },
     {
         'taskStatusName': 'Dev Done',
-        'taskStatusColor': `#12955d`
+        'taskStatusColor': `#12955d`,
+        'is_closed_status': 0,
     },
 ]);
 
 const colorHEX = ref('6466f1');
 const taskStatusNullCheck = ref(null);
 const addTaskSTatusError= ref(false);
+const closeStatusError = ref(false);
 const projectNameInput = ref(null);
 const projectDescriptionInput = ref(null);
 
@@ -44,7 +48,8 @@ const addTaskStatus = () => {
     if(taskStatusName?.value?.length > 0){
         const newTaskStatusList = {
             taskStatusName: taskStatusName.value,
-            taskStatusColor: `#${colorHEX.value}`
+            taskStatusColor: `#${colorHEX.value}`,
+            is_closed_status: 0,
         }
         taskStatusList.value.push(newTaskStatusList);
         taskStatusName.value = '';
@@ -64,8 +69,21 @@ const handleDeleteTask = (index) => {
     }
 };
 
+const selectedCloseStatus = ref(null);
+
+watch(selectedCloseStatus, (newStatus) => {
+    if (newStatus) {
+        taskStatusList.value.forEach(status => {
+            status.is_closed_status = status.taskStatusName === newStatus.taskStatusName ? 1 : 0;
+        });
+    }
+    console.log('taskStatusList', taskStatusList.value);
+});
+
+console.log('taskStatusList', taskStatusList.value);
+
 const handleCreateProject = async () => {
-    if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0){
+    if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null){
         errorHandler.value = true
     }else{
         errorHandler.value = false
@@ -84,15 +102,18 @@ const handleCreateProject = async () => {
             taskStatusList.value = [
                 {
                     'taskStatusName': 'Open',
-                    'taskStatusColor': `#6466f1`
+                    'taskStatusColor': `#6466f1`,
+                    'is_closed_status': 0,
                 },
                 {
                     'taskStatusName': 'Doing',
-                    'taskStatusColor': `#ff0084`
+                    'taskStatusColor': `#ff0084`,
+                    'is_closed_status': 0,
                 },
                 {
                     'taskStatusName': 'Dev Done',
-                    'taskStatusColor': `#12955d`
+                    'taskStatusColor': `#12955d`,
+                    'is_closed_status': 0,
                 },
             ];
         }else{
@@ -118,7 +139,7 @@ const handleCreateProject = async () => {
                 <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
             </div>
             <div class="mb-4">
-              <p class="text-slate-700 mb-2 tracking-wide left-3">Setup task status</p>
+              <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status</p>
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
@@ -163,6 +184,19 @@ const handleCreateProject = async () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="mb-4">
+              <p class="text-slate-700 mb-2 tracking-wide left-3">Set Close Status</p>
+                <div class="container">
+                    <div class="field">
+                        
+                        <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName" placeholder="Select Status" class="w-full" />
+                    </div>
+
+                    <p v-if="closeStatusError" class="text-red-600 text-small" >
+                        Please set close status!
+                    </p>
                 </div>
             </div>
             <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>

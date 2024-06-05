@@ -14,7 +14,6 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 import { useAuthStore } from '~/store/auth';
 // import { useRoute } from 'vue-router';
-console.log('path', useRoute().path);
 
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs

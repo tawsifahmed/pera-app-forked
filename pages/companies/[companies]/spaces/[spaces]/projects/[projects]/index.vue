@@ -224,13 +224,16 @@ watchEffect(() => {
 
 .breadCrumWrap {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     gap: 5px;
     align-items: start;
+    flex-wrap: wrap;
     .text {
         line-height: 1;
+        text-wrap: nowrap;
     }
 }
+
 
 .cmc {
     text-wrap: nowrap;

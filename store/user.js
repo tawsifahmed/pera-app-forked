@@ -21,7 +21,6 @@ export const useUserStore = defineStore('user', () => {
             // }
         )
         userProfile.value = data.value;
-        console.log('userProfile', userProfile.value)
     }
 
     async function updateUser(id, name, phone, email, address, image) {

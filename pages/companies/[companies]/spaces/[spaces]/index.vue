@@ -82,6 +82,10 @@ const edittProject = (id) =>{
     refProjectId.value = id;
 }
 
+const closeEditProject = (evn) => {
+    visibleEditProject.value = evn;
+};
+
 
 </script>
 
@@ -144,8 +148,8 @@ const edittProject = (id) =>{
             
         </Dialog>
 
-        <Dialog v-model:visible="visibleEditProject" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditProject :refProjectId="refProjectId" :singleSpace="singleSpace"/>
+        <Dialog v-model:visible="visibleEditProject" modal header="Edit Project" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <EditProject :refProjectId="refProjectId" :singleSpace="singleSpace" @closeEditProject="closeEditProject($event)"/>
         </Dialog>
     </div>
 </template>
