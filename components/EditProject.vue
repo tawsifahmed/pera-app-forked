@@ -48,8 +48,8 @@ const projectDescriptionInput = ref(refProjectId?.description);
 
 
 const addTaskStatus = () => {
-  dummyStatusList.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
-  if(dummyStatusList?.value?.length > 0){
+  taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
+  if(taskStatusName?.value?.length > 0){
     
     const newTaskStatusList = {
     name: taskStatusName.value,
@@ -71,8 +71,6 @@ console.log('taskStatusList', taskStatusList.value);
 
 const handleDeleteTask = (index) => {
   dummyStatusList.value.splice(index, 1);
-  console.log('taskStatusList', taskStatusList.value);
-  console.log('ss',taskStatusList.value.length);
   if (dummyStatusList.value.length == 0){
     taskStatusNullCheck.value = false;
   }
@@ -88,7 +86,6 @@ watch(selectedCloseStatus, (newStatus) => {
           status.is_closed_status = status.name === newStatus.name ? 1 : 0;
       });
   }
-  console.log('taskStatusList', taskStatusList.value);
 });
 
 const transformKeys = (list) => {

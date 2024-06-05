@@ -24,7 +24,6 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function updateUser(id, name, phone, email, address, image) {
-
         isLoading.value = true
 
         const formdata = new FormData()
@@ -33,9 +32,9 @@ export const useUserStore = defineStore('user', () => {
         formdata.append('phone', phone);
         // formdata.append('email', email);
         formdata.append('address', address);
-        formdata.append('image', image);
-        // if (typeof image === 'object') {
-        // }
+        if (image != null) {
+            formdata.append('image', image);
+        }
         const token = useCookie('token');
 
         try {

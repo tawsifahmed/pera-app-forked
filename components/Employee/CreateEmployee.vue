@@ -23,7 +23,7 @@
         </div>
 
         <div class="field flex flex-column">
-            <label>Roles</label>
+            <label>Role</label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 

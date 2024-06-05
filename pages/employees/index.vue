@@ -170,7 +170,7 @@ initFilters();
 <template>
     <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
-            <pre>{{rolePermission}}</pre>
+            <!-- <pre>{{rolePermission}}</pre> -->
             <h4 class="mb-0">Create Employee</h4>
         </div>
         <Toolbar class="border-0 px-0">

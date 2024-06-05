@@ -12,17 +12,19 @@ const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+
 import { useAuthStore } from '~/store/auth';
 // import { useRoute } from 'vue-router';
-
+const name = ref('name');
+const userImage = ref(null);
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 const visibleProfile = ref(false);
 const logout = () => {
-  logUserOut();
-  router.push('/login');
-  // location.reload();
+    logUserOut();
+    router.push('/login');
+    // location.reload();
 };
 
 onMounted(() => {
@@ -80,11 +82,14 @@ const isOutsideClicked = (event) => {
 // Profile
 
 getUserData();
-
+// watch(userProfile, (oldValue, newValue) => {
+//     name.value = newValue.data.name;
+//     userImage.value = newValue.data.image;
+//     console.log('new Value:', newValue.data.image);
+// });
 const openProfile = () => {
     visibleProfile.value = !visibleProfile.value;
 };
-
 </script>
 
 <template>
@@ -106,9 +111,16 @@ const openProfile = () => {
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
+            <!-- <pre>{{ userProfile }}</pre> -->
             <button @click="openProfile" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
+                <div v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
+                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
+                    <div class="userImage">
+                        <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
+                    </div>
+                </div>
+                <i v-else class="pi pi-user"></i>
+                <span class="ml-4">Profile</span>
             </button>
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
@@ -118,8 +130,57 @@ const openProfile = () => {
         <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
-
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.userImage {
+    height: 42px;
+    width: 42px;
+    border-radius: 50px;
+    overflow: hidden;
+    
+}
+
+.userImage:hover {
+    /* Add your hover effect styles here */
+    animation: forwardAnimation 0.3s ease-in forwards;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.userImage:not(:hover) {
+    /* Add your default state styles here */
+    animation: backwardAnimation 0.3s ease-in reverse forwards;
+    box-shadow: none;
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+@keyframes backwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+
+
+
+
+</style>

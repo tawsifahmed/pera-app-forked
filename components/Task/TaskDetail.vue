@@ -315,6 +315,17 @@ const handleShare = async () => {
     console.log(data.value.shared_token);
     console.log('error', error.value);
 };
+
+const handleShareTaskId = () => {
+    if(singleTask?.key){
+        navigator.clipboard.writeText(singleTask.key);
+        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', life: 3000 });
+
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', life: 3000 });
+    
+    }
+};
 </script>
 
 <template>
@@ -327,7 +338,8 @@ const handleShare = async () => {
                     <h5 class="m-0">
                         {{ singleTask.data.name }}
                     </h5>
-                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer"></span>
+                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
+                    <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
                 </div>
                 <div class="task-wrapper card">
                     <div class="task-det">
@@ -467,7 +479,7 @@ const handleShare = async () => {
                                     </Column>
                                 </TreeTable>
                             </TabPanel>
-                            <TabPanel :header="`Bounce`">
+                            <TabPanel :header="`Bounce ${vModelBncStatus.is_bounce === 'Yes' ? '1' : ''}`">
                                 <div class="card">
                                     <div class="flex justify-content-start align-items-center task-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
@@ -545,6 +557,53 @@ const handleShare = async () => {
 </template>
 
 <style lang="scss">
+
+.share-btn:hover{
+    animation: forwardAnimation 0.3s ease-in forwards;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.share-btn:not(:hover) {
+    /* Add your default state styles here */
+    animation: backwardAnimation 0.3s ease-in reverse forwards;
+    box-shadow: none;
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+@keyframes backwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
 .task-detail-wrapper {
     width: 100%;
 }

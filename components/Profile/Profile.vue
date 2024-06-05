@@ -19,8 +19,7 @@ const address = ref(userProfile?.data?.address);
 const handleSubmit = async () => {
     loading.value = true;
     const response = await updateUser(userId.value, userName.value, phone.value, email.value, address.value, uploadedImage.value);
-    console.log(response);
-    if (response.code === 200) {
+    if (response?.code === 200) {
         toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Success', life: 3000 });
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Profile Updated Failed', life: 3000 });
@@ -32,21 +31,18 @@ const handleImageUpload = (value) => {
     uploadedImage.value = value.target.files[0];
     imageData.value = URL.createObjectURL(uploadedImage.value);
 };
-watch(uploadedImage, (newValue, oldValue) => {
-    console.log(newValue, oldValue);
-});
 </script>
 <template>
     <!-- <pre>{{ userProfile }}</pre> -->
     <form @submit.prevent="handleSubmit" class="grid">
         <div class="col-12 text-center mb-5">
             <div class="relative w-fit mx-auto">
-                <img :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%" />
+                <img :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover" />
                 <div class="img-label">
                     <label for="image">
                         <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 8px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
                     </label>
-                    <input class="hidden" type="file" :value="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
+                    <input class="hidden" type="file" :v-model="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
                 </div>
             </div>
         </div>
