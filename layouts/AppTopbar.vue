@@ -15,8 +15,8 @@ const router = useRouter();
 
 import { useAuthStore } from '~/store/auth';
 // import { useRoute } from 'vue-router';
-console.log('path', useRoute().path);
-
+const name = ref('name');
+const userImage = ref(null);
 const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
@@ -82,7 +82,11 @@ const isOutsideClicked = (event) => {
 // Profile
 
 getUserData();
-
+// watch(userProfile, (oldValue, newValue) => {
+//     name.value = newValue.data.name;
+//     userImage.value = newValue.data.image;
+//     console.log('new Value:', newValue.data.image);
+// });
 const openProfile = () => {
     visibleProfile.value = !visibleProfile.value;
 };
@@ -107,9 +111,16 @@ const openProfile = () => {
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
+            <!-- <pre>{{ userProfile }}</pre> -->
             <button @click="openProfile" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
+                <div v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
+                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
+                    <div class="userImage">
+                        <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
+                    </div>
+                </div>
+                <i v-else class="pi pi-user"></i>
+                <span class="ml-4">Profile</span>
             </button>
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
@@ -122,4 +133,11 @@ const openProfile = () => {
     </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.userImage {
+    height: 42px;
+    width: 42px;
+    border-radius: 50px;
+    overflow: hidden;
+}
+</style>
