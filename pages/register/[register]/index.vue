@@ -238,14 +238,14 @@ loading.value = false;
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">
-                        <div class="field md:w-28rem mb-4">
+                        <!-- <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="verifyUser.email" type="email"
                                 placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report" v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
-                        </div>
+                        </div> -->
                         <div class="field md:w-28rem mb-4">
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
                             <InputText id="name" v-model="verifyUser.otp" type="text" placeholder="Enter OTP"
