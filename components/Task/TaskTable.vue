@@ -61,6 +61,7 @@ const changeAttribute = async () => {
     const end = filterEndDueDate.value;
     console.log(start,'start')
     console.log(end,'end')
+    getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
 }
 const startDateChange = (newDate) => {
     filterStartDueDate.value = newDate
