@@ -167,6 +167,43 @@ const openProfile = () => {
     overflow: hidden;
 }
 
+.userImage:hover {
+    /* Add your hover effect styles here */
+    animation: forwardAnimation 0.3s ease-in forwards;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.userImage:not(:hover) {
+    /* Add your default state styles here */
+    animation: backwardAnimation 0.3s ease-in reverse forwards;
+    box-shadow: none;
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+@keyframes backwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
 .nav-btn {
     background: none !important;
     border: none;
