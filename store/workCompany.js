@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+
 export const useActiveCompanyStore = defineStore('ActiveCompany',{
   state: () => ({
     activeCompany: null,
@@ -21,7 +22,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany',{
             element.projects.forEach(ele => {
               const proObj = {
                 'label': ele?.name,
-                'id': element?.id,
+                'id': ele?.id,
                 'icon': 'pi pi-list',
                 'color': ele?.color,
                 'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,

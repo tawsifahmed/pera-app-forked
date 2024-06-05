@@ -10,6 +10,13 @@ import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
 
+import accessPermission from "~/composables/usePermission";
+
+const readTags = ref(accessPermission('read_tags'));
+const createTagsP = ref(accessPermission('create_tags'));
+const updateTagsP = ref(accessPermission('update_tags'));
+const deleteTagsP = ref(accessPermission('delete_tags'));
+
 const filters = ref();
 
 const loading = ref(true);
@@ -109,13 +116,13 @@ initFilters();
 </script>
 
 <template>
-    <div class="card">
+    <div v-if="readTags" class="card">
         <div class="d-flex mr-2">
             <h5 class="mb-1">Tags</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create Tags" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tags" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -140,8 +147,10 @@ initFilters();
             <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTag(slotProps.data.id)" />
+                    <Button v-if="updateTagsP" icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
+                    <Button v-if="!updateTagsP" icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="deleteTagsP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTag(slotProps.data.id)" />
+                    <Button v-if="!deleteTagsP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
                 </template>
             </Column>
             <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->

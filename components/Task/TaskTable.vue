@@ -6,6 +6,11 @@ definePageMeta({
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
+import accessPermission from "~/composables/usePermission";
+const createTaskP = ref(accessPermission('create_task'));
+const updateTaskP = ref(accessPermission('update_task'));
+const deleteTaskP = ref(accessPermission('delete_task'));
+const downloadTaskP = ref(accessPermission('download_task'));
 
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 
@@ -34,14 +39,7 @@ const filterEndDueDate = ref();
 const filterSearch = ref();
 
 const usersLists = ref({});
-
 const selectedStatus = ref();
-
-// const countries = ref([
-//     { name: 'Open', code: 'AU', logo: 'pi-circle', color: '#314ebe'  },
-//     { name: 'Doing', code: 'BR', logo: 'pi-circle', color: '#f59e0b' },
-//     { name: 'Dev Done', code: 'CN', logo: 'pi-circle', color: '#10b981' },
-// ])
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -59,9 +57,18 @@ const changeAttribute = async () => {
     const priority = filterPriorities.value ? filterPriorities.value.code : '';
     const status = filterStatus.value ? filterStatus.value.id : '';
     const query = filterSearch.value;
-
-    // console.log(filterStartDueDate.value);
-    getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
+    const start = filterStartDueDate.value;
+    const end = filterEndDueDate.value;
+    console.log(start,'start')
+    console.log(end,'end')
+}
+const startDateChange = (newDate) => {
+    filterStartDueDate.value = newDate
+    changeAttribute()
+}
+const endDateChange = (newDate) => {
+    filterEndDueDate.value = newDate
+    changeAttribute()
 }
 
 onMounted(async () => {
@@ -124,14 +131,14 @@ const getUserlist = async () => {
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="statuslist" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <!-- <Calendar @change="changeAttribute()" v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar @change="changeAttribute()" v-model="filterEndDueDate" placeholder="End Due date" class="w-full md:w-17rem" /> -->
+        <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
+        <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="End Due date" class="w-full md:w-17rem" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
-            <Button icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-            <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
+            <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+            <Button v-if="downloadTaskP" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+            <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>
 
@@ -144,6 +151,7 @@ const getUserlist = async () => {
             </IconField>
         </template>
     </Toolbar>
+    <!-- <pre>{{tasks}}</pre> -->
     <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
@@ -162,7 +170,7 @@ const getUserlist = async () => {
                             </template>
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
                             </template>
@@ -194,6 +202,9 @@ const getUserlist = async () => {
             </template>
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }">
+            <template #body="slotProps">
+                <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
+            </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">
@@ -201,10 +212,13 @@ const getUserlist = async () => {
                 <div class="action-dropdown">
                     <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
                     <div class="action-dropdown-content">
-                        <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                        <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                        <Button v-if="createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
+                        <Button v-if="!createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;"/>
+                        <Button v-if="updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                        <Button v-if="!updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;" />
                         <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                        <Button icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                        <Button v-if="deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                        <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden;" />
                     </div>
                 </div>
             </template>

@@ -10,7 +10,7 @@ const { userCompany } = storeToRefs(useAuthStore());
 
 definePageMeta({
       middleware: 'auth',
-      layout: 'default' // this should match the name of the file inside the middleware directory 
+      layout: 'default'
 })
 
 const { isDarkTheme } = useLayout();

@@ -16,6 +16,14 @@ import EditEmployee from '@/components/Employee/EditEmployee.vue';
 
 import InviteGuest from '@/components/Employee/InviteGuest.vue';
 
+import accessPermission from "~/composables/usePermission";
+
+const readUser = ref(accessPermission('read_user'));
+
+const createUserP = ref(accessPermission('create_user'));
+const updateUserP = ref(accessPermission('update_user'));
+const deleteUserP = ref(accessPermission('delete_user'));
+
 const filters = ref();
 
 const loading = ref(true);
@@ -44,6 +52,10 @@ const phone = ref('');
 
 const address = ref('');
 
+const rolesLists = ref([]);
+
+const user_type = ref([]);
+
 const closeCreateModal = (evn) => {
     visibleCreateEmployee.value = false;
     init();
@@ -67,6 +79,8 @@ const closeInviteModal = (evn) => {
     visibleInviteUser.value = false;
 };
 
+const selectedRole = ref([]);
+
 const editEmployee = (data) => {
     visibleEditEmployee.value = true;
     id.value = data.id;
@@ -74,6 +88,12 @@ const editEmployee = (data) => {
     email.value = data.email;
     phone.value = data.phone;
     address.value = data.address;
+    user_type.value = data.user_type;
+    rolesLists.value.map((item) => {
+        if (item.name === data.user_type) {
+            user_type.value = item;
+        }
+    });
 };
 
 const deleteEmployee = (key) => {
@@ -113,13 +133,34 @@ const init = async () => {
     }
 };
 
+const getRoleList = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('roleLiist', () =>
+        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        console.log('data', data.value?.data);
+        rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        console.log('rolesLists', rolesLists.value);
+    
+    }
+};
+
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
+
+const rolePermission = useCookie('rolePermission');
+
 onMounted(() => {
     init();
+    getRoleList();
     loading.value = false;
 });
 
@@ -127,16 +168,17 @@ initFilters();
 </script>
 
 <template>
-    <div class="card">
+    <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
+            <!-- <pre>{{rolePermission}}</pre> -->
             <h4 class="mb-0">Create Employee</h4>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
+                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
+                <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
+                <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
 
             <template #end>
@@ -156,10 +198,13 @@ initFilters();
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
             <Column field="phone" sortable header="Phone Number"></Column>
+            <Column field="user_type" sortable header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
+                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
@@ -167,12 +212,12 @@ initFilters();
 
         <!-- Create -->
         <Dialog v-model:visible="visibleCreateEmployee" modal header="Create Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <CreateEmployee @closeCreateModal="closeCreateModal($event)" />
+            <CreateEmployee :param="{ rolesLists }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
         <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditEmployee :param="{ id, name, address, phone, email }" @closeEditModal="closeEditModal($event)" />
+            <EditEmployee :param="{ id, name, address, phone, email, user_type, rolesLists }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }">
@@ -183,7 +228,7 @@ initFilters();
 
         <!-- Invite User -->
         <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <InviteGuest @closeInviteModal="closeInviteModal($event)" />
+            <InviteGuest :param="{ rolesLists }" @closeInviteModal="closeInviteModal($event)" />
         </Dialog>
     </div>
 </template>

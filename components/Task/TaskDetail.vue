@@ -308,12 +308,23 @@ const handleShare = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
         return;
     } else {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Shared successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', life: 3000 });
         navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         return;
     }
     console.log(data.value.shared_token);
     console.log('error', error.value);
+};
+
+const handleShareTaskId = () => {
+    if(singleTask?.key){
+        navigator.clipboard.writeText(singleTask.key);
+        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', life: 3000 });
+
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', life: 3000 });
+    
+    }
 };
 </script>
 
@@ -321,13 +332,14 @@ const handleShare = async () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{tags}}</pre> -->
+                <!-- <pre>{{singleTask}}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
                     <h5 class="m-0">
                         {{ singleTask.data.name }}
                     </h5>
-                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer"></span>
+                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
+                    <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
                 </div>
                 <div class="task-wrapper card">
                     <div class="task-det">
@@ -351,7 +363,7 @@ const handleShare = async () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar style="width: 164.94px" v-model="dueDate" showIcon iconDisplay="input" />
+                                            <Calendar :style="`width: 164.94px; border: 1.5px solid ${singleTask?.data?.dueDateColor ? singleTask?.data?.dueDateColor : 'none'}; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -467,7 +479,7 @@ const handleShare = async () => {
                                     </Column>
                                 </TreeTable>
                             </TabPanel>
-                            <TabPanel :header="`Bounce`">
+                            <TabPanel :header="`Bounce ${vModelBncStatus?.is_bounce === 'Yes' ? '1' : ''}`">
                                 <div class="card">
                                     <div class="flex justify-content-start align-items-center task-detail-wrapper">
                                         <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
@@ -545,6 +557,53 @@ const handleShare = async () => {
 </template>
 
 <style lang="scss">
+
+.share-btn:hover{
+    animation: forwardAnimation 0.3s ease-in forwards;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.share-btn:not(:hover) {
+    /* Add your default state styles here */
+    animation: backwardAnimation 0.3s ease-in reverse forwards;
+    box-shadow: none;
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes forwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+@keyframes backwardAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
 .task-detail-wrapper {
     width: 100%;
 }

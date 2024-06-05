@@ -21,6 +21,13 @@
             <label for="company">Password</label>
             <InputText type="password" v-model="password" class="w-full" />
         </div>
+
+
+        <!-- <pre>{{user_type}}</pre> -->
+        <div class="field flex flex-column">
+            <label>Role</label>
+            <Dropdown v-model="user_type" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrappe">
             <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
@@ -45,6 +52,12 @@ const email = ref(props.param.email);
 const phone = ref(props.param.phone);
 
 const address = ref(props.param.address);
+
+const rolesLists = ref(props.param.rolesLists);
+
+const user_type = ref(props.param.user_type);
+// user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
 
 const password = ref('');
 
@@ -75,7 +88,8 @@ const handleSubmitData = async () => {
                     address: address.value,
                     phone: phone.value,
                     password: password.value,
-                    password_confirmation: password.value
+                    password_confirmation: password.value,
+                    role: user_type.value.name
                 }
             });
 

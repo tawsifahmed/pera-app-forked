@@ -62,9 +62,9 @@ const handleSubmitData = async () => {
             if (data.value?.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Role updated successfully!', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Update Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role!', life: 3000 });
             }
         }
     }
