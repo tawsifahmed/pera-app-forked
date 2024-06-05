@@ -21,6 +21,7 @@ const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth
 const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
 
 const visibleProfile = ref(false);
+const showNotify = ref(false);
 const logout = () => {
     logUserOut();
     router.push('/login');
@@ -101,10 +102,14 @@ const openProfile = () => {
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
-
-        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
-            <i class="pi pi-ellipsis-v"></i>
-        </button>
+        <div class="p-link layout-topbar-menu-button layout-topbar-button">
+            <button class="nav-btn" @click="onTopBarMenuButton()">
+                <i class="pi pi-bell"></i>
+            </button>
+            <button class="nav-btn" @click="onTopBarMenuButton()">
+                <i class="pi pi-ellipsis-v"></i>
+            </button>
+        </div>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
@@ -122,6 +127,22 @@ const openProfile = () => {
                 <i v-else class="pi pi-user"></i>
                 <span class="ml-4">Profile</span>
             </button>
+            <div class="relative">
+                <button
+                    @click="
+                        () => {
+                            showNotify = !showNotify;
+                        }
+                    "
+                    class="p-link layout-topbar-button notify-btn"
+                >
+                    <i class="pi pi-bell"></i>
+                    <span class="ml-4">Notification</span>
+                </button>
+                <div v-if="showNotify" class="notification">
+                    <Notification />
+                </div>
+            </div>
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
@@ -134,53 +155,25 @@ const openProfile = () => {
 </template>
 
 <style lang="scss" scoped>
+.notify-btn {
+    @media (max-width: 991px) {
+        display: none !important;
+    }
+}
 .userImage {
     height: 42px;
     width: 42px;
     border-radius: 50px;
     overflow: hidden;
-    
 }
 
-.userImage:hover {
-    /* Add your hover effect styles here */
-    animation: forwardAnimation 0.3s ease-in forwards;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
+.nav-btn {
+    background: none !important;
+    border: none;
 }
-
-.userImage:not(:hover) {
-    /* Add your default state styles here */
-    animation: backwardAnimation 0.3s ease-in reverse forwards;
-    box-shadow: none;
-    transition: all 0.3s ease-in-out;
+.notification {
+    position: absolute;
+    right: 0;
+    top: 4rem;
 }
-
-@keyframes forwardAnimation {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1.1);
-    }
-}
-@keyframes backwardAnimation {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1.1);
-    }
-}
-
-
-
-
-
 </style>

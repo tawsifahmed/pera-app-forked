@@ -28,8 +28,18 @@ const model = ref([
         label: 'Settings',
         option: 'settings_option',
         items: [
-        ],
-
+            { label: 'Employee', icon: 'pi pi-fw pi-users', to: '/employees' },
+            { label: 'Role', icon: 'pi pi-fw pi-user-edit', to: '/role' },
+            { label: 'Tags', icon: 'pi pi-fw pi-tags', to: '/tags' }
+        ]
+    },
+    {
+        label: 'Reports',
+        option: 'reports_option',
+        items: [
+            { label: 'Task Wise Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
+            { label: 'User Wise Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' }
+        ]
     }
 ]);
 
