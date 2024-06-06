@@ -30,6 +30,14 @@ const model = ref([
         items: [
         ],
 
+    },
+    {
+        label: 'Reports',
+        option: 'reports_option',
+        items: [
+            { label: 'Task Wise Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
+            { label: 'User Wise Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' }
+        ]
     }
 ]);
 
