@@ -30,6 +30,9 @@ const filterAssignees = ref();
 
 const filterPriorities = ref();
 
+const mStatusList = ref([{ name: 'All', code: '' }, ...statuslist.value]);
+
+
 const filterStatus = ref();
 
 const filterStartDueDate = ref();
@@ -42,6 +45,7 @@ const usersLists = ref({});
 const selectedStatus = ref();
 
 const priorities = ref([
+    { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
     { name: 'High', code: 'High' },
     { name: 'Normal', code: 'Normal' },
@@ -52,25 +56,70 @@ const route = useRoute();
 
 const id = route.params?.projects;
 
-const changeAttribute = async () => {
-    const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
-    const priority = filterPriorities.value ? filterPriorities.value.code : '';
-    const status = filterStatus.value ? filterStatus.value.id : '';
-    const query = filterSearch.value;
-    const start = filterStartDueDate.value;
-    const end = filterEndDueDate.value;
-    console.log(start,'start')
-    console.log(end,'end')
-    getSingleProject(id, userIds, priority, status, query, filterStartDueDate.value, filterEndDueDate.value);
+const userI = ref()
+const prio = ref()
+const sta = ref()
+const que = ref()
+const strD = ref()
+const enD = ref()
+
+const handleFilterReset = () => {
+        filterAssignees.value = ''
+        filterPriorities.value = ''
+        filterStatus.value = ''
+        filterSearch.value = ''
+        filterStartDueDate.value = ''
+        filterEndDueDate.value = ''
+        userI.value = ''
+        prio.value = ''
+        sta.value = ''
+        que.value = ''
+        strD.value = ''
+        enD.value = ''
+        isCalendarSelected1.value = false
+        isCalendarSelected2.value = false
+    changeAttribute()
 }
+
+const changeAttribute = async () => {
+    userI.value = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
+        prio.value = filterPriorities.value ? filterPriorities.value.code : '';
+        sta.value = filterStatus.value ? filterStatus.value.id : '';
+        que.value = filterSearch.value;
+        strD.value = filterStartDueDate.value;
+        enD.value = filterEndDueDate.value;
+    getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+}
+
+const isCalendarSelected1 = ref(false)
+const isCalendarSelected2 = ref(false)
+
 const startDateChange = (newDate) => {
     filterStartDueDate.value = newDate
+    isCalendarSelected1.value = true
     changeAttribute()
 }
 const endDateChange = (newDate) => {
+    isCalendarSelected2.value = true
     filterEndDueDate.value = newDate
     changeAttribute()
 }
+
+const handleDateDelete1 = () => {
+    isCalendarSelected1.value = false
+    filterStartDueDate.value = ''
+    strD.value = ''
+    changeAttribute()
+}
+
+const handleDateDelete2 = () => {
+    isCalendarSelected2.value = false
+    filterEndDueDate.value = ''
+    enD.value = ''
+    changeAttribute()
+}
+
+
 
 onMounted(async () => {
     await getSingleProject(id);
@@ -129,11 +178,18 @@ const getUserlist = async () => {
 <template>
     <div class="filter-wrapper pb-2 mb-1">
         <!-- <pre>{{statuslist}}</pre> -->
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="statuslist" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="End Due date" class="w-full md:w-17rem" />
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="mStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+        <div class="mb-2 relative">
+            <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Filter Start Due Date" class="w-full md:w-17rem"/>
+            <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
+        </div>
+        <div class="mb-2 relative">
+            <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="Filter End Due Date" class="w-full md:w-17rem" />
+            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
+        </div>
+        <Button @click="handleFilterReset" icon="pi " label="Reset" class="mr-2 mb-2" severity="secondary" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
@@ -320,6 +376,33 @@ const getUserlist = async () => {
 .assignee-wrapper {
     position: relative;
     z-index: 1;
-  }
+}
+
+.pi-times{
+    top: 30%;
+    right: 3%;
+    color: gray
+}
+
+.pi-times:hover{
+    
+        color: rgb(27, 27, 27);
+        font-weight: 500;
+        animation: hover-animation 0.3s ease-in-out forwards;  
+}
+
+@keyframes hover-animation {
+    0% {
+        transform: scale(1);
+    }
+  
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+
+
+
 
 </style>
