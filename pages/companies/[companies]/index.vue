@@ -89,15 +89,16 @@ const closeEditSpace = (evn) => {
 <template>
     <!-- <pre class="">{{ singleCompany.name }}</pre> -->
     <div class="card">
-      <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
-           <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
-           <div class="breadCrumWrap">
-            <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
-            <p class="pi pi-angle-right"></p>
-            <p class="text">Company - {{singleCompany?.name}}</p>
-           </div>
-          <div class="create-btn-wrapper ">
-              <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }"/>
+        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+            <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
+            <div class="breadCrumWrap">
+                <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
+                <p class="pi pi-angle-right"></p>
+                <p class="text">Company - {{ singleCompany?.name }}</p>
+            </div>
+            <div class="create-btn-wrapper ">
+                <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }" />
+            </div>
         </div>
 
         <div class="flex justify-content-end mb-2">
@@ -108,14 +109,18 @@ const closeEditSpace = (evn) => {
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-dco" :value="singleCompany?.spaces" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
-            <template #empty><p class="py-2 text-center">No Data found...</p> </template>
+        <DataTable v-model:filters="filters" class="table-dco" :value="singleCompany?.spaces" stripedRows paginator
+            tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+            <template #empty>
+                <p class="py-2 text-center">No Data found...</p>
+            </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="id" header="ID"></Column>
             <Column field="name" header="Space Name">
                 <template #body="slotProps">
                     <NuxtLink :to="`/companies/${companies}/spaces/${slotProps.data.id}`">
-                        <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps.data.name }}</p>
+                        <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps.data.name }}
+                        </p>
                     </NuxtLink>
                 </template>
             </Column>
@@ -126,32 +131,36 @@ const closeEditSpace = (evn) => {
                     <!-- <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
                     <Button class="cursor-pointer text-white px-5 mr-3 py-2" label="Enter" />
                   </NuxtLink> -->
-                  <Button v-if="updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSpace(slotProps.data)"  />
-                  <Button v-if="deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmDeleteSpace(slotProps.data.id)" />
-                  <Button v-if="!updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success" style="visibility: hidden;" />
-                  <Button v-if="!deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning" style="visibility: hidden;" />
-              </template>
-          </Column>
-      </DataTable>
+                    <Button v-if="updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded
+                        @click="editSpace(slotProps.data)" />
+                    <Button v-if="deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded
+                        @click="confirmDeleteSpace(slotProps.data.id)" />
+                    <Button v-if="!updateSpaceP" icon="pi pi-pencil" text class="mr-2" severity="success"
+                        style="visibility: hidden;" />
+                    <Button v-if="!deleteSpaceP" icon="pi pi-trash" text class="mt-2" severity="warning"
+                        style="visibility: hidden;" />
+                </template>
+            </Column>
+        </DataTable>
 
-      <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
-              
-        <p>Are you sure you want to delete?</p>
-        <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-        <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" /> 
-      </Dialog>
-      <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany" @closeEditSpace="closeEditSpace($event)"/>
-      </Dialog>
-  </div>
+        <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
+
+            <p>Are you sure you want to delete?</p>
+            <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
+            <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
+        </Dialog>
+
+
 
         <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
         </Dialog>
-        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany" @closeEditSpace="closeEditSpace($event)" />
+        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"
+                @closeEditSpace="closeEditSpace($event)" />
         </Dialog>
     </div>
 </template>
@@ -168,6 +177,7 @@ const closeEditSpace = (evn) => {
     justify-content: space-between;
     align-items: center;
 }
+
 /* Add your custom styles here */
 
 .breadCrumWrap {
@@ -175,6 +185,7 @@ const closeEditSpace = (evn) => {
     justify-content: center;
     gap: 5px;
     align-items: start;
+
     .text {
         line-height: 1;
     }
@@ -184,10 +195,12 @@ const closeEditSpace = (evn) => {
     border: 1px solid #ededed;
     border-radius: 10px;
     overflow: hidden;
+
     td {
         padding: 0.15rem 1rem !important;
     }
 }
+
 .table-dco thead tr {
     background: #ededed;
 }
