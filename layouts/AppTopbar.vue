@@ -1,6 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
+import clickOutside from '../composables/clickOutside';
 
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
@@ -9,7 +10,6 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
 import Notification from '../components/Notification.vue';
-
 const { layoutConfig, onMenuToggle } = useLayout();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
@@ -54,7 +54,6 @@ const topbarMenuClasses = computed(() => {
         'layout-topbar-menu-mobile-active': topbarMenuActive.value
     };
 });
-
 const bindOutsideClickListener = () => {
     if (!outsideClickListener.value) {
         outsideClickListener.value = (event) => {
@@ -83,6 +82,36 @@ const isOutsideClicked = (event) => {
 };
 
 // Profile
+
+const handleOutsideClick = () => {
+    showNotify.value = false;
+};
+
+// Register directive
+const vClickOutside = {
+    beforeMount(el, binding) {
+        el.clickOutsideEvent = (event) => {
+            if (!(el == event.target || el.contains(event.target))) {
+                binding.value(event);
+            }
+        };
+        document.body.addEventListener('click', el.clickOutsideEvent);
+    },
+    unmounted(el) {
+        document.body.removeEventListener('click', el.clickOutsideEvent);
+    }
+};
+
+// Add directive to DOM element
+onMounted(() => {
+    const element = document.querySelector('.relative');
+    vClickOutside.beforeMount(element, { value: handleOutsideClick });
+});
+
+onUnmounted(() => {
+    const element = document.querySelector('.relative');
+    vClickOutside.unmounted(element);
+});
 
 getUserData();
 // watch(userProfile, (oldValue, newValue) => {
