@@ -175,7 +175,7 @@ const closeEditSpace = (evn) => {
 .create-space-btn-wrapper {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    //align-items: center;
 }
 
 /* Add your custom styles here */
