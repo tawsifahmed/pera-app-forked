@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
-import clickOutside from '../composables/clickOutside';
+// import clickOutside from '../composables/clickOutside';
 
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
@@ -95,22 +95,22 @@ const vClickOutside = {
                 binding.value(event);
             }
         };
-        document.body.addEventListener('click', el.clickOutsideEvent);
+        document?.body.addEventListener('click', el.clickOutsideEvent);
     },
     unmounted(el) {
-        document.body.removeEventListener('click', el.clickOutsideEvent);
+        document?.body?.removeEventListener('click', el.clickOutsideEvent);
     }
 };
 
 // Add directive to DOM element
 onMounted(() => {
     const element = document.querySelector('.relative');
-    vClickOutside.beforeMount(element, { value: handleOutsideClick });
+    vClickOutside?.beforeMount(element, { value: handleOutsideClick });
 });
 
 onUnmounted(() => {
     const element = document.querySelector('.relative');
-    vClickOutside.unmounted(element);
+    vClickOutside?.unmounted(element);
 });
 
 getUserData();

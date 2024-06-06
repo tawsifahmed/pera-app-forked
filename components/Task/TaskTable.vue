@@ -1,8 +1,5 @@
 <script setup>
-definePageMeta({
-    middleware: 'auth',
-    layout: 'default'
-});
+
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';

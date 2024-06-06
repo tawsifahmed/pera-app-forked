@@ -1,6 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    typescript: false,
+    ssr: false,
+    runtimeConfig: {
+        public: {
+          apiUrl: process.env.API_URL,
+          // adminEmail: process.env.ADMIN_EMAIL,
+          // adminPassword: process.env.ADMIN_PASSWORD
+          // apiUrl: process.env.API_URL ?? 'http://localhost:8000'
+          // api end point => http://188.166.212.40/api/v1/
+        }
+      },
     app: {
         head: {
             title: 'Pera App',

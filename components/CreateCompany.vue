@@ -150,6 +150,9 @@ const handleCreateWorkspace = async () => {
             invite.value = null;
             workSpaceName.value = null;
             toast.add({ severity: 'success', summary: 'Company creation', detail: 'Company created successfully!', life: 3000 });
+            setTimeout(()=>{
+                location.reload();
+            },2000)
         } else {
             companyFormInputs.value = true;
             toast.add({ severity: 'error', summary: 'Company creation', detail: 'Company created Failed!', life: 3000 });
