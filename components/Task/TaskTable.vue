@@ -13,7 +13,7 @@ const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 
 const toast = useToast();
 
-const { taskStatus, statuslist } = storeToRefs(useCompanyStore());
+const { modStatusList, statuslist } = storeToRefs(useCompanyStore());
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 
@@ -26,9 +26,6 @@ const usersListStore = useCompanyStore();
 const filterAssignees = ref();
 
 const filterPriorities = ref();
-
-const mStatusList = ref([{ name: 'All', code: '' }, ...statuslist.value]);
-
 
 const filterStatus = ref();
 
@@ -116,8 +113,6 @@ const handleDateDelete2 = () => {
     changeAttribute()
 }
 
-
-
 onMounted(async () => {
     await getSingleProject(id);
     getUserlist();
@@ -177,7 +172,7 @@ const getUserlist = async () => {
         <!-- <pre>{{statuslist}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="mStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
             <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Filter Start Due Date" class="w-full md:w-17rem"/>
             <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
@@ -186,7 +181,7 @@ const getUserlist = async () => {
             <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="Filter End Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
         </div>
-        <Button @click="handleFilterReset" icon="pi " label="Reset" class="mr-2 mb-2" severity="secondary" />
+        <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-17rem mb-2" severity="secondary" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>

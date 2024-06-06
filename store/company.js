@@ -43,15 +43,16 @@ export const useCompanyStore = defineStore('workStation', {
     taskActivity:[],
 
     taskStatus:[],
-
+    
     users: [],
     tags: [],
     priorityList: [],
-
+    
     singleTaskComments: null,
     isTaskCommentCreated: false,
 
-    statuslist: []
+    statuslist: [],
+    modStatusList: [],
     
   }),
   
@@ -297,6 +298,7 @@ export const useCompanyStore = defineStore('workStation', {
         this.tasks = data.value?.tasks;
 
         this.statuslist = data.value?.taskStatus
+        this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
     },
 
     async createProject ({name, description, space_id, statuses}) {
