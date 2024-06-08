@@ -155,9 +155,8 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <div v-if="readTask" class="card">
-            <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
-        </div>
+        <TaskTable v-if="readTask" :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
+     
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

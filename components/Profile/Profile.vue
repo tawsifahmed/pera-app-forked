@@ -71,7 +71,7 @@ const handleImageUpload = (value) => {
             </FloatLabel>
         </div>
         <div class="col-12 mb-3 flex justify-content-center">
-            <Button type="submit" label="Submit" :loading="loading" />
+            <Button type="submit" label="Save" :loading="loading" />
         </div>
     </form>
 </template>
