@@ -167,15 +167,17 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-stR" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column field="name" sortable header="Role Name"></Column>
+            <Column style="text-wrap: nowrap;" field="name" sortable header="Role Name"></Column>
             <Column field="permissions" sortable header="Permission">
             <template #body="slotProps">
-                <div v-for="perrmission in slotProps.data.permissions" :key="permission">
-                    <div class="">{{ perrmission.name }}</div>
+                <div style="display: flex; flex-wrap:wrap; gap: 5px;">
+                    <div class="border rounded" v-for="perrmission in slotProps.data.permissions" :key="permission" style=" border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px;">
+                        <p>{{ perrmission.name }}</p>
+                    </div>
                 </div>
             </template>
             </Column>
@@ -207,13 +209,16 @@ initFilters();
     </div>
 </template>
 
-<style lang="scss" scoped>
-.table-st {
+<style lang="scss" >
+.table-stR {
     border: 1px solid #ededed;
     border-radius: 10px;
     overflow: hidden;
+    .p-datatable-tbody{
+        vertical-align: top !important;
+    }
 }
-.table-st thead tr {
+.table-stR thead tr {
     background: #ededed;
 }
 </style>

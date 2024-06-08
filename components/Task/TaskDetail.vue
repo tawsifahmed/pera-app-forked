@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useClockStore } from '~/store/clock';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
+import accessPermission from "~/composables/usePermission";
 
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
@@ -20,6 +21,7 @@ const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetail
 
 const toast = useToast();
 const btnLoading = ref(false);
+const updateTaskP = ref(accessPermission('update_task'));
 
 const assignees = ref(singleTask?.data?.assigneeObj);
 
@@ -410,7 +412,7 @@ const handleShareTaskId = () => {
                                 <Textarea id="description" v-model="description" rows="4" cols="20" />
                             </div>
 
-                            <div class="flex justify-content-end">
+                            <div v-if="updateTaskP" class="flex justify-content-end">
                                 <Button type="submit" label="Save" />
                             </div>
                         </form>
@@ -446,11 +448,11 @@ const handleShareTaskId = () => {
                                             </div>
                                         </a>
                                         <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
-                                            <i class="pi pi-times text-xs"></i>
+                                            <i class="pi pi-times text-xs text-white"></i>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex gap-2 w-full justify-content-center">
+                                <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
                                     <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
                                     <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
                                 </div>

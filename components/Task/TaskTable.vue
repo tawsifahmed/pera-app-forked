@@ -1,42 +1,28 @@
 <script setup>
-
-
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from "~/composables/usePermission";
+import Column from 'primevue/column';
+const usersListStore = useCompanyStore();
+const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
+const { modStatusList, statuslist } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
-
-const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
-
 const toast = useToast();
-
-const { modStatusList, statuslist } = storeToRefs(useCompanyStore());
-
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-
 const { tasks } = defineProps(['tasks']);
-
-import Column from 'primevue/column';
-
-const usersListStore = useCompanyStore();
+const route = useRoute();
+const id = route.params?.projects;
 
 const filterAssignees = ref();
-
 const filterPriorities = ref();
-
 const filterStatus = ref();
-
 const filterStartDueDate = ref();
-
 const filterEndDueDate = ref();
-
 const filterSearch = ref();
-
 const usersLists = ref({});
-const selectedStatus = ref();
 
 const priorities = ref([
     { name: 'All', code: '' },
@@ -46,9 +32,8 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
-const route = useRoute();
 
-const id = route.params?.projects;
+
 
 const userI = ref()
 const prio = ref()
@@ -76,7 +61,7 @@ const handleFilterReset = () => {
 }
 
 const changeAttribute = async () => {
-    userI.value = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
+        userI.value = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
         prio.value = filterPriorities.value ? filterPriorities.value.code : '';
         sta.value = filterStatus.value ? filterStatus.value.id : '';
         que.value = filterSearch.value;
