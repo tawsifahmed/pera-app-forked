@@ -189,7 +189,7 @@ const getUserlist = async () => {
     <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
+        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '50%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
@@ -320,6 +320,12 @@ const getUserlist = async () => {
     justify-content: start;
     gap: 10px;
     border-bottom: 0.5px solid rgb(230, 229, 229);
+}
+
+.tone{
+    overflow: hidden !important;
+    /*text-overflow: ellipsis !important;*/  
+    white-space: nowrap !important;
 }
 .task-status {
     display: inline-block;
