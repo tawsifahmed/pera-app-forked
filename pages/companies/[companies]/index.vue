@@ -51,11 +51,11 @@ const deletingSpace = async () => {
     await deleteSpace(refSpaceId.value, companies);
 
     if (isSpaceDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Deleted Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteSpaceDialog.value = false;
         console.log('space deleted');
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
         console.log('space not deleted');
     }
 };
@@ -89,6 +89,7 @@ const closeEditSpace = (evn) => {
 <template>
     <!-- <pre class="">{{ singleCompany.name }}</pre> -->
     <div class="card">
+        <Toast position="bottom-right" group="br" />
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <div class="breadCrumWrap">

@@ -96,9 +96,9 @@ const handleSubmitData = async () => {
                 password.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Created successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Created successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Created Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Created Failed!', group: 'br', life: 3000 });
             }
         }
     }

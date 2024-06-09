@@ -87,10 +87,10 @@ const handleCreateTask = async () => {
             showFinalMsg.value = true;
             name.value = null;
             emit('closeCreateModal', false);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', group: 'br', life: 3000 });
         } else {
             btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', group: 'br', life: 3000 });
         }
     }
 };

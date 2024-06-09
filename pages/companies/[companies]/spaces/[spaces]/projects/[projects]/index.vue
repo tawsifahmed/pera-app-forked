@@ -91,11 +91,11 @@ const deletingTask = async () => {
     await deleteTask(refTaskId.value, projects);
     if (isTaskDeleted.value === true) {
         btnLoading.value = false;
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
         deleteTaskDialog.value = false;
     } else {
         btnLoading.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete task', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete task', group: 'br', life: 3000 });
     }
 };
 
@@ -142,6 +142,7 @@ watchEffect(() => {
 
 <template>
     <div class="card">
+        <Toast position="bottom-right" group="br" />
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>

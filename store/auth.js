@@ -29,13 +29,13 @@ export const useAuthStore = defineStore('auth', {
       console.log('loginErrData', error.value?.data)
       
       if(error.value){
-        if(error.value.data.code === 403) {
+        if(error.value?.data?.code === 403) {
           this.checkOTP = true;
           this.resendOtpMsg = error.value.data.message;
         }
       }
       if(error.value){
-        if(error.value.data.code === 401) {
+        if(error.value?.data?.code === 401) {
           this.authenticated = false;
         }
       }
@@ -52,7 +52,6 @@ export const useAuthStore = defineStore('auth', {
           rolePermission.value = data?.value?.permissions;
           this.authenticated = true; //  authenticated state value to true
         }else{
-          const token = useCookie('token');
           this.authenticated = false;
           token.value = '';
         }
@@ -77,8 +76,7 @@ export const useAuthStore = defineStore('auth', {
         this.checkOTP = false;
       }
     },
-    async registerInviteUser({ id,userName, email, password, confirmPass }) {
-  
+    async registerInviteUser({ id,userName, email, password, confirmPass }) {  
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
           'password_confirmation' : confirmPass
         },
       });
-      if (data.value?.message === 'User registered successfully') {
+      if (data.value?.message === 'User registered successfully')  {
         this.checkOTP = true;
         this.resendOtp({ email })
       }

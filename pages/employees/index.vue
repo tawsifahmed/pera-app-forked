@@ -112,9 +112,9 @@ const confirmDeleteEmployee = async () => {
 
     if (data.value.code === 200) {
         visibleDeleteEmployee.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', group: 'br', life: 3000 });
     }
     init();
 };
@@ -170,6 +170,8 @@ initFilters();
 <template>
     <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
+            <Toast position="bottom-right" group="br" />
+
             <!-- <pre>{{rolePermission}}</pre> -->
             <h4 class="mb-0">Create Employee</h4>
         </div>

@@ -96,7 +96,7 @@ const handleCreateProject = async () => {
         await project.createProjects(createProjectData);
         if(save.value === true){
             companyFormInputs.value = false
-            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project create successfully!', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project create successfully!', group: 'br', life: 3000 });
             projectNameInput.value = null;
             projectDescriptionInput.value = null;
             taskStatusList.value = [
@@ -117,7 +117,7 @@ const handleCreateProject = async () => {
                 },
             ];
         }else{
-            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project create Failed!', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project create Failed!', group: 'br', life: 3000 });
         }
     }
 }

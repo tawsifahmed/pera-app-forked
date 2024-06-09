@@ -26,6 +26,7 @@ const visibleProfile = ref(false);
 const showNotify = ref(false);
 const logout = () => {
     logUserOut();
+    location.reload();
     router.push('/login');
     // location.reload();
 };
@@ -126,6 +127,7 @@ const openProfile = () => {
 
 <template>
     <div class="layout-topbar">
+        <Toast position="bottom-right" group="br" />
         <router-link to="/" class="layout-topbar-logo">
             <img src="/demo/images/login/avatar.png" alt="logo" />
         </router-link>
