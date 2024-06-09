@@ -310,8 +310,13 @@ const handleShare = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
         return;
     } else {
+        const el = document.createElement('textarea');
+        el.value = 'http://localhost:3000/sharedtask/' + data.value.shared_token;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
         toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', group: 'br', life: 3000 });
-        navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         return;
     }
     console.log(data.value.shared_token);
@@ -320,7 +325,12 @@ const handleShare = async () => {
 
 const handleShareTaskId = () => {
     if(singleTask?.key){
-        navigator.clipboard.writeText(singleTask.key);
+        const el = document.createElement('textarea');
+        el.value = singleTask?.unique_id;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
         toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', group: 'br', life: 3000 });
 
     }else{
@@ -337,7 +347,10 @@ const handleShareTaskId = () => {
                 <!-- <pre>{{singleTask}}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
-                    <h5 class="m-0">
+                    <h5 v-tooltip.top="{ value: `${singleTask.data.name}`, pt: {
+                        
+                        width: '200px',
+                    }  }" class="m-0 detail-task-name cursor-pointer">
                         {{ singleTask.data.name }}
                     </h5>
                     <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
@@ -869,5 +882,11 @@ input[type='file']::file-selector-button:hover {
 
 .attch-w {
     visibility: hidden;
+}
+
+.detail-task-name{
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 </style>
