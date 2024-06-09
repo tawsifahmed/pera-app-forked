@@ -118,7 +118,7 @@ const handleTaskDetailSubmit = async () => {
         name: singleTask.data.name,
         description: description.value,
         project_id: projID,
-        due_date: dueDate.value,
+        dueDate: dueDate.value,
         priority: priority.value.name,
         assignees: assignees.value.map((obj) => obj.id),
         tags: tags.value.map((obj) => obj.id)
