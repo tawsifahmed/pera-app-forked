@@ -66,9 +66,9 @@ const handleSubmitData = async () => {
                 employeeForm.value = false;
                 emit('closeInviteModal', false);
                 isButtonLoading.value = false;
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invited successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invited successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invited Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invited Failed!', group: 'br', life: 3000 });
             }
         }
     }

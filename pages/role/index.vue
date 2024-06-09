@@ -26,7 +26,6 @@ import Dialog from 'primevue/dialog';
 
 const visibleCreateRole = ref(false);
 
-
 const visibleEditRole = ref(false);
 
 const rolesLists = ref([]);
@@ -35,13 +34,10 @@ const permissionsList = ref([]);
 
 const slctdPermissions = ref([]);
 
-const visibleDeleteRole = ref(false);
-
 const id = ref('');
 
 const name = ref('');
 
-const email = ref('');
 
 
 const closeCreateModal = (evn) => {
@@ -73,33 +69,7 @@ const editRole = (data) => {
                 }
             })
         })
-    }
-    console.log('slctdPermissions', slctdPermissions.value)
-    // console.log('permissionsList', permissionsList.value)
-    
-};
-
-const deleteRole = (key) => {
-    visibleDeleteRole.value = true;
-    id.value = key;
-};
-
-const confirmDeleteRole = async () => {
-    const token = useCookie('token');
-    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/delete/${id.value}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${token.value}`
-        }
-    });
-
-    if (data.value.code === 200) {
-        visibleDeleteRole.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', life: 3000 });
-    } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', life: 3000 });
-    }
-    init();
+    }    
 };
 
 const init = async () => {
@@ -146,6 +116,7 @@ initFilters();
 
 <template>
     <div v-if="readRole" class="card">
+        <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
             <h5 class="mb-1">User Role</h5>
         </div>
@@ -199,12 +170,6 @@ initFilters();
         <!-- Edit -->
         <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoleEditRole :param="{ id, name, permissionsList, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
-        </Dialog>
-
-        <Dialog v-model:visible="visibleDeleteRole" header=" " :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="visibleDeleteRole = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteRole" />
         </Dialog>
     </div>
 </template>

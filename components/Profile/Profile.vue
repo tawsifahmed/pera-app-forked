@@ -20,9 +20,9 @@ const handleSubmit = async () => {
     loading.value = true;
     const response = await updateUser(userId.value, userName.value, phone.value, email.value, address.value, uploadedImage.value);
     if (response?.code === 200) {
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Success', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Success', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Profile Updated Failed', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Profile Updated Failed', group: 'br', life: 3000 });
     }
     loading.value = false;
 };

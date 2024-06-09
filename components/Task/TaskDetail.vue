@@ -88,12 +88,12 @@ const handleTaskComment = async () => {
     btnLoading.value = true;
     await addTaskComment(singleTask.key, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
         btnLoading.value = false;
         commentFile.value = null;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', group: 'br', life: 3000 });
         btnLoading.value = false;
     }
 };
@@ -127,11 +127,11 @@ const handleTaskDetailSubmit = async () => {
     await editTask(taskDetailData);
 
     if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
         // taskEditDescriptionInput.value = null;
         selectedfile.value = null;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
     }
 };
 
@@ -147,10 +147,10 @@ const uploadFile = async () => {
     }
     await fileUpload(singleTask.key, file.value);
     if (isFileUpload.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', group: 'br', life: 3000 });
         getTaskDetails(singleTask.key);
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', group: 'br', life: 3000 });
     }
 };
 
@@ -197,10 +197,10 @@ async function changeStatusData(status) {
 
         if (data.value?.app_message === 'success') {
             getTaskDetails(singleTask.key);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', group: 'br', life: 3000 });
             emit('updateTaskTable');
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -227,9 +227,9 @@ async function changeBounceStatusData(selectedBncStatus) {
 
         if (data.value?.app_message === 'success') {
             getTaskDetails(singleTask.key);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', group: 'br', life: 3000 });
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -277,10 +277,10 @@ const deleteFile = async (id) => {
     await fileDelete(id);
 
     if (isFileDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', group: 'br', life: 3000 });
         getTaskDetails(singleTask.key);
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', group: 'br', life: 3000 });
     }
 };
 const fileInput = ref(null);
@@ -310,7 +310,7 @@ const handleShare = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
         return;
     } else {
-        toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', group: 'br', life: 3000 });
         navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         return;
     }
@@ -321,10 +321,10 @@ const handleShare = async () => {
 const handleShareTaskId = () => {
     if(singleTask?.key){
         navigator.clipboard.writeText(singleTask.key);
-        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', group: 'br', life: 3000 });
 
     }else{
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
     
     }
 };

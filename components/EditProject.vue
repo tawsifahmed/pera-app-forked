@@ -126,9 +126,9 @@ const handleCreateProject = async () => {
         await editProject(createProjectData);
         if(isProjectEdited.value === true){
             emit('closeEditProject', false);
-            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', group: 'br', life: 3000 });
         }else{
-            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', group: 'br', life: 3000 });
         }
     }
 }

@@ -91,10 +91,10 @@ const handleUpdateTask = async () => {
             emit('closeEditModal', false);
 
             emit('visibleEdit', 'visibleEdit');
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', group: 'br', life: 3000 });
         } else {
             btnLoading.value = false;
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', group: 'br', life: 3000 });
         }
     }
 };

@@ -96,9 +96,9 @@ const handleSubmitData = async () => {
             if (data.value.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Updated Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Updated Failed!', group: 'br', life: 3000 });
             }
         }
     }

@@ -47,10 +47,10 @@ const handleCreateSpace = async () => {
             spaceDescripInput.value = null;
             spaceAvatarPreview.value = '#8080805c';
             spaceColorPreview.value = null;
-            toast.add({ severity: 'success', summary: 'Space creation', detail: 'Space created successfully!', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Space creation', detail: 'Space created successfully!', group: 'br', life: 3000 });
         } else {
             spaceFormInputs.value = true;
-            toast.add({ severity: 'error', summary: 'Space creation', detail: 'Space created Failed!', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Space creation', detail: 'Space created Failed!', group: 'br', life: 3000 });
         }
     }
 };

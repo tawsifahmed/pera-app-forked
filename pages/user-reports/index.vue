@@ -23,7 +23,7 @@ const handleReportDownload = async () => {
         link.target = '_blank';
         link.click();
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
     console.log('start Date: ', startDate.value, 'end Date: ', endDate.value, 'employee: ', employee.value);
 
@@ -65,6 +65,7 @@ onMounted(() => {
 <template>
     <div class="card">
         <!-- <pre>{{ usersListStore }}</pre> -->
+        <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
             <h5 class="mb-1">User Wise Reports</h5>
         </div>
