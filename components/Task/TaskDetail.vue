@@ -311,7 +311,7 @@ const handleShare = async () => {
         return;
     } else {
         const el = document.createElement('textarea');
-        el.value = 'http://localhost:3000/sharedtask/' + data.value.shared_token;
+        el.value = 'http://188.166.212.40/sharedTask/' + data.value.shared_token;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
