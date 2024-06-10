@@ -28,7 +28,7 @@
         <br />
         <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
         <div class="create-btn-wrapper">
-            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" />
+            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" :loading="btnLoading" />
         </div>
     </div>
 </template>
@@ -37,7 +37,7 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { createTask } = useCompanyStore();
-const { isTaskCreated } = storeToRefs(useCompanyStore());
+const { isTaskCreated, detectDuplicateTask } = storeToRefs(useCompanyStore());
 const { createTaskTitle, taskId, projects, usersLists, tagsLists } = defineProps(['createTaskTitle', 'taskId', 'projects', 'usersLists', 'tagsLists']);
 const toast = useToast();
 const btnLoading = ref(false);
@@ -81,13 +81,17 @@ const handleCreateTask = async () => {
             parent_task_id: taskId
         };
         await createTask(createTaskData);
-        if (isTaskCreated.value === true) {
+        if(detectDuplicateTask.value === true){
+            btnLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Task already exists!', group: 'br', life: 3000 });
+        }
+        else if (isTaskCreated.value === true) {
             btnLoading.value = false;
             spaceFormInputs.value = false;
             showFinalMsg.value = true;
             name.value = null;
             emit('closeCreateModal', false);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task created Successfully', group: 'br', life: 3000 });
         } else {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', group: 'br', life: 3000 });

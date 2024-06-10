@@ -98,28 +98,50 @@ const handleDateDelete2 = () => {
     changeAttribute()
 }
 
-const downloadTaskSheet = async (taskLists) =>{
-    const csvContent = "data:text/csv;charset=utf-8," +
-        "Serial No,Unique ID,Task Name,Assignee,Priority,Status,Due Date,Overdue\n" +
-        taskLists.map((task, index) => {
-            const serialNo = index + 1;
-            const uniqueId = task.unique_id;
-            const taskName = task.data.name;
-            const assignee = task.data.assigneeObj.name;
-            const priority = task.data.priority;
-            const status = task.data.status.name;
-            const dueDate = task.data.dueDateValue;
-            const isOverDue = task.data.is_overdue ? "Yes" : "No";
-            return [serialNo, uniqueId, taskName, assignee, priority, status, dueDate, isOverDue].join(",");
-        }).join("\n");
+const loading = ref(false);
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "tasks.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+const downloadTaskSheet = (taskLists) =>{
+    loading.value = true;
+    // console.log('lod', loading.value);
+    if(taskLists.length > 0){
+        const csvContent = "data:text/csv;charset=utf-8," +
+            "Serial No,Unique ID,Task Name,Assignee,Priority,Status,Due Date,Overdue\n" +
+            taskLists.map((task, index) => {
+                const serialNo = index + 1;
+                const uniqueId = task.unique_id;
+                const taskName = task.data.name;
+                const assignee = task.data.assigneeObj.name;
+                const priority = task.data.priority;
+                const status = task.data.status.name;
+                const dueDate = task.data.dueDateValue;
+                const isOverDue = task.data.is_overdue ? "Yes" : "No";
+                return [serialNo, uniqueId, taskName, assignee, priority, status, dueDate, isOverDue].join(",");
+            }).join("\n");
+    
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "tasks.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        loading.value = false;
+    }else{
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
+    }
+    
+
+    // link.addEventListener('click', () => {
+    //     loading.value = false;
+    //     toast.add({ severity: 'success', summary: 'Success', detail: 'CSV downloaded', group: 'br', life: 3000 });
+    // });
+
+    // link.addEventListener('error', () => {
+    //     loading.value = false;
+    //     toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to download CSV', group: 'br', life: 3000 });
+    // });
 }
 
 onMounted(async () => {
@@ -174,6 +196,13 @@ const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
 };
+
+const load = () => {
+    loading.value = true;
+    setTimeout(() => {
+        loading.value = false;
+    }, 2000);
+};
 </script>
 
 <template>
@@ -195,7 +224,8 @@ const getUserlist = async () => {
     <Toolbar class="border-0 px-0">
         <template #start>
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+            <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
+            <Button type="button" v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" v-tooltip.right="{ value: `Download Tasks` }" icon="pi pi-file-excel" :loading="loading" label="" class="mr-2" severity="secondary" :style="`${loading === true ? 'backGround: red' : '' }`" />
             <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>
