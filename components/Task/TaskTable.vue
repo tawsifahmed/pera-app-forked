@@ -98,6 +98,30 @@ const handleDateDelete2 = () => {
     changeAttribute()
 }
 
+const downloadTaskSheet = async (taskLists) =>{
+    const csvContent = "data:text/csv;charset=utf-8," +
+        "Serial No,Unique ID,Task Name,Assignee,Priority,Status,Due Date,Overdue\n" +
+        taskLists.map((task, index) => {
+            const serialNo = index + 1;
+            const uniqueId = task.unique_id;
+            const taskName = task.data.name;
+            const assignee = task.data.assigneeObj.name;
+            const priority = task.data.priority;
+            const status = task.data.status.name;
+            const dueDate = task.data.dueDateValue;
+            const isOverDue = task.data.is_overdue ? "Yes" : "No";
+            return [serialNo, uniqueId, taskName, assignee, priority, status, dueDate, isOverDue].join(",");
+        }).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "tasks.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 onMounted(async () => {
     await getSingleProject(id);
     getUserlist();
@@ -154,7 +178,7 @@ const getUserlist = async () => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{statuslist}}</pre> -->
+        <!-- <pre>{{tasks}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
@@ -171,7 +195,7 @@ const getUserlist = async () => {
     <Toolbar class="border-0 px-0">
         <template #start>
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button v-if="downloadTaskP" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+            <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
             <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>
