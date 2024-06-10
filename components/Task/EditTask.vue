@@ -73,6 +73,9 @@ const handleUpdateTask = async () => {
         btnLoading.value = false;
     } else {
         EditErrorHandler.value = false;
+        const selectedDate = new Date(dueDate.value);
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        dueDate.value = selectedDate.toISOString(); 
         const editTaskData = {
             id: singleTask.key,
             name: taskNameEditInput.value,
@@ -95,7 +98,7 @@ const handleUpdateTask = async () => {
             emit('closeEditModal', false);
 
             emit('visibleEdit', 'visibleEdit');
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task updated Successfully', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task updated Successfully', group: 'br', life: 3000 });
         } else {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task!', group: 'br', life: 3000 });

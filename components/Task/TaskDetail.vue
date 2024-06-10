@@ -113,6 +113,9 @@ const formattedTime = (time) => {
 };
 
 const handleTaskDetailSubmit = async () => {
+    const selectedDate = new Date(dueDate.value);
+    selectedDate.setDate(selectedDate.getDate() + 1);
+    dueDate.value = selectedDate.toISOString(); 
     const taskDetailData = {
         id: singleTask.key,
         name: singleTask.data.name,

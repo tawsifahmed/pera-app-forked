@@ -30,6 +30,10 @@ const editCompany = (id) => {
     refCompanyId.value = id;
 };
 
+const closeEditModal = (evn) => {
+    visibleEditCompany.value = evn;
+};
+
 const deleteCompanyDialog = ref(false);
 
 const dltConfrimPressed = ref(false);
@@ -119,7 +123,7 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                    
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
+                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
                     <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                 </template>
             </Column>
@@ -131,8 +135,8 @@ initFilters();
             <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleEditCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditCompany :refCompanyId="refCompanyId" />
+        <Dialog v-model:visible="visibleEditCompany" modal header="Edit Company" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <EditCompany :refCompanyId="refCompanyId"  @closeEditModal="closeEditModal($event)"/>
         </Dialog>
     </div>
 </template>

@@ -11,19 +11,23 @@
         </div> -->
         <div class="field">
             <label>Assignees</label>
-            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
+            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
+                placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
             <label>Tags</label>
-            <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name" placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
+            <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
+                placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
             <label>Due Date</label>
-            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
+            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
         </div>
         <div class="field">
+            <pre>{{ dueDate }}</pre>
             <label>Priority</label>
-            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority" class="w-full" />
+            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
+                class="w-full" />
         </div>
         <br />
         <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
@@ -71,6 +75,9 @@ const handleCreateTask = async () => {
         btnLoading.value = false;
     } else {
         errorHandler.value = false;
+        const selectedDate = new Date(dueDate.value);
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        dueDate.value = selectedDate.toISOString(); 
         const createTaskData = {
             name: name.value,
             dueDate: dueDate.value,
@@ -81,7 +88,7 @@ const handleCreateTask = async () => {
             parent_task_id: taskId
         };
         await createTask(createTaskData);
-        if(detectDuplicateTask.value === true){
+        if (detectDuplicateTask.value === true) {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Task already exists!', group: 'br', life: 3000 });
         }

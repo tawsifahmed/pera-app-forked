@@ -134,6 +134,7 @@ export const useCompanyStore = defineStore('workStation', {
         if(data.value?.app_message === 'success'){
           this.isCompanyEdited = true;
           this.getCompanyList();
+          await companies.getCompany()
         }
 
     },
