@@ -40,7 +40,7 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { editTask } = useCompanyStore();
-const { isTaskEdited } = storeToRefs(useCompanyStore());
+const { isTaskEdited, detectDuplicateTask } = storeToRefs(useCompanyStore());
 const { singleTask, usersLists, tagsLists, projects } = defineProps(['singleTask', 'usersLists', 'tagsLists', 'projects']);
 const toast = useToast();
 const btnLoading = ref(false);
@@ -86,7 +86,11 @@ const handleUpdateTask = async () => {
         console.log('editTaskData', editTaskData);
 
         await editTask(editTaskData);
-        if (isTaskEdited.value === true) {
+        if(detectDuplicateTask.value === true){
+            btnLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Cannnot edit, edited task name already exists!', group: 'br', life: 3000 });
+        }
+        else if (isTaskEdited.value === true) {
             btnLoading.value = false;
             emit('closeEditModal', false);
 

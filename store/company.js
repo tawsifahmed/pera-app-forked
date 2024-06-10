@@ -386,7 +386,7 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           },
         });
-        
+
         if(error.value){
           if(error.value.data.code === 400){
             this.detectDuplicateTask = true
@@ -405,7 +405,7 @@ export const useCompanyStore = defineStore('workStation', {
     async editTask ({id, name, description, project_id, dueDate, priority, assignees, tags}) {
       
       const token = useCookie('token'); 
-      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
+      const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token.value}`,
@@ -422,12 +422,26 @@ export const useCompanyStore = defineStore('workStation', {
           // 'attachments' : attachments,
         },
       });
-       
-        if(data.value?.app_message === 'success'){
-          console.log('dataAttach', data)
+
+      if(error.value){
+        if(error.value.data.code === 400){
+          this.detectDuplicateTask = true
+          this.isTaskEdited = false;
+        }
+      }
+      if(data.value){
+        if(data.value.code === 200){
           this.isTaskEdited = true;
+          this.detectDuplicateTask = false
           this.getSingleProject(project_id);
         }
+      }
+       
+        // if(data.value?.app_message === 'success'){
+        //   console.log('dataAttach', data)
+        //   this.isTaskEdited = true;
+        //   this.getSingleProject(project_id);
+        // }
 
     },
     async deleteTask (taskID, projectId) {
