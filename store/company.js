@@ -386,15 +386,17 @@ export const useCompanyStore = defineStore('workStation', {
           'description' : description,
           },
         });
-
+        
         if(error.value){
           if(error.value.data.code === 400){
             this.detectDuplicateTask = true
+            this.isTaskCreated = false;
           }
         }
         if(data.value){
           if(data.value.code === 201){
             this.isTaskCreated = true;
+            this.detectDuplicateTask = false
             this.getSingleProject(project_id);
           }
         }
