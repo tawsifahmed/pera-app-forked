@@ -310,6 +310,7 @@ const handleShare = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
         return;
     } else {
+        // navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         const el = document.createElement('textarea');
         el.value = 'http://188.166.212.40/sharedTask/' + data.value.shared_token;
         document.body.appendChild(el);
@@ -325,6 +326,7 @@ const handleShare = async () => {
 
 const handleShareTaskId = () => {
     if(singleTask?.key){
+        // navigator.clipboard.writeText(singleTask?.key);
         const el = document.createElement('textarea');
         el.value = singleTask?.unique_id;
         document.body.appendChild(el);

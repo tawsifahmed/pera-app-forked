@@ -65,7 +65,7 @@ if (readDashboard.value) {
 if (readEmployee.value) {
     const settings = model.value.find(item => item.option === 'settings_option');
     if (settings) {
-        settings.items.unshift({ label: 'Employee', icon: 'pi pi-fw pi-users', to: '/employees' });
+        settings.items.unshift({ label: 'Employees', icon: 'pi pi-fw pi-users', to: '/employees' });
     }
 }
 
