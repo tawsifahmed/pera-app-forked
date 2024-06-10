@@ -73,9 +73,11 @@ const handleUpdateTask = async () => {
         btnLoading.value = false;
     } else {
         EditErrorHandler.value = false;
-        const selectedDate = new Date(dueDate.value);
+        if(dueDate.value){
+            const selectedDate = new Date(dueDate.value);
         selectedDate.setDate(selectedDate.getDate() + 1);
         dueDate.value = selectedDate.toISOString(); 
+        }
         const editTaskData = {
             id: singleTask.key,
             name: taskNameEditInput.value,

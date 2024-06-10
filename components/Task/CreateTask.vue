@@ -24,7 +24,6 @@
             <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
         </div>
         <div class="field">
-            <pre>{{ dueDate }}</pre>
             <label>Priority</label>
             <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
                 class="w-full" />
@@ -67,7 +66,7 @@ const priorities = ref([
 ]);
 
 const emit = defineEmits(['closeCreateModal']);
-
+console.log('duedate id', dueDate.value);
 const handleCreateTask = async () => {
     btnLoading.value = true;
     if (name.value === null) {
@@ -75,9 +74,11 @@ const handleCreateTask = async () => {
         btnLoading.value = false;
     } else {
         errorHandler.value = false;
-        const selectedDate = new Date(dueDate.value);
+        if(dueDate.value){
+            const selectedDate = new Date(dueDate.value);
         selectedDate.setDate(selectedDate.getDate() + 1);
         dueDate.value = selectedDate.toISOString(); 
+        }
         const createTaskData = {
             name: name.value,
             dueDate: dueDate.value,
