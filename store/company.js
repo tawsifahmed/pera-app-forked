@@ -149,7 +149,10 @@ export const useCompanyStore = defineStore('workStation', {
       });
         if(data.value?.app_message === 'success'){
           this.isCompanyDeleted = true;
+          localStorage.removeItem('userCompany')
+          await companies.getCompany()
           this.getCompanyList();
+          // this.getSingleCompany(id);
         }
 
     },

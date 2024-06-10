@@ -152,7 +152,7 @@ const handleCreateWorkspace = async () => {
             toast.add({ severity: 'success', summary: 'Company creation', detail: 'Company created successfully!', group: 'br', life: 3000 });
             setTimeout(()=>{
                 location.reload();
-            },2000)
+            },2000) 
         } else {
             companyFormInputs.value = true;
             toast.add({ severity: 'error', summary: 'Company creation', detail: 'Company created Failed!', group: 'br', life: 3000 });

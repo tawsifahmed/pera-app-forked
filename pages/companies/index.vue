@@ -12,7 +12,7 @@ import Toast from 'primevue/toast';
 const filters = ref();
 const loading = ref(true);
 const toast = useToast();
-
+const router = useRouter();
 const visibleCreateCompany = ref(false);
 const visibleEditCompany = ref(false);
 
@@ -58,6 +58,7 @@ const deletingCompany = async () => {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
         console.log('company deleted');
+        router.push('/')
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', group: 'br', life: 3000 });
         console.log('company not deleted');

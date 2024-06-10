@@ -1,12 +1,15 @@
 <script setup>
 import { useLayout } from '@/layouts/composables/layout';
 import { onMounted, reactive, ref, watch } from 'vue';
-
-
+import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore()); 
+
+const readEmployee = ref(accessPermission('read_user'))
+const readRole = ref(accessPermission('read_role'))
+const readTags = ref(accessPermission('read_tags'))
 
 definePageMeta({
       middleware: 'auth',
@@ -146,7 +149,7 @@ watch(
     <div class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink to="companies" class="flex justify-content-between mb-3">
+                <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
                         <div class="text-900 font-medium text-xl">1</div>
@@ -159,7 +162,8 @@ watch(
                 <!-- <span class="text-500">since last visit</span> -->
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
@@ -170,8 +174,8 @@ watch(
                         <i class="pi pi-folder-open text-orange-500 text-xl"></i>
                     </div>
                 </div>
-                <!-- <span class="text-green-500 font-medium">%52+ </span> -->
-                <!-- <span class="text-500">since last week</span> -->
+                <span class="text-green-500 font-medium">%52+ </span>
+                <span class="text-500">since last week</span>
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -185,21 +189,52 @@ watch(
                         <i class="pi pi-inbox text-cyan-500 text-xl"></i>
                     </div>
                 </div>
-                <!-- <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500">newly registered</span> -->
+                <span class="text-green-500 font-medium">520 </span>
+                <span class="text-500">newly registered</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+        
+        <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
+                <NuxtLink to="/employees" class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">Users</span>
-                        <div class="text-900 font-medium text-xl">152 Unread</div>
+                        <span class="block text-500 font-medium mb-3">Employees</span>
+                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
-                </div>
+                </NuxtLink>
+                <!-- <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span> -->
+            </div>
+        </div>
+        <div v-if="readRole" class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <NuxtLink to="/roles" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Roles</span>
+                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-user-edit text-red-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
+                <!-- <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span> -->
+            </div>
+        </div>
+        <div v-if="readTags" class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <NuxtLink to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Tags</span>
+                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-tags text-green-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
                 <!-- <span class="text-green-500 font-medium">85 </span>
                 <span class="text-500">responded</span> -->
             </div>
@@ -314,12 +349,14 @@ watch(
             </div>
         </div>
          -->
-        <div class="col-12 xl:col-6">
+
+
+         <!-- <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
             </div>
-            <!-- <div class="card">
+            <div class="card">
                 <div class="flex align-items-center justify-content-between mb-4">
                     <h5>Notifications</h5>
                     <div>
@@ -380,8 +417,8 @@ watch(
                 <div class="mt-4 mr-auto md:mt-0 md:mr-0">
                     <a href="https://www.primefaces.org/primeblocks-vue" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised"> Get Started </a>
                 </div>
-            </div> -->
-        </div>
+            </div>
+        </div> -->
         <div v-if="visibleCreateCompany">
             <CreateCompany/>
         </div>
