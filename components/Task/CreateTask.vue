@@ -74,10 +74,10 @@ const handleCreateTask = async () => {
         btnLoading.value = false;
     } else {
         errorHandler.value = false;
-        if(dueDate.value){
+        if (dueDate.value) {
             const selectedDate = new Date(dueDate.value);
-        selectedDate.setDate(selectedDate.getDate() + 1);
-        dueDate.value = selectedDate.toISOString(); 
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            dueDate.value = selectedDate.toISOString();
         }
         const createTaskData = {
             name: name.value,

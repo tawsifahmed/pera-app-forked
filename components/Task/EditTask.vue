@@ -4,7 +4,8 @@
             <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name</label>
-                <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15" :invalid="spaceDescriptionError" />
+                <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15"
+                    :invalid="spaceDescriptionError" />
             </div>
             <!-- <div class="field">
                 <label for="company">Set Task Name</label>
@@ -12,23 +13,27 @@
             </div> -->
             <div class="field">
                 <label>Assignees</label>
-                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
+                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
+                    placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
                 <label>Tags</label>
-                <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name" placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
+                <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
+                    placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
             </div>
             <div class="field">
                 <label>Priority</label>
-                <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority" class="w-full" />
+                <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
+                    class="w-full" />
             </div>
 
             <br />
-            <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields</p>
+            <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields
+            </p>
             <div class="create-btn-wrapper">
                 <Button label="Update" icon="pi pi-check" text="" @click="handleUpdateTask" :loading="btnLoading" />
             </div>
@@ -73,10 +78,10 @@ const handleUpdateTask = async () => {
         btnLoading.value = false;
     } else {
         EditErrorHandler.value = false;
-        if(dueDate.value){
+        if (dueDate.value) {
             const selectedDate = new Date(dueDate.value);
-        selectedDate.setDate(selectedDate.getDate() + 1);
-        dueDate.value = selectedDate.toISOString(); 
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            dueDate.value = selectedDate.toISOString();
         }
         const editTaskData = {
             id: singleTask.key,
@@ -91,7 +96,7 @@ const handleUpdateTask = async () => {
         console.log('editTaskData', editTaskData);
 
         await editTask(editTaskData);
-        if(detectDuplicateTask.value === true){
+        if (detectDuplicateTask.value === true) {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Cannnot edit, edited task name already exists!', group: 'br', life: 3000 });
         }
