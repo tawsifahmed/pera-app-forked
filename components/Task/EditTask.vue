@@ -93,8 +93,11 @@ const handleUpdateTask = async () => {
             tags: tags.value.map((obj) => obj.id),
             project_id: projects
         };
-        console.log('editTaskData', editTaskData);
-
+        
+        const postSubDate = new Date(dueDate.value)
+        postSubDate.setDate(postSubDate.getDate() - 1);
+        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        
         await editTask(editTaskData);
         if (detectDuplicateTask.value === true) {
             btnLoading.value = false;

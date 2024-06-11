@@ -437,13 +437,6 @@ export const useCompanyStore = defineStore('workStation', {
           this.getSingleProject(project_id);
         }
       }
-       
-        // if(data.value?.app_message === 'success'){
-        //   console.log('dataAttach', data)
-        //   this.isTaskEdited = true;
-        //   this.getSingleProject(project_id);
-        // }
-
     },
     async deleteTask (taskID, projectId) {
       const token = useCookie('token'); 
@@ -520,9 +513,8 @@ export const useCompanyStore = defineStore('workStation', {
             },
           }),
       )
-      console.log('details', data.value)
+      
       this.taskDetails = data.value?.data;
-      // console.log('taskDetails', this.taskDetails)
       this.taskActivity = data.value?.taskActivity;
       this.singleTaskComments = data.value?.data.comments;
       this.subTasks = data.value?.subTasks;

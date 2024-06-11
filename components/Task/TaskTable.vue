@@ -32,9 +32,6 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
-
-
-
 const userI = ref()
 const prio = ref()
 const sta = ref()
@@ -166,6 +163,7 @@ async function handleTaskStatus(status, task_id) {
             // getTaskDetails(singleTask.key);
             console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', group: 'br', life: 3000 });
+            await getSingleProject(id);
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
         }
@@ -223,6 +221,7 @@ const load = () => {
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
+            <!-- <pre>{{tasks}}</pre> -->
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
             <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
             <Button type="button" v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" v-tooltip.right="{ value: `Download Tasks` }" icon="pi pi-file-excel" :loading="loading" label="" class="mr-2" severity="secondary" :style="`${loading === true ? 'backGround: red' : '' }`" />
@@ -289,7 +288,34 @@ const load = () => {
               </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }">
+        <Column field="status" header="Status" :style="{ width: '10%' }">
+            <template #body="slotProps">
+                <div class="inline-block">
+                    <div class="task-status-2">
+                        <!-- <pre>{{statuslist}}</pre> -->
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center" >
+                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1"> {{slotProps.value.name}}</div>
+                                   
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                    </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
+                </div>
+            </template>
+        </Column>
+        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>
@@ -343,8 +369,8 @@ const load = () => {
     align-items: center;
     gap: 3px;
     padding: 10px 5px;
-    top: -50px;
-    left: -124px;
+    top: -11px;
+    left: -156px;
     border-radius: 5px;
 }
 
@@ -439,7 +465,29 @@ const load = () => {
 }
 
 
+.task-status-2 .p-dropdown .p-dropdown-trigger {
+    width: 0.7rem !important;
+    margin-right: 6px !important;
+}
 
+
+.task-status-2 .p-dropdown .p-inputtext {
+    padding: 0.25rem 0.5rem !important;
+}
+
+.task-status-2 .status-bg {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.task-status-2 .p-dropdown-label {
+    margin-top: -4px;
+}
 
 
 </style>

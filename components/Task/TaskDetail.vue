@@ -129,11 +129,13 @@ const handleTaskDetailSubmit = async () => {
         tags: tags.value.map((obj) => obj.id)
     };
 
-    await editTask(taskDetailData);
+    const postSubDate = new Date(dueDate.value)
+    postSubDate.setDate(postSubDate.getDate() - 1);
+    dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
 
+    await editTask(taskDetailData);
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
-        // taskEditDescriptionInput.value = null;
         selectedfile.value = null;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
@@ -351,7 +353,8 @@ const handleShareTaskId = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{singleTask}}</pre> -->
+                <!-- <pre>{{taskDetails}}</pre>
+                <pre>{{singleTask}}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
                     <h5 v-tooltip.top="{
@@ -370,8 +373,6 @@ const handleShareTaskId = () => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{ singleTask }}</pre> -->
-                            <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
                                 <div class="w-full lg:w-fit">
                                     <div
@@ -395,9 +396,8 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar
-                                                :style="`width: 164.94px; border: 1.5px solid ${singleTask?.data?.dueDateColor ? singleTask?.data?.dueDateColor : 'none'}; border-radius:7px`"
-                                                v-model="dueDate" showIcon iconDisplay="input" />
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate"
+                                                showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -411,7 +411,7 @@ const handleShareTaskId = () => {
                                         </div>
                                         <Dropdown @change="changeStatusData(status)" v-model="status"
                                             :options="taskStatus" optionLabel="name" placeholder="Select Status"
-                                            style="width: 146.41px" />
+                                            style="width: 146.41px;" />
                                     </div>
                                     <div
                                         class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
@@ -516,19 +516,19 @@ const handleShareTaskId = () => {
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
-                                            <div class="action-dropdown">
+                                            <div class="action-dropdown-det">
                                                 <Button style="width: 30px; height: 30px; border-radius: 50%"
-                                                    icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
-                                                <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                    icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
+                                                <div class="action-dropdown-content-det">
+                                                    <!-- <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
                                                         @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
                                                         rounded />
                                                     <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded /> -->
+                                                    <Button icon="pi pi-cog" class=" ac-btn" severity="info"
                                                         @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
-                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <!-- <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" /> -->
                                                 </div>
                                             </div>
                                         </template>
@@ -787,29 +787,29 @@ const handleShareTaskId = () => {
     color: #444;
 }
 
-.action-dropdown {
+.action-dropdown-det {
     position: relative;
     display: inline-block;
 }
 
-.action-dropdown-content {
+.action-dropdown-content-det {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 160px;
+    min-width: fit-content;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     padding: 10px 5px;
 }
 
-.action-dropdown-content button {
+.action-dropdown-content-det button {
     width: 100%;
     text-align: left;
     padding: 10px;
     border: none;
 }
 
-.action-dropdown:hover .action-dropdown-content {
+.action-dropdown-det:hover .action-dropdown-content-det {
     display: block;
     display: flex;
     justify-content: center;
@@ -817,7 +817,8 @@ const handleShareTaskId = () => {
     gap: 3px;
     padding: 10px 5px;
     top: -10px;
-    left: -158px;
+    left: -40px;
+    /*left: -158px;*/
     border-radius: 5px;
 }
 

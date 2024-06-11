@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-    // ssr: false,
+    ssr: false,
     runtimeConfig: {
         public: {
           apiUrl: process.env.API_URL,
@@ -9,7 +9,7 @@ export default defineNuxtConfig({
           // apiUrl: process.env.API_URL ?? 'http://localhost:8000'
           // api end point => http://188.166.212.40/api/v1/
         }
-      },
+    },
     app: {
         head: {
             title: 'Pera App',
