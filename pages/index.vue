@@ -5,8 +5,8 @@ import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 import { useCompanyStore } from '~/store/company';
-const { getChartData } = useCompanyStore();
-const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo } = storeToRefs(useCompanyStore());
+const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
+const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore()); 
 
@@ -84,15 +84,13 @@ const checkUser = () => {
     }
 }
 
-
-watchEffect(() => {
-    lineData.value
-    console.log('chartTaskInfoWatch =>', lineData.value)
-    lineData.value.datasets[0].data = chartTaskInfo;
-    getChartData();
-})
+getRoles();
+getTaskAssignModalData();
+getTagsAssignModalData();
+getChartData();
 
 
+console.log('role', rolesLists.value)
 
 onMounted(() => {
     checkUser()
@@ -238,7 +236,9 @@ watch(
                 <NuxtLink to="/employees" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Employees</span>
-                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
+                        <div class="text-900 font-medium text-xl" 
+                        style="visibility: visible;"
+                        >{{users.length}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
@@ -253,7 +253,7 @@ watch(
                 <NuxtLink to="/role" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
-                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
+                        <div class="text-900 font-medium text-xl">{{rolesLists ? rolesLists.length : '0'}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
@@ -268,7 +268,7 @@ watch(
                 <NuxtLink to="/tags" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
-                        <div class="text-900 font-medium text-xl" style="visibility: hidden;">152 Unread</div>
+                        <div class="text-900 font-medium text-xl">{{tags ? tags.length : '0'}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
