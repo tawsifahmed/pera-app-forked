@@ -61,7 +61,7 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if (data.value.code === 201) {
+            if (data?.value?.code === 201) {
                 email.value = null;
                 employeeForm.value = false;
                 emit('closeInviteModal', false);

@@ -13,6 +13,7 @@ const { userCompany } = storeToRefs(useAuthStore());
 const readEmployee = ref(accessPermission('read_user'))
 const readRole = ref(accessPermission('read_role'))
 const readTags = ref(accessPermission('read_tags'))
+const createCompanyP = ref(accessPermission('create_company'))
 
 definePageMeta({
       middleware: 'auth',
@@ -74,7 +75,7 @@ const checkUser = () => {
     if (process.client){
         hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'))
         console.log('hasUserCompany =>', hasUserCompany.value)
-        if(hasUserCompany.value === null || hasUserCompany.value?.length  == 0){
+        if((hasUserCompany.value === null || hasUserCompany.value?.length  == 0) && createCompanyP.value === true){
             visibleCreateCompany.value =  true;
         }else {
             visibleCreateCompany.value =  false;
