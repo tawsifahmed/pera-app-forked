@@ -50,7 +50,7 @@ const formattedTime = (time) => {
                             <div class="flex justify-content-between flex-wrap align-items-center">
                                 <div class="col-12 lg:col-6 p-0">
                                     <div class="flex gap-2 mb-3">
-                                        <div class="flex gap-2 align-items-center">
+                                        <div class="flex gap-2 align-items-start">
                                             <span class="pi pi-user"></span>
                                             <p class="text-nowrap font-bold">Assignee:</p>
                                         </div>
@@ -85,7 +85,7 @@ const formattedTime = (time) => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-2 mb-3" style="width: 100%">
+                            <div class="flex gap-2 mb-3 align-items-start" style="width: 100%">
                                 <div class="flex gap-2 align-items-center">
                                     <span class="pi pi-tags"></span>
                                     <p class="text-nowrap font-bold">Tags:</p>
