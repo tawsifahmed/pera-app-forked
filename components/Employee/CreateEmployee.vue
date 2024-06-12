@@ -29,7 +29,7 @@
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper">
-            <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>
 </template>
@@ -64,15 +64,18 @@ const employeeForm = ref(true);
 
 const emit = defineEmits(['closeCreateModal']);
 
+const loading = ref(false);
 const handleSubmitData = async () => {
+    loading.value = true;
     if (name.value === '' || email.value === '' || password.value === '' || selectedRoles.value.length === 0) {
         errorHandler.value = true;
+        loading.value = false;
         return;
     } else {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/create`, {
+            const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -88,7 +91,16 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if (data.value.code === 201) {
+            if(error?.value){
+                if(error?.value?.data?.code === 422){
+                    loading.value = false;
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
+                    return;
+                }   
+            }
+
+            else if (data?.value?.code === 201) {
+                loading.value = false;
                 name.value = null;
                 email.value = null;
                 phone.value = null;
@@ -96,9 +108,12 @@ const handleSubmitData = async () => {
                 password.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Created successfully!', group: 'br', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee created successfully!', group: 'br', life: 3000 });
+                return
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Created Failed!', group: 'br', life: 3000 });
+                loading.value = false;
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to create employee!', group: 'br', life: 3000 });
+                return
             }
         }
     }

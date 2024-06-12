@@ -30,7 +30,7 @@
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrappe">
-            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
         </div>
     </div>
 </template>
@@ -69,15 +69,19 @@ const employeeForm = ref(true);
 
 const emit = defineEmits(['closeEditModal']);
 
+const loading = ref(false); 
+
 const handleSubmitData = async () => {
+    loading.value = true;
     if (name.value === '' || email.value === '') {
         errorHandler.value = true;
+        loading.value = false;
         return;
     } else {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/update/${id.value}`, {
+            const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -93,12 +97,24 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if (data.value.code === 200) {
+            if(error?.value){
+                if(error?.value?.data?.code === 500){
+                loading.value = false;
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
+                return;
+                }   
+            }
+
+            else if (data?.value?.code === 200) {
+                loading.value = false;
                 employeeForm.value = false;
                 emit('closeEditModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', group: 'br', life: 3000 });
+                return
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Updated Failed!', group: 'br', life: 3000 });
+                loading.value = false;
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update employee!', group: 'br', life: 3000 });
+                return
             }
         }
     }
