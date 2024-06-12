@@ -284,7 +284,15 @@ const load = () => {
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                        <img v-if="assignee.image" :src="assignee.image" style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white" alt="" srcset="" />
+                        <img
+                            v-tooltip.top="{ value: `${assignee.name}` }"
+                            class="mr-2 capitalize cursor-pointer"
+                            v-if="assignee.image"
+                            :src="assignee.image"
+                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                            alt=""
+                            srcset=""
+                        />
                         <Avatar
                             v-else
                             v-tooltip.top="{ value: `${assignee.name}` }"
