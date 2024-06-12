@@ -157,7 +157,7 @@ const openProfile = () => {
                         <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
                     </div>
                 </div>
-                <i v-else class="pi pi-user"></i>
+                <img v-else src='../assets/dummy_profile.png' alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
             <div class="relative">

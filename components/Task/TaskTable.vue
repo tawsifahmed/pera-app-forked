@@ -98,12 +98,14 @@ const handleDateDelete2 = () => {
 const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
+    console.log('pName', prjctName);
+    // return
     loading.value = true;
     // console.log('lod', loading.value);
     if (taskLists.length > 0) {
         const csvContent =
             'data:text/csv;charset=utf-8,' +
-            'Serial No,Unique ID,Task Name,Assignee,Priority,Status,Due Date,Overdue\n' +
+            'Serial No,Unique ID,Task Name,Project,Assignee,Priority,Status,Due Date,Overdue\n' +
             taskLists
                 .map((task, index) => {
                     const serialNo = index + 1;
@@ -114,7 +116,7 @@ const downloadTaskSheet = (taskLists) => {
                     const status = task.data.status.name;
                     const dueDate = task.data.dueDateValue;
                     const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
-                    return [serialNo, uniqueId, taskName, assignee, priority, status, dueDate, isOverDue].join(',');
+                    return [serialNo, uniqueId, taskName, projectName, assignee, priority, status, dueDate, isOverDue].join(',');
                 })
                 .join('\n');
 
@@ -206,7 +208,6 @@ const load = () => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{tasks}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
@@ -225,10 +226,14 @@ const load = () => {
             <!-- <pre>{{tasks}}</pre> -->
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
             <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
-            <Button
+          
+
+            <!-- task report download -->
+
+            <!-- <Button
                 type="button"
                 v-if="downloadTaskP"
-                @click="downloadTaskSheet(tasks)"
+                @click="downloadTaskSheet(tasks, projectName)"
                 v-tooltip.right="{ value: `Download Tasks` }"
                 icon="pi pi-file-excel"
                 :loading="loading"
@@ -236,7 +241,8 @@ const load = () => {
                 class="mr-2"
                 severity="secondary"
                 :style="`${loading === true ? 'backGround: red' : ''}`"
-            />
+            /> -->
+
             <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>

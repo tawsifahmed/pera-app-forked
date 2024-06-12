@@ -37,7 +37,8 @@ const handleImageUpload = (value) => {
     <form @submit.prevent="handleSubmit" class="grid">
         <div class="col-12 text-center mb-5">
             <div class="relative w-fit mx-auto">
-                <img :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover" />
+                <img v-if="imageData" :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover" />
+                <img v-else src='../../assets/dummy_profile.png' alt="" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover">
                 <div class="img-label">
                     <label for="image">
                         <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 8px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
