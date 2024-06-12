@@ -151,13 +151,13 @@ const openProfile = () => {
             </button> -->
             <!-- <pre>{{ userProfile }}</pre> -->
             <button @click="openProfile" class="p-link layout-topbar-button">
-                <div v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
+                <div  v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
                     <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
                     <div class="userImage">
                         <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
                     </div>
                 </div>
-                <img v-else src='../assets/dummy_profile.png' alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
+                <img  v-tooltip.left="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
             <div class="relative">

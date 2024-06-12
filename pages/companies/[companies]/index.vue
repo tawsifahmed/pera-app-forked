@@ -51,7 +51,7 @@ const deletingSpace = async () => {
     await deleteSpace(refSpaceId.value, companies);
 
     if (isSpaceDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteSpaceDialog.value = false;
         console.log('space deleted');
     } else {
