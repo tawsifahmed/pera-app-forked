@@ -47,7 +47,7 @@ const formattedTime = (time) => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <div class="mt-2 task-detail ml-2">
-                            <div class="flex justify-content-between flex-wrap align-items-center">
+                            <div class="flex justify-content-between flex-wrap align-items-start">
                                 <div class="col-12 lg:col-6 p-0">
                                     <div class="flex gap-2 mb-3">
                                         <div class="flex gap-2 align-items-start">
@@ -91,7 +91,7 @@ const formattedTime = (time) => {
                                     <p class="text-nowrap font-bold">Tags:</p>
                                 </div>
                                 <div class="flex gap-2 flex-wrap">
-                                    <p v-for="tag in taskData?.tags" :key="tag" class="employee">{{ tag.name }}</p>
+                                    <p v-for="tag in taskData?.tags" :key="tag" class="employee h-fit">{{ tag.name }}</p>
                                 </div>
                             </div>
                             <div class="field mt-3 flex flex-column">
@@ -190,6 +190,10 @@ const formattedTime = (time) => {
                 </div>
             </div>
         </div>
+    </div>
+    <div class="footer">
+        <img src="/demo/images/login/avatar.png" alt="Logo" height="25" class="mr-2" />
+        <p class="text-center">by Singularity</p>
     </div>
 </template>
 
@@ -467,5 +471,13 @@ input[type='file']::file-selector-button:hover {
     border: 1px solid rgba(167, 167, 167, 0.486);
     border-radius: 5px;
     padding: 2px 5px;
+}
+.footer {
+    border-top: 1px solid #d3d3d3;
+    padding: 10px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 0px;
 }
 </style>
