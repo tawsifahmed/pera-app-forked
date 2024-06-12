@@ -56,7 +56,8 @@ export const useCompanyStore = defineStore('workStation', {
         modStatusList: [],
         chartProjectInfo: null,
         chartTaskInfo: null,
-        chartClosedTaskInfo: null
+        chartClosedTaskInfo: null,
+        rolesLists: null
     }),
 
     actions: {
@@ -545,14 +546,31 @@ export const useCompanyStore = defineStore('workStation', {
                 })
             );
             console.log('chartData', data.value);
-            if(data?.value?.code === 200){
-              this.chartProjectInfo = data?.value?.data?.projects
-              console.log('chartProjectInfo', this.chartProjectInfo);
-              this.chartTaskInfo = data?.value?.data?.total_task_count;
-              this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
-            }else{
-              this.chartProjectInfo = [];
-              this.chartTaskInfo = [];
+            if (data?.value?.code === 200) {
+                this.chartProjectInfo = data?.value?.data?.projects;
+                console.log('chartProjectInfo', this.chartProjectInfo);
+                this.chartTaskInfo = data?.value?.data?.total_task_count;
+                this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
+            } else {
+                this.chartProjectInfo = [];
+                this.chartTaskInfo = [];
+            }
+        },
+        async getRoles() {
+            const token = useCookie('token');
+            const { data, pending, error } = await useAsyncData('roleLit', () =>
+                $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+                    headers: {
+                        Authorization: `Bearer ${token.value}`
+                    }
+                })
+            );
+            console.log('rolesData', data);
+            if (data.value?.data?.length > 0) {
+                this.rolesLists = data.value?.data;
+            }
+            else{
+                this.rolesLists = [];
             }
         },
 
