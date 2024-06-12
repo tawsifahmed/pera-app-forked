@@ -295,7 +295,7 @@ export const useCompanyStore = defineStore('workStation', {
           http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}?assignees=${assignees}&priority=${priority}&status=${status}&search=${query}&start=${start}&end=${end}`,{
           headers: {
               Authorization: `Bearer ${token.value}`,
-          },
+            },
           }),
         )
 
