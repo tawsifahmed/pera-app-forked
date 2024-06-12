@@ -80,11 +80,12 @@ watch(selectedCloseStatus, (newStatus) => {
     console.log('taskStatusList', taskStatusList.value);
 });
 
-console.log('taskStatusList', taskStatusList.value);
-
+const loading = ref(false);
 const handleCreateProject = async () => {
+    loading.value = true;
     if(projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null){
         errorHandler.value = true
+        loading.value = false;
     }else{
         errorHandler.value = false
         const createProjectData = {
@@ -96,7 +97,7 @@ const handleCreateProject = async () => {
         await project.createProjects(createProjectData);
         if(save.value === true){
             companyFormInputs.value = false
-            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project create successfully!', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Success!', detail: 'Project created successfully!', group: 'br', life: 3000 });
             projectNameInput.value = null;
             projectDescriptionInput.value = null;
             taskStatusList.value = [
@@ -116,8 +117,10 @@ const handleCreateProject = async () => {
                     'is_closed_status': 0,
                 },
             ];
+            loading.value = false;
         }else{
-            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project create Failed!', group: 'br', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Failed', detail: 'Project creation Failed!', group: 'br', life: 3000 });
+            loading.value = false;
         }
     }
 }
@@ -202,7 +205,7 @@ const handleCreateProject = async () => {
             <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
+                <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
             </template>
         </Dialog>
     </div>
