@@ -12,21 +12,21 @@ const handleReportDownload = async () => {
     loading.value = true;
     console.log('start Date: ', startDate.value, 'end Date: ', endDate.value);
 
-    // const params = {
-    //     startDate: startDate.value,
-    //     endDate: endDate.value
-    // };
-    // const response = await useFetch('/api/reports/download', {
-    //     method: 'GET',
-    //     headers: {
-    //         Authorization: `Bearer ${token.value}`
-    //     }
-    // });
-    // if (response.status === 200) {
-    //     window.location.href = response.data;
-    // } else {
-    //     console.log(response);
-    // }
+    const params = {
+        startDate: startDate.value,
+        endDate: endDate.value
+    };
+    const response = await useFetch('/api/reports/download', {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (response.status === 200) {
+        window.location.href = response.data;
+    } else {
+        console.log(response);
+    }
     loading.value = false;
 };
 </script>
