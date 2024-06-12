@@ -96,9 +96,12 @@ const transformKeys = (list) => {
     }));
 }
 
+const loading = ref(false);
 const handleCreateProject = async () => {
+    loading.value = true;
     if(projectNameInput.value === null || projectDescriptionInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null){
         errorHandler.value = true
+        loading.value = false;
     }else{
         errorHandler.value = false
         
@@ -126,8 +129,10 @@ const handleCreateProject = async () => {
         await editProject(createProjectData);
         if(isProjectEdited.value === true){
             emit('closeEditProject', false);
+            loading.value = false;
             toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', group: 'br', life: 3000 });
         }else{
+            loading.value = false;
             toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', group: 'br', life: 3000 });
         }
     }
@@ -225,7 +230,7 @@ onMounted(() => {
 
       <div class="float-right">
         <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-        <Button label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
+        <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
       </div>
 
     </div>

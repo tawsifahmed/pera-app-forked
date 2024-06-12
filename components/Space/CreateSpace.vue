@@ -23,13 +23,17 @@ const changeColor = (color) => {
     spaceAvatarPreview.value = color;
 };
 
+const loading = ref(false);
 const handleCreateSpace = async () => {
+    loading.value = true;
     if (spaceNameInput.value === null) {
         spaceNameError.value = true;
+        loading.value = false;
         return;
     }
     if (spaceDescripInput.value === null) {
         spaceDescriptionError.value = true;
+        loading.value = false;
         return;
     } else {
         const createSpaceData = {
@@ -47,9 +51,11 @@ const handleCreateSpace = async () => {
             spaceDescripInput.value = null;
             spaceAvatarPreview.value = '#8080805c';
             spaceColorPreview.value = null;
+            loading.value = false;
             toast.add({ severity: 'success', summary: 'Space creation', detail: 'Space created successfully!', group: 'br', life: 3000 });
         } else {
             spaceFormInputs.value = true;
+            loading.value = false;
             toast.add({ severity: 'error', summary: 'Space creation', detail: 'Space created Failed!', group: 'br', life: 3000 });
         }
     }
@@ -101,7 +107,7 @@ const hideDialog = () => {
             </div>
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" text="" @click="handleCreateSpace" />
+                <Button label="Save" icon="pi pi-check" text="" @click="handleCreateSpace" :loading="loading" />
             </template>
         </Dialog>
     </div>

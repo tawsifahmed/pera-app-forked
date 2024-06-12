@@ -4,6 +4,9 @@ import { onMounted, reactive, ref, watch } from 'vue';
 import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+import { useCompanyStore } from '~/store/company';
+const { getChartData } = useCompanyStore();
+const { chartProjectInfo, chartTaskInfo } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore()); 
 
@@ -18,27 +21,28 @@ definePageMeta({
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
-const lineData = reactive({
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+const lineData = ref({
+    labels: chartProjectInfo,
     datasets: [
         {
-            label: 'First Dataset',
-            data: [65, 59, 80, 81, 56, 55, 40],
+            label: 'Task Count',
+            data: chartTaskInfo,
             fill: false,
             backgroundColor: '#2f4860',
             borderColor: '#2f4860',
             tension: 0.4
         },
-        {
-            label: 'Second Dataset',
-            data: [28, 48, 40, 19, 86, 27, 90],
-            fill: false,
-            backgroundColor: '#00bb7e',
-            borderColor: '#00bb7e',
-            tension: 0.4
-        }
+        // {
+        //     label: 'Second Dataset',
+        //     data: [28, 48, 40, 19, 86, 27, 90],
+        //     fill: false,
+        //     backgroundColor: '#00bb7e',
+        //     borderColor: '#00bb7e',
+        //     tension: 0.4
+        // }
     ]
 });
+
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-minus' }
@@ -62,6 +66,16 @@ const checkUser = () => {
         console.log('visibleCreateCompany =>', visibleCreateCompany.value)
     }
 }
+
+
+watchEffect(() => {
+    lineData.value
+    console.log('chartTaskInfoWatch =>', lineData.value)
+    lineData.value.datasets[0].data = chartTaskInfo;
+    getChartData();
+})
+
+
 
 onMounted(() => {
     checkUser()
@@ -351,12 +365,13 @@ watch(
          -->
 
 
-         <!-- <div class="col-12 xl:col-6">
+         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
             </div>
-            <div class="card">
+
+            <!-- <div class="card">
                 <div class="flex align-items-center justify-content-between mb-4">
                     <h5>Notifications</h5>
                     <div>
@@ -405,8 +420,9 @@ watch(
                         </span>
                     </li>
                 </ul>
-            </div>
-            <div
+            </div> -->
+
+            <!-- <div
                 class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3"
                 style="border-radius: 1rem; background: linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1c80cf 47.88%, #ffffff 100.01%)"
             >
@@ -417,8 +433,8 @@ watch(
                 <div class="mt-4 mr-auto md:mt-0 md:mr-0">
                     <a href="https://www.primefaces.org/primeblocks-vue" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised"> Get Started </a>
                 </div>
-            </div>
-        </div> -->
+            </div> -->
+        </div>
         <div v-if="visibleCreateCompany">
             <CreateCompany/>
         </div>

@@ -125,9 +125,12 @@ const handleEmail = () => {
 // Lastly, what would you like to name your Workspace?
 const workSpaceName = ref(null);
 const errorHandler = ref(false);
+const loading = ref(false);
 const handleCreateWorkspace = async () => {
+    loading.value = true;
     if (numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === '') {
         errorHandler.value = true;
+        loading.value = false;
         return;
     } else {
         errorHandler.value = false;
@@ -149,12 +152,14 @@ const handleCreateWorkspace = async () => {
             sSolution.value = null;
             invite.value = null;
             workSpaceName.value = null;
+            loading.value = false;
             toast.add({ severity: 'success', summary: 'Company creation', detail: 'Company created successfully!', group: 'br', life: 3000 });
             setTimeout(()=>{
                 location.reload();
             },2000) 
         } else {
             companyFormInputs.value = true;
+            loading.value = false;
             toast.add({ severity: 'error', summary: 'Company creation', detail: 'Company created Failed!', group: 'br', life: 3000 });
         }
     }
@@ -182,7 +187,7 @@ const handleCreateWorkspace = async () => {
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <template #footer>
-            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateWorkspace" />
+            <Button label="Save" icon="pi pi-check" text="" :loading="loading" @click="handleCreateWorkspace" />
         </template>
     </Dialog>
 </template>
