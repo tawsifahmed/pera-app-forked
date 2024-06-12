@@ -62,7 +62,7 @@ const deletingCompany = async () => {
     await deleteCompany(refCompanyId.value);
 
     if (isCompanyDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
         console.log('company deleted');
         router.push('/')

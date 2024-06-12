@@ -163,7 +163,7 @@ async function handleTaskStatus(status, task_id) {
         if (data.value?.app_message === 'success') {
             // getTaskDetails(singleTask.key);
             console.log('Status Changed', data);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             await getSingleProject(id);
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });

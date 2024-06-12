@@ -91,7 +91,7 @@ const deletingTask = async () => {
     await deleteTask(refTaskId.value, projects);
     if (isTaskDeleted.value === true) {
         btnLoading.value = false;
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
         deleteTaskDialog.value = false;
     } else {
         btnLoading.value = false;

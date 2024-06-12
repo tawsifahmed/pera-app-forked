@@ -85,15 +85,11 @@ const checkUser = () => {
     }
 }
 
-getRoles();
-getTaskAssignModalData();
-getTagsAssignModalData();
-getChartData();
-
-
-console.log('role', rolesLists.value)
-
 onMounted(() => {
+    getRoles();
+    getTaskAssignModalData();
+    getTagsAssignModalData();
+    getChartData();
     checkUser()
     // ProductService.getProductsSmall().then((data) => (products.value = data));
 });

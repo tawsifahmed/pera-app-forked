@@ -55,7 +55,7 @@ const handleEditSpace = async () => {
               spaceFormInputs.value = false
               loading.value = false
               emit('closeEditSpace', false);
-              toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Updated Successfully', group: 'br', life: 3000 });   
+              toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Updated Successfully', group: 'br', life: 3000 });   
 
               console.log('space created')
           }else{

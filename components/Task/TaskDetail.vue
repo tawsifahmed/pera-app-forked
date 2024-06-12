@@ -88,7 +88,7 @@ const handleTaskComment = async () => {
     btnLoading.value = true;
     await addTaskComment(singleTask.key, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
         btnLoading.value = false;
         commentFile.value = null;
@@ -206,7 +206,7 @@ async function changeStatusData(status) {
 
         if (data.value?.app_message === 'success') {
             getTaskDetails(singleTask.key);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             emit('updateTaskTable');
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
@@ -286,7 +286,7 @@ const deleteFile = async (id) => {
     await fileDelete(id);
 
     if (isFileDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'File Deleted successfully!', group: 'br', life: 3000 });
         getTaskDetails(singleTask.key);
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', group: 'br', life: 3000 });
