@@ -54,8 +54,9 @@ export const useCompanyStore = defineStore('workStation', {
 
         statuslist: [],
         modStatusList: [],
-        chartProjectInfo: [],
-        chartTaskInfo: []
+        chartProjectInfo: null,
+        chartTaskInfo: null,
+        chartClosedTaskInfo: null
     }),
 
     actions: {
@@ -543,11 +544,12 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            // console.log('chartData', data.value.code);
+            console.log('chartData', data.value);
             if(data?.value?.code === 200){
-              this.chartProjectInfo = data?.value?.data?.map(project => project.project_name);
+              this.chartProjectInfo = data?.value?.data?.projects
               console.log('chartProjectInfo', this.chartProjectInfo);
-              this.chartTaskInfo = data?.value?.data?.map(task => task.tasks_count);            
+              this.chartTaskInfo = data?.value?.data?.total_task_count;
+              this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
             }else{
               this.chartProjectInfo = [];
               this.chartTaskInfo = [];

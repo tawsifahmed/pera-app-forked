@@ -67,6 +67,7 @@ const priorities = ref([
 
 const emit = defineEmits(['closeCreateModal']);
 console.log('duedate id', dueDate.value);
+
 const handleCreateTask = async () => {
     btnLoading.value = true;
     if (name.value === null) {
@@ -88,9 +89,11 @@ const handleCreateTask = async () => {
             project_id: projects,
             parent_task_id: taskId
         };
-        const postSubDate = new Date(dueDate.value)
-        postSubDate.setDate(postSubDate.getDate() - 1);
-        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        if(dueDate.value){
+            const postSubDate = new Date(dueDate.value)
+            postSubDate.setDate(postSubDate.getDate() - 1);
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        }
         
         await createTask(createTaskData);
         if (detectDuplicateTask.value === true) {

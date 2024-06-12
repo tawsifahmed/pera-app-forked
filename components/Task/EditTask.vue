@@ -94,9 +94,11 @@ const handleUpdateTask = async () => {
             project_id: projects
         };
         
-        const postSubDate = new Date(dueDate.value)
-        postSubDate.setDate(postSubDate.getDate() - 1);
-        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        if(dueDate.value){
+            const postSubDate = new Date(dueDate.value)
+            postSubDate.setDate(postSubDate.getDate() - 1);
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        }
         
         await editTask(editTaskData);
         if (detectDuplicateTask.value === true) {
