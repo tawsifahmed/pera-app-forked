@@ -9,40 +9,52 @@ const employee = ref('');
 const employees = ref([]);
 const loading = ref(false);
 const toast = useToast();
+
+// Date Formatter
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
 const handleReportDownload = async () => {
     const token = useCookie('token');
     loading.value = true;
-    const { data, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/report-download`, {
-        headers: {
-            Authorization: `Bearer ${token.value}`
+    if (employee.value == '') {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please Select Employee', group: 'br', life: 3000 });
+    }
+    if (startDate.value == '' && endDate.value !== '') {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please Select Start Date', group: 'br', life: 3000 });
+    }
+    const formattedStartDate = dateFormatter(startDate.value);
+    const formattedEndDate = dateFormatter(endDate.value);
+
+    console.log(employee.value);
+    const { data, error } = await useFetch(
+        `http://188.166.212.40/pera/public/api/v1/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
+        {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
         }
-    });
+    );
     if (data.value.code == 200) {
         const link = document.createElement('a');
         link.href = data.value.download_path;
         link.target = '_blank';
         link.click();
+        return (loading.value = false);
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
-    console.log('start Date: ', startDate.value, 'end Date: ', endDate.value, 'employee: ', employee.value);
-
-    // const params = {
-    //     startDate: startDate.value,
-    //     endDate: endDate.value
-    // };
-    // const response = await useFetch('/api/reports/download', {
-    //     method: 'GET',
-    //     headers: {
-    //         Authorization: `Bearer ${token.value}`
-    //     }
-    // });
-    // if (response.status === 200) {
-    //     window.location.href = response.data;
-    // } else {
-    //     console.log(response);
-    // }
-    loading.value = false;
 };
 
 const init = async () => {
@@ -90,7 +102,7 @@ onMounted(() => {
             </template>
 
             <template #end>
-                <Button @click="handleReportDownload" class="w-full" label="Download" />
+                <Button @click="handleReportDownload" class="w-full" label="Download" :loading="loading" />
             </template>
         </Toolbar>
     </div>
