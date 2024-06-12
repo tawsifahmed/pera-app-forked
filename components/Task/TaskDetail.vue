@@ -40,10 +40,12 @@ const handleClickClock = async () => {
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
         await getTaskDetails(singleTask.key);
         startTimer();
+        toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(singleTask.key);
         stopTimer();
+        toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
     }
 };
 
