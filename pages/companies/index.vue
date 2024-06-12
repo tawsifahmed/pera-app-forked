@@ -8,6 +8,9 @@ import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Toast from 'primevue/toast';
+import accessPermission from "~/composables/usePermission";
+const updateCompanyP = ref(accessPermission('update_company'));
+const deleteCompanyP = ref(accessPermission('delete_company'));
 
 const filters = ref();
 const loading = ref(true);
@@ -123,8 +126,10 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                    
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
-                    <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                    <Button v-if="updateCompanyP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
+                    <Button v-if="!updateCompanyP" style="visibility: hidden;" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
+                    <Button v-if="deleteCompanyP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                    <Button v-if="!deleteCompanyP" style="visibility: hidden;" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
