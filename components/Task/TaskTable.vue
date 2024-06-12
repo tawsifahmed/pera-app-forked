@@ -32,9 +32,6 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
-
-
-
 const userI = ref()
 const prio = ref()
 const sta = ref()
@@ -98,6 +95,52 @@ const handleDateDelete2 = () => {
     changeAttribute()
 }
 
+const loading = ref(false);
+
+
+const downloadTaskSheet = (taskLists) =>{
+    loading.value = true;
+    // console.log('lod', loading.value);
+    if(taskLists.length > 0){
+        const csvContent = "data:text/csv;charset=utf-8," +
+            "Serial No,Unique ID,Task Name,Assignee,Priority,Status,Due Date,Overdue\n" +
+            taskLists.map((task, index) => {
+                const serialNo = index + 1;
+                const uniqueId = task.unique_id;
+                const taskName = task.data.name;
+                const assignee = task.data.assigneeObj.name;
+                const priority = task.data.priority;
+                const status = task.data.status.name;
+                const dueDate = task.data.dueDateValue;
+                const isOverDue = task.data.is_overdue ? "Yes" : "No";
+                return [serialNo, uniqueId, taskName, assignee, priority, status, dueDate, isOverDue].join(",");
+            }).join("\n");
+    
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "tasks.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        loading.value = false;
+    }else{
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
+    }
+    
+
+    // link.addEventListener('click', () => {
+    //     loading.value = false;
+    //     toast.add({ severity: 'success', summary: 'Success', detail: 'CSV downloaded', group: 'br', life: 3000 });
+    // });
+
+    // link.addEventListener('error', () => {
+    //     loading.value = false;
+    //     toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to download CSV', group: 'br', life: 3000 });
+    // });
+}
+
 onMounted(async () => {
     await getSingleProject(id);
     getUserlist();
@@ -120,6 +163,7 @@ async function handleTaskStatus(status, task_id) {
             // getTaskDetails(singleTask.key);
             console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', group: 'br', life: 3000 });
+            await getSingleProject(id);
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
         }
@@ -150,11 +194,18 @@ const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
 };
+
+const load = () => {
+    loading.value = true;
+    setTimeout(() => {
+        loading.value = false;
+    }, 2000);
+};
 </script>
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{statuslist}}</pre> -->
+        <!-- <pre>{{tasks}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
@@ -170,8 +221,10 @@ const getUserlist = async () => {
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
+            <!-- <pre>{{tasks}}</pre> -->
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button v-if="downloadTaskP" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+            <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
+            <Button type="button" v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" v-tooltip.right="{ value: `Download Tasks` }" icon="pi pi-file-excel" :loading="loading" label="" class="mr-2" severity="secondary" :style="`${loading === true ? 'backGround: red' : '' }`" />
             <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
         </template>
@@ -235,7 +288,34 @@ const getUserlist = async () => {
               </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }">
+        <Column field="status" header="Status" :style="{ width: '10%' }">
+            <template #body="slotProps">
+                <div class="inline-block">
+                    <div class="task-status-2">
+                        <!-- <pre>{{statuslist}}</pre> -->
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center" >
+                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1"> {{slotProps.value.name}}</div>
+                                   
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                    </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
+                </div>
+            </template>
+        </Column>
+        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>
@@ -289,8 +369,8 @@ const getUserlist = async () => {
     align-items: center;
     gap: 3px;
     padding: 10px 5px;
-    top: -50px;
-    left: -124px;
+    top: -11px;
+    left: -156px;
     border-radius: 5px;
 }
 
@@ -385,7 +465,29 @@ const getUserlist = async () => {
 }
 
 
+.task-status-2 .p-dropdown .p-dropdown-trigger {
+    width: 0.7rem !important;
+    margin-right: 6px !important;
+}
 
+
+.task-status-2 .p-dropdown .p-inputtext {
+    padding: 0.25rem 0.5rem !important;
+}
+
+.task-status-2 .status-bg {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.task-status-2 .p-dropdown-label {
+    margin-top: -4px;
+}
 
 
 </style>

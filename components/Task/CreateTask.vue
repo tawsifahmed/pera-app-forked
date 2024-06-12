@@ -11,24 +11,27 @@
         </div> -->
         <div class="field">
             <label>Assignees</label>
-            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
+            <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
+                placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
             <label>Tags</label>
-            <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name" placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
+            <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
+                placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
             <label>Due Date</label>
-            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date"/>
+            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
         </div>
         <div class="field">
             <label>Priority</label>
-            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority" class="w-full" />
+            <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
+                class="w-full" />
         </div>
         <br />
         <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
         <div class="create-btn-wrapper">
-            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" />
+            <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" :loading="btnLoading" />
         </div>
     </div>
 </template>
@@ -37,7 +40,7 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { createTask } = useCompanyStore();
-const { isTaskCreated } = storeToRefs(useCompanyStore());
+const { isTaskCreated, detectDuplicateTask } = storeToRefs(useCompanyStore());
 const { createTaskTitle, taskId, projects, usersLists, tagsLists } = defineProps(['createTaskTitle', 'taskId', 'projects', 'usersLists', 'tagsLists']);
 const toast = useToast();
 const btnLoading = ref(false);
@@ -63,7 +66,7 @@ const priorities = ref([
 ]);
 
 const emit = defineEmits(['closeCreateModal']);
-
+console.log('duedate id', dueDate.value);
 const handleCreateTask = async () => {
     btnLoading.value = true;
     if (name.value === null) {
@@ -71,6 +74,11 @@ const handleCreateTask = async () => {
         btnLoading.value = false;
     } else {
         errorHandler.value = false;
+        if (dueDate.value) {
+            const selectedDate = new Date(dueDate.value);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            dueDate.value = selectedDate.toISOString();
+        }
         const createTaskData = {
             name: name.value,
             dueDate: dueDate.value,
@@ -80,14 +88,22 @@ const handleCreateTask = async () => {
             project_id: projects,
             parent_task_id: taskId
         };
+        const postSubDate = new Date(dueDate.value)
+        postSubDate.setDate(postSubDate.getDate() - 1);
+        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        
         await createTask(createTaskData);
-        if (isTaskCreated.value === true) {
+        if (detectDuplicateTask.value === true) {
+            btnLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Task already exists!', group: 'br', life: 3000 });
+        }
+        else if (isTaskCreated.value === true) {
             btnLoading.value = false;
             spaceFormInputs.value = false;
             showFinalMsg.value = true;
             name.value = null;
             emit('closeCreateModal', false);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task created Successfully', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task created Successfully', group: 'br', life: 3000 });
         } else {
             btnLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to create task!', group: 'br', life: 3000 });

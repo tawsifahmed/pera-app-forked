@@ -32,6 +32,7 @@ export const useAuthStore = defineStore('auth', {
         if(error.value?.data?.code === 403) {
           this.checkOTP = true;
           this.resendOtpMsg = error.value.data.message;
+          this.resendOtp({ email })
         }
       }
       if(error.value){
