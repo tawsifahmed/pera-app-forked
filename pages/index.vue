@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pini
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 import { useCompanyStore } from '~/store/company';
 const { getChartData } = useCompanyStore();
-const { chartProjectInfo, chartTaskInfo } = storeToRefs(useCompanyStore());
+const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore()); 
 
@@ -25,23 +25,40 @@ const lineData = ref({
     labels: chartProjectInfo,
     datasets: [
         {
-            label: 'Task Count',
+            label: 'Total Tasks',
             data: chartTaskInfo,
+            fill: false,
+            backgroundColor: '#00bb7e',
+            borderColor: '#00bb7e',
+            tension: 0.4
+        },
+        {
+            label: 'Closed Tasks',
+            data: chartClosedTaskInfo,
             fill: false,
             backgroundColor: '#2f4860',
             borderColor: '#2f4860',
             tension: 0.4
-        },
-        // {
-        //     label: 'Second Dataset',
-        //     data: [28, 48, 40, 19, 86, 27, 90],
-        //     fill: false,
-        //     backgroundColor: '#00bb7e',
-        //     borderColor: '#00bb7e',
-        //     tension: 0.4
-        // }
+        }
     ]
 });
+
+// const lineOptions = ref({
+//     scales: {
+//         x: {
+//             title: {
+//                 display: true,
+//                 text: 'X Axis Title'
+//             }
+//         },
+//         y: {
+//             title: {
+//                 display: true,
+//                 text: 'Y Axis Title'
+//             }
+//         }
+//     }
+// });
 
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
@@ -102,6 +119,10 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
+                },
+                title: {
+                    display: true,
+                    text: 'Projects'
                 }
             },
             y: {
@@ -110,6 +131,10 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
+                },
+                title: {
+                    display: true,
+                    text: 'Numbers  of  Tasks'
                 }
             }
         }
@@ -365,7 +390,7 @@ watch(
          -->
 
 
-         <div class="col-12 xl:col-6">
+         <div class="col-12 xl:col-8">
             <div class="card">
                 <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
