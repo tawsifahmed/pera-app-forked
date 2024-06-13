@@ -5,7 +5,7 @@ import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
-const { modStatusList, statuslist } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -106,19 +106,32 @@ const downloadTaskSheet = (taskLists) => {
     if (taskLists.length > 0) {
         const csvContent =
     'data:text/csv;charset=utf-8,' +
-    '"Serial No","Unique ID","Task Name","Assignee","Priority","Status","Due Date","Overdue"\n' +
+    '"Serial No","Unique ID","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
     taskLists
         .map((task, index) => {
             const serialNo = index + 1;
             const uniqueId = task.unique_id;
             const taskName = task.data.name;
+            const projectName = singleProject.value.name;
             const assignees = task.data.assignee.split(', ').join('; ');
-            const priority = task.data.priority;
+            const priority = task.data.priority ? task.data.priority : '';
             const status = task.data.status.name;
+            let timeTracked = task.data.total_duration;
+            const hours = Math.floor(timeTracked / 3600);
+            const minutes = Math.floor((timeTracked % 3600) / 60);
+            const seconds = timeTracked % 60;
+
+            if (hours > 0) {
+                timeTracked = `${hours} hr ${minutes} min ${seconds} sec`;
+            } else if (minutes > 0) {
+                timeTracked = `${minutes} min ${seconds} sec`;
+            } else {
+                timeTracked = `${seconds} sec`;
+            }
             const dueDate = task.data.dueDateValue;
             const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
 
-            return `"${serialNo}","${uniqueId}","${taskName}","${assignees}","${priority}","${status}","${dueDate}","${isOverDue}"`;
+            return `"${serialNo}","${uniqueId}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
         })
         .join('\n');
         const encodedUri = encodeURI(csvContent);
@@ -199,6 +212,7 @@ const load = () => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
+        <!-- <pre>{{tasks}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
@@ -337,8 +351,9 @@ const load = () => {
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">
             <template #body="slotProps">
-                <div class="action-dropdown">
+                <div class="action-dropdown flex justify-content-start align-items-center">
                     <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                    <!-- <span class="pi pi-circle-fill text-xs ml-2 mt-1" style="color:crimson;"></span> -->
                     <div class="action-dropdown-content">
                         <Button v-if="createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
                         <Button v-if="!createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden" />
@@ -347,6 +362,7 @@ const load = () => {
                         <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
                         <Button v-if="deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                         <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden" />
+                        
                     </div>
                 </div>
             </template>

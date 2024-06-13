@@ -11,7 +11,7 @@ const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderSt
 const { getTaskTimerData } = useClockStore();
 const { trackedTime } = storeToRefs(useClockStore());
 
-const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
+const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
 
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
@@ -36,16 +36,17 @@ const handleClickClock = async () => {
     const taskId = taskDetails.value.id;
 
     if (taskDetails.value?.is_timer_start === 'false') {
-        localStorage.setItem(`timerStart_${taskId}`, Date.now());
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
         await getTaskDetails(singleTask.key);
         startTimer();
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
+        await getSingleProject(projID)
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(singleTask.key);
         stopTimer();
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
+        await getSingleProject(projID)
     }
 };
 
@@ -579,7 +580,8 @@ const handleShareTaskId = () => {
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
-                                    <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small"
+                                    <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%;">
+                                    <Avatar v-else :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small"
                                         style="background-color: gray; color: #ededed; border-radius: 50%" />
                                     <p class="text-lg">{{ val.commentator_name }}</p>
                                 </div>

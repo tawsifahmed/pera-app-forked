@@ -75,7 +75,7 @@ const checkUser = () => {
     if (process.client){
         hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'))
         console.log('hasUserCompany =>', hasUserCompany.value)
-        if((hasUserCompany.value === null || hasUserCompany.value?.length  == 0) && createCompanyP.value === true){
+        if(hasUserCompany.value === null || hasUserCompany.value?.length  == 0){
             visibleCreateCompany.value =  true;
         }else {
             visibleCreateCompany.value =  false;
