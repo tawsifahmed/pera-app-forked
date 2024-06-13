@@ -98,28 +98,29 @@ const handleDateDelete2 = () => {
 const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
-    console.log('pName', prjctName);
+    
     // return
     loading.value = true;
-    // console.log('lod', loading.value);
+    console.log('lod', taskLists);
+    // return
     if (taskLists.length > 0) {
         const csvContent =
-            'data:text/csv;charset=utf-8,' +
-            'Serial No,Unique ID,Task Name,Project,Assignee,Priority,Status,Due Date,Overdue\n' +
-            taskLists
-                .map((task, index) => {
-                    const serialNo = index + 1;
-                    const uniqueId = task.unique_id;
-                    const taskName = task.data.name;
-                    const assignee = task.data.assigneeObj.name;
-                    const priority = task.data.priority;
-                    const status = task.data.status.name;
-                    const dueDate = task.data.dueDateValue;
-                    const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
-                    return [serialNo, uniqueId, taskName, projectName, assignee, priority, status, dueDate, isOverDue].join(',');
-                })
-                .join('\n');
+    'data:text/csv;charset=utf-8,' +
+    '"Serial No","Unique ID","Task Name","Assignee","Priority","Status","Due Date","Overdue"\n' +
+    taskLists
+        .map((task, index) => {
+            const serialNo = index + 1;
+            const uniqueId = task.unique_id;
+            const taskName = task.data.name;
+            const assignees = task.data.assignee.split(', ').join('; ');
+            const priority = task.data.priority;
+            const status = task.data.status.name;
+            const dueDate = task.data.dueDateValue;
+            const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
 
+            return `"${serialNo}","${uniqueId}","${taskName}","${assignees}","${priority}","${status}","${dueDate}","${isOverDue}"`;
+        })
+        .join('\n');
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement('a');
         link.setAttribute('href', encodedUri);
@@ -132,16 +133,6 @@ const downloadTaskSheet = (taskLists) => {
         loading.value = false;
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
     }
-
-    // link.addEventListener('click', () => {
-    //     loading.value = false;
-    //     toast.add({ severity: 'success', summary: 'Success', detail: 'CSV downloaded', group: 'br', life: 3000 });
-    // });
-
-    // link.addEventListener('error', () => {
-    //     loading.value = false;
-    //     toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to download CSV', group: 'br', life: 3000 });
-    // });
 };
 
 onMounted(async () => {
@@ -230,10 +221,10 @@ const load = () => {
 
             <!-- task report download -->
 
-            <!-- <Button
+            <Button
                 type="button"
                 v-if="downloadTaskP"
-                @click="downloadTaskSheet(tasks, projectName)"
+                @click="downloadTaskSheet(tasks)"
                 v-tooltip.right="{ value: `Download Tasks` }"
                 icon="pi pi-file-excel"
                 :loading="loading"
@@ -241,7 +232,7 @@ const load = () => {
                 class="mr-2"
                 severity="secondary"
                 :style="`${loading === true ? 'backGround: red' : ''}`"
-            /> -->
+            />
 
             <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
