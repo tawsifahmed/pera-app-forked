@@ -113,7 +113,7 @@ initFilters();
            
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Company Name" sortable>
               <template #body="slotProps" >
                 <NuxtLink :to="`/companies/${slotProps?.data?.id}`">

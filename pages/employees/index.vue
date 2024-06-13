@@ -129,7 +129,7 @@ const init = async () => {
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data;
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));;
     }
 };
 
@@ -196,10 +196,10 @@ initFilters();
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
-            <Column field="phone" sortable header="Phone Number"></Column>
+            <Column field="phone" sortable header="Phone"></Column>
             <Column field="user_type" sortable header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">

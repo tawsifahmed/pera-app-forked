@@ -55,7 +55,7 @@ const handleImageUpload = (value) => {
         </div>
         <div class="col-12 lg:col-6 mb-3">
             <FloatLabel>
-                <InputText id="phone" v-model="phone" class="w-full" />
+                <InputText id="phone" v-model="phone" type="number" class="w-full" />
                 <label for="phone">Phone</label>
             </FloatLabel>
         </div>
@@ -92,5 +92,17 @@ const handleImageUpload = (value) => {
     bottom: 5px;
     z-index: 1;
     cursor: pointer;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
+input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield; 
 }
 </style>
