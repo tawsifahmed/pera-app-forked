@@ -123,6 +123,22 @@ getUserData();
 const openProfile = () => {
     visibleProfile.value = !visibleProfile.value;
 };
+
+const $primevue = usePrimeVue();
+
+const onChangeTheme = (theme, mode) => {
+    $primevue.changeTheme(layoutConfig.theme.value, theme, 'theme-css', () => {
+        layoutConfig.theme.value = theme;
+        layoutConfig.darkTheme.value = mode;
+    });
+};
+
+const onDarkModeChange = (value) => {
+    const newThemeName = value ? layoutConfig.theme.value.replace('light', 'dark') : layoutConfig.theme.value.replace('dark', 'light');
+
+    layoutConfig.darkTheme.value = value;
+    onChangeTheme(newThemeName, value);
+};
 </script>
 
 <template>
@@ -143,13 +159,20 @@ const openProfile = () => {
                 <i class="pi pi-ellipsis-v"></i>
             </button>
         </div>
-
+       
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-calendar"></i>
                 <span>Calendar</span>
             </button> -->
             <!-- <pre>{{ userProfile }}</pre> -->
+
+            <!-- darkmode -->
+            <!-- <section v-tooltip.left="{ value: layoutConfig.darkTheme.value ? 'Turn Off Dark Mode' : 'Dark Mode' }" class="flex align-items-center pr-2 justify-content-between surface-border">
+           
+                <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
+            </section> -->
+            
             <button @click="openProfile" class="p-link layout-topbar-button">
                 <div  v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
                     <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
@@ -160,6 +183,7 @@ const openProfile = () => {
                 <img  v-tooltip.left="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
+            
             <div class="relative">
                 <button
                     @click="
@@ -181,6 +205,7 @@ const openProfile = () => {
                 <span>Sign Out</span>
             </button>
         </div>
+        
         <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>

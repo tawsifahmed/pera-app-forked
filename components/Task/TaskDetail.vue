@@ -15,7 +15,7 @@ const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompan
 
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
-const { singleTask, usersLists, tagsLists, projID } = defineProps(['singleTask', 'usersLists', 'tagsLists', 'projID']);
+const { usersLists, tagsLists, projID } = defineProps(['usersLists', 'tagsLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask', 'updateTaskTable']);
 
@@ -26,9 +26,10 @@ const updateTaskP = ref(accessPermission('update_task'));
 const assignees = ref(null);
 assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
 
-const tags = ref(singleTask?.data?.tagsObj);
+const tags = ref(taskDetails.value?.tags?.map((obj) => ({ id: obj.id, name: obj.name })));
 
-const dueDate = ref(singleTask?.data?.dueDate);
+const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US') : null);
+
 const status = ref();
 const timeTrack = ref('00:00:00');
 let interval = null;
@@ -38,13 +39,13 @@ const handleClickClock = async () => {
 
     if (taskDetails.value?.is_timer_start === 'false') {
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
-        await getTaskDetails(singleTask.key);
+        await getTaskDetails(taskDetails.value?.id);
         startTimer();
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
         await getSingleProject(projID)
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
-        await getTaskDetails(singleTask.key);
+        await getTaskDetails(taskDetails.value?.id);
         stopTimer();
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
         await getSingleProject(projID)
@@ -66,14 +67,11 @@ const stopTimer = () => {
     timeTrack.value = secondsToHHMMSS(taskDetails.value.total_duration);
 };
 
-const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
-
 const bounceStatus = ref([{ is_bounce: 'No' }, { is_bounce: 'Yes' }]);
 
 const vModelBncStatus = ref();
 
-const description = ref(singleTask?.data?.description);
+const description = ref(taskDetails.value?.description);
 const taskCommentInput = ref(null);
 const selectedfile = ref();
 
@@ -90,7 +88,7 @@ const hideActivity = () => {
 
 const handleTaskComment = async () => {
     btnLoading.value = true;
-    await addTaskComment(singleTask.key, taskCommentInput.value, commentFile.value);
+    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
@@ -123,12 +121,11 @@ const handleTaskDetailSubmit = async () => {
         dueDate.value = selectedDate.toISOString();
     }
     const taskDetailData = {
-        id: singleTask.key,
-        name: singleTask.data.name,
+        id: taskDetails.value?.id,
+        name: taskDetails.value?.name,
         description: description.value,
         project_id: projID,
         dueDate: dueDate.value,
-        priority: priority.value.name,
         assignees: assignees.value.map((obj) => obj.id),
         tags: tags.value.map((obj) => obj.id)
     };
@@ -158,10 +155,10 @@ const uploadFile = async () => {
     if (file.value) {
         console.log('file =>', file.value);
     }
-    await fileUpload(singleTask.key, file.value);
+    await fileUpload(taskDetails.value?.id, file.value);
     if (isFileUpload.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', group: 'br', life: 3000 });
-        getTaskDetails(singleTask.key);
+        getTaskDetails(taskDetails.value?.id);
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', group: 'br', life: 3000 });
     }
@@ -178,7 +175,7 @@ const closeCommentAttachment = () => {
 };
 
 onMounted(async () => {
-    await getTaskDetails(singleTask.key);
+    await getTaskDetails(taskDetails.value?.id);
     const obg = {
         name: taskDetails.value.status_name,
         code: taskDetails.value.status
@@ -198,7 +195,7 @@ onMounted(async () => {
 async function changeStatusData(status) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -209,7 +206,7 @@ async function changeStatusData(status) {
         });
 
         if (data.value?.app_message === 'success') {
-            getTaskDetails(singleTask.key);
+            getTaskDetails(taskDetails.value?.id);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             emit('updateTaskTable');
         } else {
@@ -226,7 +223,7 @@ async function changeBounceStatusData(selectedBncStatus) {
     // return;
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -239,7 +236,7 @@ async function changeBounceStatusData(selectedBncStatus) {
         console.log('dataBO', data);
 
         if (data.value?.app_message === 'success') {
-            getTaskDetails(singleTask.key);
+            getTaskDetails(taskDetails.value?.id);
             toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', group: 'br', life: 3000 });
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
@@ -291,7 +288,7 @@ const deleteFile = async (id) => {
 
     if (isFileDeleted.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'File Deleted successfully!', group: 'br', life: 3000 });
-        getTaskDetails(singleTask.key);
+        getTaskDetails(taskDetails.value?.id);
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', group: 'br', life: 3000 });
     }
@@ -313,7 +310,7 @@ const handleCloseCommetFile = async () => {
 
 const handleShare = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/share/${singleTask.key}`, {
+    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/share/${taskDetails.value?.id}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -338,10 +335,10 @@ const handleShare = async () => {
 };
 
 const handleShareTaskId = () => {
-    if (singleTask?.key) {
+    if (taskDetails.value?.id) {
         // navigator.clipboard.writeText(singleTask?.key);
         const el = document.createElement('textarea');
-        el.value = singleTask?.unique_id;
+        el.value = taskDetails.value?.unique_id;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
@@ -359,9 +356,10 @@ const handleShareTaskId = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <pre>{{assignees}}</pre>
-                <pre>api task detail => {{taskDetails.assignee}}</pre>
-                <!-- <pre>{{assignees}}</pre> -->
+                <!-- <pre>{{singleTask.key}}</pre> -->
+                <!-- <pre>api task detail => {{taskDetails}}</pre> -->
+                <!-- <pre>api task detail => {{taskDetails}}</pre> -->
+                <!-- <pre>{{singleTask?.data?.tagsObj}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
                     <h5 v-tooltip.top="{
                         value: `${taskDetails.name}`, pt: {

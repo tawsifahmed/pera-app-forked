@@ -1,6 +1,13 @@
 <script setup>
 import Column from 'primevue/column';
 
+const isLogged = ref(false);
+
+const token = useCookie('token');
+if(token.value){
+    isLogged.value = true;
+}
+
 definePageMeta({
     layout: false
 });
@@ -37,12 +44,22 @@ const formattedTime = (time) => {
 </script>
 
 <template>
+    <div>
+        <div class="card lg:mx-auto mx-auto shared-nav">
+        <img src="/demo/images/login/avatar.png" alt="Logo" height="35" class="mr-2" />
+        <pre>{{authenticated}}</pre>
+        <NuxtLink v-if="!isLogged" to="/login">
+            <Button type="submit" label="Login" class="w-full px-3 py-2 text-xl"></Button>
+        </NuxtLink>
+    </div>
     <div class="shared-task lg:mx-auto card grid p-4 mx-auto justify-content-center">
+        
         <div class="col-12 lg:col-7">
             <div>
                 <!-- <pre>{{ taskData }}</pre> -->
                 <!-- <pre>{{assignees}}</pre> -->
                 <h5 class="">Task: {{ taskData?.name }}</h5>
+            
 
                 <div class="task-wrapper card">
                     <div class="task-det">
@@ -195,9 +212,25 @@ const formattedTime = (time) => {
         <img src="/demo/images/login/avatar.png" alt="Logo" height="25" class="mr-2" />
         <p class="text-center">by Singularity</p>
     </div>
+    </div>
 </template>
 
 <style lang="scss">
+
+.shared-nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    padding: 24px 8%;
+    border-radius: 5px;
+    width: 100%;
+    margin: 0 auto;
+    .login-btn{
+        border-radius: 5px;
+    }
+
+}
 .shared-task {
     max-width: 100rem;
     margin-top: 2rem;
