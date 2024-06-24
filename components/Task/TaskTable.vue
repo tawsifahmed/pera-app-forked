@@ -317,7 +317,7 @@ const load = () => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '10%' }">
+        <Column field="status" header="Status" :style="{ width: '15%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -343,7 +343,7 @@ const load = () => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }">
+        <Column field="dueDateValue" header="Due Date"  :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>

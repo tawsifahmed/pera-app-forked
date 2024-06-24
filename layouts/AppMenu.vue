@@ -103,7 +103,7 @@ watchEffect(async () => { });
                     class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{
             company?.charAt(0) }}</span>
                 <h6 class="m-0 font-bold font-size-16">{{ company }}</h6>
-                <!-- <pre>{{readDashboard}}</pre> -->
+                
             </div>
         </div>
         <hr />
