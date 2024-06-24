@@ -23,7 +23,8 @@ const toast = useToast();
 const btnLoading = ref(false);
 const updateTaskP = ref(accessPermission('update_task'));
 
-const assignees = ref(singleTask?.data?.assigneeObj);
+const assignees = ref(null);
+assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
 
 const tags = ref(singleTask?.data?.tagsObj);
 
@@ -358,17 +359,17 @@ const handleShareTaskId = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{taskDetails}}</pre>
-                <pre>{{singleTask}}</pre> -->
+                <pre>{{assignees}}</pre>
+                <pre>api task detail => {{taskDetails.assignee}}</pre>
                 <!-- <pre>{{assignees}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
                     <h5 v-tooltip.top="{
-                        value: `${singleTask.data.name}`, pt: {
+                        value: `${taskDetails.name}`, pt: {
 
                             width: '200px',
                         }
                     }" class="m-0 detail-task-name cursor-pointer">
-                        {{ singleTask.data.name }}
+                        {{ taskDetails.name }}
                     </h5>
                     <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }"
                         class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>

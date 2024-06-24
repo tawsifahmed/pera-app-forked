@@ -463,7 +463,6 @@ export const useCompanyStore = defineStore('workStation', {
                     let obj = {
                         id: element.id,
                         name: element.name,
-                        image: element.image
                     };
                     this.users.push(obj);
                 });
