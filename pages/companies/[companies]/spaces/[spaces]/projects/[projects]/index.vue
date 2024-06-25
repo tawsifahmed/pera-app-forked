@@ -31,13 +31,6 @@ const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
 
-const taskNameEditInput = ref(null);
-const taskEditDescriptionInput = ref(null);
-const priority = ref(null);
-const dueDate = ref(null);
-const assignees = ref([]);
-const tags = ref([]);
-const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const tagsLists = ref([]);
 const visibleEdit = ref(false);
@@ -69,13 +62,6 @@ const handleTaskEdit = async (task) => {
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
-    // refTaskIdForEdit.value = task.key;
-    // taskNameEditInput.value = task.data.name;
-    // taskEditDescriptionInput.value = task.data.description;
-    // priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
-    // assignees.value = task.data.assigneeObj;
-    // tags.value = task.data.tagsObj;
-    // dueDate.value = task.data.dueDate;
     visibleEdit.value = true;
 };
 
@@ -89,7 +75,7 @@ const deletingTask = async () => {
     await deleteTask(refTaskId.value, projects);
     if (isTaskDeleted.value === true) {
         btnLoading.value = false;
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
         deleteTaskDialog.value = false;
     } else {
         btnLoading.value = false;
@@ -101,10 +87,7 @@ const handleTaskDetailView = async (task) => {
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
-    singleTask.value = task;
-    refTaskId.value = task.key;
-    taskNameEditInput.value = task.data.name;
-    // getTaskDetails(task.key);
+    await getTaskDetails(task.key);
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
@@ -169,7 +152,7 @@ watchEffect(() => {
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TaskDetail
-                :singleTask="singleTask"
+                
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"
                 :projID="projects"

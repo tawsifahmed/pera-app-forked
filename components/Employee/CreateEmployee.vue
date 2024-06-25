@@ -10,8 +10,8 @@
             <InputText type="email" v-model="email" class="w-full" />
         </div>
         <div class="field">
-            <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="text" class="w-full" />
+            <label for="phoneNo">Phone</label>
+            <InputText v-model="phone" inputId="worktype" type="number" class="w-full" />
         </div>
         <div class="field">
             <label for="company">Address</label>
@@ -147,5 +147,17 @@ const handleSubmitData = async () => {
         padding-top: 11px !important;
     }
     
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
+input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield; 
 }
 </style>

@@ -12,6 +12,7 @@ export const useCompanyStore = defineStore('workStation', {
         companyList: null,
         companyId: null,
         singleCompany: null,
+        singleCompanySpaces: null,
         singleCompanyName: null,
 
         // space api
@@ -20,6 +21,7 @@ export const useCompanyStore = defineStore('workStation', {
         isSpaceDeleted: false,
         isSpaceEdited: false,
         singleSpace: null,
+        singleSpaceProjects: null,
         spaceSidebarlist: [],
 
         // projectapi
@@ -70,7 +72,7 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            this.companyList = data.value?.data;
+            this.companyList = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
             this.singleCompanyName = data.value?.data[0]?.name;
         },
         async getSingleCompany(company) {
@@ -83,6 +85,7 @@ export const useCompanyStore = defineStore('workStation', {
                 })
             );
             this.singleCompany = data.value?.data;
+            this.singleCompanySpaces = this.singleCompany?.spaces.map((item, index) => ({ ...item, index: index + 1 }));
         },
         async createCompany({ name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
@@ -195,6 +198,7 @@ export const useCompanyStore = defineStore('workStation', {
                 })
             );
             this.singleSpace = data.value?.data;
+            this.singleSpaceProjects = this.singleSpace?.projects.map((item, index) => ({ ...item, index: index + 1 }));
         },
         async createSpace({ name, description, company_id, color }) {
             const token = useCookie('token');
@@ -458,7 +462,7 @@ export const useCompanyStore = defineStore('workStation', {
                 data.value?.data.forEach((element) => {
                     let obj = {
                         id: element.id,
-                        name: element.name
+                        name: element.name,
                     };
                     this.users.push(obj);
                 });

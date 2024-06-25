@@ -129,7 +129,7 @@ const init = async () => {
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data;
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));;
     }
 };
 
@@ -171,14 +171,14 @@ initFilters();
     <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
             <Toast position="bottom-right" group="br" />
-
-            <!-- <pre>{{rolePermission}}</pre> -->
-            <h4 class="mb-0">Create Employee</h4>
+            <div class="d-flex mr-2">
+                <h5 class="mb-1">Employees</h5>
+            </div>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
                 <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
@@ -196,10 +196,10 @@ initFilters();
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
-            <Column field="phone" sortable header="Phone Number"></Column>
+            <Column field="phone" sortable header="Phone"></Column>
             <Column field="user_type" sortable header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">

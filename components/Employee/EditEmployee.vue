@@ -11,7 +11,7 @@
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="text" class="w-full" />
+            <InputText v-model="phone" type="number" class="w-full" />
         </div>
         <div class="field">
             <label for="company">Address</label>
@@ -129,5 +129,17 @@ const handleSubmitData = async () => {
 .create-btn-wrappe {
     display: flex;
     justify-content: end;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
+input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield; 
 }
 </style>
