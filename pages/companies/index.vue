@@ -62,7 +62,7 @@ const deletingCompany = async () => {
     await deleteCompany(refCompanyId.value);
 
     if (isCompanyDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
         console.log('company deleted');
         router.push('/')
@@ -113,7 +113,7 @@ initFilters();
            
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Company Name" sortable>
               <template #body="slotProps" >
                 <NuxtLink :to="`/companies/${slotProps?.data?.id}`">

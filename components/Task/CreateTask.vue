@@ -81,7 +81,7 @@ const handleCreateTask = async () => {
             dueDate.value = selectedDate.toISOString();
         }
         const createTaskData = {
-            name: name.value,
+            name: name.value, 
             dueDate: dueDate.value,
             assignees: assignees.value?.map((assignee) => assignee.id),
             tags: tags.value?.map((tag) => tag.id),

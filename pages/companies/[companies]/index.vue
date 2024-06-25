@@ -3,7 +3,7 @@ import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getSingleCompany, deleteSpace } = useCompanyStore();
-const { singleCompany, isSpaceDeleted } = storeToRefs(useCompanyStore());
+const { singleCompany, singleCompanySpaces, isSpaceDeleted } = storeToRefs(useCompanyStore());
 import accessPermission from "~/composables/usePermission";
 
 const createSpaceP = ref(accessPermission('create_space'));
@@ -25,6 +25,7 @@ const toast = useToast();
 const { companies } = useRoute().params;
 console.log('companyParams,', companies);
 const visible = ref(false);
+
 
 if (singleCompany.value === undefined) {
     throw createError({ statusCode: 404, message: 'Company not found', fatal: true });
@@ -51,7 +52,7 @@ const deletingSpace = async () => {
     await deleteSpace(refSpaceId.value, companies);
 
     if (isSpaceDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteSpaceDialog.value = false;
         console.log('space deleted');
     } else {
@@ -110,13 +111,13 @@ const closeEditSpace = (evn) => {
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-dco" :value="singleCompany?.spaces" stripedRows paginator
+        <DataTable v-model:filters="filters" class="table-dco" :value="singleCompanySpaces" stripedRows paginator
             tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>
             <template #loading> Loading data. Please wait. </template>
-            <Column field="id" header="ID"></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Space Name">
                 <template #body="slotProps">
                     <NuxtLink :to="`/companies/${companies}/spaces/${slotProps.data.id}`">

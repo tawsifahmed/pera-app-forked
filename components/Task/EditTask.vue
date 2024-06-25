@@ -1,16 +1,11 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
-            <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name</label>
                 <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15"
                     :invalid="spaceDescriptionError" />
             </div>
-            <!-- <div class="field">
-                <label for="company">Set Task Name</label>
-                <InputText v-model="taskNameEditInput" class="w-full" />
-            </div> -->
             <div class="field">
                 <label>Assignees</label>
                 <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
@@ -30,7 +25,6 @@
                 <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
                     class="w-full" />
             </div>
-
             <br />
             <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields
             </p>
@@ -55,11 +49,14 @@ const taskEditDescriptionInput = ref(null);
 const taskNameEditInput = ref(singleTask?.data?.name);
 const dueDate = ref(singleTask?.data?.dueDate);
 
-const assignees = ref(singleTask?.data?.assigneeObj);
+const assignees = ref(null);
+assignees.value = singleTask?.data?.assigneeObj ? singleTask?.data?.assigneeObj.map((obj) => ({ id: obj.id, name: obj.name  })) : '';
+
 const tags = ref(singleTask?.data?.tagsObj);
 
 const priority = ref(null);
 priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
     { name: 'High', code: 'High' },
