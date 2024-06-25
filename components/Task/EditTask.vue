@@ -1,8 +1,6 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
-            <!-- <pre>{{singleTask?.data?.assigneeObj}}</pre> -->
-            <!-- <pre>{{assignees}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name</label>
                 <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15"
@@ -14,8 +12,6 @@
                     placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
-                <!-- <pre>{{tagsLists}}</pre>
-                <pre>{{tags}}</pre> -->
                 <label>Tags</label>
                 <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
                     placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
