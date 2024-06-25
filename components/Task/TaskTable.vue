@@ -98,42 +98,41 @@ const handleDateDelete2 = () => {
 const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
-    
     // return
     loading.value = true;
     console.log('lod', taskLists);
     // return
     if (taskLists.length > 0) {
         const csvContent =
-    'data:text/csv;charset=utf-8,' +
-    '"Serial No","Unique ID","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
-    taskLists
-        .map((task, index) => {
-            const serialNo = index + 1;
-            const uniqueId = task.unique_id;
-            const taskName = task.data.name;
-            const projectName = singleProject.value.name;
-            const assignees = task.data.assignee.split(', ').join('; ');
-            const priority = task.data.priority ? task.data.priority : '';
-            const status = task.data.status.name;
-            let timeTracked = task.data.total_duration;
-            const hours = Math.floor(timeTracked / 3600);
-            const minutes = Math.floor((timeTracked % 3600) / 60);
-            const seconds = timeTracked % 60;
+            'data:text/csv;charset=utf-8,' +
+            '"Serial No","Unique ID","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
+            taskLists
+                .map((task, index) => {
+                    const serialNo = index + 1;
+                    const uniqueId = task.unique_id;
+                    const taskName = task.data.name;
+                    const projectName = singleProject.value.name;
+                    const assignees = task.data.assignee.split(', ').join('; ');
+                    const priority = task.data.priority ? task.data.priority : '';
+                    const status = task.data.status.name;
+                    let timeTracked = task.data.total_duration;
+                    const hours = Math.floor(timeTracked / 3600);
+                    const minutes = Math.floor((timeTracked % 3600) / 60);
+                    const seconds = timeTracked % 60;
 
-            if (hours > 0) {
-                timeTracked = `${hours} hr ${minutes} min ${seconds} sec`;
-            } else if (minutes > 0) {
-                timeTracked = `${minutes} min ${seconds} sec`;
-            } else {
-                timeTracked = `${seconds} sec`;
-            }
-            const dueDate = task.data.dueDateValue;
-            const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
+                    if (hours > 0) {
+                        timeTracked = `${hours} hr ${minutes} min ${seconds} sec`;
+                    } else if (minutes > 0) {
+                        timeTracked = `${minutes} min ${seconds} sec`;
+                    } else {
+                        timeTracked = `${seconds} sec`;
+                    }
+                    const dueDate = task.data.dueDateValue;
+                    const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
 
-            return `"${serialNo}","${uniqueId}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
-        })
-        .join('\n');
+                    return `"${serialNo}","${uniqueId}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
+                })
+                .join('\n');
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement('a');
         link.setAttribute('href', encodedUri);
@@ -229,29 +228,30 @@ const load = () => {
     <Toolbar class="border-0 px-0">
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
-            <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button v-if="createTaskP" icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
-            <Button v-if="createTaskP" icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
-            <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
-          
+            <div class="flex flex-wrap gap-1">
+                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP" icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP" icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
+                <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
-            <!-- task report download -->
+                <!-- task report download -->
 
-            <Button
-                type="button"
-                v-if="downloadTaskP"
-                @click="downloadTaskSheet(tasks)"
-                v-tooltip.right="{ value: `Download Tasks` }"
-                icon="pi pi-file-excel"
-                :loading="loading"
-                label=""
-                class="mr-2"
-                severity="secondary"
-                :style="`${loading === true ? 'backGround: red' : ''}`"
-            />
+                <Button
+                    type="button"
+                    v-if="downloadTaskP"
+                    @click="downloadTaskSheet(tasks)"
+                    v-tooltip.right="{ value: `Download Tasks` }"
+                    icon="pi pi-file-excel"
+                    :loading="loading"
+                    label=""
+                    class="mr-2"
+                    severity="secondary"
+                    :style="`${loading === true ? 'backGround: red' : ''}`"
+                />
 
-            <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
-            <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
+                <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
+                <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
+            </div>
         </template>
 
         <template #end>
@@ -345,7 +345,7 @@ const load = () => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date"  :style="{ width: '10%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>
@@ -364,7 +364,6 @@ const load = () => {
                         <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
                         <Button v-if="deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
                         <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden" />
-                        
                     </div>
                 </div>
             </template>
