@@ -23,7 +23,7 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-
+const tableView = ref(true);
 const priorities = ref([
     { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
@@ -224,6 +224,8 @@ const load = () => {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+            <Button v-if="createTaskP" icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
+            <Button v-if="createTaskP" icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
             <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
             <Button
                 type="button"
@@ -251,7 +253,7 @@ const load = () => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
         <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '50%' }">
@@ -355,6 +357,9 @@ const load = () => {
             </template>
         </Column>
     </TreeTable>
+
+    <!-- Kanban Board -->
+    <TaskKanban v-if="!tableView">hello</TaskKanban>
 </template>
 
 <style>
