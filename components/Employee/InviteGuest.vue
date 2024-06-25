@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="field">
-            <label for="email">Email address</label>
+            <label for="email">Email address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" v-model="email" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label>Role</label>
+            <label>Role <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 

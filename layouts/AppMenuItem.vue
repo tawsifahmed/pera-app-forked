@@ -107,10 +107,11 @@ const toggle = (event) => {
             
 
             <div v-if="item.option == 'space_option'">
-                <div class="flex">
+                <div class="flex align-items-center">
                     <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
+                    <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer text-sm instruction-tip"></div>
                 </div>
             </div>
         </div>
@@ -122,6 +123,7 @@ const toggle = (event) => {
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject v-if="createProjectP"  v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
+                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             </div>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
