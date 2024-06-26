@@ -2,7 +2,7 @@
     <div>
         <InputText type="hidden" v-model="tskId" />
         <div class="field flex flex-column">
-            <label for="name">Set Task Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="name">Set Task Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div>
         <!-- <div class="field">
@@ -10,21 +10,21 @@
             <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div> -->
         <div class="field">
-            <label>Assignees <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Assignees <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
                 placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
-            <label>Tags <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Tags <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
                 placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
         </div>
         <div class="field">
-            <label>Due Date <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Due Date <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
         </div>
         <div class="field">
-            <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
                 class="w-full" />
         </div>

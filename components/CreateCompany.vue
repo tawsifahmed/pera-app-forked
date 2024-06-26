@@ -167,20 +167,20 @@ const handleCreateWorkspace = async () => {
 <template>
     <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Company" :modal="true" class="p-fluid">
         <div class="field">
-            <label for="company">Company Size <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+            <label for="company">Company Size <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="numEmployees" inputId="company" :options="companyLargeAmount" optionLabel="label" class="w-full" />
         </div>
         <div class="field">
-            <label for="worktype">Company work type? <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+            <label for="worktype">Company work type? <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" class="w-full" />
         </div>
         <div class="field">
-            <label for="email">Email address <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+            <label for="email">Email address <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail" />
             <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
         </div>
         <div class="field">
-            <label for="company">Company name <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+            <label for="company">Company name <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="workSpaceName" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>

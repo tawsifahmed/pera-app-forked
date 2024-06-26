@@ -134,15 +134,15 @@ const handleCreateProject = async () => {
                 <label for="name">Create project for <strong>{{singleSpace?.name}}</strong> space</label>
             </div>
             <div class="field">
-                <label for="name">Project Name <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+                <label for="name">Project Name <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <InputText id="name" v-model="projectNameInput" required="true" />
             </div>
             <div class="field">
-                <label for="name">Project Description <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></label>
+                <label for="name">Project Description <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
             </div>
             <div class="mb-4">
-              <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></p>
+              <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
@@ -190,7 +190,7 @@ const handleCreateProject = async () => {
                 </div>
             </div>
             <div class="mb-4">
-              <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm"></span></p>
+              <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
                     <div class="field">
                         

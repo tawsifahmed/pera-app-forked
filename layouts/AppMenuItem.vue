@@ -111,7 +111,7 @@ const toggle = (event) => {
                     <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
-                    <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer text-sm instruction-tip"></div>
+                    <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
                 </div>
             </div>
         </div>
@@ -122,13 +122,21 @@ const toggle = (event) => {
             </div>
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-                <CreateSpecificProject v-if="createProjectP"  v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
-                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-question-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+                <CreateSpecificProject v-if="createProjectP" v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
             </div>
         </a>
-        <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
-            <span class="layout-menuitem-text">{{ item.label }}</span>
+        <router-link class="flex align-items-center justify-content-between" v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
+            <div class="flex flex-row">
+                <i :class="item.icon" class="layout-menuitem-icon"></i>
+                <span class="layout-menuitem-text">{{ item.label }}</span>
+            </div>
+            <span v-if="item.label == 'Employees'" style="left: 7px; position: relative;" v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            <span v-if="item.label == 'Roles'" style="left: 7px; position: relative;" v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            <span v-if="item.label == 'Tags'" style="left: 7px; position: relative;" v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            <span v-if="item.label == 'Task Wise Reports'" style="left: 7px; position: relative;" v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            <span v-if="item.label == 'User Wise Reports'" style="left: 7px; position: relative;" v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
