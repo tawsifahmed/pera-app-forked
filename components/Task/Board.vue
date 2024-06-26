@@ -1,7 +1,7 @@
 <script setup>
 const taskList = ref([
     {
-        name: 'Todo',
+        name: 'Open',
         content: [
             { t_name: 'laundry', id: 1, description: 'I need to do my laundry' },
             { t_name: 'clean', id: 2, description: 'I need to do my cleaning' },
@@ -13,11 +13,11 @@ const taskList = ref([
         content: [{ t_name: 'run', id: 4 }]
     },
     {
-        name: 'Done',
+        name: 'Dev Done',
         content: [{ t_name: 'shower', id: 5 }]
     },
     {
-        name: 'Checked',
+        name: 'Complete',
         content: [{ t_name: 'shower', id: 6 }]
     }
 ]);
@@ -49,12 +49,35 @@ const save = () => {
     localStorage.setItem('taskList', JSON.stringify(taskList.value));
 };
 
-const addColumn = () => {
-    taskList.value.push({
-        name: newStatus.value,
-        content: [{ t_name: 'shower', id: uuidv4() }]
-    });
-    newStatus.value = '';
+// const addColumn = () => {
+//     taskList.value.push({
+//         name: newStatus.value,
+//         content: [{ t_name: 'shower', id: uuidv4() }]
+//     });
+//     newStatus.value = '';
+// };
+
+const handleChange = (event, serial) => {
+    const { added, moved, removed } = event;
+    console.log(event, serial.value);
+    // if (added) {
+    //     const { element, newIndex } = added;
+    //     const toColumn = taskList.value[event.to.index];
+    //     console.log(`Added item ${element.t_name} to ${toColumn.name} at position ${newIndex}`);
+    // }
+
+    // if (removed) {
+    //     const { element, oldIndex } = removed;
+    //     const fromColumn = taskList.value[event.from.index];
+    //     console.log(`Removed item ${element.t_name} from ${fromColumn.name} at position ${oldIndex}`);
+    // }
+
+    // if (moved) {
+    //     const { element, newIndex, oldIndex } = moved;
+    //     const fromColumn = taskList.value[event.from.index];
+    //     const toColumn = taskList.value[event.to.index];
+    //     console.log(`Moved item ${element.t_name} from ${fromColumn.name} at position ${oldIndex} to ${toColumn.name} at position ${newIndex}`);
+    // }
 };
 
 onMounted(() => {
@@ -80,7 +103,7 @@ watch(
     <div>
         <div class="boardContainer" style="display: flex; overflow-x: scroll; padding-bottom: 2rem; align-items: start">
             <div v-for="list in taskList" :key="list" class="groupColumnContainer">
-                <TaskStatusColumn :list="list.content" :name="list.name" @open-modal="openModal"></TaskStatusColumn>
+                <TaskStatusColumn :list="list.content" :name="list.name" :index="index" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
             </div>
 
             <!-- TASK MODAL -->
@@ -101,7 +124,7 @@ watch(
                 </div>
             </div>
 
-            <input @keydown.enter="addColumn" placeholder="+ New" v-model="newStatus" class="new-status-input" />
+            <!-- <input @keydown.enter="addColumn" placeholder="+ New" v-model="newStatus" class="new-status-input" /> -->
         </div>
     </div>
 </template>

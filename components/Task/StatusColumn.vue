@@ -3,8 +3,8 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import draggable from 'vuedraggable';
 
-const props = defineProps(['list', 'name']);
-const emits = defineEmits(['open-modal']);
+const props = defineProps(['list', 'name', 'index']);
+const emits = defineEmits(['open-modal', 'change']);
 
 const alteredList = ref(props.list);
 const newtask = ref('');
@@ -12,11 +12,14 @@ const editable = ref(true);
 const isDragging = ref(false);
 const delayedDragging = ref(false);
 
-const add = () => {
-    if (newtask.value) {
-        alteredList.value.push({ t_name: newtask.value, id: uuidv4() });
-        newtask.value = '';
-    }
+// const add = () => {
+//     if (newtask.value) {
+//         alteredList.value.push({ t_name: newtask.value, id: uuidv4() });
+//         newtask.value = '';
+//     }
+// };
+const emitChange = (event) => {
+    emits('change', event, serial);
 };
 
 const dragOptions = computed(() => ({
@@ -72,7 +75,7 @@ watch(isDragging, (newValue) => {
 <template>
     <div class="column-container">
         <div class="column-header">{{ name }} - {{ alteredList.length }}</div>
-        <draggable v-model="alteredList" :options="dragOptions" class="draggable" @change="log" itemKey="name" group="cardItem">
+        <draggable v-model="alteredList" :options="dragOptions" class="draggable" itemKey="name" group="cardItem" @change="emitChange">
             <template v-slot:item="{ element }">
                 <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('open-modal', element, alteredList, name)">
                     {{ element.t_name }}
@@ -94,7 +97,7 @@ watch(isDragging, (newValue) => {
 .column-header {
     margin-bottom: 5px;
     font-size: 0.85em;
-    background-color: indigo;
+    background-color: rgb(3, 184, 93);
     color: white;
     padding: 5px;
     border-radius: 5px;
@@ -121,7 +124,7 @@ watch(isDragging, (newValue) => {
 }
 
 .ghost {
-    background-color: #d2b5ff;
+    background-color: #e20d0d;
 }
 .sortable {
     background-color: white;
