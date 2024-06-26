@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
 import draggable from 'vuedraggable';
 
 const props = defineProps(['list', 'name', 'index']);

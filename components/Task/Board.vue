@@ -1,4 +1,6 @@
 <script setup>
+const { data, statuses } = defineProps(['data', 'statuses']);
+
 const taskList = ref([
     {
         name: 'Open',
