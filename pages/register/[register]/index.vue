@@ -43,6 +43,7 @@ const errorData = ref({
     emailError: false,
     passwordError: false,
     confirmPassError: false,
+    confirmPassMismatch: false,
     otpError: false
 });
 
@@ -71,11 +72,24 @@ const handleLoginSubmit = async () => {
     createUser.value.email = users.value.email;
     createUser.value.password ? (errorData.value.passwordError = false) : (errorData.value.passwordError = true);
     createUser.value.confirmPass ? (errorData.value.confirmPassError = false) : (errorData.value.confirmPassError = true);
-    if (createUser.value.password !== createUser.value.confirmPass) {
-        errorData.value.confirmPassError = true;
-        regBtnHandle.value = false;
+
+    if (createUser.value.confirmPass && createUser.value.password !== createUser.value.confirmPass) {
+        errorData.value.confirmPassError = false
+        errorData.value.confirmPassMismatch = true
+        regBtnHandle.value = false
     }
-    if (errorData.value.userNameError || errorData.value.passwordError || errorData.value.confirmPassError) {
+    
+    if (createUser.value.password === createUser.value.confirmPass) {
+        errorData.value.confirmPassMismatch = false  
+    }
+
+    if (createUser.value.confirmPass === '' ) {
+        errorData.value.confirmPassMismatch = false
+        errorData.value.confirmPassError = true
+        regBtnHandle.value = false
+    }
+    
+    if (errorData.value.userNameError || errorData.value.passwordError || errorData.value.confirmPassError || errorData.value.confirmPassMismatch) {
         regBtnHandle.value = false;
     } else {
 
@@ -226,6 +240,9 @@ loading.value = false;
                             </Password>
                             <small id="password-help" class="error-report" v-if="errorData.confirmPassError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required!
+                            </small>
+                            <small id="password-help" class="error-report" v-if="errorData.confirmPassMismatch">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password did not match!
                             </small>
                         </div>
                         <Button type="submit" label="Sign Up" :loading="regBtnHandle"

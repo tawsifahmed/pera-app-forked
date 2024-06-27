@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
     userProfile: null,
     userCompany: null,
     resendOtpMsg: null,
+    detectDuplicateEmail: false,
   }),
   
   actions: {
@@ -69,15 +70,30 @@ export const useAuthStore = defineStore('auth', {
           'password_confirmation' : confirmPass
         },
       });
-      if (data.value?.message === 'Registration success.') {
-        this.checkOTP = true;
-        this.resendOtp({ email })
+
+      if(error.value){
+        if(error.value?.data?.code === 422) {
+          this.detectDuplicateEmail = true;
+          this.checkOTP = false;
+        }
       }
+
+      if (data.value) {
+        if (data.value.code === 201) {
+        this.checkOTP = true;
+        this.detectDuplicateEmail = false;
+        // this.resendOtp({ email })
+      }
+      else {
+        this.checkOTP = false;
+        this.detectDuplicateEmail = false;
+      }
+    }
       else{
         this.checkOTP = false;
       }
     },
-    async registerInviteUser({ id,userName, email, password, confirmPass }) {  
+    async registerInviteUser({ id, userName, email, password, confirmPass }) {  
       const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,7 +107,7 @@ export const useAuthStore = defineStore('auth', {
       });
       if (data.value?.message === 'User registered successfully')  {
         this.checkOTP = true;
-        this.resendOtp({ email })
+        // this.resendOtp({ email })
       }
       else{
         this.checkOTP = false;

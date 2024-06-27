@@ -167,12 +167,10 @@ const uploadFile = async () => {
 const checkAttachmentType = (file) => {
     const imageExtensions = ['jpg', 'JPG', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif', 'heic', 'heif'];
     const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp', 'mkv'];
-    const pdfExtensions = ['pdf', 'PDF'];
+    const pdfExtensions = ['pdf', 'PDF', 'ppt', 'pptx'];
     const wordExtensions = ['doc', 'docx'];
     const excelExtensions = ['xls', 'xlsx', 'csv'];
-    // const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp'];
-    // const audioExtensions = ['mp3', 'wav', 'ogg', 'wma', 'flac', 'aac'];
-    // const documentExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'rtf', 'odt', 'ods', 'odp'];
+
     if (imageExtensions.some(ext => file.endsWith('.' + ext))) {
         return 'image';
     } else if (videoExtensions.some(ext => file.endsWith('.' + ext))) {
@@ -243,9 +241,7 @@ async function changeStatusData(status) {
 }
 
 async function changeBounceStatusData(selectedBncStatus) {
-    console.log('bounceStatus', selectedBncStatus.is_bounce);
-    // return
-    // return;
+
     try {
         const token = useCookie('token');
         const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
