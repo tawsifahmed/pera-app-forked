@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async authenticateUser({ email, password }) {
       
-      const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -57,10 +57,10 @@ export const useAuthStore = defineStore('auth', {
           this.authenticated = false;
           token.value = '';
         }
-       }
+       } 
     },
     async registerUser({ userName, email, password, confirmPass }) {
-      const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/register`, {
+      const { data, pending, error } = await useFetch(`https://pbe.singularitybd.net/api/v1/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -94,7 +94,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async registerInviteUser({ id, userName, email, password, confirmPass }) {  
-      const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user-register`, {
+      const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/invite-user-register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -114,7 +114,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async otpVerify({ email, password, otp  }) {
-      const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/verify-email`, {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { 
@@ -136,7 +136,7 @@ export const useAuthStore = defineStore('auth', {
         
           this.userCreated = true;
           if(this.userCreated) {
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/login`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: {
@@ -172,7 +172,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async resendOtp({ email }) {
-      const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/resend-otp`, {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { 

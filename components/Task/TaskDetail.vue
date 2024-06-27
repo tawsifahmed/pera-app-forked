@@ -218,7 +218,7 @@ onMounted(async () => {
 async function changeStatusData(status) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
+        const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -244,7 +244,7 @@ async function changeBounceStatusData(selectedBncStatus) {
 
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
+        const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -331,7 +331,7 @@ const handleCloseCommetFile = async () => {
 
 const handleShare = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/share/${taskDetails.value?.id}`, {
+    const { data, pending, error } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/share/${taskDetails.value?.id}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`

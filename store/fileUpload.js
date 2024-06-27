@@ -17,7 +17,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-upload`, {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-upload`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -50,7 +50,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-delete/${id}`, {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`,

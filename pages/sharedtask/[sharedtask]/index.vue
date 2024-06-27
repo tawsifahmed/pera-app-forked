@@ -15,7 +15,7 @@ const { sharedtask } = useRoute().params;
 const taskData = ref();
 const taskTable = ref([]);
 const handleFetch = async () => {
-    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/shared/${sharedtask}`);
+    const { data, pending, error } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/shared/${sharedtask}`);
     taskData.value = data.value.data;
     taskTable.value = data.value.subTask;
     console.log(data.value.subTask);

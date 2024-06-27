@@ -88,7 +88,7 @@ const handleLoginSubmit = async () => {
         errorData.value.confirmPassError = true
         regBtnHandle.value = false
     }
-    
+
     if (errorData.value.userNameError || errorData.value.passwordError || errorData.value.confirmPassError || errorData.value.confirmPassMismatch) {
         regBtnHandle.value = false;
     } else {
@@ -164,7 +164,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData(() =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/user/' + empId.value, {
+        $fetch('https://pbe.singularitybd.net/api/v1/user/' + empId.value, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

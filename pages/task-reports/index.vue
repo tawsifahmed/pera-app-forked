@@ -32,7 +32,7 @@ const handleReportDownload = async () => {
         startDate: startDate.value,
         endDate: endDate.value
     };
-    const { data, error } = await useFetch('http://188.166.212.40/pera/public/api/v1/tasks/report-download', {
+    const { data, error } = await useFetch('https://pbe.singularitybd.net/api/v1/tasks/report-download', {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`

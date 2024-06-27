@@ -57,7 +57,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany',{
       const token = useCookie('token');
       const { data, pending, error } = await useAsyncData(
           'companyList',
-          () => $fetch('http://188.166.212.40/pera/public/api/v1/company/list',{
+          () => $fetch('https://pbe.singularitybd.net/api/v1/company/list',{
             headers: {
               Authorization: `Bearer ${token.value}`,
             },

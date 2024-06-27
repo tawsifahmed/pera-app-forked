@@ -66,7 +66,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getCompanyList() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('companyList', () =>
-                $fetch('http://188.166.212.40/pera/public/api/v1/company/list', {
+                $fetch('https://pbe.singularitybd.net/api/v1/company/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -78,7 +78,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getSingleCompany(company) {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('singleCompany', () =>
-                $fetch(`http://188.166.212.40/pera/public/api/v1/company/show/${company}`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/company/show/${company}`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -89,7 +89,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createCompany({ name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -117,7 +117,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editCompany({ id, name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/update/${id}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -141,7 +141,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async deleteCompany(id) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/delete/${id}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -166,7 +166,7 @@ export const useCompanyStore = defineStore('workStation', {
             const token = useCookie('token');
             if (id) {
                 const { data, pending, error } = await useAsyncData('spaceList', () =>
-                    $fetch(`http://188.166.212.40/pera/public/api/v1/space/list/${id}`, {
+                    $fetch(`https://pbe.singularitybd.net/api/v1/space/list/${id}`, {
                         headers: {
                             Authorization: `Bearer ${token.value}`
                         }
@@ -191,7 +191,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getSingleSpace(space) {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('singleSpace', () =>
-                $fetch(`http://188.166.212.40/pera/public/api/v1/space/show/${space}`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/space/show/${space}`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -202,7 +202,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createSpace({ name, description, company_id, color }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/create`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -222,7 +222,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editSpace({ id, name, description, company_id, color }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/update/${id}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -245,7 +245,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async deleteSpace(spaceId, companyId) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/space/delete/${spaceId}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/delete/${spaceId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -265,7 +265,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getProjectList() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('projectList', () =>
-                $fetch('http://188.166.212.40/pera/public/api/v1/space/list', {
+                $fetch('https://pbe.singularitybd.net/api/v1/space/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -284,7 +284,7 @@ export const useCompanyStore = defineStore('workStation', {
             const { data, pending, error } = await useAsyncData('singleProject', () =>
                 $fetch(
                     `
-          http://188.166.212.40/pera/public/api/v1/projects/show/${projectID}?assignees=${assignees}&priority=${priority}&status=${status}&search=${query}&start=${start}&end=${end}`,
+          https://pbe.singularitybd.net/api/v1/projects/show/${projectID}?assignees=${assignees}&priority=${priority}&status=${status}&search=${query}&start=${start}&end=${end}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token.value}`
@@ -302,7 +302,7 @@ export const useCompanyStore = defineStore('workStation', {
 
         async createProject({ name, description, space_id, statuses }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -324,7 +324,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editProject({ id, name, description, space_id, statuses }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/update/${id}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -346,7 +346,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async deleteProject(projectID, spaceId) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/projects/delete/${projectID}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/delete/${projectID}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -364,7 +364,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
             const token = useCookie('token');
-            const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/create`, {
+            const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -397,7 +397,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editTask({ id, name, description, project_id, dueDate, priority, assignees, tags }) {
             const token = useCookie('token');
-            const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${id}`, {
+            const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -431,7 +431,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async deleteTask(taskID, projectId) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/delete/${taskID}`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/delete/${taskID}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -450,7 +450,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getTaskAssignModalData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-                $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+                $fetch('https://pbe.singularitybd.net/api/v1/users/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -471,7 +471,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getTagsAssignModalData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('tagsAssignModalData', () =>
-                $fetch('http://188.166.212.40/pera/public/api/v1/tag/list', {
+                $fetch('https://pbe.singularitybd.net/api/v1/tag/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -492,7 +492,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getTaskDetails(id) {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('taskDetails', () =>
-                $fetch(`http://188.166.212.40/pera/public/api/v1/tasks/show/${id}`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/tasks/show/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -525,7 +525,7 @@ export const useCompanyStore = defineStore('workStation', {
             formData.append('file', file);
 
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/comments/create`, {
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/comments/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -543,7 +543,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getChartData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('chartData', () =>
-                $fetch(`http://188.166.212.40/pera/public/api/v1/chart-data`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/chart-data`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
@@ -563,7 +563,7 @@ export const useCompanyStore = defineStore('workStation', {
         async getRoles() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('roleLit', () =>
-                $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+                $fetch('https://pbe.singularitybd.net/api/v1/roles/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }

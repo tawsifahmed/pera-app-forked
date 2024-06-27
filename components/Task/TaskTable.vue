@@ -156,7 +156,7 @@ onMounted(async () => {
 async function handleTaskStatus(status, task_id) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${task_id}`, {
+        const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${task_id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
