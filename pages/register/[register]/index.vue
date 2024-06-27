@@ -164,7 +164,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData(() =>
-        $fetch('https://pbe.singularitybd.net/api/v1/user/' + empId.value, {
+        $fetch('http://188.166.212.40/pera/public/api/v1/user/' + empId.value, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

@@ -103,7 +103,7 @@ const deleteEmployee = (key) => {
 
 const confirmDeleteEmployee = async () => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/users/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -122,7 +122,7 @@ const confirmDeleteEmployee = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('https://pbe.singularitybd.net/api/v1/users/list', {
+        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -136,7 +136,7 @@ const init = async () => {
 const getRoleList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch('https://pbe.singularitybd.net/api/v1/roles/list', {
+        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

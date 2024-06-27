@@ -38,7 +38,7 @@ const handleReportDownload = async () => {
 
     console.log(employee.value);
     const { data, error } = await useFetch(
-        `https://pbe.singularitybd.net/api/v1/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
+        `http://188.166.212.40/pera/public/api/v1/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
         {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -60,7 +60,7 @@ const handleReportDownload = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('https://pbe.singularitybd.net/api/v1/users/list', {
+        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

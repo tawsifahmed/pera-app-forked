@@ -9,7 +9,7 @@ export const useWorkStation = defineStore('workstation', () => {
     const setWorkStation = async (payload) => {
         // workStations.value.push(payload)
         const token = useCookie('token'); 
-        const { data, pending, refresh } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
+        const { data, pending, refresh } = await useFetch(`http://188.166.212.40/pera/public/api/v1/company/create`, {
             method: 'POST',
             headers: {
                 
@@ -31,7 +31,7 @@ export const useWorkStation = defineStore('workstation', () => {
         const token = useCookie('token'); 
         const { data, pending, error } = await useAsyncData(
           'companyList',
-          () => $fetch('https://pbe.singularitybd.net/api/v1/company/list',{
+          () => $fetch('http://188.166.212.40/pera/public/api/v1/company/list',{
             headers: {
               Authorization: `Bearer ${token.value}`,
             },

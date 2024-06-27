@@ -50,7 +50,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/invite-user`, {
+            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`

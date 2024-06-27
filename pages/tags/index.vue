@@ -72,7 +72,7 @@ const deleteTag = (key) => {
 
 const confirmDeleteTag = async () => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tag/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -91,7 +91,7 @@ const confirmDeleteTag = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('tagsList', () =>
-        $fetch('https://pbe.singularitybd.net/api/v1/tag/list', {
+        $fetch('http://188.166.212.40/pera/public/api/v1/tag/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

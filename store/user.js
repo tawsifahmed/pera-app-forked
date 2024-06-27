@@ -10,7 +10,7 @@ export const useUserStore = defineStore('user', () => {
         const token = useCookie('token');
         const { data, pending, error } = await useAsyncData(
             'userProf',
-            () => $fetch('https://pbe.singularitybd.net/api/v1/users/profile', {
+            () => $fetch('http://188.166.212.40/pera/public/api/v1/users/profile', {
                 headers: {
                     Authorization: `Bearer ${token.value}`,
                 },
@@ -38,7 +38,7 @@ export const useUserStore = defineStore('user', () => {
         const token = useCookie('token');
 
         try {
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/users/update/${id}`, {
+            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/users/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,

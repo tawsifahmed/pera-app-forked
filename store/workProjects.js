@@ -15,7 +15,7 @@ export const useWorkProjectStore = defineStore('workProjects', {
     actions: {
         async createProjects ({name, description, space_id, statuses}) {
             const token = useCookie('token');
-            const { data, pending } = await  useFetch(`https://pbe.singularitybd.net/api/v1/projects/create`, {
+            const { data, pending } = await  useFetch(`http://188.166.212.40/pera/public/api/v1/projects/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
