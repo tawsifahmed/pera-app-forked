@@ -4,6 +4,10 @@ import { useLayout } from './composables/layout';
 import { useRoute } from 'vue-router';
 import accessPermission from "~/composables/usePermission";
 
+import { storeToRefs } from 'pinia';
+import { useActiveCompanyStore } from '~/store/workCompany';
+const { company_id } = storeToRefs(useActiveCompanyStore());
+
 import Dialog from 'primevue/dialog';
 
 const createSpaceP = ref(accessPermission('create_space'));
@@ -33,6 +37,26 @@ const props = defineProps({
 const isActiveMenu = ref(false);
 const itemKey = ref(null);
 
+const items = ref([
+    {
+        label: 'Settings',
+        items: [
+            {
+                label: 'Manage Space',
+                icon: 'pi pi-th-large'
+            },
+            // {
+            //     label: 'Show all Space',
+            //     icon: 'pi pi-eye'
+            // },
+            // {
+            //     label: 'Show Archive',
+            //     icon: 'pi pi-inbox'
+            // }
+        ]
+    }
+]);
+
 onBeforeMount(() => {
     itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);
     const activeItem = layoutState.activeMenuItem;
@@ -47,8 +71,8 @@ watch(
 );
 
 const itemClick = (event, item) => {
-    console.log('clicked');
-    console.log('item', item);
+    
+    console.log('clicked item', item);
     if (item.disabled) {
         event.preventDefault();
         console.log('clicked ids');
@@ -70,30 +94,19 @@ const itemClick = (event, item) => {
     setActiveMenuItem(foundItemKey);
 };
 
+const clickSpaceMenu = (event) => {
+    if(event[0].items[0].label == 'Manage Space'){
+       console.log('company_id', company_id.value);
+           return navigateTo(`/companies/${company_id.value}`)
+    }
+};
+
 const checkActiveRoute = (item) => {
     return route.path === item.to;
 };
 
 const menu = ref();
-const items = ref([
-    {
-        label: 'Settings',
-        items: [
-            {
-                label: 'Manage Space',
-                icon: 'pi pi-th-large'
-            },
-            {
-                label: 'Show all Space',
-                icon: 'pi pi-eye'
-            },
-            {
-                label: 'Show Archive',
-                icon: 'pi pi-inbox'
-            }
-        ]
-    }
-]);
+
 
 const toggle = (event) => {
     menu.value.toggle(event);
@@ -109,7 +122,7 @@ const toggle = (event) => {
             <div v-if="item.option == 'space_option'">
                 <div class="flex align-items-center">
                     <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
-                    <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                    <Menu ref="menu" id="overlay_menu" @click="clickSpaceMenu(items)" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
                     <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
                 </div>

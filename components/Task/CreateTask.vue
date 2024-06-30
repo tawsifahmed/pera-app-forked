@@ -12,12 +12,12 @@
         <div class="field">
             <label>Assignees <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
-                placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
+                placeholder="Select Assignees" :maxSelectedLabels="5" class="w-full" />
         </div>
         <div class="field">
             <label>Tags <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
-                placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
+                placeholder="Select Tags" :maxSelectedLabels="5" class="w-full" />
         </div>
         <div class="field">
             <label>Due Date <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>

@@ -664,7 +664,7 @@ const handleShareTaskId = () => {
                                 </div>
                             </template>
                             <template #content>
-                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
+                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
                                     <a :href="val?.file" target="_blank"
                                         class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
                                         style="background-color: #f7fafc">
@@ -678,7 +678,7 @@ const handleShareTaskId = () => {
                                 <p class="m-0 ml-1">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
-                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
