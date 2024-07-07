@@ -1,35 +1,34 @@
 <script setup>
 const { data, statuses } = defineProps(['data', 'statuses']);
 
-const taskList = ref([
-    {
-        name: 'Open',
-        content: [
-            { t_name: 'laundry', id: 1, description: 'I need to do my laundry' },
-            { t_name: 'clean', id: 2, description: 'I need to do my cleaning' },
-            { t_name: 'code', id: 3 }
-        ]
-    },
-    {
-        name: 'Doing',
-        content: [{ t_name: 'run', id: 4 }]
-    },
-    {
-        name: 'Dev Done',
-        content: [{ t_name: 'shower', id: 5 }]
-    },
-    {
-        name: 'Complete',
-        content: [{ t_name: 'shower', id: 6 }]
-    }
-]);
-
+// const taskList = ref([
+//     {
+//         name: 'Open',
+//         content: [
+//             { t_name: 'laundry', id: 1, description: 'I need to do my laundry' },
+//             { t_name: 'clean', id: 2, description: 'I need to do my cleaning' },
+//             { t_name: 'code', id: 3 }
+//         ]
+//     },
+//     {
+//         name: 'Doing',
+//         content: [{ t_name: 'run', id: 4 }]
+//     },
+//     {
+//         name: 'Dev Done',
+//         content: [{ t_name: 'shower', id: 5 }]
+//     },
+//     {
+//         name: 'Complete',
+//         content: [{ t_name: 'shower', id: 6 }]
+//     }
+// ]);
+const taskList = ref(data);
 const currStatus = ref('');
 const currList = ref([]);
 const currTask = ref({});
 const isOpen = ref(false);
 const newStatus = ref('');
-
 const openModal = (element, list, listName) => {
     isOpen.value = true;
     currList.value = list;
@@ -61,7 +60,6 @@ const save = () => {
 
 const handleChange = (event, serial) => {
     const { added, moved, removed } = event;
-    console.log(event, serial.value);
     // if (added) {
     //     const { element, newIndex } = added;
     //     const toColumn = taskList.value[event.to.index];
@@ -82,30 +80,30 @@ const handleChange = (event, serial) => {
     // }
 };
 
-onMounted(() => {
-    if (process.client) {
-        if (localStorage.taskList) {
-            taskList.value = JSON.parse(localStorage.getItem('taskList') || '[]');
-        } else {
-            localStorage.setItem('taskList', JSON.stringify(taskList.value));
-        }
-    }
-});
+// onMounted(() => {
+//     if (process.client) {
+//         if (localStorage.taskList) {
+//             taskList.value = JSON.parse(localStorage.getItem('taskList') || '[]');
+//         } else {
+//             localStorage.setItem('taskList', JSON.stringify(taskList.value));
+//         }
+//     }
+// });
 
-watch(
-    taskList,
-    (newTaskList) => {
-        localStorage.setItem('taskList', JSON.stringify(newTaskList));
-    },
-    { deep: true }
-);
+// watch(
+//     taskList,
+//     (newTaskList) => {
+//         localStorage.setItem('taskList', JSON.stringify(newTaskList));
+//     },
+//     { deep: true }
+// );
 </script>
 
 <template>
     <div>
         <div class="boardContainer" style="display: flex; overflow-x: scroll; padding-bottom: 2rem; align-items: start">
             <div v-for="list in taskList" :key="list" class="groupColumnContainer">
-                <TaskStatusColumn :list="list.content" :name="list.name" :index="index" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
+                <TaskStatusColumn :list="list.content" :name="list.name" :color="list.statusColor" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
             </div>
 
             <!-- TASK MODAL -->
@@ -141,6 +139,7 @@ watch(
 
 .groupColumnContainer {
     flex-shrink: 0;
+    height: 100%;
 }
 
 .modal-overlay {

@@ -2,7 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
 
-const props = defineProps(['list', 'name', 'index']);
+const props = defineProps(['list', 'name', 'index', 'color']);
 const emits = defineEmits(['open-modal', 'change']);
 
 const alteredList = ref(props.list);
@@ -10,7 +10,24 @@ const newtask = ref('');
 const editable = ref(true);
 const isDragging = ref(false);
 const delayedDragging = ref(false);
+console.log('list: ', props.list);
+function getRandomDeepColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 10)];
+    }
+    return color;
+}
 
+function avatarStyle(index) {
+    return {
+        backgroundColor: getRandomDeepColor(),
+        color: 'white',
+        borderRadius: '50%',
+        border: '2px solid white'
+    };
+}
 // const add = () => {
 //     if (newtask.value) {
 //         alteredList.value.push({ t_name: newtask.value, id: uuidv4() });
@@ -73,10 +90,57 @@ watch(isDragging, (newValue) => {
 
 <template>
     <div class="column-container">
-        <div class="column-header">{{ name }} - {{ alteredList.length }}</div>
+        <div :style="`background-color: ${props.color}; `" class="column-header">{{ name }} - {{ alteredList.length }}</div>
         <draggable v-model="alteredList" :options="dragOptions" class="draggable" itemKey="name" group="cardItem" @change="emitChange">
             <template v-slot:item="{ element }">
                 <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('open-modal', element, alteredList, name)">
+                    <!-- <pre>{{ element.data }}</pre> -->
+                    <div class="">
+                        <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                        <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                        <div class="flex align-items-center gap-2 mt-1">
+                            <div class="status-icon" :style="`background-color:${props.color}`"></div>
+                            <p class="status text-sm">{{ element.data.status.name }}</p>
+                        </div>
+                        <div class="mt-2 flex align-items-center gap-2">
+                            <i class="pi pi-user text-lg"></i>
+                            <div class="flex justify-content-start gap-1">
+                                <span v-for="(assignee, index) in element.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
+                                    <!-- <pre>{{ assignee }}</pre> -->
+                                    <img
+                                        v-tooltip.top="{ value: `${assignee.name}` }"
+                                        class="mr-2 capitalize cursor-pointer"
+                                        v-if="assignee.image"
+                                        :src="assignee.image"
+                                        style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                        alt=""
+                                        srcset=""
+                                    />
+                                    <Avatar
+                                        v-else
+                                        v-tooltip.top="{ value: `${assignee.name}` }"
+                                        :label="assignee.name.charAt(0)"
+                                        class="mr-2 capitalize cursor-pointer"
+                                        size="small"
+                                        style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                        :style="avatarStyle(index)"
+                                    />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex align-items-center gap-2">
+                            <i class="pi pi-calendar-minus text-lg"></i>
+                            <p :style="`color: ${element.data.dueDateColor}; font-weight: 600;`">{{ element.data.dueDateValue }}</p>
+                        </div>
+                        <div class="mt-2 flex align-items-center gap-2">
+                            <i class="pi pi-flag text-lg"></i>
+                            <p class="text-sm">{{ element.data.priority }}</p>
+                        </div>
+                        <div class="mt-2 flex align-items-center gap-2">
+                            <i class="pi pi-list text-lg"></i>
+                            <p class="text-sm">{{ element.children.length }}</p>
+                        </div>
+                    </div>
                     {{ element.t_name }}
                 </div>
             </template>
@@ -91,14 +155,18 @@ watch(isDragging, (newValue) => {
     margin: 10px;
     width: 240px;
     min-height: 100px;
+    /* height: 100%; */
+    /* background-color: #e20d0d; */
+    /* padding-bottom: 50px; */
 }
 
 .column-header {
+    font-weight: 500;
     margin-bottom: 5px;
     font-size: 0.85em;
-    background-color: rgb(3, 184, 93);
+    /* background-color: rgb(3, 184, 93); */
     color: white;
-    padding: 5px;
+    padding: 10px;
     border-radius: 5px;
 }
 
@@ -119,7 +187,11 @@ watch(isDragging, (newValue) => {
 }
 
 .draggable {
-    min-height: 200px;
+    min-height: 485px;
+    background-color: rgb(245, 241, 236);
+    padding-bottom: 20px;
+    min-height: 60vh;
+    height: 100%;
 }
 
 .ghost {
@@ -143,7 +215,28 @@ watch(isDragging, (newValue) => {
     box-shadow: 2px 3px #e2e2e2;
     border: none;
 }
-
+.title {
+    margin: 0;
+}
+.desc {
+    margin: 0;
+    color: #818181;
+}
+.status-icon {
+    /* background-color: red; */
+    height: 10px;
+    width: 10px;
+    border-radius: 10px;
+}
+.status {
+    text-transform: uppercase;
+}
+.truncate {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
 @media only screen and (max-width: 1250px) {
     .boardContainer {
         max-width: 1025px;
