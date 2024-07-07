@@ -1,6 +1,11 @@
 <script setup>
+// import Dialog from 'primevue/dialog';
+import { useCompanyStore } from '~/store/company';
 const { data, statuses } = defineProps(['data', 'statuses']);
-
+const usersListStore = useCompanyStore();
+const tagsListStore = useCompanyStore();
+const usersLists = ref(usersListStore);
+const tagsLists = ref(tagsListStore);
 // const taskList = ref([
 //     {
 //         name: 'Open',
@@ -28,12 +33,14 @@ const currStatus = ref('');
 const currList = ref([]);
 const currTask = ref({});
 const isOpen = ref(false);
+const { projects } = useRoute().params;
 const newStatus = ref('');
 const openModal = (element, list, listName) => {
     isOpen.value = true;
     currList.value = list;
     currTask.value = element;
     currStatus.value = listName;
+    console.log('open modal:', element, projects);
 };
 
 const close = () => {
@@ -59,6 +66,7 @@ const save = () => {
 // };
 
 const handleChange = (event, serial) => {
+    console.log('event: ', event, serial.value);
     const { added, moved, removed } = event;
     // if (added) {
     //     const { element, newIndex } = added;
@@ -97,17 +105,22 @@ const handleChange = (event, serial) => {
 //     },
 //     { deep: true }
 // );
+
+// Modal Handler
+const handleTaskDetailView = (event) => {
+    console.log(event);
+};
 </script>
 
 <template>
     <div>
-        <div class="boardContainer" style="display: flex; overflow-x: scroll; padding-bottom: 2rem; align-items: start">
+        <div class="boardContainer" style="display: flex; overflow-x: scroll; align-items: start">
             <div v-for="list in taskList" :key="list" class="groupColumnContainer">
                 <TaskStatusColumn :list="list.content" :name="list.name" :color="list.statusColor" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
             </div>
 
             <!-- TASK MODAL -->
-            <div v-if="isOpen" class="modal-overlay" @click="close">
+            <!-- <div v-if="isOpen" class="modal-overlay" @click="close">
                 <div class="modal-content" @click="stop">
                     <header class="modal-header">
                         <span class="badge">{{ currStatus }}</span>
@@ -122,8 +135,18 @@ const handleChange = (event, serial) => {
                         <button class="delete-button" @click="handleDelete">Delete</button>
                     </footer>
                 </div>
-            </div>
-
+            </div> -->
+            <Dialog v-model:visible="isOpen" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <TaskDetail
+                    :usersLists="usersLists"
+                    :tagsLists="tagsLists"
+                    :projID="projects"
+                    @handleTaskEdit="handleTaskEdit($event)"
+                    @handleTaskDetailView="handleTaskDetailView($event)"
+                    @confirmDeleteTask="confirmDeleteTask($event)"
+                    @updateTaskTable="updateTaskTable"
+                />
+            </Dialog>
             <!-- <input @keydown.enter="addColumn" placeholder="+ New" v-model="newStatus" class="new-status-input" /> -->
         </div>
     </div>
@@ -133,13 +156,13 @@ const handleChange = (event, serial) => {
 .boardContainer {
     display: flex;
     overflow-x: scroll;
-    padding-bottom: 2rem;
     align-items: start;
 }
 
 .groupColumnContainer {
     flex-shrink: 0;
     height: 100%;
+    /* width: 100%; */
 }
 
 .modal-overlay {

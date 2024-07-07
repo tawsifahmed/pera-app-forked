@@ -10,7 +10,6 @@ const newtask = ref('');
 const editable = ref(true);
 const isDragging = ref(false);
 const delayedDragging = ref(false);
-console.log('list: ', props.list);
 function getRandomDeepColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -47,10 +46,10 @@ const dragOptions = computed(() => ({
 
 const taskCardStyle = computed(() => ({
     backgroundColor: '#fff',
-    boxShadow: '0px 3px 8px #e2e2e2',
+    boxShadow: '0px 2px 2px #e2e2e2',
     cursor: 'grab',
     padding: '12px 10px',
-    margin: '4px 0px'
+    margin: '8px 0px'
 }));
 
 const serial = computed(() => {
@@ -91,7 +90,7 @@ watch(isDragging, (newValue) => {
 <template>
     <div class="column-container">
         <div :style="`background-color: ${props.color}; `" class="column-header">{{ name }} - {{ alteredList.length }}</div>
-        <draggable v-model="alteredList" :options="dragOptions" class="draggable" itemKey="name" group="cardItem" @change="emitChange">
+        <draggable v-model="alteredList" :options="dragOptions" class="draggable scrollbar" itemKey="name" group="cardItem" @change="emitChange">
             <template v-slot:item="{ element }">
                 <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('open-modal', element, alteredList, name)">
                     <!-- <pre>{{ element.data }}</pre> -->
@@ -130,7 +129,7 @@ watch(isDragging, (newValue) => {
                         </div>
                         <div class="mt-2 flex align-items-center gap-2">
                             <i class="pi pi-calendar-minus text-lg"></i>
-                            <p :style="`color: ${element.data.dueDateColor}; font-weight: 600;`">{{ element.data.dueDateValue }}</p>
+                            <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                         </div>
                         <div class="mt-2 flex align-items-center gap-2">
                             <i class="pi pi-flag text-lg"></i>
@@ -138,7 +137,7 @@ watch(isDragging, (newValue) => {
                         </div>
                         <div class="mt-2 flex align-items-center gap-2">
                             <i class="pi pi-list text-lg"></i>
-                            <p class="text-sm">{{ element.children.length }}</p>
+                            <p class="text-sm font-semibold">{{ element.children.length }}</p>
                         </div>
                     </div>
                     {{ element.t_name }}
@@ -153,21 +152,18 @@ watch(isDragging, (newValue) => {
 <style scoped>
 .column-container {
     margin: 10px;
-    width: 240px;
     min-height: 100px;
-    /* height: 100%; */
-    /* background-color: #e20d0d; */
-    /* padding-bottom: 50px; */
 }
 
 .column-header {
     font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-size: 0.85em;
     /* background-color: rgb(3, 184, 93); */
     color: white;
     padding: 10px;
     border-radius: 5px;
+    user-select: none;
 }
 
 .task-card {
@@ -175,7 +171,9 @@ watch(isDragging, (newValue) => {
     box-shadow: 0px 3px 8px #e2e2e2;
     cursor: grab;
     padding: 12px 10px;
-    margin: 4px 0px;
+    /* margin: 10px 0px; */
+    border-radius: 8px;
+    min-width: 20rem;
 }
 
 .input-new {
@@ -187,13 +185,22 @@ watch(isDragging, (newValue) => {
 }
 
 .draggable {
-    min-height: 485px;
     background-color: rgb(245, 241, 236);
-    padding-bottom: 20px;
-    min-height: 60vh;
-    height: 100%;
+    padding: 1px 5px 10px 5px;
+    height: 55vh;
+    overflow-y: auto;
+    min-width: 290px;
+    border-radius: 8px;
 }
 
+.srcollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.srcollbar::-webkit-scrollbar-thumb {
+    background-color: darkgrey !important;
+    outline: 1px solid slategrey;
+}
 .ghost {
     background-color: #e20d0d;
 }
