@@ -2,7 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
 
-const props = defineProps(['list', 'name', 'index', 'color']);
+const props = defineProps(['list', 'name', 'index', 'color', 'status']);
 const emits = defineEmits(['open-modal', 'change']);
 
 const alteredList = ref(props.list);
@@ -72,6 +72,7 @@ watch(
                 localStorage.setItem('taskList', JSON.stringify(existing));
             }
         }
+        // console.log('status', props.status[serial.value].status);
     },
     { deep: true }
 );
@@ -93,13 +94,13 @@ watch(isDragging, (newValue) => {
         <draggable v-model="alteredList" :options="dragOptions" class="draggable scrollbar" itemKey="name" group="cardItem" @change="emitChange">
             <template v-slot:item="{ element }">
                 <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('open-modal', element, alteredList, name)">
-                    <!-- <pre>{{ element.data }}</pre> -->
                     <div class="">
                         <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
                         <p class="truncate text-sm desc">{{ element.data.description }}</p>
                         <div class="flex align-items-center gap-2 mt-1">
                             <div class="status-icon" :style="`background-color:${props.color}`"></div>
-                            <p class="status text-sm">{{ element.data.status.name }}</p>
+                            <!-- <p class="status text-sm">{{ element.data.status.name }}</p> -->
+                            <p class="status text-sm">{{ props.status.name }}</p>
                         </div>
                         <div class="mt-2 flex align-items-center gap-2">
                             <i class="pi pi-user text-lg"></i>
@@ -193,14 +194,10 @@ watch(isDragging, (newValue) => {
     border-radius: 8px;
 }
 
-.srcollbar::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3) !important;
+.scrollbar::-webkit-scrollbar {
+    display: none !important;
 }
 
-.srcollbar::-webkit-scrollbar-thumb {
-    background-color: darkgrey !important;
-    outline: 1px solid slategrey;
-}
 .ghost {
     background-color: #e20d0d;
 }

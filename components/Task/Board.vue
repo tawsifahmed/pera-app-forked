@@ -1,7 +1,7 @@
 <script setup>
 // import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-const { data, statuses } = defineProps(['data', 'statuses']);
+const { data, statuses, handleStatus } = defineProps(['data', 'statuses', 'handleStatus']);
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const usersLists = ref(usersListStore);
@@ -66,13 +66,20 @@ const save = () => {
 // };
 
 const handleChange = (event, serial) => {
-    console.log('event: ', event, serial.value);
+    // console.log('event: ', event);
+
+    // console.log('moved: ', event.moved);
+    // console.log('removed: ', event.removed);
     const { added, moved, removed } = event;
-    // if (added) {
-    //     const { element, newIndex } = added;
-    //     const toColumn = taskList.value[event.to.index];
-    //     console.log(`Added item ${element.t_name} to ${toColumn.name} at position ${newIndex}`);
-    // }
+    if (added) {
+        handleStatus(taskList.value[serial.value].status, taskList.value[serial.value].status.project_id);
+        console.log('serial: ', serial.value);
+        console.log('status: ', taskList.value[serial.value].status);
+        console.log('add: ', event.added);
+        // const { element, newIndex } = added;
+        // const toColumn = taskList.value[event.to.index];
+        // console.log(`Added item ${element.t_name} to ${toColumn.name} at position ${newIndex}`);
+    }
 
     // if (removed) {
     //     const { element, oldIndex } = removed;
@@ -88,23 +95,25 @@ const handleChange = (event, serial) => {
     // }
 };
 
-// onMounted(() => {
-//     if (process.client) {
-//         if (localStorage.taskList) {
-//             taskList.value = JSON.parse(localStorage.getItem('taskList') || '[]');
-//         } else {
-//             localStorage.setItem('taskList', JSON.stringify(taskList.value));
-//         }
-//     }
-// });
+onMounted(() => {
+    if (process.client) {
+        // if (localStorage.taskList) {
+        //     taskList.value = JSON.parse(localStorage.getItem('taskList') || '[]');
+        // } else {
+        //     localStorage.setItem('taskList', JSON.stringify(taskList.value));
+        // }
 
-// watch(
-//     taskList,
-//     (newTaskList) => {
-//         localStorage.setItem('taskList', JSON.stringify(newTaskList));
-//     },
-//     { deep: true }
-// );
+        localStorage.setItem('taskList', JSON.stringify(taskList.value));
+    }
+});
+
+watch(
+    taskList,
+    (newTaskList) => {
+        localStorage.setItem('taskList', JSON.stringify(newTaskList));
+    },
+    { deep: true }
+);
 
 // Modal Handler
 const handleTaskDetailView = (event) => {
@@ -114,9 +123,9 @@ const handleTaskDetailView = (event) => {
 
 <template>
     <div>
-        <div class="boardContainer" style="display: flex; overflow-x: scroll; align-items: start">
+        <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
             <div v-for="list in taskList" :key="list" class="groupColumnContainer">
-                <TaskStatusColumn :list="list.content" :name="list.name" :color="list.statusColor" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
+                <TaskStatusColumn :list="list.content" :name="list.name" :color="list.statusColor" :status="list.status" @open-modal="openModal" @change="handleChange"></TaskStatusColumn>
             </div>
 
             <!-- TASK MODAL -->
@@ -297,7 +306,8 @@ textarea {
 
 /* width */
 ::-webkit-scrollbar {
-    height: 5px;
+    height: 8px;
+    border-radius: 8px;
     width: 5px;
     cursor: pointer;
 }
@@ -305,16 +315,18 @@ textarea {
 /* Track */
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 8px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #d2b5ff;
+    background: #c0c0c0;
     cursor: pointer;
+    border-radius: 8px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #d3b5ff93;
+    background: #77777793;
 }
 </style>
