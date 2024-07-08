@@ -117,7 +117,6 @@ watch(
     },
     { deep: true }
 );
-
 // Modal Handler
 // const handleTaskDetailView = (event) => {
 //     console.log(event);

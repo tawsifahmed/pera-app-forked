@@ -19,7 +19,8 @@ const handleModal = (event) => {
 };
 
 watchEffect(statuses, dataFormatter());
-watchEffect(tasks, dataFormatter());
+
+// watchEffect(tasks, dataFormatter());
 </script>
 
 <template>
