@@ -72,10 +72,10 @@ const handleChange = (event, serial) => {
     // console.log('removed: ', event.removed);
     const { added, moved, removed } = event;
     if (added) {
-        handleStatus(taskList.value[serial.value].status, taskList.value[serial.value].status.project_id);
-        console.log('serial: ', serial.value);
-        console.log('status: ', taskList.value[serial.value].status);
-        console.log('add: ', event.added);
+        handleStatus(taskList.value[serial.value].status, event.added.element.key);
+        // console.log('serial: ', serial.value);
+        // console.log('status: ', taskList.value[serial.value].status);
+        // console.log('add: ', event.added.element.key);
         // const { element, newIndex } = added;
         // const toColumn = taskList.value[event.to.index];
         // console.log(`Added item ${element.t_name} to ${toColumn.name} at position ${newIndex}`);

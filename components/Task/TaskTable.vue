@@ -371,7 +371,7 @@ const load = () => {
     </TreeTable>
 
     <!-- Kanban Board -->
-    <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" @handleStatus="handleTaskStatus"></TaskKanban>
+    <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus"></TaskKanban>
 </template>
 
 <style>

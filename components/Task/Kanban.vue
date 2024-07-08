@@ -25,7 +25,7 @@ watchEffect(tasks, dataFormatter());
     <!-- <pre>{{ data }}</pre> -->
     <div class="main-container">
         <div class="content">
-            <TaskBoard :data="data" :statuses="statuses" @handleStatus="handleStatus" />
+            <TaskBoard :data="data" :statuses="statuses" :handleStatus="handleStatus" />
         </div>
     </div>
 </template>
