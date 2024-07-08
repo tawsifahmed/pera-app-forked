@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Tag Name</label>
+            <label for="company">Tag Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm"></span><span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="name" class="w-full" placeholder="Enter tag name" />
         </div>
 

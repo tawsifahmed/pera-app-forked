@@ -60,7 +60,6 @@
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required!
                             </small>
                         </div>
-
                        
                         <Button type="submit" label="Verify" :loading="loginBtnHandle" class="w-full p-3 text-xl"></Button>
                     </form>

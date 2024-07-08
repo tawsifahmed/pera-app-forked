@@ -1,24 +1,24 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Name</label>
+            <label for="company">Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="name" class="w-full" />
         </div>
 
         <div class="field">
-            <label for="email">Email address</label>
+            <label for="email">Email address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" v-model="email" class="w-full" />
         </div>
         <div class="field">
-            <label for="phoneNo">Phone</label>
+            <label for="phoneNo">Phone <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="phone" inputId="worktype" type="number" class="w-full" />
         </div>
         <div class="field">
-            <label for="company">Address</label>
+            <label for="company">Address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Textarea v-model="address" rows="3" cols="20" class="w-full" />
         </div>
         <div class="field">
-            <label for="company">Password</label>
+            <label for="company">Password <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="password" v-model="password" class="w-full" />
         </div>
 

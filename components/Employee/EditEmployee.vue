@@ -17,10 +17,10 @@
             <label for="company">Address</label>
             <Textarea v-model="address" rows="3" cols="20" class="w-full" />
         </div>
-        <div class="field">
+        <!-- <div class="field">
             <label for="company">Password</label>
             <InputText type="password" v-model="password" class="w-full" />
-        </div>
+        </div> -->
 
 
         <!-- <pre>{{user_type}}</pre> -->
@@ -59,10 +59,6 @@ const user_type = ref(props.param.user_type);
 // user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
 
-const password = ref('');
-
-const password_confirmation = ref('');
-
 const errorHandler = ref(false);
 
 const employeeForm = ref(true);
@@ -91,8 +87,6 @@ const handleSubmitData = async () => {
                     email: email.value,
                     address: address.value,
                     phone: phone.value,
-                    password: password.value,
-                    password_confirmation: password.value,
                     role: user_type.value.name
                 }
             });
