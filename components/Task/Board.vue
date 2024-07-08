@@ -2,6 +2,7 @@
 // import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
 const { data, statuses, handleStatus } = defineProps(['data', 'statuses', 'handleStatus']);
+
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const usersLists = ref(usersListStore);
@@ -35,12 +36,14 @@ const currTask = ref({});
 const isOpen = ref(false);
 const { projects } = useRoute().params;
 const newStatus = ref('');
+const emit = defineEmits(['handleModal']);
 const openModal = (element, list, listName) => {
     isOpen.value = true;
     currList.value = list;
     currTask.value = element;
     currStatus.value = listName;
-    console.log('open modal:', element, projects);
+    emit('handleModal', element);
+    console.log('open modal:', element);
 };
 
 const close = () => {
@@ -116,9 +119,9 @@ watch(
 );
 
 // Modal Handler
-const handleTaskDetailView = (event) => {
-    console.log(event);
-};
+// const handleTaskDetailView = (event) => {
+//     console.log(event);
+// };
 </script>
 
 <template>
@@ -145,7 +148,7 @@ const handleTaskDetailView = (event) => {
                     </footer>
                 </div>
             </div> -->
-            <Dialog v-model:visible="isOpen" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <!-- <Dialog v-model:visible="isOpen" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <TaskDetail
                     :usersLists="usersLists"
                     :tagsLists="tagsLists"
@@ -155,7 +158,7 @@ const handleTaskDetailView = (event) => {
                     @confirmDeleteTask="confirmDeleteTask($event)"
                     @updateTaskTable="updateTaskTable"
                 />
-            </Dialog>
+            </Dialog> -->
             <!-- <input @keydown.enter="addColumn" placeholder="+ New" v-model="newStatus" class="new-status-input" /> -->
         </div>
     </div>

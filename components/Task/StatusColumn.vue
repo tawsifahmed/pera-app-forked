@@ -3,7 +3,7 @@ import { ref, computed, watch, nextTick } from 'vue';
 import draggable from 'vuedraggable';
 
 const props = defineProps(['list', 'name', 'index', 'color', 'status']);
-const emits = defineEmits(['open-modal', 'change']);
+const emits = defineEmits(['open-modal', 'change', 'handleTaskDetailView']);
 
 const alteredList = ref(props.list);
 const newtask = ref('');

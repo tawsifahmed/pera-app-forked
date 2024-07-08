@@ -1,5 +1,6 @@
 <script setup>
 const { tasks, statuslist, handleStatus } = defineProps(['tasks', 'statuslist', 'handleStatus']);
+const emit = defineEmits(['modalHandler']);
 const data = ref(tasks);
 const statuses = ref(statuslist);
 const arr = ref([]);
@@ -10,13 +11,13 @@ const dataFormatter = () => {
         arr.value.push(content);
         return { name: val.name, statusColor: val.color_code, status: val, content: content };
     });
-    // console.log(data.value);
-    // data.value.map((value) => {
-    //     console.log(value.data.status.name);
-    //     updatedData
-    // });
     return (data.value = updatedData);
 };
+// test
+const handleModal = (event) => {
+    emit('modalHandler', event);
+};
+
 watchEffect(statuses, dataFormatter());
 watchEffect(tasks, dataFormatter());
 </script>
@@ -25,7 +26,7 @@ watchEffect(tasks, dataFormatter());
     <!-- <pre>{{ data }}</pre> -->
     <div class="main-container">
         <div class="content">
-            <TaskBoard :data="data" :statuses="statuses" :handleStatus="handleStatus" />
+            <TaskBoard :data="data" :statuses="statuses" :handleStatus="handleStatus" @handleModal="handleModal" />
         </div>
     </div>
 </template>

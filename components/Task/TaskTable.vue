@@ -207,6 +207,11 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
+
+// test
+const modalHandler = (event) => {
+    emit('handleTaskDetailView', event);
+};
 </script>
 
 <template>
@@ -371,7 +376,7 @@ const load = () => {
     </TreeTable>
 
     <!-- Kanban Board -->
-    <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus"></TaskKanban>
+    <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban>
 </template>
 
 <style>
