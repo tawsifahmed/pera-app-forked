@@ -16,12 +16,11 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 
 import { useAuthStore } from '~/store/auth';
-// import { useRoute } from 'vue-router';
+
 const name = ref('name');
 const userImage = ref(null);
-const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
-
+const { logUserOut } = useAuthStore(); 
+const { authenticated } = storeToRefs(useAuthStore()); 
 const visibleProfile = ref(false);
 const showNotify = ref(false);
 const logout = () => {
@@ -82,7 +81,7 @@ const isOutsideClicked = (event) => {
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
 
-// Profile
+
 
 const handleOutsideClick = () => {
     showNotify.value = false;

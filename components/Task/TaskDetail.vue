@@ -164,6 +164,29 @@ const uploadFile = async () => {
     }
 };
 
+const checkAttachmentType = (file) => {
+    const imageExtensions = ['jpg', 'JPG', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif', 'heic', 'heif'];
+    const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp', 'mkv'];
+    const pdfExtensions = ['pdf', 'PDF', 'ppt', 'pptx'];
+    const wordExtensions = ['doc', 'docx'];
+    const excelExtensions = ['xls', 'xlsx', 'csv'];
+
+    if (imageExtensions.some(ext => file.endsWith('.' + ext))) {
+        return 'image';
+    } else if (videoExtensions.some(ext => file.endsWith('.' + ext))) {
+        return 'video';
+    } else if (pdfExtensions.some(ext => file.endsWith('.' + ext))) {
+        return 'pdf';
+    } else if (wordExtensions.some(ext => file.endsWith('.' + ext))) {
+        return 'word';
+    } else if (excelExtensions.some(ext => file.endsWith('.' + ext))) {
+        return 'excel';
+    }
+      else {
+        return 'file';
+    }
+};
+
 const commentAttachment = ref(false);
 
 const handleCommentAttachment = () => {
@@ -218,9 +241,7 @@ async function changeStatusData(status) {
 }
 
 async function changeBounceStatusData(selectedBncStatus) {
-    console.log('bounceStatus', selectedBncStatus.is_bounce);
-    // return
-    // return;
+
     try {
         const token = useCookie('token');
         const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${taskDetails.value?.id}`, {
@@ -486,8 +507,9 @@ const handleShareTaskId = () => {
                                     <div v-for="item in taskDetails?.attachments" :key="item" target="_blank"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                         style="background-color: #f7fafc">
-                                        <a target="_blank"
-                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative"
+                                        <!-- <pre v-if="checkAttachmentType(item?.file == 'image')">{{checkAttachmentType(item?.file)}}</pre> -->
+                                        <a v-if="checkAttachmentType(item?.file) === 'file'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
                                             :href="item?.file">
                                             <div class="pi pi-file text-6xl attach-icon"></div>
                                             <div
@@ -496,6 +518,62 @@ const handleShareTaskId = () => {
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
+                                        <a v-if="checkAttachmentType(item?.file) === 'image'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 relative"
+                                            :href="item?.file">
+                                            <img :src="item?.file" alt="" style="width: 90%; height: 80px; border-radius: 10px; border-top-left-radius: 10px; object-fit: cover;">
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a v-if="checkAttachmentType(item?.file) === 'video'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file">
+                                            <div class="pi pi-video text-6xl attach-icon"></div>
+                                        
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a v-if="checkAttachmentType(item?.file) === 'pdf'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file">
+                                            <div class="pi pi-file-pdf text-6xl text-danger attach-icon"></div>
+                                        
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                       
+                                        <a v-if="checkAttachmentType(item?.file) === 'word'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file">
+                                            <div class="pi pi-file-word text-6xl text-blue attach-icon"></div>
+                                        
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a v-if="checkAttachmentType(item?.file) === 'excel'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file">
+                                            <div class="pi pi-file-excel text-6xl text-primary attach-icon"></div>
+                                        
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                       
                                         <div @click="deleteFile(item?.id)"
                                             class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs text-white"></i>
@@ -586,11 +664,11 @@ const handleShareTaskId = () => {
                                 </div>
                             </template>
                             <template #content>
-                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
+                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
                                     <a :href="val?.file" target="_blank"
                                         class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
                                         style="background-color: #f7fafc">
-                                        <div class="pi pi-file attach-icon"></div>
+                                        <div class="pi pi-file"></div>
                                         <div
                                             class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
@@ -600,7 +678,7 @@ const handleShareTaskId = () => {
                                 <p class="m-0 ml-1">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
-                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
@@ -792,6 +870,11 @@ const handleShareTaskId = () => {
     color: #444;
 }
 
+.attach-icon{
+    position: relative;
+    top: -16px;
+}
+
 .action-dropdown-det {
     position: relative;
     display: inline-block;
@@ -967,5 +1050,13 @@ input[type='file']::file-selector-button:hover {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-blue {
+    color: #2a78cc;
 }
 </style>

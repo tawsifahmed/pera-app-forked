@@ -161,7 +161,7 @@ onMounted(() => {
           <InputText id="name" v-model="projectNameInput" required="true" />
       </div>
       <div class="field flex flex-column">
-          <label for="name">Space Description</label>
+          <label for="name">Project Description</label>
           <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
       </div>
       <div class="mb-4">
@@ -213,7 +213,7 @@ onMounted(() => {
           </div>
       </div>
       <div class="mb-4">
-        <p class="text-slate-700 mb-2 tracking-wide left-3">Set Close Status</p>
+        <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status</p>
           <div class="container">
               <div class="field">
                   
