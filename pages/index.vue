@@ -29,8 +29,8 @@ const lineData = ref({
             label: 'Total Tasks',
             data: chartTaskInfo,
             fill: false,
-            backgroundColor: '#00bb7e',
-            borderColor: '#00bb7e',
+            backgroundColor: '#6366f1',
+            borderColor: '#6366f1',
             tension: 0.4
         },
         {
