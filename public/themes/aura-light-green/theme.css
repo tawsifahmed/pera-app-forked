@@ -191,11 +191,11 @@
   --primary-800:#096647;
   --primary-900:#064a34;
 }
-.error-report {
-  color:var(--red-500);
+.error-report red-text {
+  color: red !important;
   font-weight: 600;
 }
-.error-report span{
+.error-report red-text span{
   font-size:12px;
   font-weight: 600;
 }

@@ -15,14 +15,14 @@
                         <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="user.email" type="text" placeholder="Enter your work email" class="w-full" style="padding:1rem" />
-                            <small id="email-help" class="error-report"  v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text red-text"  v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div>
                         <div class="field md:w-28rem mb-5">
                             <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
                             <Password id="password" v-model="user.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
-                            <small id="password-help" class="error-report" v-if="errorData.passwordError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.passwordError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required!
                             </small>
                         </div>
@@ -49,14 +49,14 @@
                         <!-- <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="verifyUser.email" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report"  v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text"  v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div> -->
                         <div class="field md:w-28rem mb-4">
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
                             <InputText id="name" v-model="verifyUser.otp" type="text" placeholder="Enter OTP" class="w-full" style="padding: 1rem"  />
-                            <small id="name-help" class="error-report"  v-if="errorData.otpError">
+                            <small id="name-help" class="error-report red-text"  v-if="errorData.otpError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required!
                             </small>
                         </div>
@@ -258,6 +258,10 @@ watch(() => verifyOTPForm.value, (newVal) => {
     50% {
       opacity: 0.5;
     }
+}
+
+.red-text{
+    color: red !important;
 }
 
 
