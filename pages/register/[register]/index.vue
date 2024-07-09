@@ -189,7 +189,7 @@ loading.value = false;
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="regForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign Up</div>
                     </div>
 
@@ -251,7 +251,7 @@ loading.value = false;
                 </div>
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">

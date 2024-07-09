@@ -18,6 +18,10 @@ const handleModal = (event) => {
     emit('modalHandler', event);
 };
 
+watch(tasks, (oldV, NewV) =>{
+    console.log
+})
+
 watchEffect(statuses, dataFormatter());
 watchEffect(tasks, dataFormatter());
 </script>
