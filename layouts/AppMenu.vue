@@ -57,7 +57,7 @@ if (readDashboard.value) {
         {
             label: 'Home',
             option: 'home_option',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home text-lg', to: '/' }]
         },
     );
 }

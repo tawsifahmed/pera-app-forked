@@ -9,7 +9,7 @@ const logoUrl = computed(() => {
 
 <template>
     <div class="layout-footer">
-        <img src="/demo/images/login/avatar.png" alt="Logo" height="20" class="mr-2" />
+        <img src="/demo/images/login/avatar.svg" alt="Logo" height="20" class="mr-2" />
         by<span class="font-medium">Singularity</span>
     </div>
 </template>

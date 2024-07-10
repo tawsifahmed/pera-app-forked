@@ -144,7 +144,7 @@ const onDarkModeChange = (value) => {
     <div class="layout-topbar">
         <Toast position="bottom-right" group="br" />
         <router-link to="/" class="layout-topbar-logo">
-            <img src="/demo/images/login/avatar.png" alt="logo" />
+            <img src="/demo/images/login/avatar.svg" alt="logo" />
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
