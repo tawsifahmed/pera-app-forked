@@ -122,7 +122,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tags" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tag" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
