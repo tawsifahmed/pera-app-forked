@@ -5,7 +5,7 @@ import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
-// companies.getCompany()
+companies.getCompany()
 const { menu, company } = storeToRefs(useActiveCompanyStore());
 
 const readDashboard = ref(accessPermission('read_dashboard'))
@@ -121,4 +121,5 @@ watchEffect(async () => { });
     border-radius: 6px;
     text-transform: capitalize;
 }
+
 </style>

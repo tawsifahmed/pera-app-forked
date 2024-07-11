@@ -256,8 +256,8 @@ const handleChange = (event, name) => {
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <Button v-if="createTaskP" icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
-                <Button v-if="createTaskP" icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
@@ -402,11 +402,11 @@ const handleChange = (event, name) => {
         <div class="content">
             <div>
                 <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
-                    <!-- <pre>khn {{ tasks }}</pre> -->
+                    <!-- <pre>khn {{ updateTaskP }}</pre> -->
                     <div v-for="list in kanbanTasks" :key="list" class="groupColumnContainer">
                         <div class="column-container">
                             <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name }} - {{ list.content.length }}</div>
-                            <draggable v-model="list.content" :options="dragOptions" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
+                            <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
                                 <template v-slot:item="{ element }">
                                     <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                         <div class="">
