@@ -29,7 +29,7 @@
                 class="w-full" />
         </div>
         <br />
-        <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
+        <p class="text-center" v-if="errorHandler" style="color: red">Please add task name</p>
         <div class="create-btn-wrapper">
             <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" :loading="btnLoading" />
         </div>

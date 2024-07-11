@@ -7,7 +7,7 @@
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign in to continue</div>
                     </div>
                    
@@ -15,14 +15,14 @@
                         <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="user.email" type="text" placeholder="Enter your work email" class="w-full" style="padding:1rem" />
-                            <small id="email-help" class="error-report"  v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text red-text"  v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div>
                         <div class="field md:w-28rem mb-5">
                             <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
                             <Password id="password" v-model="user.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
-                            <small id="password-help" class="error-report" v-if="errorData.passwordError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.passwordError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required!
                             </small>
                         </div>
@@ -42,21 +42,21 @@
                 </div>
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">
                         <!-- <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="verifyUser.email" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report"  v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text"  v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div> -->
                         <div class="field md:w-28rem mb-4">
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
                             <InputText id="name" v-model="verifyUser.otp" type="text" placeholder="Enter OTP" class="w-full" style="padding: 1rem"  />
-                            <small id="name-help" class="error-report"  v-if="errorData.otpError">
+                            <small id="name-help" class="error-report red-text"  v-if="errorData.otpError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required!
                             </small>
                         </div>
@@ -258,6 +258,10 @@ watch(() => verifyOTPForm.value, (newVal) => {
     50% {
       opacity: 0.5;
     }
+}
+
+.red-text{
+    color: red !important;
 }
 
 

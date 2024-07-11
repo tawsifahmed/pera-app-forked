@@ -46,7 +46,7 @@ const formattedTime = (time) => {
 <template>
     <div>
         <div class="card lg:mx-auto mx-auto shared-nav">
-        <img src="/demo/images/login/avatar.png" alt="Logo" height="35" class="mr-2" />
+        <img src="/demo/images/login/avatar.svg" alt="Logo" height="35" class="mr-2" />
         <pre>{{authenticated}}</pre>
         <NuxtLink v-if="!isLogged" to="/login">
             <Button type="submit" label="Login" class="w-full px-3 py-2 text-xl"></Button>
@@ -209,7 +209,7 @@ const formattedTime = (time) => {
         </div>
     </div>
     <div class="footer">
-        <img src="/demo/images/login/avatar.png" alt="Logo" height="25" class="mr-2" />
+        <img src="/demo/images/login/avatar.svg" alt="Logo" height="25" class="mr-2" />
         <p class="text-center">by Singularity</p>
     </div>
     </div>

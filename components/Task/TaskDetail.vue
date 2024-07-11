@@ -933,7 +933,7 @@ input[type='file'] {
 input[type='file']::file-selector-button {
     margin-right: 20px;
     border: none;
-    background: #10b981;
+    background: #6366f1;
     padding: 7px 15px;
     border-radius: 5px;
     color: #fff;
@@ -976,7 +976,7 @@ input[type='file']::file-selector-button:hover {
 }
 
 .activity-btns:hover {
-    background-color: #63ceaa !important;
+    background-color: #8486eb !important;
     color: white !important;
 }
 

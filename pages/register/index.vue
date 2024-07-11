@@ -175,7 +175,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="regForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign Up</div>
                     </div>
 
@@ -184,7 +184,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="name" class="block text-900 text-xl font-medium mb-2">Full Name</label>
                             <InputText id="name" v-model="createUser.userName" type="text" placeholder="John Doe"
                                 class="w-full" style="padding: 1rem" />
-                            <small id="name-help" class="error-report" v-if="errorData.userNameError">
+                            <small id="name-help" class="error-report red-text" v-if="errorData.userNameError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Full name required!
                             </small>
                         </div>
@@ -192,7 +192,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="createUser.email" type="email"
                                 placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report" v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text" v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div>
@@ -214,7 +214,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                                     </ul>
                                 </template>
                             </Password>
-                            <small id="password-help" class="error-report" v-if="errorData.passwordError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.passwordError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required!
                             </small>
                         </div>
@@ -224,10 +224,10 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password"
                                 :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }">
                             </Password>
-                            <small id="password-help" class="error-report" v-if="errorData.confirmPassError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required!
                             </small>
-                            <small id="password-help" class="error-report" v-if="errorData.confirmPassMismatch">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassMismatch">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password did not match!
                             </small>
                         </div>
@@ -242,7 +242,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                 </div>
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">
@@ -250,7 +250,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="verifyUser.email" type="email"
                                 placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report" v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text" v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div> -->
@@ -258,7 +258,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
                             <InputText id="name" v-model="verifyUser.otp" type="text" placeholder="Enter OTP"
                                 class="w-full" style="padding: 1rem" />
-                            <small id="name-help" class="error-report" v-if="errorData.otpError">
+                            <small id="name-help" class="error-report red-text" v-if="errorData.otpError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required!
                             </small>
                         </div>
@@ -314,5 +314,9 @@ watch(() => verifyOTPForm.value, (newVal) => {
     50% {
         opacity: 0.5;
     }
+}
+
+.red-text{
+    color: red !important;
 }
 </style>
