@@ -38,6 +38,7 @@ export const useCompanyStore = defineStore('workStation', {
         isTaskDeleted: false,
         isTaskEdited: false,
         tasks: [],
+        kanbanTasks: [],
         asngUsers: [],
 
         subTasks: [],
@@ -295,8 +296,14 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
-
             this.statuslist = data.value?.taskStatus;
+
+            const updatedData = this.statuslist.map((val) => {
+                const content = this.tasks.filter((item) => item.data.status.name === val.name);
+                return { name: val.name, statusColor: val.color_code, status: val, content: content };
+            })
+
+            this.kanbanTasks = updatedData
             this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
         },
 
@@ -573,7 +580,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (data.value?.data?.length > 0) {
                 this.rolesLists = data.value?.data;
             }
-            else{
+            else {
                 this.rolesLists = [];
             }
         },
