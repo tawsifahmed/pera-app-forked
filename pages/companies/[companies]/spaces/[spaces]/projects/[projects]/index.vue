@@ -16,7 +16,7 @@ const readTask = ref(accessPermission('read_task'));
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const { getSingleProject, deleteTask, getTaskAssignModalData, getTagsAssignModalData, getTaskDetails } = useCompanyStore();
-const { singleProject, isTaskDeleted, tasks } = storeToRefs(useCompanyStore());
+const { singleProject, isTaskDeleted, tasks, kanbanTasks } = storeToRefs(useCompanyStore());
 
 const filters = ref({});
 const loading = ref(true);
@@ -137,7 +137,16 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <TaskTable v-if="readTask" :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
+        <TaskTable
+            v-if="readTask"
+            :kanbanTasks="kanbanTasks"
+            :tasks="tasks"
+            @openCreateSpace="openCreateSpace"
+            @handleTaskEdit="handleTaskEdit($event)"
+            @handleTaskDetailView="handleTaskDetailView($event)"
+            @confirmDeleteTask="confirmDeleteTask($event)"
+        >
+        </TaskTable>
 
         <!-- Create Task Modal -->
         <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -152,7 +161,6 @@ watchEffect(() => {
         <!-- Task Detail Modal -->
         <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TaskDetail
-                
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"
                 :projID="projects"

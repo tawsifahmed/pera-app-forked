@@ -1,4 +1,5 @@
 <script setup>
+import draggable from 'vuedraggable';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
@@ -12,7 +13,7 @@ const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
 const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-const { tasks } = defineProps(['tasks']);
+const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -208,9 +209,29 @@ const load = () => {
     }, 2000);
 };
 
-// test
-const modalHandler = (event) => {
-    emit('handleTaskDetailView', event);
+// Kanban
+const editable = ref(true);
+console.log('asd', tasks);
+const dragOptions = computed(() => ({
+    animation: 250,
+    group: 'tasks',
+    disabled: !editable.value,
+    ghostClass: 'ghost'
+}));
+
+const taskCardStyle = computed(() => ({
+    backgroundColor: '#fff',
+    boxShadow: '0px 2px 2px #e2e2e2',
+    cursor: 'grab',
+    padding: '12px 10px',
+    margin: '8px 0px'
+}));
+
+const handleChange = (event, name) => {
+    const { added, moved, removed } = event;
+    if (added) {
+        handleTaskStatus(name, event.added.element.key);
+    }
 };
 </script>
 
@@ -228,15 +249,15 @@ const modalHandler = (event) => {
             <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Filter End Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
         </div>
-        <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-17rem mb-2" severity="secondary" />
+        <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-15rem mb-2" severity="secondary" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <Button v-if="createTaskP" icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
-                <Button v-if="createTaskP" icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
@@ -376,7 +397,73 @@ const modalHandler = (event) => {
     </TreeTable>
 
     <!-- Kanban Board -->
-    <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban>
+    <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
+    <div v-if="!tableView" class="main-container">
+        <div class="content">
+            <div>
+                <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
+                    <!-- <pre>khn {{ updateTaskP }}</pre> -->
+                    <div v-for="list in kanbanTasks" :key="list" class="groupColumnContainer">
+                        <div class="column-container">
+                            <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name }} - {{ list.content.length }}</div>
+                            <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
+                                <template v-slot:item="{ element }">
+                                    <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                        <div class="">
+                                            <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                                            <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                            <div class="flex align-items-center gap-2 mt-1">
+                                                <div class="status-icon" :style="`background-color:${list.statusColor}`"></div>
+                                                <p class="status text-sm">{{ list.status.name }}</p>
+                                            </div>
+                                            <div class="mt-2 flex align-items-center gap-2">
+                                                <i class="pi pi-user text-lg"></i>
+                                                <div class="flex justify-content-start gap-1">
+                                                    <span v-for="(assignee, index) in element.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
+                                                        <img
+                                                            v-tooltip.top="{ value: `${assignee.name}` }"
+                                                            class="mr-2 capitalize cursor-pointer"
+                                                            v-if="assignee.image"
+                                                            :src="assignee.image"
+                                                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                                            alt=""
+                                                            srcset=""
+                                                        />
+                                                        <Avatar
+                                                            v-else
+                                                            v-tooltip.top="{ value: `${assignee.name}` }"
+                                                            :label="assignee.name.charAt(0)"
+                                                            class="mr-2 capitalize cursor-pointer"
+                                                            size="small"
+                                                            style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                                            :style="avatarStyle(index)"
+                                                        />
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 flex align-items-center gap-2">
+                                                <i class="pi pi-calendar-minus text-lg"></i>
+                                                <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
+                                            </div>
+                                            <div class="mt-2 flex align-items-center gap-2">
+                                                <i class="pi pi-flag text-lg"></i>
+                                                <p class="text-sm">{{ element.data.priority }}</p>
+                                            </div>
+                                            <div class="mt-2 flex align-items-center gap-2">
+                                                <i class="pi pi-list text-lg"></i>
+                                                <p class="text-sm font-semibold">{{ element.children.length }}</p>
+                                            </div>
+                                        </div>
+                                        {{ element.t_name }}
+                                    </div>
+                                </template>
+                            </draggable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style>
@@ -523,5 +610,305 @@ const modalHandler = (event) => {
 
 .task-status-2 .p-dropdown-label {
     margin-top: -4px;
+}
+/* Kanban */
+.boardContainer {
+    display: flex;
+    overflow-x: scroll;
+    align-items: start;
+}
+
+.groupColumnContainer {
+    flex-shrink: 0;
+    height: 100%;
+    /* width: 100%; */
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 500px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    background-color: indigo;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.85em;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    margin-top: 1rem;
+}
+
+.task-input {
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    border: none;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid black;
+    padding: 0.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.save-button,
+.delete-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.save-button {
+    background-color: gray;
+    color: white;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+}
+
+.new-status-input {
+    min-width: 200px;
+    border: none;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+}
+.new-status-input:focus {
+    outline: none !important;
+}
+.sortable {
+    background-color: white;
+    color: black;
+    border: 1px solid #d6d6d6;
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    -webkit-box-shadow: 2px 3px #202836;
+    box-shadow: 2px 3px #202836;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    text-align: left;
+}
+
+.inputNew input {
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    border: none;
+}
+
+@media only screen and (max-width: 1250px) {
+    .boardContainer {
+        max-width: 1025px;
+    }
+}
+
+@media only screen and (max-width: 1025px) {
+    .boardContainer {
+        max-width: 600px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .boardContainer {
+        max-width: 325px;
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    height: 8px;
+    border-radius: 8px;
+    width: 5px;
+    cursor: pointer;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #77777793;
+}
+
+/* Status Column */
+.column-container {
+    margin: 10px;
+    min-height: 100px;
+}
+
+.column-header {
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 0.85em;
+    /* background-color: rgb(3, 184, 93); */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.task-card {
+    background-color: #fff;
+    box-shadow: 0px 3px 8px #e2e2e2;
+    cursor: grab;
+    padding: 12px 10px;
+    /* margin: 10px 0px; */
+    border-radius: 8px;
+    min-width: 20rem;
+}
+
+.input-new {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    margin-top: 10px;
+}
+
+.draggable {
+    background-color: rgb(245, 241, 236);
+    padding: 1px 5px 10px 5px;
+    height: 55vh;
+    overflow-y: auto;
+    min-width: 290px;
+    border-radius: 8px;
+}
+
+.scrollbar::-webkit-scrollbar {
+    display: none !important;
+}
+
+.ghost {
+    background-color: #e20d0d;
+}
+.sortable {
+    background-color: white;
+    color: black;
+    border: 1px solid #d6d6d6;
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    -webkit-box-shadow: 2px 3px #202836;
+    box-shadow: 2px 3px #202836;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    text-align: left;
+}
+
+.inputNew input {
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    border: none;
+}
+.title {
+    margin: 0;
+}
+.desc {
+    margin: 0;
+    color: #818181;
+}
+.status-icon {
+    /* background-color: red; */
+    height: 10px;
+    width: 10px;
+    border-radius: 10px;
+}
+.status {
+    text-transform: uppercase;
+}
+.truncate {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+@media only screen and (max-width: 1250px) {
+    .boardContainer {
+        max-width: 1025px;
+    }
+}
+
+@media only screen and (max-width: 1025px) {
+    .boardContainer {
+        max-width: 600px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .boardContainer {
+        max-width: 325px;
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+    cursor: pointer;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #d2b5ff;
+    cursor: pointer;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #d3b5ff93;
 }
 </style>
