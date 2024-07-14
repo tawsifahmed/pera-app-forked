@@ -185,7 +185,7 @@ onMounted(() => {
               </InputGroup>
 
               <p v-if="addTaskSTatusError" class="text-red-600 text-small" >
-                  Please Type task name!
+                Please type status name!
               </p>
 
 
