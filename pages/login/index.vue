@@ -1,5 +1,4 @@
 <script setup>
-import { GoogleSignInButton } from 'vue3-google-signin';
 import { useLayout } from '@/layouts/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layouts/AppConfig.vue';
@@ -30,6 +29,7 @@ const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp } = st
 import Checkbox from 'primevue/checkbox';
 import RadioButton from 'primevue/radiobutton';
 import Toast from 'primevue/toast';
+import GoogleLogin from '../../components/FirebaseLogin/GoogleLogin.vue';
 const toast = useToast();
 
 // definePageMeta({
@@ -92,7 +92,7 @@ const handleLoginSubmit = async () => {
         } else if (authenticated.value == true) {
             errorData.value.passwordError = false;
             errorData.value.emailError = false;
-            toast.add({ severity: 'success', summary: 'Login Success', detail: '', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
             setTimeout(() => {
                 router.push('/');
             }, 300);
@@ -137,29 +137,6 @@ const handleResendOtp = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: resendOtpMsg, life: 3000 });
     }
     // toast.add({ severity: 'info', summary: 'OTP Resent', detail: '', life: 3000 });
-};
-
-// Google Login
-// handle success event
-const handleLoginSuccess = async (response) => {
-    const { credential } = response;
-    console.log('Access Token', credential);
-    try {
-        const { data } = await useFetch('http://188.166.212.40/pera/public/api/v1/verify-google-token', {
-            method: 'GET',
-            headers: {
-                token: credential
-            }
-        });
-        console.log(data);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-// handle an error event
-const handleLoginError = () => {
-    console.error('Login failed');
 };
 
 watch(
@@ -208,7 +185,8 @@ watch(
                         <Button type="submit" label="Sign In" :loading="loginBtnHandle" class="w-full p-3 text-xl" />
                     </form>
                     <div class="w-full mt-4">
-                        <GoogleSignInButton size="large" width="500" class="" @success="handleLoginSuccess" @error="handleLoginError"></GoogleSignInButton>
+                        <!-- <GoogleSignInButton size="large" width="500" class="" @success="handleLoginSuccess" @error="handleLoginError"></GoogleSignInButton> -->
+                        <GoogleLogin></GoogleLogin>
                     </div>
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here.</NuxtLink>

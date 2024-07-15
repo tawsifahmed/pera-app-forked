@@ -23,10 +23,7 @@ export default defineNuxtConfig({
             ]
         }
     },
-    modules: ['@pinia/nuxt', 'nuxt-primevue', 'nuxt-vue3-google-signin'],
-    googleSignIn: {
-        clientId: '211658542966-bhp52oh9u033nrg360i1ou9tp6nihjna.apps.googleusercontent.com',
-    },
+    modules: ['@pinia/nuxt', 'nuxt-primevue'],
     primevue: {
         options: { ripple: true },
         components: {
