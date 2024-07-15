@@ -3,11 +3,11 @@ export default defineNuxtConfig({
     ssr: false,
     runtimeConfig: {
         public: {
-          apiUrl: process.env.API_URL,
-          // adminEmail: process.env.ADMIN_EMAIL,
-          // adminPassword: process.env.ADMIN_PASSWORD
-          // apiUrl: process.env.API_URL ?? 'http://localhost:8000'
-          // api end point => http://188.166.212.40/api/v1/
+            apiUrl: process.env.API_URL,
+            // adminEmail: process.env.ADMIN_EMAIL,
+            // adminPassword: process.env.ADMIN_PASSWORD
+            // apiUrl: process.env.API_URL ?? 'http://localhost:8000'
+            // api end point => http://188.166.212.40/api/v1/
         }
     },
     app: {
@@ -23,7 +23,10 @@ export default defineNuxtConfig({
             ]
         }
     },
-    modules: ['@pinia/nuxt', 'nuxt-primevue'],
+    modules: ['@pinia/nuxt', 'nuxt-primevue', 'nuxt-vue3-google-signin'],
+    googleSignIn: {
+        clientId: '211658542966-bhp52oh9u033nrg360i1ou9tp6nihjna.apps.googleusercontent.com',
+    },
     primevue: {
         options: { ripple: true },
         components: {
