@@ -27,9 +27,14 @@ const signInWithGoogle = async () => {
             }
         });
         console.log(data.value);
+        const userCompany = data?.value?.company?.id;
+        if (userCompany) {
+            localStorage.setItem('userCompany', JSON.stringify(userCompany));
+        }
         toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
         const token = useCookie('token');
         token.value = data.value.token;
+
         setTimeout(() => {
             router.push('/');
         }, 300);
@@ -60,13 +65,14 @@ const signInWithGoogle = async () => {
 <style scoped>
 /* Customize styles as needed */
 .login-with-google-btn {
+    cursor: pointer;
     display: flex;
     gap: 10px;
     justify-content: center;
     align-items: center;
     transition: background-color 0.3s, box-shadow 0.3s;
     width: 100%;
-    padding: 12px 16px 12px 42px;
+    padding: 12px 16px;
     border-radius: 5px;
     /* box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25); */
     border: 1px solid #ededed;
