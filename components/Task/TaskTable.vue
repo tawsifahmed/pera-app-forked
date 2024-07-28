@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
@@ -156,7 +157,7 @@ onMounted(async () => {
 async function handleTaskStatus(status, task_id) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${task_id}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${task_id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`

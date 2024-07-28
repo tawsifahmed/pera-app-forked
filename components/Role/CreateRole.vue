@@ -17,14 +17,13 @@
     </div>
 </template>
 <script setup>
-
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
         required: true
     }
 });
-
 
 const toast = useToast();
 
@@ -40,8 +39,6 @@ const employeeForm = ref(true);
 
 const emit = defineEmits(['closeCreateModal']);
 
-
-
 const handleSubmitData = async () => {
     if (name.value === '') {
         errorHandler.value = true;
@@ -50,7 +47,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/roles/create`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -84,22 +81,20 @@ const handleSubmitData = async () => {
     justify-content: end;
 }
 
-.permission_selection{
-    .p-multiselect-label{
+.permission_selection {
+    .p-multiselect-label {
         display: flex !important;
         flex-wrap: wrap !important;
-        .p-multiselect-token{
+        .p-multiselect-token {
             margin: 0 5px 5px 0 !important;
-        
         }
     }
 
-    .p-multiselect-trigger{
+    .p-multiselect-trigger {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         padding-top: 11px !important;
     }
-    
 }
 </style>

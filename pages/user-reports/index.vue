@@ -1,4 +1,5 @@
 <script setup>
+const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -38,7 +39,7 @@ const handleReportDownload = async () => {
 
     console.log(employee.value);
     const { data, error } = await useFetch(
-        `http://188.166.212.40/pera/public/api/v1/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
+        `${url.public.apiUrl}/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
         {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -60,7 +61,7 @@ const handleReportDownload = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+        $fetch(`${url.public.apiUrl}/users/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

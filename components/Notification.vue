@@ -1,4 +1,5 @@
 <script setup>
+const url = useRuntimeConfig();
 const token = useCookie('token');
 const notificationData = ref([]);
 const page = ref(1);
@@ -6,7 +7,7 @@ const totalPage = ref(1);
 
 const handleClick = async (id) => {
     try {
-        const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/notification/update/${id}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -23,7 +24,7 @@ const handleClick = async (id) => {
 
 const fetchData = async () => {
     try {
-        const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/notification/list?limit=5&page=${page.value}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=5&page=${page.value}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`

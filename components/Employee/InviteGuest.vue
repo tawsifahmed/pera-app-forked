@@ -10,7 +10,6 @@
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 
-
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper">
             <Button v-if="isButtonLoading == 'false'" label="Send" icon="pi pi-check" text="" @click="handleSubmitData" />
@@ -19,6 +18,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -50,7 +50,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/invite-user`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`

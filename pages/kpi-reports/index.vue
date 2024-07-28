@@ -1,4 +1,5 @@
 <script setup>
+const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -84,14 +85,13 @@ const handleReportDownload = async (e) => {
     //     console.log(pair[0] + ': ' + pair[1]);
     // }
     loading.value = true;
-    const { data, error } = await useFetch(`https://188.166.212.40/pera/public/api/v1/kpi/report`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/report`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
         },
         body: kpiData
     });
-    console.log(data);
     // if (data.value.code == 200) {
     //     const link = document.createElement('a');
     //     link.href = data.value.download_path;
@@ -107,7 +107,7 @@ const handleReportDownload = async (e) => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+        $fetch(`${url.public.apiUrl}/users/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

@@ -3,7 +3,7 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
-
+const url = useRuntimeConfig();
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
@@ -16,7 +16,7 @@ import EditEmployee from '@/components/Employee/EditEmployee.vue';
 
 import InviteGuest from '@/components/Employee/InviteGuest.vue';
 
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 
 const readUser = ref(accessPermission('read_user'));
 
@@ -103,7 +103,7 @@ const deleteEmployee = (key) => {
 
 const confirmDeleteEmployee = async () => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/users/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -122,21 +122,21 @@ const confirmDeleteEmployee = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+        $fetch('${url.public.apiUrl}/users/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));;
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
 const getRoleList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+        $fetch('${url.public.apiUrl}/roles/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -146,7 +146,6 @@ const getRoleList = async () => {
         console.log('data', data.value?.data);
         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
         console.log('rolesLists', rolesLists.value);
-    
     }
 };
 
@@ -204,9 +203,9 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
-                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" />
                     <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
-                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
+                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>

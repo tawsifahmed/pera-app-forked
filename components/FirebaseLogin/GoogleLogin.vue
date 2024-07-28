@@ -2,6 +2,7 @@
 <script setup>
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../composables/firebase';
+const url = useRuntimeConfig();
 const user = ref(null);
 const toast = useToast();
 const router = useRouter();
@@ -20,7 +21,7 @@ const signInWithGoogle = async () => {
         });
 
     try {
-        const { data } = await useFetch('http://188.166.212.40/pera/public/api/v1/verify-google-token', {
+        const { data } = await useFetch(`${url.public.apiUrl}/verify-google-token`, {
             method: 'GET',
             headers: {
                 token: authToken
