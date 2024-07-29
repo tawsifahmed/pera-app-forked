@@ -128,7 +128,7 @@ const closeEditProject = (evn) => {
                     <!-- <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink> -->
-                    <Button v-if="updateProjectP" icon="pi pi-pencil" text class="" severity="success" rounded @click="edittProject(slotProps.data)" />
+                    <Button v-if="updateProjectP" icon="pi pi-pencil" text class="w-fit" severity="success" rounded @click="edittProject(slotProps.data)" />
                     <Button v-if="deleteProjectP" icon="pi pi-trash" text class="" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                     <Button v-if="!updateProjectP" icon="pi pi-pencil" text class="" severity="success" style="visibility: hidden" />
                     <Button v-if="!deleteProjectP" icon="pi pi-trash" text class="" severity="warning" style="visibility: hidden" />
