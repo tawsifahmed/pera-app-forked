@@ -3,14 +3,14 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
-
+const url = useRuntimeConfig();
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
 
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 
 const readRole = ref(accessPermission('read_role'));
 const createRoleP = ref(accessPermission('create_role'));
@@ -38,8 +38,6 @@ const id = ref('');
 
 const name = ref('');
 
-
-
 const closeCreateModal = (evn) => {
     visibleCreateRole.value = false;
     init();
@@ -60,22 +58,22 @@ const editRole = (data) => {
     id.value = data.id;
     name.value = data.name;
     permissionsList.value = permissionsList.value;
-    slctdPermissions.value = []
-    if(data?.permissions?.length > 0){
+    slctdPermissions.value = [];
+    if (data?.permissions?.length > 0) {
         data.permissions.map((item) => {
             permissionsList.value.map((pItem) => {
-                if(item.id === pItem.id){
-                    slctdPermissions.value.push(pItem)
+                if (item.id === pItem.id) {
+                    slctdPermissions.value.push(pItem);
                 }
-            })
-        })
-    }    
+            });
+        });
+    }
 };
 
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleList', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+        $fetch(`${url.public.apiUrl}/roles/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -89,7 +87,7 @@ const init = async () => {
 const permissionList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('permissionList', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/permissions/list', {
+        $fetch(`${url.public.apiUrl}/permissions/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -142,20 +140,20 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column style="text-wrap: nowrap;" field="name" sortable header="Role Name"></Column>
+            <Column style="text-wrap: nowrap" field="name" sortable header="Role Name"></Column>
             <Column field="permissions" sortable header="Permission">
-            <template #body="slotProps">
-                <div style="display: flex; flex-wrap:wrap; gap: 5px;">
-                    <div class="border rounded" v-for="perrmission in slotProps.data.permissions" :key="permission" style=" border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px;">
-                        <p>{{ perrmission.name }}</p>
+                <template #body="slotProps">
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px">
+                        <div class="border rounded" v-for="perrmission in slotProps.data.permissions" :key="permission" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
+                            <p>{{ perrmission.name }}</p>
+                        </div>
                     </div>
-                </div>
-            </template>
+                </template>
             </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateRoleP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editRole(slotProps.data)" />
-                    <Button v-if="!updateRoleP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="!updateRoleP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" />
                     <!-- <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteRole(slotProps.data.id)" /> -->
                 </template>
             </Column>
@@ -174,12 +172,12 @@ initFilters();
     </div>
 </template>
 
-<style lang="scss" >
+<style lang="scss">
 .table-stR {
     border: 1px solid #ededed;
     border-radius: 10px;
     overflow: hidden;
-    .p-datatable-tbody{
+    .p-datatable-tbody {
         vertical-align: top !important;
     }
 }

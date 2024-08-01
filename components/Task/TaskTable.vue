@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
 const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
@@ -156,7 +157,7 @@ onMounted(async () => {
 async function handleTaskStatus(status, task_id) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${task_id}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${task_id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -290,10 +291,10 @@ const handleChange = (event, name) => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '50%' }">
+        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '40%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
@@ -319,7 +320,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '20%' }">
+        <Column field="assignee" header="Assignee">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
@@ -345,7 +346,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '15%' }">
+        <Column field="status" header="Status" :style="{ width: '20%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -371,7 +372,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '10%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>

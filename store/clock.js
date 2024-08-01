@@ -11,14 +11,14 @@ export const useClockStore = defineStore('clock', () => {
         try {
             let url;
 
-            if(timerId) {
+            if (timerId) {
                 url = `set-task-time-traker?action=${action}&timer_id=${timerId}`
-            }else {
+            } else {
                 url = `set-task-time-traker?action=${action}&task_id=${taskId}`
             }
             console.log('Saction', action)
 
-            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/${url}`, {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/${url}`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -38,6 +38,6 @@ export const useClockStore = defineStore('clock', () => {
             console.error('Error uploading file:', error)
         }
     }
-  
+
     return { getTaskTimerData, trackedTime }
 })

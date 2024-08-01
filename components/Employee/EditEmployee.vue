@@ -22,7 +22,6 @@
             <InputText type="password" v-model="password" class="w-full" />
         </div> -->
 
-
         <!-- <pre>{{user_type}}</pre> -->
         <div class="field flex flex-column">
             <label>Role</label>
@@ -35,6 +34,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -58,14 +58,13 @@ const rolesLists = ref(props.param.rolesLists);
 const user_type = ref(props.param.user_type);
 // user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
-
 const errorHandler = ref(false);
 
 const employeeForm = ref(true);
 
 const emit = defineEmits(['closeEditModal']);
 
-const loading = ref(false); 
+const loading = ref(false);
 
 const handleSubmitData = async () => {
     loading.value = true;
@@ -77,7 +76,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, error, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/update/${id.value}`, {
+            const { data, error, pending } = await useFetch(`${url.public.apiUrl}/users/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -91,24 +90,22 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if(error?.value){
-                if(error?.value?.data?.code === 500){
-                loading.value = false;
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
-                return;
-                }   
-            }
-
-            else if (data?.value?.code === 200) {
+            if (error?.value) {
+                if (error?.value?.data?.code === 500) {
+                    loading.value = false;
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
+                    return;
+                }
+            } else if (data?.value?.code === 200) {
                 loading.value = false;
                 employeeForm.value = false;
                 emit('closeEditModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', group: 'br', life: 3000 });
-                return
+                return;
             } else {
                 loading.value = false;
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update employee!', group: 'br', life: 3000 });
-                return
+                return;
             }
         }
     }
@@ -127,13 +124,12 @@ const handleSubmitData = async () => {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-   
     -webkit-appearance: none;
-    margin: 0; 
+    margin: 0;
 }
 
-input[type=number] {
+input[type='number'] {
     appearance: textfield;
-    -moz-appearance: textfield; 
+    -moz-appearance: textfield;
 }
 </style>

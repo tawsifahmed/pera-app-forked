@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Name</label>
-            <InputText v-model="name" class="w-full" placeholder="Edit tag name"/>
+            <InputText v-model="name" class="w-full" placeholder="Edit tag name" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -12,6 +12,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -38,13 +39,13 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/update/${id.value}`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value,
+                    name: name.value
                 }
             });
 
