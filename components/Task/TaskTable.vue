@@ -805,7 +805,7 @@ textarea {
     padding: 12px 10px;
     /* margin: 10px 0px; */
     border-radius: 8px;
-    min-width: 20rem;
+    width: 20rem;
 }
 
 .input-new {

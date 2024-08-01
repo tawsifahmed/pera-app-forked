@@ -341,7 +341,7 @@ const handleShare = async () => {
     } else {
         // navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         const el = document.createElement('textarea');
-        el.value = 'http://188.166.212.40/sharedTask/' + data.value.shared_token;
+        el.value = 'https://pera.singularitybd.net/sharedTask/' + data.value.shared_token;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
@@ -656,7 +656,7 @@ const handleShareTaskId = () => {
                         </Card>
                     </div>
                     <form @submit.prevent="handleTaskComment" class="comment-add">
-                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
+                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative" v-if="commentFile">
                             <div>
                                 <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
                             </div>
@@ -664,11 +664,12 @@ const handleShareTaskId = () => {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div class="comment-form">
-                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required />
+                        <div >
+                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15" class="border-gray-300 mb-1 comment-text" required/>
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
+                            
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
-                            <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
+                            <Button class="ml-2" type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
                         </div>
                     </form>
                 </div>
@@ -749,14 +750,14 @@ const handleShareTaskId = () => {
 
 .comment-wrapper {
     overflow: hidden;
-    height: 70vh;
+    height: 78vh;
     padding: 5px !important;
     background-color: #f7fafc;
 }
 
 .comments {
     overflow-y: auto;
-    height: 80%;
+    height: 73%;
     padding: 5px;
 }
 
@@ -796,7 +797,7 @@ const handleShareTaskId = () => {
 
 .task-wrapper {
     overflow: hidden;
-    height: 70vh;
+    height: 78vh;
     padding: 5px !important;
 }
 
@@ -957,10 +958,17 @@ input[type='file']::file-selector-button:hover {
     font-weight: 600;
 }
 
+@media(max-width: 991px){
+    .comment-text {
+     height: 75px !important;
+    }
+}
+
 .comment-form {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 5px;
 }
 
 .comment-form input {

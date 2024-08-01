@@ -149,17 +149,17 @@ watchEffect(() => {
         </TaskTable>
 
         <!-- Create Task Modal -->
-        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw', '330px': '98vw' }">
             <TaskCreateTask :usersLists="usersLists" :tagsLists="tagsLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
-        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :tagsLists="tagsLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskDetail
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"
