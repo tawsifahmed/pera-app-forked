@@ -1,4 +1,5 @@
 <script setup>
+const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -32,7 +33,7 @@ const handleReportDownload = async () => {
         startDate: startDate.value,
         endDate: endDate.value
     };
-    const { data, error } = await useFetch('http://188.166.212.40/pera/public/api/v1/tasks/report-download', {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`

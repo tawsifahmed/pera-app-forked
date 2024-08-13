@@ -15,7 +15,7 @@ const spaceFormInputs = ref(false);
 const spaceNameError = ref(false);
 const spaceDescriptionError = ref(false);
 const spaceNameInput = ref(null);
-const spaceDescripInput = ref(null);
+const spaceDescripInput = ref('');
 const spaceAvatarPreview = ref('#8080805c');
 const spaceColorPreview = ref(null);
 
@@ -85,7 +85,7 @@ const hideDialog = () => {
                 <label for="name">Space Color <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <div class="m-0 d-flex colorpicker-wrapper">
                     <div class="flex justify-center align-items-center">
-                        <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S'}}</div>
+                        <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{ spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S' }}</div>
                         <div class="ml-2">
                             <div class="flex">
                                 <div id="white" class="color" @click="changeColor('#e5ded4')"></div>

@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 
-export const useActiveCompanyStore = defineStore('ActiveCompany',{
+export const useActiveCompanyStore = defineStore('ActiveCompany', {
   state: () => ({
     activeCompany: null,
   }),
   getters: {
     menu(state) {
-      if(state.activeCompany){
+      if (state.activeCompany) {
         const items = []
         state.activeCompany[0]?.spaces.forEach(element => {
           const obj = {
@@ -16,9 +16,9 @@ export const useActiveCompanyStore = defineStore('ActiveCompany',{
             'id': element?.id,
             'name': element?.name,
             'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
-            'items':[]
+            'items': []
           }
-          if (element.projects.length > 0){
+          if (element.projects.length > 0) {
             element.projects.forEach(ele => {
               const proObj = {
                 'label': ele?.name,
@@ -33,35 +33,35 @@ export const useActiveCompanyStore = defineStore('ActiveCompany',{
           items.push(obj)
         });
         return items;
-      }else{
+      } else {
         return [];
       }
     },
-    company(state){
-      if(state.activeCompany){
+    company(state) {
+      if (state.activeCompany) {
         return state.activeCompany[0]?.name;
-      }else{
+      } else {
         return '';
       }
     },
-    company_id(state){
-      if(state.activeCompany){
+    company_id(state) {
+      if (state.activeCompany) {
         return state.activeCompany[0]?.id;
-      }else{
+      } else {
         return '';
       }
     },
   },
   actions: {
-    async getCompany(){
+    async getCompany() {
       const token = useCookie('token');
       const { data, pending, error } = await useAsyncData(
-          'companyList',
-          () => $fetch('http://188.166.212.40/pera/public/api/v1/company/list',{
-            headers: {
-              Authorization: `Bearer ${token.value}`,
-            },
-          }),
+        'companyList',
+        () => $fetch('https://pbe.singularitybd.net/api/v1/company/list', {
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+        }),
       )
       // console.log('process.env.API_URL=>',process.env.API_URL)
       this.activeCompany = await data.value?.data;

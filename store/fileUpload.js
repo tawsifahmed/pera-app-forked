@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 
 export const useFileUploaderStore = defineStore('fileUpload', () => {
-    
+
     const isFileUpload = ref(false)
     const isLoading = ref(false)
     const isFileDeleted = ref(false)
@@ -17,7 +17,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-upload`, {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-upload`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -33,7 +33,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
             console.log('upload data =>', data)
             if (data?.user_message === 'success') {
                 isFileUpload.value = true
-            }else {
+            } else {
                 isFileUpload.value = false
             }
 
@@ -50,7 +50,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`http://188.166.212.40/pera/public/api/v1/tasks/attachment-delete/${id}`, {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -66,7 +66,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
 
             if (data?.user_message === 'success') {
                 isFileDeleted.value = true
-            }else {
+            } else {
                 isFileDeleted.value = false
             }
         } catch (error) {
@@ -74,6 +74,6 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
             isFileDeleted.value = false
         }
     }
-  
+
     return { fileUpload, fileDelete, isFileUpload, isLoading, isFileDeleted }
 })
