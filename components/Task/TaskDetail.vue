@@ -655,7 +655,7 @@ const handleShareTaskId = () => {
                             </template>
                         </Card>
                     </div>
-                    <form @submit.prevent="handleTaskComment" class="comment-add">
+                    <form @submit.prevent="handleTaskComment" class="comment-add"> 
                         <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative" v-if="commentFile">
                             <div>
                                 <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
