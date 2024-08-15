@@ -73,13 +73,15 @@ const isCalendarSelected1 = ref(false);
 const isCalendarSelected2 = ref(false);
 
 const startDateChange = (newDate) => {
-    filterStartDueDate.value = newDate;
+    const date = new Date(newDate);
+    filterStartDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     isCalendarSelected1.value = true;
     changeAttribute();
 };
 const endDateChange = (newDate) => {
     isCalendarSelected2.value = true;
-    filterEndDueDate.value = newDate;
+    const date = new Date(newDate);
+    filterEndDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     changeAttribute();
 };
 
