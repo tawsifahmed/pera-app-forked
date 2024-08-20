@@ -27,13 +27,7 @@ const handleReportDownload = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
-    console.log('start Date: ', startDate.value, 'end Date: ', endDate.value);
-
-    const params = {
-        startDate: startDate.value,
-        endDate: endDate.value
-    };
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -51,6 +45,15 @@ const handleReportDownload = async () => {
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
 };
+
+const handleChange = (field, event) => {
+    const date = new Date(event);
+    if (field == 'startDate') {
+        startDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    } else {
+        endDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    }
+};
 </script>
 <template>
     <div class="card">
@@ -62,11 +65,11 @@ const handleReportDownload = async () => {
                 <div class="flex gap-2">
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                        <Calendar v-model="startDate" showIcon iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2"> To: </label>
-                        <Calendar v-model="endDate" showIcon iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>
             </template>

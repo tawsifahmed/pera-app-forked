@@ -37,7 +37,6 @@ const handleReportDownload = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
-    console.log(employee.value);
     const { data, error } = await useFetch(
         `${url.public.apiUrl}/tasks/task-report-download?user_id=${employee.value.id}${startDate.value !== '' ? `&start_date=${formattedStartDate}` : ''}${endDate.value !== '' ? `&end_date=${formattedEndDate}` : ''}`,
         {
