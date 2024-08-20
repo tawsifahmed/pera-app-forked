@@ -279,20 +279,16 @@ const handleChange = (event, name) => {
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
-
-                <Button
-                    type="button"
+                 <Button
                     v-if="downloadTaskP"
                     @click="downloadTaskSheet(tasks)"
-                    v-tooltip.right="{ value: `Download Tasks` }"
-                    icon="pi pi-file-excel"
+                    v-tooltip.right="{ value: `Download Tasks` }" 
                     :loading="loading"
-                    label=""
-                    class="mr-2"
-                    severity="secondary"
                     :style="`${loading === true ? 'backGround: red' : ''}`"
-                />
+                    class="excel-export-btn">
+                    <img  src="/assets/icons/excel-export-icon.png" />
 
+                 </Button>
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
             </div>
@@ -1011,5 +1007,22 @@ textarea {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #d3b5ff93;
+}
+
+.excel-export-btn {
+    background: #f1f5f9;
+    border: 1px solid #f1f5f9;
+    text-decoration: none;
+}
+
+.excel-export-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+.excel-export-btn:hover {
+    background: #e2e8f0;
+    color: #334155;
+    border-color: #e2e8f0;
 }
 </style>
