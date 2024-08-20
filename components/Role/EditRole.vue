@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Role Name</label>
-            <InputText v-model="editName" class="w-full" placeholder="Edit role name"/>
+            <InputText v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
 
         <div class="field permission_selection">
@@ -18,6 +18,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -48,7 +49,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/roles/update/${id.value}`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -62,9 +63,9 @@ const handleSubmitData = async () => {
             if (data.value?.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Role updated successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Role updated successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role!', group: 'br', life: 3000 });
             }
         }
     }

@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Name</label>
-            <InputText v-model="name" class="w-full" placeholder="Edit tag name"/>
+            <InputText v-model="name" class="w-full" placeholder="Edit tag name" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -12,6 +12,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -38,22 +39,22 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/update/${id.value}`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value,
+                    name: name.value
                 }
             });
 
             if (data.value.code === 200) {
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Updated successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Update Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Update Failed!', group: 'br', life: 3000 });
             }
         }
     }

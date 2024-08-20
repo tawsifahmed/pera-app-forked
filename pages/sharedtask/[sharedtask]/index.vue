@@ -1,5 +1,13 @@
 <script setup>
+const url = useRuntimeConfig();
 import Column from 'primevue/column';
+
+const isLogged = ref(false);
+
+const token = useCookie('token');
+if (token.value) {
+    isLogged.value = true;
+}
 
 definePageMeta({
     layout: false
@@ -8,7 +16,7 @@ const { sharedtask } = useRoute().params;
 const taskData = ref();
 const taskTable = ref([]);
 const handleFetch = async () => {
-    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/shared/${sharedtask}`);
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/shared/${sharedtask}`);
     taskData.value = data.value.data;
     taskTable.value = data.value.subTask;
     console.log(data.value.subTask);
@@ -37,163 +45,189 @@ const formattedTime = (time) => {
 </script>
 
 <template>
-    <div class="shared-task lg:mx-auto card grid p-4 mx-auto justify-content-center">
-        <div class="col-12 lg:col-7">
-            <div>
-                <!-- <pre>{{ taskData }}</pre> -->
-                <!-- <pre>{{assignees}}</pre> -->
-                <h5 class="">Task: {{ taskData?.name }}</h5>
+    <div>
+        <div class="card lg:mx-auto mx-auto shared-nav">
+            <img src="/demo/images/login/avatar.svg" alt="Logo" height="35" class="mr-2" />
+            <pre>{{ authenticated }}</pre>
+            <NuxtLink v-if="!isLogged" to="/login">
+                <Button type="submit" label="Login" class="w-full px-3 py-2 text-xl"></Button>
+            </NuxtLink>
+        </div>
+        <div class="shared-task lg:mx-auto card grid p-4 mx-auto justify-content-center">
+            <div class="col-12 lg:col-7">
+                <div>
+                    <!-- <pre>{{ taskData }}</pre> -->
+                    <!-- <pre>{{assignees}}</pre> -->
+                    <h5 class="">Task: {{ taskData?.name }}</h5>
 
-                <div class="task-wrapper card">
-                    <div class="task-det">
-                        <div class="mt-2 task-detail ml-2">
-                            <div class="flex justify-content-between flex-wrap align-items-center">
-                                <div class="col-12 lg:col-6 p-0">
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="flex gap-2 align-items-center">
-                                            <span class="pi pi-user"></span>
-                                            <p class="text-nowrap font-bold">Assignee:</p>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <div v-for="assigne in taskData?.assignee" :key="assigne">
-                                                <p class="employee">{{ assigne.name }}</p>
+                    <div class="task-wrapper card">
+                        <div class="task-det">
+                            <div class="mt-2 task-detail ml-2">
+                                <div class="flex justify-content-between flex-wrap align-items-start">
+                                    <div class="col-12 lg:col-6 p-0">
+                                        <div class="flex gap-2 mb-3">
+                                            <div class="flex gap-2 align-items-start">
+                                                <span class="pi pi-user"></span>
+                                                <p class="text-nowrap font-bold">Assignee:</p>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2">
+                                                <div v-for="assigne in taskData?.assignee" :key="assigne">
+                                                    <p class="employee">{{ assigne.name }}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="flex gap-2 align-items-center">
-                                            <span class="pi pi-calendar"></span>
-                                            <p class="text-nowrap font-bold">Due Date:</p>
+                                        <div class="flex gap-2 mb-3">
+                                            <div class="flex gap-2 align-items-center">
+                                                <span class="pi pi-calendar"></span>
+                                                <p class="text-nowrap font-bold">Due Date:</p>
+                                            </div>
+                                            <p class="">{{ taskData?.due_date }}</p>
                                         </div>
-                                        <p class="">{{ taskData?.due_date }}</p>
+                                    </div>
+                                    <div class="col-12 lg:col-6 p-0">
+                                        <div class="flex gap-2 mb-3">
+                                            <div class="flex gap-2 align-items-center">
+                                                <span class="pi pi-flag"></span>
+                                                <p class="text-nowrap font-bold">Status:</p>
+                                            </div>
+                                            <p class="">{{ taskData?.status_name }}</p>
+                                        </div>
+                                        <div class="flex gap-2 mb-3">
+                                            <div class="flex gap-2 align-items-center">
+                                                <span class="pi pi-stopwatch"></span>
+                                                <p class="text-nowrap font-bold">Task Duration:</p>
+                                            </div>
+                                            <p class="">{{ taskData?.total_duration }}</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-12 lg:col-6 p-0">
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="flex gap-2 align-items-center">
-                                            <span class="pi pi-flag"></span>
-                                            <p class="text-nowrap font-bold">Status:</p>
-                                        </div>
-                                        <p class="">{{ taskData?.status_name }}</p>
+                                <div class="flex gap-2 mb-3 align-items-start" style="width: 100%">
+                                    <div class="flex gap-2 align-items-center">
+                                        <span class="pi pi-tags"></span>
+                                        <p class="text-nowrap font-bold">Tags:</p>
                                     </div>
-                                    <div class="flex gap-2 mb-3">
-                                        <div class="flex gap-2 align-items-center">
-                                            <span class="pi pi-stopwatch"></span>
-                                            <p class="text-nowrap font-bold">Task Duration:</p>
-                                        </div>
-                                        <p class="">{{ taskData?.total_duration }}</p>
+                                    <div class="flex gap-2 flex-wrap">
+                                        <p v-for="tag in taskData?.tags" :key="tag" class="employee h-fit">{{ tag.name }}</p>
                                     </div>
+                                </div>
+                                <div class="field mt-3 flex flex-column">
+                                    <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                        <span class="pi pi-sliders-h"></span>
+                                        <p class="text-nowrap font-bold">Description:</p>
+                                    </div>
+                                    <p class="">{{ taskData?.description }}</p>
                                 </div>
                             </div>
-                            <div class="flex gap-2 mb-3" style="width: 100%">
-                                <div class="flex gap-2 align-items-center">
-                                    <span class="pi pi-tags"></span>
-                                    <p class="text-nowrap font-bold">Tags:</p>
-                                </div>
-                                <div class="flex gap-2 flex-wrap">
-                                    <p v-for="tag in taskData?.tags" :key="tag" class="employee">{{ tag.name }}</p>
-                                </div>
-                            </div>
-                            <div class="field mt-3 flex flex-column">
-                                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
-                                    <span class="pi pi-sliders-h"></span>
-                                    <p class="text-nowrap font-bold">Description:</p>
-                                </div>
-                                <p class="">{{ taskData?.description }}</p>
-                            </div>
-                        </div>
 
-                        <!-- tab for details, sub task  -->
-                        <TabView class="mt-3">
-                            <TabPanel class="file-upload" header="Detail">
-                                <p class="m-0">Attachments: {{ taskData?.attachments?.length || 0 }}</p>
-                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
-                                    <div v-if="taskData?.attachments?.length == 0" class="">
-                                        <p class="text-[#000000]">No Attachment</p>
-                                    </div>
-                                    <div
-                                        v-for="(item, index) in taskData?.attachments"
-                                        :key="item"
-                                        target="_blank"
-                                        class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
-                                        style="background-color: #f7fafc"
-                                    >
-                                        <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="`http://188.166.212.40/pera/public${item?.file}`">
-                                            <div class="pi pi-file text-6xl attach-icon"></div>
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
-                                                <!-- <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                            <!-- tab for details, sub task  -->
+                            <TabView class="mt-3">
+                                <TabPanel class="file-upload" header="Detail">
+                                    <p class="m-0">Attachments: {{ taskData?.attachments?.length || 0 }}</p>
+                                    <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
+                                        <div v-if="taskData?.attachments?.length == 0" class="">
+                                            <p class="text-[#000000]">No Attachment</p>
+                                        </div>
+                                        <div
+                                            v-for="(item, index) in taskData?.attachments"
+                                            :key="item"
+                                            target="_blank"
+                                            class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
+                                            style="background-color: #f7fafc"
+                                        >
+                                            <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="`http://188.166.212.40/pera/public${item?.file}`">
+                                                <div class="pi pi-file text-6xl attach-icon"></div>
+                                                <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                    <!-- <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div> -->
-                                                Attacthment {{ index + 1 }}
+                                                    Attacthment {{ index + 1 }}
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </TabPanel>
+                                <TabPanel :header="`Sub Tasks ${taskTable?.children?.length ? taskTable?.children?.length : 0}`">
+                                    <TreeTable class="tree-table" :value="taskTable?.children" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                                        <template #empty>
+                                            <p class="text-center">No Data found...</p>
+                                        </template>
+                                        <Column field="name" header="Name" expander :style="{ width: '30%' }"></Column>
+                                        <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
+                                        <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
+                                        <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
+                                    </TreeTable>
+                                </TabPanel>
+                                <TabPanel :header="`Bounce`">
+                                    <div class="card">
+                                        <div class="flex align-items-center gap-3">
+                                            <span class="pi pi-flag"></span>
+                                            <p class="text-nowrap my-auto">Bounce Status:</p>
+                                            <p class="text-nowrap my-auto">{{ taskData?.is_bounce }}</p>
+                                        </div>
+                                    </div>
+                                </TabPanel>
+                            </TabView>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 lg:col-5">
+                <div>
+                    <h5 class="cmc">Comments</h5>
+                    <div class="comment-wrapper card">
+                        <div class="comments">
+                            <Card class="mb-2" v-for="comment in taskData?.comments" :key="comment.id">
+                                <template #title>
+                                    <div class="flex justify-content-start align-items-center">
+                                        <Avatar :label="comment?.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
+                                        <p class="text-lg">{{ comment.commentator_name }}</p>
+                                    </div>
+                                </template>
+                                <template #content>
+                                    <div v-if="setFileUrl(comment?.file)" class="flex justify-content-end">
+                                        <a
+                                            :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
+                                            target="_blank"
+                                            class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
+                                            style="background-color: #f7fafc"
+                                        >
+                                            <div class="pi pi-file attach-icon"></div>
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center">
+                                                <div class="text-xs">{{ setFileUrl(comment?.file) }}</div>
                                             </div>
                                         </a>
                                     </div>
-                                </div>
-                            </TabPanel>
-                            <TabPanel :header="`Sub Tasks ${taskTable?.children?.length ? taskTable?.children?.length : 0}`">
-                                <TreeTable class="tree-table" :value="taskTable?.children" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
-                                    <template #empty>
-                                        <p class="text-center">No Data found...</p>
-                                    </template>
-                                    <Column field="name" header="Name" expander :style="{ width: '30%' }"></Column>
-                                    <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
-                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
-                                    <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
-                                </TreeTable>
-                            </TabPanel>
-                            <TabPanel :header="`Bounce`">
-                                <div class="card">
-                                    <div class="flex align-items-center gap-3">
-                                        <span class="pi pi-flag"></span>
-                                        <p class="text-nowrap my-auto">Bounce Status:</p>
-                                        <p class="text-nowrap my-auto">{{ taskData?.is_bounce }}</p>
-                                    </div>
-                                </div>
-                            </TabPanel>
-                        </TabView>
+                                    <p class="m-0 ml-1">
+                                        {{ comment?.comment ? comment?.comment : '' }}
+                                    </p>
+                                    <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(comment.created_at) }}</i>
+                                </template>
+                            </Card>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 lg:col-5">
-            <div>
-                <h5 class="cmc">Comments</h5>
-                <div class="comment-wrapper card">
-                    <div class="comments">
-                        <Card class="mb-2" v-for="comment in taskData?.comments" :key="comment.id">
-                            <template #title>
-                                <div class="flex justify-content-start align-items-center">
-                                    <Avatar :label="comment?.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
-                                    <p class="text-lg">{{ comment.commentator_name }}</p>
-                                </div>
-                            </template>
-                            <template #content>
-                                <div v-if="setFileUrl(comment?.file)" class="flex justify-content-end">
-                                    <a
-                                        :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
-                                        target="_blank"
-                                        class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
-                                        style="background-color: #f7fafc"
-                                    >
-                                        <div class="pi pi-file attach-icon"></div>
-                                        <div class="attach-detail flex flex-column justify-content-center align-items-center">
-                                            <div class="text-xs">{{ setFileUrl(comment?.file) }}</div>
-                                        </div>
-                                    </a>
-                                </div>
-                                <p class="m-0 ml-1">
-                                    {{ comment?.comment ? comment?.comment : '' }}
-                                </p>
-                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(comment.created_at) }}</i>
-                            </template>
-                        </Card>
-                    </div>
-                </div>
-            </div>
+        <div class="footer">
+            <img src="/demo/images/login/avatar.svg" alt="Logo" height="25" class="mr-2" />
+            <p class="text-center">by Singularity</p>
         </div>
     </div>
 </template>
 
 <style lang="scss">
+.shared-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    padding: 24px 8%;
+    border-radius: 5px;
+    width: 100%;
+    margin: 0 auto;
+    .login-btn {
+        border-radius: 5px;
+    }
+}
 .shared-task {
     max-width: 100rem;
     margin-top: 2rem;
@@ -467,5 +501,13 @@ input[type='file']::file-selector-button:hover {
     border: 1px solid rgba(167, 167, 167, 0.486);
     border-radius: 5px;
     padding: 2px 5px;
+}
+.footer {
+    border-top: 1px solid #d3d3d3;
+    padding: 10px;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    gap: 0px;
 }
 </style>

@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Role Name</label>
+            <label for="company">Role Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
         <div class="field permission_selection">
-            <label>Permissions</label>
+            <label>Permissions <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
@@ -17,14 +17,13 @@
     </div>
 </template>
 <script setup>
-
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
         required: true
     }
 });
-
 
 const toast = useToast();
 
@@ -40,8 +39,6 @@ const employeeForm = ref(true);
 
 const emit = defineEmits(['closeCreateModal']);
 
-
-
 const handleSubmitData = async () => {
     if (name.value === '') {
         errorHandler.value = true;
@@ -50,7 +47,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/roles/create`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -65,9 +62,9 @@ const handleSubmitData = async () => {
                 name.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Role Created successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Role Created successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Role Creation Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Role Creation Failed!', group: 'br', life: 3000 });
             }
         }
     }
@@ -84,22 +81,20 @@ const handleSubmitData = async () => {
     justify-content: end;
 }
 
-.permission_selection{
-    .p-multiselect-label{
+.permission_selection {
+    .p-multiselect-label {
         display: flex !important;
         flex-wrap: wrap !important;
-        .p-multiselect-token{
+        .p-multiselect-token {
             margin: 0 5px 5px 0 !important;
-        
         }
     }
 
-    .p-multiselect-trigger{
+    .p-multiselect-trigger {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         padding-top: 11px !important;
     }
-    
 }
 </style>

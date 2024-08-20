@@ -1,4 +1,5 @@
 <script setup>
+const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -10,7 +11,7 @@ import Column from 'primevue/column';
 
 import DataTable from 'primevue/datatable';
 
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 
 const readTags = ref(accessPermission('read_tags'));
 const createTagsP = ref(accessPermission('create_tags'));
@@ -72,7 +73,7 @@ const deleteTag = (key) => {
 
 const confirmDeleteTag = async () => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -91,14 +92,14 @@ const confirmDeleteTag = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('tagsList', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/tag/list', {
+        $fetch(`${url.public.apiUrl}/tag/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        tagsLists.value = data.value?.data;
+        tagsLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -122,7 +123,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tags" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tag" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -141,16 +142,17 @@ initFilters();
         <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
+
             <Column field="name" sortable header="Tag Name"></Column>
             <!-- <Column field="email" sortable header="Email Address"></Column> -->
             <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateTagsP" icon="pi pi-pencil" text class="" severity="success" rounded @click="editTag(slotProps.data)" />
-                    <Button v-if="!updateTagsP" icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="!updateTagsP" icon="pi pi-pencil" text class="" severity="success" rounded style="visibility: hidden" />
                     <Button v-if="deleteTagsP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTag(slotProps.data.id)" />
-                    <Button v-if="!deleteTagsP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
+                    <Button v-if="!deleteTagsP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
             <!-- <template #footer> In total there are {{ tagsLists ? tagsLists.length : 0 }} rows. </template> -->
@@ -174,7 +176,6 @@ initFilters();
 
         <!-- Invite User -->
         <Toast position="bottom-right" group="br" />
-
     </div>
 </template>
 

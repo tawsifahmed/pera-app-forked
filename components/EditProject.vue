@@ -96,9 +96,12 @@ const transformKeys = (list) => {
     }));
 }
 
+const loading = ref(false);
 const handleCreateProject = async () => {
+    loading.value = true;
     if(projectNameInput.value === null || projectDescriptionInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null){
         errorHandler.value = true
+        loading.value = false;
     }else{
         errorHandler.value = false
         
@@ -126,9 +129,11 @@ const handleCreateProject = async () => {
         await editProject(createProjectData);
         if(isProjectEdited.value === true){
             emit('closeEditProject', false);
-            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', life: 3000 });
+            loading.value = false;
+            toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', group: 'br', life: 3000 });
         }else{
-            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', life: 3000 });
+            loading.value = false;
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', group: 'br', life: 3000 });
         }
     }
 }
@@ -156,7 +161,7 @@ onMounted(() => {
           <InputText id="name" v-model="projectNameInput" required="true" />
       </div>
       <div class="field flex flex-column">
-          <label for="name">Space Description</label>
+          <label for="name">Project Description</label>
           <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
       </div>
       <div class="mb-4">
@@ -180,7 +185,7 @@ onMounted(() => {
               </InputGroup>
 
               <p v-if="addTaskSTatusError" class="text-red-600 text-small" >
-                  Please Type task name!
+                Please type status name!
               </p>
 
 
@@ -208,7 +213,7 @@ onMounted(() => {
           </div>
       </div>
       <div class="mb-4">
-        <p class="text-slate-700 mb-2 tracking-wide left-3">Set Close Status</p>
+        <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status</p>
           <div class="container">
               <div class="field">
                   
@@ -225,7 +230,7 @@ onMounted(() => {
 
       <div class="float-right">
         <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-        <Button label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
+        <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleCreateProject" />
       </div>
 
     </div>

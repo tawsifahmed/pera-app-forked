@@ -6,7 +6,7 @@ import Toast from 'primevue/toast';
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 const { registerUser, otpVerify, resendOtp } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, authOtp, checkOTP, resendOtpResponse, resendOtpMsg } = storeToRefs(useAuthStore());
+const { authenticated, authOtp, checkOTP, resendOtpResponse, resendOtpMsg, detectDuplicateEmail } = storeToRefs(useAuthStore());
 const toast = useToast();
 const router = useRouter();
 const { layoutConfig } = useLayout();
@@ -45,6 +45,7 @@ const errorData = ref({
     emailError: false,
     passwordError: false,
     confirmPassError: false,
+    confirmPassMismatch: false,
     otpError: false
 })
 
@@ -73,19 +74,34 @@ const handleLoginSubmit = async () => {
     createUser.value.email ? errorData.value.emailError = false : errorData.value.emailError = true
     createUser.value.password ? errorData.value.passwordError = false : errorData.value.passwordError = true
     createUser.value.confirmPass ? errorData.value.confirmPassError = false : errorData.value.confirmPassError = true
-    if (createUser.value.password !== createUser.value.confirmPass) {
-        errorData.value.confirmPassError = true
-        regBtnHandle.value = false
+
+    if (createUser.value.confirmPass && createUser.value.password !== createUser.value.confirmPass) {
+        errorData.value.confirmPassError = false
+        errorData.value.confirmPassMismatch = true
     }
-    if (errorData.value.userNameError || errorData.value.emailError || errorData.value.passwordError || errorData.value.confirmPassError) {
+    
+    if (createUser.value.password === createUser.value.confirmPass) {
+        errorData.value.confirmPassMismatch = false  
+    }
+    
+    if (createUser.value.confirmPass === '' ) {
+        errorData.value.confirmPassMismatch = false
+        errorData.value.confirmPassError = true
+    }
+
+    if (errorData.value.userNameError || errorData.value.emailError || errorData.value.passwordError || errorData.value.confirmPassError || errorData.value.confirmPassMismatch) {
         regBtnHandle.value = false
     } else {
         
         await registerUser(createUser.value);
-        if (checkOTP.value === true) {
-
+        if(detectDuplicateEmail.value === true){
+            toast.add({ severity: 'error', summary: 'Error', detail: 'The email has already been taken', life: 3000 });
+            regBtnHandle.value = false
+            return
+        }
+        else if (checkOTP.value === true) {
             console.log('authenticated =>', authenticated.value)
-            toast.add({ severity: 'success', summary: 'Successfully Registered', detail: 'Now verify email using OTP', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfully Registered', detail: 'Now verify email using OTP', life: 5000 });
             // setTimeout(() => {
             //     router.push('/login')
             // }, 300);
@@ -159,7 +175,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                 style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="regForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign Up</div>
                     </div>
 
@@ -168,7 +184,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="name" class="block text-900 text-xl font-medium mb-2">Full Name</label>
                             <InputText id="name" v-model="createUser.userName" type="text" placeholder="John Doe"
                                 class="w-full" style="padding: 1rem" />
-                            <small id="name-help" class="error-report" v-if="errorData.userNameError">
+                            <small id="name-help" class="error-report red-text" v-if="errorData.userNameError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Full name required!
                             </small>
                         </div>
@@ -176,7 +192,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="createUser.email" type="email"
                                 placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report" v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text" v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div>
@@ -198,7 +214,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                                     </ul>
                                 </template>
                             </Password>
-                            <small id="password-help" class="error-report" v-if="errorData.passwordError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.passwordError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required!
                             </small>
                         </div>
@@ -208,8 +224,11 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password"
                                 :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }">
                             </Password>
-                            <small id="password-help" class="error-report" v-if="errorData.confirmPassError">
+                            <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required!
+                            </small>
+                            <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassMismatch">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password did not match!
                             </small>
                         </div>
                         <Button type="submit" label="Sign Up" :loading="regBtnHandle"
@@ -223,7 +242,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                 </div>
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
-                        <img src="/demo/images/login/avatar.png" alt="Image" height="80" class="mb-3" />
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">
@@ -231,7 +250,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
                             <InputText id="email" v-model="verifyUser.email" type="email"
                                 placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
-                            <small id="email-help" class="error-report" v-if="errorData.emailError">
+                            <small id="email-help" class="error-report red-text" v-if="errorData.emailError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
                             </small>
                         </div> -->
@@ -239,7 +258,7 @@ watch(() => verifyOTPForm.value, (newVal) => {
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
                             <InputText id="name" v-model="verifyUser.otp" type="text" placeholder="Enter OTP"
                                 class="w-full" style="padding: 1rem" />
-                            <small id="name-help" class="error-report" v-if="errorData.otpError">
+                            <small id="name-help" class="error-report red-text" v-if="errorData.otpError">
                                 <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required!
                             </small>
                         </div>
@@ -295,5 +314,9 @@ watch(() => verifyOTPForm.value, (newVal) => {
     50% {
         opacity: 0.5;
     }
+}
+
+.red-text{
+    color: red !important;
 }
 </style>

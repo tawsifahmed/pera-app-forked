@@ -1,5 +1,5 @@
 <script setup>
-// Access users data 
+// Access users data
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -9,16 +9,14 @@ import { storeToRefs } from 'pinia';
 import { FilterMatchMode } from 'primevue/api';
 import Dialog from 'primevue/dialog';
 import { useCompanyStore } from '~/store/company';
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 
 const readTask = ref(accessPermission('read_task'));
-
-
 
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const { getSingleProject, deleteTask, getTaskAssignModalData, getTagsAssignModalData, getTaskDetails } = useCompanyStore();
-const { singleProject, isTaskDeleted, tasks } = storeToRefs(useCompanyStore());
+const { singleProject, isTaskDeleted, tasks, kanbanTasks } = storeToRefs(useCompanyStore());
 
 const filters = ref({});
 const loading = ref(true);
@@ -33,13 +31,6 @@ const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
 
-const taskNameEditInput = ref(null);
-const taskEditDescriptionInput = ref(null);
-const priority = ref(null);
-const dueDate = ref(null);
-const assignees = ref([]);
-const tags = ref([]);
-const refTaskIdForEdit = ref(null);
 const usersLists = ref([]);
 const tagsLists = ref([]);
 const visibleEdit = ref(false);
@@ -62,7 +53,6 @@ const openCreateSpace = async (key, type) => {
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
-
 };
 
 const handleTaskEdit = async (task) => {
@@ -72,13 +62,6 @@ const handleTaskEdit = async (task) => {
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
-    // refTaskIdForEdit.value = task.key;
-    // taskNameEditInput.value = task.data.name;
-    // taskEditDescriptionInput.value = task.data.description;
-    // priority.value = task.data.priority ? { name: task.data.priority, code: task.data.priority } : '';
-    // assignees.value = task.data.assigneeObj;
-    // tags.value = task.data.tagsObj;
-    // dueDate.value = task.data.dueDate;
     visibleEdit.value = true;
 };
 
@@ -92,11 +75,11 @@ const deletingTask = async () => {
     await deleteTask(refTaskId.value, projects);
     if (isTaskDeleted.value === true) {
         btnLoading.value = false;
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task Deleted Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task Deleted Successfully', group: 'br', life: 3000 });
         deleteTaskDialog.value = false;
     } else {
         btnLoading.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete task', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete task', group: 'br', life: 3000 });
     }
 };
 
@@ -104,11 +87,8 @@ const handleTaskDetailView = async (task) => {
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
-    singleTask.value = task;
-    refTaskId.value = task.key;
-    taskNameEditInput.value = task.data.name;
-    // getTaskDetails(task.key);
-    await getTaskAssignModalData(); 
+    await getTaskDetails(task.key);
+    await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
@@ -137,13 +117,13 @@ const updateTaskTable = () => {
 getSingleProject(projects);
 
 watchEffect(() => {
-    
     loading.value = false;
 });
 </script>
 
 <template>
     <div class="card">
+        <Toast position="bottom-right" group="br" />
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
@@ -157,24 +137,30 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <div v-if="readTask" class="card">
-            <TaskTable :tasks="tasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)"> </TaskTable>
-        </div>
+        <TaskTable
+            v-if="readTask"
+            :kanbanTasks="kanbanTasks"
+            :tasks="tasks"
+            @openCreateSpace="openCreateSpace"
+            @handleTaskEdit="handleTaskEdit($event)"
+            @handleTaskDetailView="handleTaskDetailView($event)"
+            @confirmDeleteTask="confirmDeleteTask($event)"
+        >
+        </TaskTable>
 
         <!-- Create Task Modal -->
-        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw', '330px': '98vw' }">
             <TaskCreateTask :usersLists="usersLists" :tagsLists="tagsLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
-        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :tagsLists="tagsLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskDetail
-                :singleTask="singleTask"
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"
                 :projID="projects"
@@ -233,7 +219,6 @@ watchEffect(() => {
         text-wrap: nowrap;
     }
 }
-
 
 .cmc {
     text-wrap: nowrap;

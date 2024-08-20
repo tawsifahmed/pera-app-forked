@@ -12,102 +12,98 @@ const { isCompanyEdited } = storeToRefs(useCompanyStore());
 
 const { refCompanyId } = defineProps(['refCompanyId']);
 
+const emit = defineEmits(['closeEditModal']);
+const toast = useToast();
 
-const spaceFormInputs = ref(true);
 const showFinalMsg = ref(false);
 
 
 const numEmployees = ref();
+numEmployees.value = refCompanyId?.number_of_employees ? { id: refCompanyId?.number_of_employees, label: refCompanyId?.number_of_employees } : '';
 const companyLargeAmount = ref([
     {
-        id: 1,
+        id: '1-10',
         label: '1-10'
     },
     {
-        id: 2,
+        id: '11-25',
         label: '11-25'
     },
     {
-        id: 3,
+        id: '26-250',
         label: '26-250'
     },
     {
-        id: 4,
+        id: '251-500',
         label: '251-500'
     },
     {
-        id: 5,
+        id: '501-2000',
         label: '501-2000'
     },
     {
-        id: 6,
+        id:'2000+',
         label: '2000+'
     }
-    // {
-    //     id: 7,
-    //     label: "I don't know"
-    // }
 ]);
 
-const sSolution = ref(null);
+const sSolution = ref(refCompanyId?.company_type ? { id: refCompanyId?.company_type, label: refCompanyId?.company_type } : '');
 const solutions = ref([
     {
-        id: 1,
+        id: 'PMO',
         label: 'PMO'
     },
     {
-        id: 2,
+        id: 'Finance & Accounting',
         label: 'Finance & Accounting'
     },
     {
-        id: 3,
+        id: 'HR & Recruiting',
         label: 'HR & Recruiting'
     },
     {
-        id: 4,
+        id: 'Operations',
         label: 'Operations'
     },
     {
-        id: 5,
+        id: 'Support',
         label: 'Support'
     },
     {
-        id: 6,
+        id: 'Seles & CRM',
         label: 'Seles & CRM'
     },
     {
-        id: 7,
+        id: 'Personal Use',
         label: 'Personal Use'
     },
     {
-        id: 8,
+        id: 'IT',
         label: 'IT'
     },
     {
-        id: 9,
+        id: 'Creative & Design',
         label: 'Creative & Design'
     },
     {
-        id: 10,
+        id: 'Personal Services',
         label: 'Personal Services'
     },
     {
-        id: 11,
+        id: 'Marketing',
         label: 'Marketing'
     },
     {
-        id: 12,
+        id: 'Engineering & Production',
         label: 'Engineering & Production'
     },
     {
-        id: 13,
+        id: 'Other',
         label: 'Other'
     }
 ]);
 
-// Invite people to your Workspace
-const invite = ref(null);
-
+const invite = ref(refCompanyId?.email);
 const validateEmail = (mail) => {
     return String(mail)
         .toLowerCase()
@@ -116,7 +112,7 @@ const validateEmail = (mail) => {
 
 const showValidEmail = ref(null);
 const validEmailStatus = ref(null);
-const pForEmail = ref(null);
+
 const handleEmail = () => {
     validEmailStatus.value = false;
     let progressForInvite;
@@ -130,11 +126,15 @@ const handleEmail = () => {
     }
 };
 
-const workSpaceName = ref(null);
+const workSpaceName = ref(refCompanyId?.name);
 const errorHandler = ref(false);
+
+const btnLoading = ref(false);
 const handleEditCompany = async () => {
+    btnLoading.value = true;
     if (numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === '') {
         errorHandler.value = true;
+        btnLoading.value = false;
         return;
     } else {
         errorHandler.value = false;
@@ -142,12 +142,8 @@ const handleEditCompany = async () => {
         let nE = numEmployees.value?.label;
         let sS = sSolution.value?.label;
         console.log('company type', sSolution.value.label);
-
-        console.log('nE', nE);
-        console.log('sS', sS);
-
         const workspaceData = {
-            id: refCompanyId,
+            id: refCompanyId.id,
             name: workSpaceName.value,
             email: invite.value,
             address: null,
@@ -161,18 +157,16 @@ const handleEditCompany = async () => {
         await editCompany(workspaceData);
         // await getCompanyList();
         if (isCompanyEdited.value === true) {
-            spaceFormInputs.value = false;
-            showFinalMsg.value = true;
-            numEmployees.value = null;
-            sSolution.value = null;
-            invite.value = null;
-            workSpaceName.value = null;
+            emit('closeEditModal', false);
 
-            console.log('showFinalMsg', showFinalMsg.value);
+            toast.add({ severity: 'success', summary: 'Success', detail: 'Company edited successfully!', group: 'br', life: 3000 });
 
             console.log('company edited');
+            btnLoading.value = false;
         } else {
             console.log('company not edited');
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to edit company!', group: 'br', life: 3000 });
+            btnLoading.value = false;
         }
     }
 };
@@ -181,50 +175,30 @@ const handleEditCompany = async () => {
 <template lang="">
     <div class="position-relative flex flex-column justify-content-between w-100 modal-container">
         <!-- <p>refCompanyId {{refCompanyId}}</p> -->
-        <div v-if="spaceFormInputs">
-            <div class="flex justify-content-center">
-                <FloatLabel class="w-full md:w-50rem mt-4">
-                    <Dropdown v-model="numEmployees" inputId="dd-city" :options="companyLargeAmount" optionLabel="label" class="w-full" />
-                    <label for="dd-city">Select Companny Size</label>
-                </FloatLabel>
+       
+            <div class="field">
+                <label for="company">Company Size</label>
+                <Dropdown v-model="numEmployees" inputId="company" :options="companyLargeAmount" optionLabel="label" class="w-full" />
             </div>
-            <br />
-            <div class="flex justify-content-center">
-                <FloatLabel class="w-full md:w-50rem mt-4">
-                    <Dropdown v-model="sSolution" inputId="dd-city" :options="solutions" optionLabel="label" class="w-full" />
-                    <label for="dd-city">Company work type? </label>
-                </FloatLabel>
+            <div class="field">
+                <label for="worktype">Company work type?</label>
+                <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" class="w-full" />
             </div>
-
-            <br />
-            <br />
-            <FloatLabel>
-                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail" />
-                <label>Email address</label>
+          
+            <div class="field">
+                <label for="email">Email address</label>
+                <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail" />
                 <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
-            </FloatLabel>
-            <br />
-            <br />
-            <FloatLabel>
-                <InputText type="email" class="w-full px-4 py-2 shadow border focus:border-purple-500" v-model="workSpaceName" />
-                <label>Workspace name...</label>
-            </FloatLabel>
+            </div>
+            <div class="field">
+                <label for="company">Company name</label>
+                <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="workSpaceName" />
+            </div>
             <br />
             <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
             <div class="create-btn-wrapper">
-                <Button @click="handleEditCompany" class="text-white py-2 px-6 tracking-wide" label="Update Company" />
+                <Button @click="handleEditCompany" class="text-white py-2 px-6 tracking-wide" label="Update Company" :loading="btnLoading" />
             </div>
-        </div>
-        <div v-if="showFinalMsg">
-            <h3 class="text-dark mb-4 text-black text-center font-weight-semibold">Company edited successfully</h3>
-
-            <div class="centering">
-                <FloatLabel>
-                    <!-- <InputText type="email" class="w-100 px-4 py-2 shadow border border-primary focus:border-primary" v-model="workSpaceName"/> -->
-                    <p class="text-center mb-2">You can close the modal now.</p>
-                </FloatLabel>
-            </div>
-        </div>
     </div>
 </template>
 

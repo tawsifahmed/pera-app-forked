@@ -20,9 +20,9 @@ const handleSubmit = async () => {
     loading.value = true;
     const response = await updateUser(userId.value, userName.value, phone.value, email.value, address.value, uploadedImage.value);
     if (response?.code === 200) {
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Success', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Success', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Profile Updated Failed', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Profile Updated Failed', group: 'br', life: 3000 });
     }
     loading.value = false;
 };
@@ -37,7 +37,8 @@ const handleImageUpload = (value) => {
     <form @submit.prevent="handleSubmit" class="grid">
         <div class="col-12 text-center mb-5">
             <div class="relative w-fit mx-auto">
-                <img :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover" />
+                <img v-if="imageData" :src="`${imageData}`" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover" />
+                <img v-else src='../../assets/dummy_profile.png' alt="" style="height: 100px; width: 100px; border-radius: 100%; object-fit: cover">
                 <div class="img-label">
                     <label for="image">
                         <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 8px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
@@ -54,7 +55,7 @@ const handleImageUpload = (value) => {
         </div>
         <div class="col-12 lg:col-6 mb-3">
             <FloatLabel>
-                <InputText id="phone" v-model="phone" class="w-full" />
+                <InputText id="phone" v-model="phone" type="number" class="w-full" />
                 <label for="phone">Phone</label>
             </FloatLabel>
         </div>
@@ -71,7 +72,7 @@ const handleImageUpload = (value) => {
             </FloatLabel>
         </div>
         <div class="col-12 mb-3 flex justify-content-center">
-            <Button type="submit" label="Submit" :loading="loading" />
+            <Button type="submit" label="Save" :loading="loading" />
         </div>
     </form>
 </template>
@@ -91,5 +92,17 @@ const handleImageUpload = (value) => {
     bottom: 5px;
     z-index: 1;
     cursor: pointer;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   
+    -webkit-appearance: none;
+    margin: 0; 
+}
+
+input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield; 
 }
 </style>

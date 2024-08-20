@@ -3,7 +3,7 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
-
+const url = useRuntimeConfig();
 import { FilterMatchMode } from 'primevue/api';
 
 import Column from 'primevue/column';
@@ -16,7 +16,7 @@ import EditEmployee from '@/components/Employee/EditEmployee.vue';
 
 import InviteGuest from '@/components/Employee/InviteGuest.vue';
 
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 
 const readUser = ref(accessPermission('read_user'));
 
@@ -103,7 +103,7 @@ const deleteEmployee = (key) => {
 
 const confirmDeleteEmployee = async () => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/users/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -112,9 +112,9 @@ const confirmDeleteEmployee = async () => {
 
     if (data.value.code === 200) {
         visibleDeleteEmployee.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', group: 'br', life: 3000 });
     }
     init();
 };
@@ -122,21 +122,21 @@ const confirmDeleteEmployee = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/users/list', {
+        $fetch('${url.public.apiUrl}/users/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data;
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
 const getRoleList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch('http://188.166.212.40/pera/public/api/v1/roles/list', {
+        $fetch('${url.public.apiUrl}/roles/list', {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -146,7 +146,6 @@ const getRoleList = async () => {
         console.log('data', data.value?.data);
         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
         console.log('rolesLists', rolesLists.value);
-    
     }
 };
 
@@ -170,13 +169,15 @@ initFilters();
 <template>
     <div v-if="readUser" class="card">
         <div class="d-flex mr-2">
-            <!-- <pre>{{rolePermission}}</pre> -->
-            <h4 class="mb-0">Create Employee</h4>
+            <Toast position="bottom-right" group="br" />
+            <div class="d-flex mr-2">
+                <h5 class="mb-1">Employees</h5>
+            </div>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
                 <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
+                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
@@ -194,17 +195,17 @@ initFilters();
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" sortable header="Employee Name"></Column>
             <Column field="email" sortable header="Email Address"></Column>
-            <Column field="phone" sortable header="Phone Number"></Column>
+            <Column field="phone" sortable header="Phone"></Column>
             <Column field="user_type" sortable header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
-                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden;" />
+                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" />
                     <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
-                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden;" />
+                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>

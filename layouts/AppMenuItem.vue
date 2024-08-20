@@ -2,13 +2,16 @@
 import { ref, onBeforeMount, watch } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRoute } from 'vue-router';
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
+
+import { storeToRefs } from 'pinia';
+import { useActiveCompanyStore } from '~/store/workCompany';
+const { company_id } = storeToRefs(useActiveCompanyStore());
 
 import Dialog from 'primevue/dialog';
 
 const createSpaceP = ref(accessPermission('create_space'));
 const createProjectP = ref(accessPermission('create_project'));
- 
 
 const route = useRoute();
 const { layoutConfig, layoutState, setActiveMenuItem, onMenuToggle } = useLayout();
@@ -33,6 +36,26 @@ const props = defineProps({
 const isActiveMenu = ref(false);
 const itemKey = ref(null);
 
+const items = ref([
+    {
+        label: 'Settings',
+        items: [
+            {
+                label: 'Manage Space',
+                icon: 'pi pi-th-large'
+            }
+            // {
+            //     label: 'Show all Space',
+            //     icon: 'pi pi-eye'
+            // },
+            // {
+            //     label: 'Show Archive',
+            //     icon: 'pi pi-inbox'
+            // }
+        ]
+    }
+]);
+
 onBeforeMount(() => {
     itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);
     const activeItem = layoutState.activeMenuItem;
@@ -47,8 +70,7 @@ watch(
 );
 
 const itemClick = (event, item) => {
-    console.log('clicked');
-    console.log('item', item);
+    console.log('clicked item', item);
     if (item.disabled) {
         event.preventDefault();
         console.log('clicked ids');
@@ -66,8 +88,15 @@ const itemClick = (event, item) => {
     }
 
     const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
-
+    console.log(foundItemKey);
     setActiveMenuItem(foundItemKey);
+};
+
+const clickSpaceMenu = (event) => {
+    if (event[0].items[0].label == 'Manage Space') {
+        console.log('company_id', company_id.value);
+        return navigateTo(`/companies/${company_id.value}`);
+    }
 };
 
 const checkActiveRoute = (item) => {
@@ -75,25 +104,6 @@ const checkActiveRoute = (item) => {
 };
 
 const menu = ref();
-const items = ref([
-    {
-        label: 'Settings',
-        items: [
-            {
-                label: 'Manage Space',
-                icon: 'pi pi-th-large'
-            },
-            {
-                label: 'Show all Space',
-                icon: 'pi pi-eye'
-            },
-            {
-                label: 'Show Archive',
-                icon: 'pi pi-inbox'
-            }
-        ]
-    }
-]);
 
 const toggle = (event) => {
     menu.value.toggle(event);
@@ -104,35 +114,76 @@ const toggle = (event) => {
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
-            
 
             <div v-if="item.option == 'space_option'">
-                <div class="flex">
-                    <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm  w-2rem h-2rem " @click="toggle" severity="secondary" aria-label="Bookmark" text />
-                    <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+                <div class="flex align-items-center">
+                    <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                    <Menu ref="menu" id="overlay_menu" @click="clickSpaceMenu(items)" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
+                    <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
                 </div>
             </div>
         </div>
-        <a  class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false"  :class="item.class" :target="item.target" tabindex="0">
-             <div class="flex align-items-center">
-                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small"  :style="{ 'background-color': [item.color?item.color:'#3b82f6'], 'color': ['#ededed']}" />
-                 <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text">{{ item.label }}  </NuxtLink>
+        <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
+            <div class="flex align-items-center">
+                <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text">{{ item.label }} </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
-                <CreateSpecificProject v-if="createProjectP"  v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
+                <CreateSpecificProject v-if="createProjectP" v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
+                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             </div>
         </a>
-        <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
-            <i :class="item.icon" class="layout-menuitem-icon"></i>
-            <span class="layout-menuitem-text">{{ item.label }}</span>
+        <router-link
+            class="flex align-items-center justify-content-between"
+            v-if="item.to && !item.items && item.visible !== false"
+            @click="itemClick($event, item, index)"
+            :class="[item.class, { 'active-route': checkActiveRoute(item) }]"
+            tabindex="0"
+            :to="item.to"
+        >
+            <div class="flex flex-row">
+                <i :class="item.icon" class="layout-menuitem-icon"></i>
+                <span class="layout-menuitem-text">{{ item.label }}</span>
+            </div>
+            <span
+                v-if="item.label == 'Employees'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'Roles'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'Tags'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'Task Wise Reports'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'User Wise Reports'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
             <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1">
                 <app-menu-item v-for="(child, i) in item.items" :key="child" :index="i" :item="child" :parentItemKey="itemKey" :root="false"></app-menu-item>
-<!--                <CreateSpace/>-->
+                <!-- <CreateSpace /> -->
             </ul>
         </Transition>
     </li>

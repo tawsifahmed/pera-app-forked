@@ -11,17 +11,16 @@
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="text" class="w-full" />
+            <InputText v-model="phone" type="number" class="w-full" />
         </div>
         <div class="field">
             <label for="company">Address</label>
             <Textarea v-model="address" rows="3" cols="20" class="w-full" />
         </div>
-        <div class="field">
+        <!-- <div class="field">
             <label for="company">Password</label>
             <InputText type="password" v-model="password" class="w-full" />
-        </div>
-
+        </div> -->
 
         <!-- <pre>{{user_type}}</pre> -->
         <div class="field flex flex-column">
@@ -30,11 +29,12 @@
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrappe">
-            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
         </div>
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -58,26 +58,25 @@ const rolesLists = ref(props.param.rolesLists);
 const user_type = ref(props.param.user_type);
 // user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
-
-const password = ref('');
-
-const password_confirmation = ref('');
-
 const errorHandler = ref(false);
 
 const employeeForm = ref(true);
 
 const emit = defineEmits(['closeEditModal']);
 
+const loading = ref(false);
+
 const handleSubmitData = async () => {
+    loading.value = true;
     if (name.value === '' || email.value === '') {
         errorHandler.value = true;
+        loading.value = false;
         return;
     } else {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/users/update/${id.value}`, {
+            const { data, error, pending } = await useFetch(`${url.public.apiUrl}/users/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -87,18 +86,26 @@ const handleSubmitData = async () => {
                     email: email.value,
                     address: address.value,
                     phone: phone.value,
-                    password: password.value,
-                    password_confirmation: password.value,
                     role: user_type.value.name
                 }
             });
 
-            if (data.value.code === 200) {
+            if (error?.value) {
+                if (error?.value?.data?.code === 500) {
+                    loading.value = false;
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
+                    return;
+                }
+            } else if (data?.value?.code === 200) {
+                loading.value = false;
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', group: 'br', life: 3000 });
+                return;
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Updated Failed!', life: 3000 });
+                loading.value = false;
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update employee!', group: 'br', life: 3000 });
+                return;
             }
         }
     }
@@ -113,5 +120,16 @@ const handleSubmitData = async () => {
 .create-btn-wrappe {
     display: flex;
     justify-content: end;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    appearance: textfield;
+    -moz-appearance: textfield;
 }
 </style>

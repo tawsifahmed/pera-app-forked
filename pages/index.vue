@@ -1,12 +1,19 @@
 <script setup>
 import { useLayout } from '@/layouts/composables/layout';
 import { onMounted, reactive, ref, watch } from 'vue';
-
-
+import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+import { useCompanyStore } from '~/store/company';
+const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
+const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore()); 
+
+const readEmployee = ref(accessPermission('read_user'))
+const readRole = ref(accessPermission('read_role'))
+const readTags = ref(accessPermission('read_tags'))
+const createCompanyP = ref(accessPermission('create_company'))
 
 definePageMeta({
       middleware: 'auth',
@@ -15,27 +22,45 @@ definePageMeta({
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
-const lineData = reactive({
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+const lineData = ref({
+    labels: chartProjectInfo,
     datasets: [
         {
-            label: 'First Dataset',
-            data: [65, 59, 80, 81, 56, 55, 40],
+            label: 'Total Tasks',
+            data: chartTaskInfo,
+            fill: false,
+            backgroundColor: '#6366f1',
+            borderColor: '#6366f1',
+            tension: 0.4
+        },
+        {
+            label: 'Closed Tasks',
+            data: chartClosedTaskInfo,
             fill: false,
             backgroundColor: '#2f4860',
             borderColor: '#2f4860',
             tension: 0.4
-        },
-        {
-            label: 'Second Dataset',
-            data: [28, 48, 40, 19, 86, 27, 90],
-            fill: false,
-            backgroundColor: '#00bb7e',
-            borderColor: '#00bb7e',
-            tension: 0.4
         }
     ]
 });
+
+// const lineOptions = ref({
+//     scales: {
+//         x: {
+//             title: {
+//                 display: true,
+//                 text: 'X Axis Title'
+//             }
+//         },
+//         y: {
+//             title: {
+//                 display: true,
+//                 text: 'Y Axis Title'
+//             }
+//         }
+//     }
+// });
+
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-minus' }
@@ -61,6 +86,10 @@ const checkUser = () => {
 }
 
 onMounted(() => {
+    getRoles();
+    getTaskAssignModalData();
+    getTagsAssignModalData();
+    getChartData();
     checkUser()
     // ProductService.getProductsSmall().then((data) => (products.value = data));
 });
@@ -85,6 +114,10 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
+                },
+                title: {
+                    display: true,
+                    text: 'Projects'
                 }
             },
             y: {
@@ -93,6 +126,10 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
+                },
+                title: {
+                    display: true,
+                    text: 'Numbers  of  Tasks'
                 }
             }
         }
@@ -146,10 +183,10 @@ watch(
     <div class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink to="companies" class="flex justify-content-between mb-3">
+                <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <div class="text-900 font-medium text-xl">1</div>
+                        <div class="text-900 font-medium text-xl">{{hasUserCompany ? '1' : '0'}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
@@ -159,7 +196,8 @@ watch(
                 <!-- <span class="text-500">since last visit</span> -->
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div class="flex justify-content-between mb-3">
                     <div>
@@ -170,8 +208,8 @@ watch(
                         <i class="pi pi-folder-open text-orange-500 text-xl"></i>
                     </div>
                 </div>
-                <!-- <span class="text-green-500 font-medium">%52+ </span> -->
-                <!-- <span class="text-500">since last week</span> -->
+                <span class="text-green-500 font-medium">%52+ </span>
+                <span class="text-500">since last week</span>
             </div>
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
@@ -185,21 +223,54 @@ watch(
                         <i class="pi pi-inbox text-cyan-500 text-xl"></i>
                     </div>
                 </div>
-                <!-- <span class="text-green-500 font-medium">520 </span>
-                <span class="text-500">newly registered</span> -->
+                <span class="text-green-500 font-medium">520 </span>
+                <span class="text-500">newly registered</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+        
+        <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <div class="flex justify-content-between mb-3">
+                <NuxtLink to="/employees" class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">Users</span>
-                        <div class="text-900 font-medium text-xl">152 Unread</div>
+                        <span class="block text-500 font-medium mb-3">Employees</span>
+                        <div class="text-900 font-medium text-xl" 
+                        style="visibility: visible;"
+                        >{{users.length}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
-                </div>
+                </NuxtLink>
+                <!-- <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span> -->
+            </div>
+        </div>
+        <div v-if="readRole" class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <NuxtLink to="/role" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Roles</span>
+                        <div class="text-900 font-medium text-xl">{{rolesLists ? rolesLists.length : '0'}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-user-edit text-red-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
+                <!-- <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span> -->
+            </div>
+        </div>
+        <div v-if="readTags" class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <NuxtLink to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Tags</span>
+                        <div class="text-900 font-medium text-xl">{{tags ? tags.length : '0'}}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-tags text-green-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
                 <!-- <span class="text-green-500 font-medium">85 </span>
                 <span class="text-500">responded</span> -->
             </div>
@@ -314,11 +385,14 @@ watch(
             </div>
         </div>
          -->
-        <div class="col-12 xl:col-6">
+
+
+         <div class="col-12 xl:col-8">
             <div class="card">
                 <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
             </div>
+
             <!-- <div class="card">
                 <div class="flex align-items-center justify-content-between mb-4">
                     <h5>Notifications</h5>
@@ -368,8 +442,9 @@ watch(
                         </span>
                     </li>
                 </ul>
-            </div>
-            <div
+            </div> -->
+
+            <!-- <div
                 class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3"
                 style="border-radius: 1rem; background: linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1c80cf 47.88%, #ffffff 100.01%)"
             >

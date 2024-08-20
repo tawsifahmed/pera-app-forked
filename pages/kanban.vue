@@ -1,3 +1,33 @@
+<script>
+import draggable from 'vuedraggable';
+
+export default {
+    name: 'KanbanBoard',
+    components: {
+        draggable
+    },
+    data() {
+        return {
+            list1: [
+                { name: 'John', id: 1 },
+                { name: 'Joao', id: 2 },
+                { name: 'Jean', id: 3 },
+                { name: 'Gerard', id: 4 }
+            ],
+            list2: [
+                { name: 'Juan', id: 5 },
+                { name: 'Edgard', id: 6 },
+                { name: 'Johnson', id: 7 }
+            ]
+        };
+    },
+    methods: {
+        log: function (evt) {
+            console.log(evt);
+        }
+    }
+};
+</script>
 <template>
     <div class="kanban-board">
         <div class="kanban-column">
@@ -44,37 +74,6 @@
         <rawDisplayer class="raw-displayer" :value="list2" title="List 2" />
     </div>
 </template>
-
-<script>
-import draggable from 'vuedraggable';
-
-export default {
-    name: 'KanbanBoard',
-    components: {
-        draggable
-    },
-    data() {
-        return {
-            list1: [
-                { name: 'John', id: 1 },
-                { name: 'Joao', id: 2 },
-                { name: 'Jean', id: 3 },
-                { name: 'Gerard', id: 4 }
-            ],
-            list2: [
-                { name: 'Juan', id: 5 },
-                { name: 'Edgard', id: 6 },
-                { name: 'Johnson', id: 7 }
-            ]
-        };
-    },
-    methods: {
-        log: function (evt) {
-            console.log(evt);
-        }
-    }
-};
-</script>
 
 <style scoped>
 .kanban-board {

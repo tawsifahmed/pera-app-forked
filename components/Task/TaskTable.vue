@@ -1,75 +1,155 @@
 <script setup>
-definePageMeta({
-    middleware: 'auth',
-    layout: 'default'
-});
-
+import draggable from 'vuedraggable';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
+import Column from 'primevue/column';
+const url = useRuntimeConfig();
+const usersListStore = useCompanyStore();
+const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
+const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
-
-const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
-
 const toast = useToast();
-
-const { taskStatus, statuslist } = storeToRefs(useCompanyStore());
-
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-
-const { tasks } = defineProps(['tasks']);
-
-import Column from 'primevue/column';
-
-const usersListStore = useCompanyStore();
+const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
+const route = useRoute();
+const id = route.params?.projects;
 
 const filterAssignees = ref();
-
 const filterPriorities = ref();
-
 const filterStatus = ref();
-
 const filterStartDueDate = ref();
-
 const filterEndDueDate = ref();
-
 const filterSearch = ref();
-
 const usersLists = ref({});
-const selectedStatus = ref();
-
+const tableView = ref(true);
 const priorities = ref([
+    { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
     { name: 'High', code: 'High' },
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
 ]);
 
-const route = useRoute();
-
-const id = route.params?.projects;
+const userI = ref();
+const prio = ref();
+const sta = ref();
+const que = ref();
+const strD = ref();
+const enD = ref();
+const activeSubTask = ref(null);
+const handleFilterReset = () => {
+    filterAssignees.value = '';
+    filterPriorities.value = '';
+    filterStatus.value = '';
+    filterSearch.value = '';
+    filterStartDueDate.value = '';
+    filterEndDueDate.value = '';
+    userI.value = '';
+    prio.value = '';
+    sta.value = '';
+    que.value = '';
+    strD.value = '';
+    enD.value = '';
+    isCalendarSelected1.value = false;
+    isCalendarSelected2.value = false;
+    changeAttribute();
+};
 
 const changeAttribute = async () => {
-    const userIds = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
-    const priority = filterPriorities.value ? filterPriorities.value.code : '';
-    const status = filterStatus.value ? filterStatus.value.id : '';
-    const query = filterSearch.value;
-    const start = filterStartDueDate.value;
-    const end = filterEndDueDate.value;
-    console.log(start,'start')
-    console.log(end,'end')
-}
+    userI.value = filterAssignees.value ? filterAssignees.value.map((item) => item.id) : '';
+    prio.value = filterPriorities.value ? filterPriorities.value.code : '';
+    sta.value = filterStatus.value ? filterStatus.value.id : '';
+    que.value = filterSearch.value;
+    strD.value = filterStartDueDate.value;
+    enD.value = filterEndDueDate.value;
+    getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+};
+
+const isCalendarSelected1 = ref(false);
+const isCalendarSelected2 = ref(false);
+
 const startDateChange = (newDate) => {
-    filterStartDueDate.value = newDate
-    changeAttribute()
-}
+    const date = new Date(newDate);
+    filterStartDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    isCalendarSelected1.value = true;
+    changeAttribute();
+};
 const endDateChange = (newDate) => {
-    filterEndDueDate.value = newDate
-    changeAttribute()
-}
+    isCalendarSelected2.value = true;
+    const date = new Date(newDate);
+    filterEndDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    changeAttribute();
+};
+
+const handleDateDelete1 = () => {
+    isCalendarSelected1.value = false;
+    filterStartDueDate.value = '';
+    strD.value = '';
+    changeAttribute();
+};
+
+const handleDateDelete2 = () => {
+    isCalendarSelected2.value = false;
+    filterEndDueDate.value = '';
+    enD.value = '';
+    changeAttribute();
+};
+
+const loading = ref(false);
+
+const downloadTaskSheet = (taskLists) => {
+    // return
+    loading.value = true;
+    console.log('lod', taskLists);
+    // return
+    if (taskLists.length > 0) {
+        const csvContent =
+            'data:text/csv;charset=utf-8,' +
+            '"Serial No","Unique ID","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
+            taskLists
+                .map((task, index) => {
+                    const serialNo = index + 1;
+                    const uniqueId = task.unique_id;
+                    const taskName = task.data.name;
+                    const projectName = singleProject.value.name;
+                    const assignees = task.data.assignee.split(', ').join('; ');
+                    const priority = task.data.priority ? task.data.priority : '';
+                    const status = task.data.status.name;
+                    let timeTracked = task.data.total_duration;
+                    const hours = Math.floor(timeTracked / 3600);
+                    const minutes = Math.floor((timeTracked % 3600) / 60);
+                    const seconds = timeTracked % 60;
+
+                    if (hours > 0) {
+                        timeTracked = `${hours} hr ${minutes} min ${seconds} sec`;
+                    } else if (minutes > 0) {
+                        timeTracked = `${minutes} min ${seconds} sec`;
+                    } else {
+                        timeTracked = `${seconds} sec`;
+                    }
+                    const dueDate = task.data.dueDateValue;
+                    const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
+
+                    return `"${serialNo}","${uniqueId}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
+                })
+                .join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'tasks.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        loading.value = false;
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
+    }
+};
 
 onMounted(async () => {
     await getSingleProject(id);
@@ -79,7 +159,7 @@ onMounted(async () => {
 async function handleTaskStatus(status, task_id) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${task_id}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${task_id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -92,9 +172,10 @@ async function handleTaskStatus(status, task_id) {
         if (data.value?.app_message === 'success') {
             // getTaskDetails(singleTask.key);
             console.log('Status Changed', data);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
+            await getSingleProject(id);
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -102,44 +183,119 @@ async function handleTaskStatus(status, task_id) {
 }
 
 function getRandomDeepColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 10)]; 
-  }
-  return color;
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 10)];
+    }
+    return color;
 }
 
 function avatarStyle(index) {
-  return {
-    backgroundColor: getRandomDeepColor(),
-    color: 'white',
-    borderRadius: '50%',
-    border: '2px solid white',
-  };
+    return {
+        backgroundColor: getRandomDeepColor(),
+        color: 'white',
+        borderRadius: '50%',
+        border: '2px solid white'
+    };
 }
 
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
 };
+
+const load = () => {
+    loading.value = true;
+    setTimeout(() => {
+        loading.value = false;
+    }, 2000);
+};
+function countTasks(tasks) {
+    let count = 0;
+
+    function countSubTasks(task) {
+        count++; // Count the current task
+
+        if (task.sub_task) {
+            countSubTasks(task.sub_task); // Recursively count sub-tasks
+        }
+    }
+
+    tasks.forEach((task) => {
+        countSubTasks(task); // Start counting from each top-level task
+    });
+
+    return count;
+}
+// Kanban
+const editable = ref(true);
+const dragOptions = computed(() => ({
+    animation: 250,
+    group: 'tasks',
+    disabled: !editable.value,
+    ghostClass: 'ghost'
+}));
+
+const taskCardStyle = computed(() => ({
+    backgroundColor: '#fff',
+    boxShadow: '0px 2px 2px #e2e2e2',
+    cursor: 'grab',
+    padding: '12px 10px',
+    margin: '8px 0px'
+}));
+
+const handleChange = (event, name) => {
+    const { added, moved, removed } = event;
+    if (added) {
+        handleTaskStatus(name, event.added.element.key);
+    }
+};
 </script>
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{statuslist}}</pre> -->
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Select Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="statuslist" optionLabel="name" placeholder="Select Status" class="w-full md:w-17rem mb-2" />
-        <Calendar @date-select="startDateChange($event)"  v-model="filterStartDueDate" placeholder="Start Due date" class="w-full md:w-17rem mb-2" />
-        <Calendar   @date-select="endDateChange($event)" v-model="filterEndDueDate"  placeholder="End Due date" class="w-full md:w-17rem" />
+        <!-- <pre>{{tasks}}</pre> -->
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+        <div class="mb-2 relative">
+            <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate" placeholder="Filter Start Due Date" class="w-full md:w-17rem" />
+            <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
+        </div>
+        <div class="mb-2 relative">
+            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Filter End Due Date" class="w-full md:w-17rem" />
+            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
+        </div>
+        <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-15rem mb-2" severity="secondary" />
     </div>
     <Toolbar class="border-0 px-0">
         <template #start>
-            <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-            <Button v-if="downloadTaskP" icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
-            <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
-            <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
+            <!-- <pre>{{tasks}}</pre> -->
+            <div class="flex flex-wrap gap-1">
+                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
+                <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
+                <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
+
+                <!-- task report download -->
+
+                <Button
+                    type="button"
+                    v-if="downloadTaskP"
+                    @click="downloadTaskSheet(tasks)"
+                    v-tooltip.right="{ value: `Download Tasks` }"
+                    icon="pi pi-file-excel"
+                    :loading="loading"
+                    label=""
+                    class="mr-2"
+                    severity="secondary"
+                    :style="`${loading === true ? 'backGround: red' : ''}`"
+                />
+
+                <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
+                <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
+            </div>
         </template>
 
         <template #end>
@@ -151,11 +307,11 @@ const getUserlist = async () => {
             </IconField>
         </template>
     </Toolbar>
-    <!-- <pre>{{tasks}}</pre> -->
-    <TreeTable class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" filterDisplay="menu" style="overflow: auto">
+    <!-- <pre>{{ tasks }}</pre> -->
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty> <p class="text-center">No Data found...</p> </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="cursor-pointer" expander :style="{ width: '50%' }">
+        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '40%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
@@ -170,7 +326,7 @@ const getUserlist = async () => {
                             </template>
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%;" class="p-1 mr-2 pi"></div>
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
                             </template>
@@ -181,27 +337,59 @@ const getUserlist = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '20%' }">
+        <Column field="assignee" header="Assignee">
             <template #body="slotProps">
-              <div class="flex justify-content-start gap-1">
-                <span
-                  v-for="(assignee, index) in slotProps.node.data.assigneeObj"
-                  :key="index"
-                  class="flex justify-content-center assignee-wrapper"
-                  :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index, }"
-                >
-                  <Avatar v-tooltip.top="{ value: `${assignee.name}` }"
-                    :label="assignee.name.charAt(0)"
-                    class="mr-2 capitalize cursor-pointer"
-                    size="small"
-                    style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                    :style="avatarStyle(index)"
-                  />
-                </span>
-              </div>
+                <div class="flex justify-content-start gap-1">
+                    <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
+                        <img
+                            v-tooltip.top="{ value: `${assignee.name}` }"
+                            class="mr-2 capitalize cursor-pointer"
+                            v-if="assignee.image"
+                            :src="assignee.image"
+                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                            alt=""
+                            srcset=""
+                        />
+                        <Avatar
+                            v-else
+                            v-tooltip.top="{ value: `${assignee.name}` }"
+                            :label="assignee.name.charAt(0)"
+                            class="mr-2 capitalize cursor-pointer"
+                            size="small"
+                            style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                            :style="avatarStyle(index)"
+                        />
+                    </span>
+                </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ width: '15%' }">
+        <Column field="status" header="Status" :style="{ width: '20%' }">
+            <template #body="slotProps">
+                <div class="inline-block">
+                    <div class="task-status-2">
+                        <!-- <pre>{{statuslist}}</pre> -->
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center">
+                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{ slotProps.value.name }}</div>
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                    </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
+                </div>
+            </template>
+        </Column>
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap' }">
             <template #body="slotProps">
                 <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{ slotProps.node.data.dueDateValue }}</div>
             </template>
@@ -209,24 +397,177 @@ const getUserlist = async () => {
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%' }">
             <template #body="slotProps">
-                <div class="action-dropdown">
+                <div class="action-dropdown flex justify-content-start align-items-center">
                     <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
+                    <!-- <span class="pi pi-circle-fill text-xs ml-2 mt-1" style="color:crimson;"></span> -->
                     <div class="action-dropdown-content">
                         <Button v-if="createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" v-tooltip.left="{ value: 'Create Sub Task' }" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                        <Button v-if="!createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;"/>
+                        <Button v-if="!createTaskP" icon="pi pi-plus" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden" />
                         <Button v-if="updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" v-tooltip.top="{ value: 'Edit Task' }" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                        <Button v-if="!updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden;" />
+                        <Button v-if="!updateTaskP" icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" rounded style="visibility: hidden" />
                         <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" v-tooltip.top="{ value: 'Task Detail' }" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
                         <Button v-if="deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" v-tooltip.top="{ value: 'Delete Task' }" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
-                        <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden;" />
+                        <Button v-if="!deleteTaskP" icon="pi pi-trash" class="ac-btn" severity="warning" rounded style="visibility: hidden" />
                     </div>
                 </div>
             </template>
         </Column>
     </TreeTable>
+
+    <!-- Kanban Board -->
+    <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
+    <div v-if="!tableView" class="main-container">
+        <div class="content">
+            <div>
+                <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
+                    <!-- <pre>khn {{ updateTaskP }}</pre> -->
+                    <div v-for="list in kanbanTasks" :key="list" class="groupColumnContainer">
+                        <div class="column-container">
+                            <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name }} - {{ list.content.length }}</div>
+                            <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
+                                <template v-slot:item="{ element }">
+                                    <div class="">
+                                        <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                            <div class="">
+                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <div class="flex align-items-center gap-2 mt-1">
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
+                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-user text-lg"></i>
+                                                    <div class="flex justify-content-start gap-1">
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
+                                                            :key="index"
+                                                            class="flex justify-content-center assignee-wrapper"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
+                                                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                :label="assignee.name.charAt(0)"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
+                                                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                                                :style="avatarStyle(index)"
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-flag text-lg"></i>
+                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                </div>
+                                                <div
+                                                    class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
+                                                    style="border-radius: 5px"
+                                                    @click="
+                                                        (event) => {
+                                                            event.stopPropagation();
+                                                            if (activeSubTask == element.unique_id) {
+                                                                activeSubTask = null;
+                                                            } else {
+                                                                activeSubTask = element.unique_id;
+                                                            }
+                                                        }
+                                                    "
+                                                >
+                                                    <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
+                                                    <p class="text-sm font-semibold">{{ element.children.length }}</p>
+                                                </div>
+                                            </div>
+                                            {{ element.t_name }}
+                                        </div>
+                                        <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
+                                            <div v-for="element in element.children" :key="element.unique_id" class="sub-card" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <div class="flex align-items-center gap-2 mt-1">
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
+                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-user text-lg"></i>
+                                                    <div class="flex justify-content-start gap-1">
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
+                                                            :key="index"
+                                                            class="flex justify-content-center assignee-wrapper"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
+                                                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                :label="assignee.name.charAt(0)"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
+                                                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                                                :style="avatarStyle(index)"
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-flag text-lg"></i>
+                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-angle-right text-lg"></i>
+                                                    <p class="text-sm font-semibold">{{ element.children.length }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </draggable>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style>
+.sub-card {
+    background-color: #fff;
+    box-shadow: 0px 3px 8px #e2e2e2;
+    cursor: grab;
+    padding: 12px 10px;
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    width: calc(20rem - 15px);
+}
 .action-dropdown {
     position: relative;
     display: inline-block;
@@ -255,8 +596,8 @@ const getUserlist = async () => {
     align-items: center;
     gap: 3px;
     padding: 10px 5px;
-    top: -50px;
-    left: -124px;
+    top: -11px;
+    left: -156px;
     border-radius: 5px;
 }
 
@@ -286,6 +627,12 @@ const getUserlist = async () => {
     justify-content: start;
     gap: 10px;
     border-bottom: 0.5px solid rgb(230, 229, 229);
+}
+
+.tone {
+    overflow: hidden !important;
+    /*text-overflow: ellipsis !important;*/
+    white-space: nowrap !important;
 }
 .task-status {
     display: inline-block;
@@ -319,6 +666,350 @@ const getUserlist = async () => {
 .assignee-wrapper {
     position: relative;
     z-index: 1;
-  }
+}
 
+.pi-times {
+    top: 30%;
+    right: 3%;
+    color: gray;
+}
+
+.pi-times:hover {
+    color: rgb(27, 27, 27);
+    font-weight: 500;
+    animation: hover-animation 0.3s ease-in-out forwards;
+}
+
+@keyframes hover-animation {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+.task-status-2 .p-dropdown .p-dropdown-trigger {
+    width: 0.7rem !important;
+    margin-right: 6px !important;
+}
+
+.task-status-2 .p-dropdown .p-inputtext {
+    padding: 0.25rem 0.5rem !important;
+}
+
+.task-status-2 .status-bg {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.task-status-2 .p-dropdown-label {
+    margin-top: -4px;
+}
+/* Kanban */
+.boardContainer {
+    display: flex;
+    overflow-x: scroll;
+    align-items: start;
+}
+
+.groupColumnContainer {
+    flex-shrink: 0;
+    height: 100%;
+    /* width: 100%; */
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 500px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    background-color: indigo;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 0.85em;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    margin-top: 1rem;
+}
+
+.task-input {
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    border: none;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    border: 1px solid black;
+    padding: 0.5rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.save-button,
+.delete-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.save-button {
+    background-color: gray;
+    color: white;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+}
+
+.new-status-input {
+    min-width: 200px;
+    border: none;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+}
+.new-status-input:focus {
+    outline: none !important;
+}
+.sortable {
+    background-color: white;
+    color: black;
+    border: 1px solid #d6d6d6;
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    -webkit-box-shadow: 2px 3px #202836;
+    box-shadow: 2px 3px #202836;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    text-align: left;
+}
+
+.inputNew input {
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    border: none;
+}
+
+@media only screen and (max-width: 1250px) {
+    .boardContainer {
+        max-width: 1025px;
+    }
+}
+
+@media only screen and (max-width: 1025px) {
+    .boardContainer {
+        max-width: 600px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .boardContainer {
+        max-width: 325px;
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    height: 8px;
+    border-radius: 8px;
+    width: 5px;
+    cursor: pointer;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #77777793;
+}
+
+/* Status Column */
+.column-container {
+    margin: 10px;
+    min-height: 100px;
+}
+
+.column-header {
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-size: 0.85em;
+    /* background-color: rgb(3, 184, 93); */
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.task-card {
+    background-color: #fff;
+    box-shadow: 0px 3px 8px #e2e2e2;
+    cursor: grab;
+    padding: 12px 10px;
+    /* margin: 10px 0px; */
+    border-radius: 8px;
+    width: 20rem;
+}
+
+.input-new {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    margin-top: 10px;
+}
+
+.draggable {
+    background-color: rgb(245, 241, 236);
+    padding: 1px 5px 10px 5px;
+    height: 55vh;
+    overflow-y: auto;
+    min-width: 290px;
+    border-radius: 8px;
+}
+
+.scrollbar::-webkit-scrollbar {
+    display: none !important;
+}
+
+.ghost {
+    background-color: #e20d0d;
+}
+.sortable {
+    background-color: white;
+    color: black;
+    border: 1px solid #d6d6d6;
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    -webkit-box-shadow: 2px 3px #202836;
+    box-shadow: 2px 3px #202836;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    text-align: left;
+}
+
+.inputNew input {
+    -webkit-box-shadow: 2px 3px #e2e2e2;
+    box-shadow: 2px 3px #e2e2e2;
+    border: none;
+}
+.title {
+    margin: 0;
+}
+.desc {
+    margin: 0;
+    color: #818181;
+}
+.status-icon {
+    /* background-color: red; */
+    height: 10px;
+    width: 10px;
+    border-radius: 10px;
+}
+.status {
+    text-transform: uppercase;
+}
+.truncate {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+@media only screen and (max-width: 1250px) {
+    .boardContainer {
+        max-width: 1025px;
+    }
+}
+
+@media only screen and (max-width: 1025px) {
+    .boardContainer {
+        max-width: 600px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .boardContainer {
+        max-width: 325px;
+    }
+}
+
+/* width */
+::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+    cursor: pointer;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #d2b5ff;
+    cursor: pointer;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #d3b5ff93;
+}
 </style>

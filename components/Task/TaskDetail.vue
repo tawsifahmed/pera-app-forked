@@ -3,29 +3,33 @@ import { storeToRefs } from 'pinia';
 import { useClockStore } from '~/store/clock';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
-
+import accessPermission from '~/composables/usePermission';
+const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { getTaskTimerData } = useClockStore();
 const { trackedTime } = storeToRefs(useClockStore());
 
-const { editTask, addTaskComment, getTaskDetails } = useCompanyStore();
+const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
 
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
-const { singleTask, usersLists, tagsLists, projID } = defineProps(['singleTask', 'usersLists', 'tagsLists', 'projID']);
+const { usersLists, tagsLists, projID } = defineProps(['usersLists', 'tagsLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask', 'updateTaskTable']);
 
 const toast = useToast();
 const btnLoading = ref(false);
+const updateTaskP = ref(accessPermission('update_task'));
 
-const assignees = ref(singleTask?.data?.assigneeObj);
+const assignees = ref(null);
+assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
 
-const tags = ref(singleTask?.data?.tagsObj);
+const tags = ref(taskDetails.value?.tags?.map((obj) => ({ id: obj.id, name: obj.name })));
 
-const dueDate = ref(singleTask?.data?.dueDate);
+const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US') : null);
+
 const status = ref();
 const timeTrack = ref('00:00:00');
 let interval = null;
@@ -34,14 +38,17 @@ const handleClickClock = async () => {
     const taskId = taskDetails.value.id;
 
     if (taskDetails.value?.is_timer_start === 'false') {
-        localStorage.setItem(`timerStart_${taskId}`, Date.now());
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
-        await getTaskDetails(singleTask.key);
+        await getTaskDetails(taskDetails.value?.id);
         startTimer();
+        toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
+        await getSingleProject(projID);
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
-        await getTaskDetails(singleTask.key);
+        await getTaskDetails(taskDetails.value?.id);
         stopTimer();
+        toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
+        await getSingleProject(projID);
     }
 };
 
@@ -60,14 +67,11 @@ const stopTimer = () => {
     timeTrack.value = secondsToHHMMSS(taskDetails.value.total_duration);
 };
 
-const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
-
 const bounceStatus = ref([{ is_bounce: 'No' }, { is_bounce: 'Yes' }]);
 
 const vModelBncStatus = ref();
 
-const description = ref(singleTask?.data?.description);
+const description = ref(taskDetails.value?.description);
 const taskCommentInput = ref(null);
 const selectedfile = ref();
 
@@ -84,14 +88,14 @@ const hideActivity = () => {
 
 const handleTaskComment = async () => {
     btnLoading.value = true;
-    await addTaskComment(singleTask.key, taskCommentInput.value, commentFile.value);
+    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Comment added Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
         btnLoading.value = false;
         commentFile.value = null;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add comment', group: 'br', life: 3000 });
         btnLoading.value = false;
     }
 };
@@ -111,25 +115,33 @@ const formattedTime = (time) => {
 };
 
 const handleTaskDetailSubmit = async () => {
+    if (dueDate.value) {
+        const selectedDate = new Date(dueDate.value);
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        dueDate.value = selectedDate.toISOString();
+    }
     const taskDetailData = {
-        id: singleTask.key,
-        name: singleTask.data.name,
+        id: taskDetails.value?.id,
+        name: taskDetails.value?.name,
         description: description.value,
         project_id: projID,
-        due_date: dueDate.value,
-        priority: priority.value.name,
+        dueDate: dueDate.value,
         assignees: assignees.value.map((obj) => obj.id),
         tags: tags.value.map((obj) => obj.id)
     };
 
-    await editTask(taskDetailData);
+    if (dueDate.value) {
+        const postSubDate = new Date(dueDate.value);
+        postSubDate.setDate(postSubDate.getDate() - 1);
+        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+    }
 
+    await editTask(taskDetailData);
     if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', life: 3000 });
-        // taskEditDescriptionInput.value = null;
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
     }
 };
 
@@ -143,12 +155,34 @@ const uploadFile = async () => {
     if (file.value) {
         console.log('file =>', file.value);
     }
-    await fileUpload(singleTask.key, file.value);
+    await fileUpload(taskDetails.value?.id, file.value);
     if (isFileUpload.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', life: 3000 });
-        getTaskDetails(singleTask.key);
+        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', group: 'br', life: 3000 });
+        getTaskDetails(taskDetails.value?.id);
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', group: 'br', life: 3000 });
+    }
+};
+
+const checkAttachmentType = (file) => {
+    const imageExtensions = ['jpg', 'JPG', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif', 'heic', 'heif'];
+    const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp', 'mkv'];
+    const pdfExtensions = ['pdf', 'PDF', 'ppt', 'pptx'];
+    const wordExtensions = ['doc', 'docx'];
+    const excelExtensions = ['xls', 'xlsx', 'csv'];
+
+    if (imageExtensions.some((ext) => file.endsWith('.' + ext))) {
+        return 'image';
+    } else if (videoExtensions.some((ext) => file.endsWith('.' + ext))) {
+        return 'video';
+    } else if (pdfExtensions.some((ext) => file.endsWith('.' + ext))) {
+        return 'pdf';
+    } else if (wordExtensions.some((ext) => file.endsWith('.' + ext))) {
+        return 'word';
+    } else if (excelExtensions.some((ext) => file.endsWith('.' + ext))) {
+        return 'excel';
+    } else {
+        return 'file';
     }
 };
 
@@ -163,7 +197,7 @@ const closeCommentAttachment = () => {
 };
 
 onMounted(async () => {
-    await getTaskDetails(singleTask.key);
+    await getTaskDetails(taskDetails.value?.id);
     const obg = {
         name: taskDetails.value.status_name,
         code: taskDetails.value.status
@@ -183,7 +217,7 @@ onMounted(async () => {
 async function changeStatusData(status) {
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -194,11 +228,11 @@ async function changeStatusData(status) {
         });
 
         if (data.value?.app_message === 'success') {
-            getTaskDetails(singleTask.key);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Status Changed', life: 3000 });
+            getTaskDetails(taskDetails.value?.id);
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             emit('updateTaskTable');
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change status', group: 'br', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -206,12 +240,9 @@ async function changeStatusData(status) {
 }
 
 async function changeBounceStatusData(selectedBncStatus) {
-    console.log('bounceStatus', selectedBncStatus.is_bounce);
-    // return
-    // return;
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/update/${singleTask.key}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${taskDetails.value?.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -224,10 +255,10 @@ async function changeBounceStatusData(selectedBncStatus) {
         console.log('dataBO', data);
 
         if (data.value?.app_message === 'success') {
-            getTaskDetails(singleTask.key);
-            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', life: 3000 });
+            getTaskDetails(taskDetails.value?.id);
+            toast.add({ severity: 'success', summary: 'Successfull', detail: 'Bounce Status Changed', group: 'br', life: 3000 });
         } else {
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
         }
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -275,10 +306,10 @@ const deleteFile = async (id) => {
     await fileDelete(id);
 
     if (isFileDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Deleted successfully!', life: 3000 });
-        getTaskDetails(singleTask.key);
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'File Deleted successfully!', group: 'br', life: 3000 });
+        getTaskDetails(taskDetails.value?.id);
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete file!', group: 'br', life: 3000 });
     }
 };
 const fileInput = ref(null);
@@ -298,7 +329,7 @@ const handleCloseCommetFile = async () => {
 
 const handleShare = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tasks/share/${singleTask.key}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/share/${taskDetails.value?.id}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -308,8 +339,14 @@ const handleShare = async () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to share', life: 3000 });
         return;
     } else {
-        toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', life: 3000 });
-        navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
+        // navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
+        const el = document.createElement('textarea');
+        el.value = 'https://pera.singularitybd.net/sharedTask/' + data.value.shared_token;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', group: 'br', life: 3000 });
         return;
     }
     console.log(data.value.shared_token);
@@ -317,13 +354,17 @@ const handleShare = async () => {
 };
 
 const handleShareTaskId = () => {
-    if(singleTask?.key){
-        navigator.clipboard.writeText(singleTask.key);
-        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', life: 3000 });
-
-    }else{
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', life: 3000 });
-    
+    if (taskDetails.value?.id) {
+        // navigator.clipboard.writeText(singleTask?.key);
+        const el = document.createElement('textarea');
+        el.value = taskDetails.value?.unique_id;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', group: 'br', life: 3000 });
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
     }
 };
 </script>
@@ -332,11 +373,21 @@ const handleShareTaskId = () => {
     <div class="grid">
         <div class="col-12 lg:col-7">
             <div>
-                <!-- <pre>{{singleTask}}</pre> -->
-                <!-- <pre>{{assignees}}</pre> -->
+                <!-- <pre>{{singleTask.key}}</pre> -->
+                <!-- <pre>api task detail => {{taskDetails}}</pre> -->
+                <!-- <pre>api task detail => {{taskDetails}}</pre> -->
+                <!-- <pre>{{singleTask?.data?.tagsObj}}</pre> -->
                 <div class="flex align-items-start gap-2 mb-3">
-                    <h5 class="m-0">
-                        {{ singleTask.data.name }}
+                    <h5
+                        v-tooltip.top="{
+                            value: `${taskDetails.name}`,
+                            pt: {
+                                width: '200px'
+                            }
+                        }"
+                        class="m-0 detail-task-name cursor-pointer"
+                    >
+                        {{ taskDetails.name }}
                     </h5>
                     <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
                     <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
@@ -344,8 +395,6 @@ const handleShareTaskId = () => {
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
-                            <!-- <pre>{{ singleTask }}</pre> -->
-                            <!-- <pre>{{taskDetails}}</pre> -->
                             <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
                                 <div class="w-full lg:w-fit">
                                     <div class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
@@ -363,7 +412,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border: 1.5px solid ${singleTask?.data?.dueDateColor ? singleTask?.data?.dueDateColor : 'none'}; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input" />
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -410,7 +459,7 @@ const handleShareTaskId = () => {
                                 <Textarea id="description" v-model="description" rows="4" cols="20" />
                             </div>
 
-                            <div class="flex justify-content-end">
+                            <div v-if="updateTaskP" class="flex justify-content-end">
                                 <Button type="submit" label="Save" />
                             </div>
                         </form>
@@ -438,19 +487,86 @@ const handleShareTaskId = () => {
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                         style="background-color: #f7fafc"
                                     >
-                                        <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="item?.file">
+                                        <!-- <pre v-if="checkAttachmentType(item?.file == 'image')">{{checkAttachmentType(item?.file)}}</pre> -->
+                                        <a
+                                            v-if="checkAttachmentType(item?.file) === 'file'"
+                                            target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file"
+                                        >
                                             <div class="pi pi-file text-6xl attach-icon"></div>
                                             <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
+                                        <a v-if="checkAttachmentType(item?.file) === 'image'" target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 relative" :href="item?.file">
+                                            <img :src="item?.file" alt="" style="width: 90%; height: 80px; border-radius: 10px; border-top-left-radius: 10px; object-fit: cover" />
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a
+                                            v-if="checkAttachmentType(item?.file) === 'video'"
+                                            target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file"
+                                        >
+                                            <div class="pi pi-video text-6xl attach-icon"></div>
+
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a
+                                            v-if="checkAttachmentType(item?.file) === 'pdf'"
+                                            target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file"
+                                        >
+                                            <div class="pi pi-file-pdf text-6xl text-danger attach-icon"></div>
+
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+
+                                        <a
+                                            v-if="checkAttachmentType(item?.file) === 'word'"
+                                            target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file"
+                                        >
+                                            <div class="pi pi-file-word text-6xl text-blue attach-icon"></div>
+
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+                                        <a
+                                            v-if="checkAttachmentType(item?.file) === 'excel'"
+                                            target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
+                                            :href="item?.file"
+                                        >
+                                            <div class="pi pi-file-excel text-6xl text-primary attach-icon"></div>
+
+                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                                <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
+                                                <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
+                                            </div>
+                                        </a>
+
                                         <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
-                                            <i class="pi pi-times text-xs"></i>
+                                            <i class="pi pi-times text-xs text-white"></i>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex gap-2 w-full justify-content-center">
+                                <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
                                     <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
                                     <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
                                 </div>
@@ -466,13 +582,17 @@ const handleShareTaskId = () => {
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
-                                            <div class="action-dropdown">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-toggle" />
-                                                <div class="action-dropdown-content">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                            <div class="action-dropdown-det">
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
+                                                <div class="action-dropdown-content-det">
+                                                    <!-- <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                                                        rounded />
+                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded /> -->
+                                                    <Button icon="pi pi-cog" class="ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                    <!-- <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" /> -->
                                                 </div>
                                             </div>
                                         </template>
@@ -512,16 +632,17 @@ const handleShareTaskId = () => {
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
-                            <template class="commentator-name" #title>
+                            <template #title>
                                 <div class="flex justify-content-start align-items-center">
-                                    <Avatar :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
+                                    <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
+                                    <Avatar v-else :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
                                     <p class="text-lg">{{ val.commentator_name }}</p>
                                 </div>
                             </template>
                             <template #content>
-                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-end">
+                                <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
                                     <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
-                                        <div class="pi pi-file attach-icon"></div>
+                                        <div class="pi pi-file"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
                                         </div>
@@ -530,12 +651,12 @@ const handleShareTaskId = () => {
                                 <p class="m-0 ml-1">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
-                                <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>
                             </template>
                         </Card>
                     </div>
-                    <form @submit.prevent="handleTaskComment" class="comment-add">
-                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-2 relative" v-if="commentFile">
+                    <form @submit.prevent="handleTaskComment" class="comment-add"> 
+                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative" v-if="commentFile">
                             <div>
                                 <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
                             </div>
@@ -543,11 +664,12 @@ const handleShareTaskId = () => {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div class="comment-form">
-                            <InputText v-model="taskCommentInput" type="text" placeholder="Add comment" required />
+                        <div >
+                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15" class="border-gray-300 mb-1 comment-text" required/>
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
+                            
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
-                            <Button type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
+                            <Button class="ml-2" type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
                         </div>
                     </form>
                 </div>
@@ -557,8 +679,7 @@ const handleShareTaskId = () => {
 </template>
 
 <style lang="scss">
-
-.share-btn:hover{
+.share-btn:hover {
     animation: forwardAnimation 0.3s ease-in forwards;
 }
 
@@ -566,9 +687,11 @@ const handleShareTaskId = () => {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1);
     }
@@ -585,20 +708,25 @@ const handleShareTaskId = () => {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1.1);
     }
 }
+
 @keyframes backwardAnimation {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1.1);
     }
@@ -622,14 +750,14 @@ const handleShareTaskId = () => {
 
 .comment-wrapper {
     overflow: hidden;
-    height: 70vh;
+    height: 78vh;
     padding: 5px !important;
     background-color: #f7fafc;
 }
 
 .comments {
     overflow-y: auto;
-    height: 80%;
+    height: 73%;
     padding: 5px;
 }
 
@@ -669,7 +797,7 @@ const handleShareTaskId = () => {
 
 .task-wrapper {
     overflow: hidden;
-    height: 70vh;
+    height: 78vh;
     padding: 5px !important;
 }
 
@@ -681,27 +809,33 @@ const handleShareTaskId = () => {
 
 .attach-sec {
     overflow-x: scroll;
-    white-space: nowrap; /* Prevents wrapping of child elements */
+    white-space: nowrap;
+    /* Prevents wrapping of child elements */
     border: 1px solid #ddd;
     padding: 10px;
     border-radius: 5px;
 }
 
 .attach-sec::-webkit-scrollbar {
-    width: 10px; /* Width of the scrollbar */
-    height: 10px; /* Height of the scrollbar */
+    width: 10px;
+    /* Width of the scrollbar */
+    height: 10px;
+    /* Height of the scrollbar */
 }
 
 .attach-sec::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Track color */
+    background: #f1f1f1;
+    /* Track color */
 }
 
 .attach-sec::-webkit-scrollbar-thumb {
-    background: #888; /* Thumb color */
+    background: #888;
+    /* Thumb color */
 }
 
 .attach-sec::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Hover state color */
+    background: #555;
+    /* Hover state color */
 }
 
 .attachment-wrapper {
@@ -709,29 +843,34 @@ const handleShareTaskId = () => {
     color: #444;
 }
 
-.action-dropdown {
+.attach-icon {
+    position: relative;
+    top: -16px;
+}
+
+.action-dropdown-det {
     position: relative;
     display: inline-block;
 }
 
-.action-dropdown-content {
+.action-dropdown-content-det {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 160px;
+    min-width: fit-content;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
     z-index: 1;
     padding: 10px 5px;
 }
 
-.action-dropdown-content button {
+.action-dropdown-content-det button {
     width: 100%;
     text-align: left;
     padding: 10px;
     border: none;
 }
 
-.action-dropdown:hover .action-dropdown-content {
+.action-dropdown-det:hover .action-dropdown-content-det {
     display: block;
     display: flex;
     justify-content: center;
@@ -739,7 +878,8 @@ const handleShareTaskId = () => {
     gap: 3px;
     padding: 10px 5px;
     top: -10px;
-    left: -158px;
+    left: -40px;
+    /*left: -158px;*/
     border-radius: 5px;
 }
 
@@ -766,7 +906,7 @@ input[type='file'] {
 input[type='file']::file-selector-button {
     margin-right: 20px;
     border: none;
-    background: #10b981;
+    background: #6366f1;
     padding: 7px 15px;
     border-radius: 5px;
     color: #fff;
@@ -783,6 +923,7 @@ input[type='file']::file-selector-button:hover {
     .p-inputtext {
         padding: 0.35rem 0.75rem !important;
     }
+
     .p-multiselect .p-multiselect-label {
         padding: 0.35rem 0.75rem !important;
     }
@@ -808,7 +949,7 @@ input[type='file']::file-selector-button:hover {
 }
 
 .activity-btns:hover {
-    background-color: #63ceaa !important;
+    background-color: #8486eb !important;
     color: white !important;
 }
 
@@ -816,29 +957,42 @@ input[type='file']::file-selector-button:hover {
     border-top: 1px solid #e2e8f0;
     font-weight: 600;
 }
+
+@media(max-width: 991px){
+    .comment-text {
+     height: 75px !important;
+    }
+}
+
 .comment-form {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 5px;
 }
+
 .comment-form input {
     width: 75%;
 }
+
 .close-comment {
     position: absolute;
     top: 7px;
     right: 10px;
     cursor: pointer;
 }
+
 .comment-file {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border-radius: 5px;
 }
+
 .clock-wrapper {
     display: flex;
     align-items: center;
     gap: 7px;
 }
+
 .clock-btn {
     width: 20px;
     height: 20px;
@@ -850,15 +1004,18 @@ input[type='file']::file-selector-button:hover {
     cursor: pointer;
     transition: all 0.1s ease-in-out;
 }
+
 .clock-btn:hover {
     box-shadow: none;
 }
+
 .stop {
     color: white;
     font-size: 8px;
     margin-top: 1px;
     margin-left: 1px;
 }
+
 .start {
     color: white;
     font-size: 10px;
@@ -867,5 +1024,19 @@ input[type='file']::file-selector-button:hover {
 
 .attch-w {
     visibility: hidden;
+}
+
+.detail-task-name {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-blue {
+    color: #2a78cc;
 }
 </style>

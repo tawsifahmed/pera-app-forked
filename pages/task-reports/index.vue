@@ -1,0 +1,84 @@
+<script setup>
+const url = useRuntimeConfig();
+definePageMeta({
+    middleware: 'auth',
+    layout: 'default'
+});
+
+const startDate = ref('');
+const endDate = ref('');
+const loading = ref(false);
+
+// Date Formatter
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
+const handleReportDownload = async () => {
+    const token = useCookie('token');
+    loading.value = true;
+    const formattedStartDate = dateFormatter(startDate.value);
+    const formattedEndDate = dateFormatter(endDate.value);
+
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (data.value.code == 200) {
+        const link = document.createElement('a');
+        link.href = data.value.download_path;
+        link.target = '_blank';
+        link.click();
+        loading.value = false;
+        return;
+    } else {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+    }
+};
+
+const handleChange = (field, event) => {
+    const date = new Date(event);
+    if (field == 'startDate') {
+        startDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    } else {
+        endDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    }
+};
+</script>
+<template>
+    <div class="card">
+        <div class="d-flex mr-2">
+            <h5 class="mb-1">Task Summery Reports</h5>
+        </div>
+        <Toolbar class="border-0 px-0">
+            <template #start>
+                <div class="flex gap-2">
+                    <div class="flex-auto">
+                        <label for="icondisplay" class="font-bold block mb-2">From: </label>
+                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                    </div>
+                    <div class="flex-auto">
+                        <label for="icondisplay" class="font-bold block mb-2"> To: </label>
+                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                    </div>
+                </div>
+            </template>
+
+            <template #end>
+                <Button @click="handleReportDownload" class="w-full" label="Download" :loading="loading" />
+            </template>
+        </Toolbar>
+    </div>
+</template>
+
+<style lang="scss" scoped></style>

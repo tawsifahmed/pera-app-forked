@@ -5,6 +5,7 @@ import AppFooter from './AppFooter.vue';
 import AppSidebar from './AppSidebar.vue';
 import AppConfig from './AppConfig.vue';
 import { useLayout } from './composables/layout';
+import { provideTracker } from '../composables/timeTracker';
 
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 
@@ -17,7 +18,7 @@ watch(isSidebarActive, (newVal) => {
         unbindOutsideClickListener();
     }
 });
-
+provideTracker();
 const containerClass = computed(() => {
     return {
         'layout-theme-light': layoutConfig.darkTheme.value === 'light',

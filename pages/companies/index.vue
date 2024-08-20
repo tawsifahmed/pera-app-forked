@@ -8,11 +8,14 @@ import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Toast from 'primevue/toast';
+import accessPermission from "~/composables/usePermission";
+const updateCompanyP = ref(accessPermission('update_company'));
+const deleteCompanyP = ref(accessPermission('delete_company'));
 
 const filters = ref();
 const loading = ref(true);
 const toast = useToast();
-
+const router = useRouter();
 const visibleCreateCompany = ref(false);
 const visibleEditCompany = ref(false);
 
@@ -28,6 +31,10 @@ const handleCreateCompanyModal = () => {
 const editCompany = (id) => {
     visibleEditCompany.value = true;
     refCompanyId.value = id;
+};
+
+const closeEditModal = (evn) => {
+    visibleEditCompany.value = evn;
 };
 
 const deleteCompanyDialog = ref(false);
@@ -55,11 +62,12 @@ const deletingCompany = async () => {
     await deleteCompany(refCompanyId.value);
 
     if (isCompanyDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Company Deleted Successfully', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
         console.log('company deleted');
+        router.push('/')
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', group: 'br', life: 3000 });
         console.log('company not deleted');
     }
 };
@@ -105,7 +113,7 @@ initFilters();
            
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
-            <Column field="id" header="ID" sortable></Column>
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Company Name" sortable>
               <template #body="slotProps" >
                 <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
@@ -118,8 +126,10 @@ initFilters();
             <Column field="action" header="Action">
                 <template #body="slotProps">
                    
-                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data.id)" />
-                    <Button icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                    <Button v-if="updateCompanyP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
+                    <Button v-if="!updateCompanyP" style="visibility: hidden;" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
+                    <Button v-if="deleteCompanyP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                    <Button v-if="!deleteCompanyP" style="visibility: hidden;" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -130,8 +140,8 @@ initFilters();
             <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleEditCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditCompany :refCompanyId="refCompanyId" />
+        <Dialog v-model:visible="visibleEditCompany" modal header="Edit Company" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <EditCompany :refCompanyId="refCompanyId"  @closeEditModal="closeEditModal($event)"/>
         </Dialog>
     </div>
 </template>

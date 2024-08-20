@@ -1,7 +1,10 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Tag Name</label>
+            <label for="company"
+                >Tag Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm"></span
+                ><span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+            ></label>
             <InputText v-model="name" class="w-full" placeholder="Enter tag name" />
         </div>
 
@@ -12,6 +15,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const toast = useToast();
 
 const name = ref('');
@@ -30,13 +34,13 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/tag/create`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value,
+                    name: name.value
                 }
             });
 
@@ -44,9 +48,9 @@ const handleSubmitData = async () => {
                 name.value = null;
                 employeeForm.value = false;
                 emit('closeCreateModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Created successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Created successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Creation Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Creation Failed!', group: 'br', life: 3000 });
             }
         }
     }

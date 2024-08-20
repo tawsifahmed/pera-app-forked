@@ -1,15 +1,14 @@
 <template>
     <div>
         <div class="field">
-            <label for="email">Email address</label>
+            <label for="email">Email address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" v-model="email" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label>Role</label>
+            <label>Role <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
-
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrapper">
@@ -19,6 +18,7 @@
     </div>
 </template>
 <script setup>
+const url = useRuntimeConfig();
 const props = defineProps({
     param: {
         type: Object,
@@ -50,7 +50,7 @@ const handleSubmitData = async () => {
         errorHandler.value = false;
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`http://188.166.212.40/pera/public/api/v1/invite-user`, {
+            const { data, pending } = await useFetch(`${url.public.apiUrl}/invite-user`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
@@ -61,14 +61,14 @@ const handleSubmitData = async () => {
                 }
             });
 
-            if (data.value.code === 201) {
+            if (data?.value?.code === 201) {
                 email.value = null;
                 employeeForm.value = false;
                 emit('closeInviteModal', false);
                 isButtonLoading.value = false;
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invited successfully!', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invited successfully!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invited Failed!', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invited Failed!', group: 'br', life: 3000 });
             }
         }
     }

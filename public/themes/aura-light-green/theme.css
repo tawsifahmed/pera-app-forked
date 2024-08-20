@@ -191,11 +191,11 @@
   --primary-800:#096647;
   --primary-900:#064a34;
 }
-.error-report {
-  color:var(--red-500);
+.error-report red-text {
+  color: red !important;
   font-weight: 600;
 }
-.error-report span{
+.error-report red-text span{
   font-size:12px;
   font-weight: 600;
 }
@@ -7235,7 +7235,7 @@
     position: absolute;
     display: none;
     padding: 0.25em 0.5rem;
-    max-width: 12.5rem;
+    max-width: 25.5rem;
   }
 
   .p-tooltip.p-tooltip-right,

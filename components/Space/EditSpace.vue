@@ -29,11 +29,13 @@ const changeColor = (color) => {
 
 const emit = defineEmits(['closeEditSpace']);
 
-
+const loading = ref(false);
 
 const handleEditSpace = async () => {
+        loading.value = true
         if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
             errorHandler.value = true
+            loading.value = false
             return
         }else{
             const editSpaceData = {
@@ -47,20 +49,18 @@ const handleEditSpace = async () => {
               // 'features': selectedFeatures.value,
               // 'views': checkedViews,
           }
-          console.log('spaceData', editSpaceData)
-
-          
+    
           await editSpace(editSpaceData);
-
           if(isSpaceEdited.value === true){
               spaceFormInputs.value = false
-              
+              loading.value = false
               emit('closeEditSpace', false);
-              toast.add({ severity: 'success', summary: 'Successfull', detail: 'Space Updated Successfully', life: 3000 });   
+              toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Updated Successfully', group: 'br', life: 3000 });   
 
               console.log('space created')
           }else{
-              toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update space', life: 3000 });
+              loading.value = false
+              toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update space', group: 'br', life: 3000 });
               console.log('space not created')
               
           }
@@ -112,7 +112,7 @@ const handleEditSpace = async () => {
           <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
           <br>
           <div class="create-btn-wrapper">
-            <Button @click="handleEditSpace" class="text-white py-2 px-6 tracking-wide" label="Update Space"/>
+            <Button @click="handleEditSpace" class="text-white py-2 px-6 tracking-wide" label="Update Space" :loading="loading"/>
           </div>
       </div>
 
