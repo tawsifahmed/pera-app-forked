@@ -122,7 +122,7 @@ const confirmDeleteEmployee = async () => {
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('${url.public.apiUrl}/users/list', {
+        $fetch(`${url.public.apiUrl}/users/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

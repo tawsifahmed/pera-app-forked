@@ -40,7 +40,7 @@ const sta = ref();
 const que = ref();
 const strD = ref();
 const enD = ref();
-
+const activeSubTask = ref(null);
 const handleFilterReset = () => {
     filterAssignees.value = '';
     filterPriorities.value = '';
@@ -73,13 +73,15 @@ const isCalendarSelected1 = ref(false);
 const isCalendarSelected2 = ref(false);
 
 const startDateChange = (newDate) => {
-    filterStartDueDate.value = newDate;
+    const date = new Date(newDate);
+    filterStartDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     isCalendarSelected1.value = true;
     changeAttribute();
 };
 const endDateChange = (newDate) => {
     isCalendarSelected2.value = true;
-    filterEndDueDate.value = newDate;
+    const date = new Date(newDate);
+    filterEndDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     changeAttribute();
 };
 
@@ -209,10 +211,25 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
+function countTasks(tasks) {
+    let count = 0;
 
+    function countSubTasks(task) {
+        count++; // Count the current task
+
+        if (task.sub_task) {
+            countSubTasks(task.sub_task); // Recursively count sub-tasks
+        }
+    }
+
+    tasks.forEach((task) => {
+        countSubTasks(task); // Start counting from each top-level task
+    });
+
+    return count;
+}
 // Kanban
 const editable = ref(true);
-console.log('asd', tasks);
 const dragOptions = computed(() => ({
     animation: 250,
     group: 'tasks',
@@ -262,20 +279,16 @@ const handleChange = (event, name) => {
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
-
-                <Button
-                    type="button"
+                 <Button
                     v-if="downloadTaskP"
                     @click="downloadTaskSheet(tasks)"
-                    v-tooltip.right="{ value: `Download Tasks` }"
-                    icon="pi pi-file-excel"
+                    v-tooltip.right="{ value: `Download Tasks` }" 
                     :loading="loading"
-                    label=""
-                    class="mr-2"
-                    severity="secondary"
                     :style="`${loading === true ? 'backGround: red' : ''}`"
-                />
+                    class="excel-export-btn">
+                    <img  src="/assets/icons/excel-export-icon.png" />
 
+                 </Button>
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
             </div>
@@ -409,53 +422,125 @@ const handleChange = (event, name) => {
                             <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name }} - {{ list.content.length }}</div>
                             <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
                                 <template v-slot:item="{ element }">
-                                    <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
-                                        <div class="">
-                                            <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
-                                            <p class="truncate text-sm desc">{{ element.data.description }}</p>
-                                            <div class="flex align-items-center gap-2 mt-1">
-                                                <div class="status-icon" :style="`background-color:${list.statusColor}`"></div>
-                                                <p class="status text-sm">{{ list.status.name }}</p>
-                                            </div>
-                                            <div class="mt-2 flex align-items-center gap-2">
-                                                <i class="pi pi-user text-lg"></i>
-                                                <div class="flex justify-content-start gap-1">
-                                                    <span v-for="(assignee, index) in element.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                                                        <img
-                                                            v-tooltip.top="{ value: `${assignee.name}` }"
-                                                            class="mr-2 capitalize cursor-pointer"
-                                                            v-if="assignee.image"
-                                                            :src="assignee.image"
-                                                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
-                                                            alt=""
-                                                            srcset=""
-                                                        />
-                                                        <Avatar
-                                                            v-else
-                                                            v-tooltip.top="{ value: `${assignee.name}` }"
-                                                            :label="assignee.name.charAt(0)"
-                                                            class="mr-2 capitalize cursor-pointer"
-                                                            size="small"
-                                                            style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                                                            :style="avatarStyle(index)"
-                                                        />
-                                                    </span>
+                                    <div class="">
+                                        <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                            <div class="">
+                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <div class="flex align-items-center gap-2 mt-1">
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
+                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-user text-lg"></i>
+                                                    <div class="flex justify-content-start gap-1">
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
+                                                            :key="index"
+                                                            class="flex justify-content-center assignee-wrapper"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
+                                                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                :label="assignee.name.charAt(0)"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
+                                                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                                                :style="avatarStyle(index)"
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-flag text-lg"></i>
+                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                </div>
+                                                <div
+                                                    class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
+                                                    style="border-radius: 5px"
+                                                    @click="
+                                                        (event) => {
+                                                            event.stopPropagation();
+                                                            if (activeSubTask == element.unique_id) {
+                                                                activeSubTask = null;
+                                                            } else {
+                                                                activeSubTask = element.unique_id;
+                                                            }
+                                                        }
+                                                    "
+                                                >
+                                                    <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
+                                                    <p class="text-sm font-semibold">{{ element.children.length }}</p>
                                                 </div>
                                             </div>
-                                            <div class="mt-2 flex align-items-center gap-2">
-                                                <i class="pi pi-calendar-minus text-lg"></i>
-                                                <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
-                                            </div>
-                                            <div class="mt-2 flex align-items-center gap-2">
-                                                <i class="pi pi-flag text-lg"></i>
-                                                <p class="text-sm">{{ element.data.priority }}</p>
-                                            </div>
-                                            <div class="mt-2 flex align-items-center gap-2">
-                                                <i class="pi pi-list text-lg"></i>
-                                                <p class="text-sm font-semibold">{{ element.children.length }}</p>
+                                            {{ element.t_name }}
+                                        </div>
+                                        <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
+                                            <div v-for="element in element.children" :key="element.unique_id" class="sub-card" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
+                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <div class="flex align-items-center gap-2 mt-1">
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
+                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-user text-lg"></i>
+                                                    <div class="flex justify-content-start gap-1">
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
+                                                            :key="index"
+                                                            class="flex justify-content-center assignee-wrapper"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
+                                                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                :label="assignee.name.charAt(0)"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
+                                                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                                                :style="avatarStyle(index)"
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-flag text-lg"></i>
+                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                </div>
+                                                <div class="mt-2 flex align-items-center gap-2">
+                                                    <i class="pi pi-angle-right text-lg"></i>
+                                                    <p class="text-sm font-semibold">{{ element.children.length }}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                        {{ element.t_name }}
                                     </div>
                                 </template>
                             </draggable>
@@ -468,6 +553,17 @@ const handleChange = (event, name) => {
 </template>
 
 <style>
+.sub-card {
+    background-color: #fff;
+    box-shadow: 0px 3px 8px #e2e2e2;
+    cursor: grab;
+    padding: 12px 10px;
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    width: calc(20rem - 15px);
+}
 .action-dropdown {
     position: relative;
     display: inline-block;
@@ -911,5 +1007,23 @@ textarea {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #d3b5ff93;
+}
+
+.excel-export-btn {
+    background: #f1f5f9;
+    border: 1px solid #f1f5f9;
+    text-decoration: none;
+    padding: 0.2rem 1rem !important;
+}
+
+.excel-export-btn img {
+    width: 21px;
+    height: 20px;
+}
+
+.excel-export-btn:hover {
+    background: #e2e8f0;
+    color: #334155;
+    border-color: #e2e8f0;
 }
 </style>

@@ -5,28 +5,8 @@ definePageMeta({
     layout: 'default'
 });
 const employees = ref([]);
-const quater = ref([
-    {
-        name: 'Quarter 1',
-        start_date: '2022-01-01',
-        end_date: '2022-03-31'
-    },
-    {
-        name: 'Quarter 2',
-        start_date: '2022-04-01',
-        end_date: '2022-06-31'
-    },
-    {
-        name: 'Quarter 3',
-        start_date: '2022-07-01',
-        end_date: '2022-09-31'
-    },
-    {
-        name: 'Quarter 4',
-        start_date: '2022-10-01',
-        end_date: '2022-12-31'
-    }
-]);
+const quater = ref([]);
+const quaterYear = ref('');
 const loading = ref(false);
 const toast = useToast();
 
@@ -75,8 +55,8 @@ const handleReportDownload = async (e) => {
     const membersList = members.value.map((member) => member.id);
     const kpiData = new FormData();
     kpiData.append('user_id', employee.value.id);
-    kpiData.append('quater_start_date', selectedQuarter.value.start_date);
-    kpiData.append('quater_end_date', selectedQuarter.value.end_date);
+    kpiData.append('quater_start_date', `${quaterYear.value}-${selectedQuarter.value.start_date}`);
+    kpiData.append('quater_end_date', `${quaterYear.value}-${selectedQuarter.value.end_date}`);
     kpiData.append('team_members', JSON.stringify(membersList));
     kpiData.append('project_team_mark', pmMark.value);
     kpiData.append('team_building', teamBuilding.value);
@@ -92,16 +72,16 @@ const handleReportDownload = async (e) => {
         },
         body: kpiData
     });
-    // if (data.value.code == 200) {
-    //     const link = document.createElement('a');
-    //     link.href = data.value.download_path;
-    //     link.target = '_blank';
-    //     link.click();
-    //     return (loading.value = false);
-    // } else {
-    //     loading.value = false;
-    //     return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
-    // }
+    if (data.value.code == 200) {
+        const link = document.createElement('a');
+        link.href = data.value.download_path;
+        link.target = '_blank';
+        link.click();
+        return (loading.value = false);
+    } else {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+    }
 };
 
 const init = async () => {
@@ -117,8 +97,24 @@ const init = async () => {
         employees.value = data.value?.data;
     }
 };
+const fetchQuater = async () => {
+    const token = useCookie('token');
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi-quater/list`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    console.log('Quater:', data);
+    if (data.value?.data?.length > 0) {
+        quater.value = data.value?.data;
+    }
+};
 onMounted(() => {
     init();
+    fetchQuater();
+    const date = new Date();
+    quaterYear.value = date.getFullYear();
 });
 </script>
 <template>
@@ -153,6 +149,12 @@ onMounted(() => {
                         <label for="icondisplay" class="font-bold block mb-2">Quarter:</label>
                         <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
                     </div>
+                    <!-- <div class="flex gap-2 flew-wrap">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Year:</label>
+                            <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Year" class="w-full" />
+                        </div>
+                    </div> -->
                 </div>
                 <div class="col-12 md:col-6">
                     <div class="user-selection w-full">

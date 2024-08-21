@@ -567,7 +567,7 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                                 <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
-                                    <input @change="onFileChange" class="float-right" type="file" placeholder="+" />
+                                    <input @change="onFileChange" class="float-right file-up-btn" type="file" placeholder="+" />
                                     <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
                                 </div>
                             </TabPanel>
@@ -1038,5 +1038,9 @@ input[type='file']::file-selector-button:hover {
 
 .text-blue {
     color: #2a78cc;
+}
+
+.file-up-btn{
+    width: 65% !important;
 }
 </style>
