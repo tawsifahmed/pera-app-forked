@@ -16,7 +16,7 @@ const signInWithGoogle = async () => {
         })
         .catch((error) => {
             // Handle sign in error
-            toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
+            // toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
             console.error('Error signing in with Google:', error.message);
         });
 
@@ -27,21 +27,23 @@ const signInWithGoogle = async () => {
                 token: authToken
             }
         });
-        console.log(data.value);
-        const userCompany = data?.value?.company?.id;
-        if (userCompany) {
-            localStorage.setItem('userCompany', JSON.stringify(userCompany));
+        console.log('loginData',data.value);
+        if(data.value){
+            const userCompany = data?.value?.company?.id;
+            if (userCompany) {
+                localStorage.setItem('userCompany', JSON.stringify(userCompany));
+            }
+            toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
+            const token = useCookie('token');
+            token.value = data.value.token;
+    
+            setTimeout(() => {
+                router.push('/');
+            }, 300);
+            const rolePermission = useCookie('rolePermission');
+            rolePermission.value = data?.value?.permissions;
         }
-        toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
-        const token = useCookie('token');
-        token.value = data.value.token;
 
-        setTimeout(() => {
-            router.push('/');
-        }, 300);
-
-        const rolePermission = useCookie('rolePermission');
-        rolePermission.value = data?.value?.permissions;
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
         console.log(error);

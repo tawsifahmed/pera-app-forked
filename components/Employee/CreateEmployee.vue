@@ -108,6 +108,7 @@ const handleSubmitData = async () => {
         </div>
 
         <div class="field flex flex-column">
+            <pre>rol {{rolesLists}}</pre>
             <label>Role</label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
