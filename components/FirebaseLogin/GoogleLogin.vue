@@ -33,7 +33,7 @@ const signInWithGoogle = async () => {
             if (userCompany) {
                 localStorage.setItem('userCompany', JSON.stringify(userCompany));
             }
-            toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Authorized', detail: 'Login Successful', group: 'br', life: 3000 });
             const token = useCookie('token');
             token.value = data.value.token;
     
@@ -45,7 +45,7 @@ const signInWithGoogle = async () => {
         }
 
     } catch (error) {
-        toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Authorization Failed', detail: 'Something went wrong.', group: 'br', life: 3000 });
         console.log(error);
     }
 };
