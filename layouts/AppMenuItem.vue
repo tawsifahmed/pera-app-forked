@@ -127,7 +127,9 @@ const toggle = (event) => {
         <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
-                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text">{{ item.label }} </NuxtLink>
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text" v-tooltip.right="{value: `${item.label}`}">
+                    {{ item.label.length > 18 ? item.label.slice(0, 16) + '...' : item.label }}
+                </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
