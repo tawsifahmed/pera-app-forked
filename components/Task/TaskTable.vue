@@ -329,7 +329,8 @@ const handleChange = (event, name) => {
                         </Dropdown>
                     </div>
                     <!-- <div>{{slotProps.node.data.status.name}}</div> -->
-                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)">{{ slotProps.node.data.name }}</span>
+                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{
+                        value: `${slotProps.node.data.name}`}">{{ slotProps.node.data.name }}</span>
                 </div>
             </template>
         </Column>
