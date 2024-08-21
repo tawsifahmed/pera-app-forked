@@ -1013,11 +1013,12 @@ textarea {
     background: #f1f5f9;
     border: 1px solid #f1f5f9;
     text-decoration: none;
+    padding: 0.2rem 1rem !important;
 }
 
 .excel-export-btn img {
-    width: 16px;
-    height: 16px;
+    width: 21px;
+    height: 20px;
 }
 
 .excel-export-btn:hover {
