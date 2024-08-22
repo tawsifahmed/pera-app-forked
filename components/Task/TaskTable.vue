@@ -274,8 +274,10 @@ const handleChange = (event, name) => {
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="mr-2" severity="secondary" />
-                <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="mr-2" severity="secondary" />
+                <div>
+                    <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="table-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': tableView }" />
+                    <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="board-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': !tableView }" />
+                </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
@@ -426,8 +428,8 @@ const handleChange = (event, name) => {
                                     <div class="">
                                         <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}</p>
-                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <p class="font-semibold truncate text-sm title" v-tooltip.top="{value: `${element.data.name}`}">{{ element.data.name }}</p>
+                                                <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
@@ -1026,5 +1028,20 @@ textarea {
     background: #e2e8f0;
     color: #334155;
     border-color: #e2e8f0;
+}
+
+.table-btn{
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    min-width: 91.22px;
+}
+
+.board-btn{
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler{
+    margin-right: 0.2rem !important;
 }
 </style>

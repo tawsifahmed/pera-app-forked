@@ -141,7 +141,7 @@ const handleCreateProject = async () => {
             </div>
             <div class="field">
                 <label for="name">Project Description <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-                <Textarea id="description" v-model="projectDescriptionInput" rows="3" cols="20" />
+                <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput" rows="3" cols="20" />
             </div>
             <div class="mb-4">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>

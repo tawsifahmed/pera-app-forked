@@ -81,7 +81,7 @@ const handleEditSpace = async () => {
           </div>
           <div class="field flex flex-column">
               <label for="name">Space Description</label>
-              <Textarea id="description" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
+              <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
           </div>
           
           <div class="field">

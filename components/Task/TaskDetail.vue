@@ -384,7 +384,7 @@ const handleShareTaskId = () => {
                 {{ taskDetails.name }}
             </h5>
            <div class="flex gap-1">
-                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
+                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
                 <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
                 <h5 class="m-0 ml-2">Activity</h5>
            </div>
@@ -460,7 +460,7 @@ const handleShareTaskId = () => {
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
-                                <Textarea id="description" v-model="description" rows="4" cols="20" />
+                                <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">

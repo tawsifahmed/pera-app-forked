@@ -79,7 +79,7 @@ const hideDialog = () => {
             </div>
             <div class="field">
                 <label for="name">Space Description <span v-tooltip.right="{ value: 'After setting space name, you can provide description.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-                <Textarea id="description" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
+                <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
                 <label for="name">Space Color <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>

@@ -3,7 +3,7 @@
         <InputText type="hidden" v-model="tskId" />
         <div class="field flex flex-column">
             <label for="name">Set Task Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
+            <Textarea id="description" class="border-gray-300" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div>
         <!-- <div class="field">
             <label for="company">Set Task Name</label>

@@ -162,7 +162,7 @@ onMounted(() => {
       </div>
       <div class="field flex flex-column">
           <label for="name">Project Description</label>
-          <Textarea id="description" v-model="projectDescriptionInput"  rows="3" cols="20" />
+          <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput"  rows="3" cols="20" />
       </div>
       <div class="mb-4">
         <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status</p>

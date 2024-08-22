@@ -3,7 +3,7 @@
         <div>
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name</label>
-                <Textarea id="description" v-model="taskNameEditInput" rows="3" cols="15"
+                <Textarea id="description" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
                     :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
