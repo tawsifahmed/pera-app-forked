@@ -90,6 +90,8 @@ const closeEditProject = (evn) => {
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home responsive-text"></NuxtLink>
+                <p class="pi pi-angle-right"></p>
+                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
                 <p class="pi pi-angle-right responsive-text"></p>
                 <NuxtLink class="text responsive-text" :to="`/companies/${singleSpace?.company_id}`"> Company - {{ singleSpace?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right responsive-text"></p>

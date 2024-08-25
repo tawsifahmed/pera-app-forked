@@ -96,6 +96,8 @@ const closeEditSpace = (evn) => {
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
+                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
+                <p class="pi pi-angle-right"></p>
                 <p class="text">Company - {{ singleCompany?.name }}</p>
             </div>
             <div class="create-btn-wrapper ">

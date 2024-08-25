@@ -97,6 +97,8 @@ watch(selectedCompany, (newVal) => {
     selectedComp.value = companyList.value.find(item => item.id === newVal.id);
 });
 
+const router = useRouter();
+
 const switchCompanyHandler = async (switchCompId) => {
     console.log('switchCompId', switchCompId);
     await switchCompany(switchCompId);
@@ -105,24 +107,29 @@ const switchCompanyHandler = async (switchCompId) => {
         localStorage.setItem('userCompany', JSON.stringify(switchCompId));
         await companies.getCompany();
         toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+        if (window.location.pathname !== '/' && window.location.pathname !== '/companies') {
+            router.push('/');
+        }
     }else{
         toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
     }
-
 };
 </script>
 
 <template>
     <div>
         <div class="mt-3" v-if="company">
-            <!-- <pre>cList{{companyList}}</pre>
-            <pre>pre2: {{selectedComp}}</pre>
-            <pre>selC{{selectedCompany}}</pre> -->
-           <div class="flex">
-            <span v-tooltip.top="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round w-3rem text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green w-full">{{ company?.charAt(0) }}</span>
-            <div class="comp-switch w-full" v-tooltip.right="{ value: 'Switch Company' }">
-                <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList"  optionLabel="label" class="w-full" />
-            </div>
+            <!-- <pre>cList => {{companyList.length}}</pre> -->
+            <!-- <pre>pre2: {{selectedComp}}</pre> -->
+            <!-- <pre>selC{{selectedCompany}}</pre> -->
+           <div v-if="companyList.length > 0" class="flex">
+                <span v-tooltip.top="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round w-3rem text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green w-full">{{ company?.charAt(0) }}</span>
+                <div class="comp-switch w-full"  v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
+                    <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList"  optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
+                </div>
+           </div>
+           <div v-else>
+
            </div>
             <!-- <div class="flex align-items-center">
                 <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{ company?.charAt(0) }}</span>
