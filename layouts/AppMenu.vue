@@ -4,9 +4,14 @@ import AppMenuItem from './AppMenuItem.vue';
 import accessPermission from '~/composables/usePermission';
 import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
+import { useCompanyStore } from '~/store/company'; // import the auth store we just created
+const { switchCompany } = useCompanyStore(); // use authenticateUser action from  auth store
+const { companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore()); 
 const companies = useActiveCompanyStore();
 companies.getCompany();
-const { menu, company } = storeToRefs(useActiveCompanyStore());
+
+const { menu, company, companyList, selectedCompany } = storeToRefs(useActiveCompanyStore());
+const toast = useToast();
 
 const readDashboard = ref(accessPermission('read_dashboard'));
 
@@ -83,15 +88,46 @@ onMounted(() => {
 });
 
 watchEffect(async () => {});
+
+
+const selectedComp = ref(null);
+selectedComp.value = companyList.value.find(item => item.id === selectedCompany.value.id);
+
+watch(selectedCompany, (newVal) => {
+    selectedComp.value = companyList.value.find(item => item.id === newVal.id);
+});
+
+const switchCompanyHandler = async (switchCompId) => {
+    console.log('switchCompId', switchCompId);
+    await switchCompany(switchCompId);
+    // localStorage.removeItem('userCompany');
+    if(isCompanySwitched.value === true){
+        localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+        await companies.getCompany();
+        toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
+    }
+
+};
 </script>
 
 <template>
     <div>
         <div class="mt-3" v-if="company">
-            <div class="flex align-items-center">
+            <!-- <pre>cList{{companyList}}</pre>
+            <pre>pre2: {{selectedComp}}</pre>
+            <pre>selC{{selectedCompany}}</pre> -->
+           <div class="flex">
+            <span v-tooltip.top="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round w-3rem text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green w-full">{{ company?.charAt(0) }}</span>
+            <div class="comp-switch w-full" v-tooltip.right="{ value: 'Switch Company' }">
+                <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList"  optionLabel="label" class="w-full" />
+            </div>
+           </div>
+            <!-- <div class="flex align-items-center">
                 <span class="bg-orange-100 border-round w-2rem h-2rem flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{ company?.charAt(0) }}</span>
                 <h6 class="m-0 font-bold font-size-16">{{ company }}</h6>
-            </div>
+            </div> -->
         </div>
         <hr />
         <ul class="layout-menu">
@@ -103,9 +139,14 @@ watchEffect(async () => {});
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .rounded {
     border-radius: 6px;
     text-transform: capitalize;
+}
+
+.comp-switch > div > .p-inputtext{
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
 }
 </style>

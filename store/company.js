@@ -14,6 +14,8 @@ export const useCompanyStore = defineStore('workStation', {
         singleCompany: null,
         singleCompanySpaces: null,
         singleCompanyName: null,
+        isCompanySwitched: false,
+        companySwitchToast: null,
 
         // space api
         spaceList: null,
@@ -138,6 +140,31 @@ export const useCompanyStore = defineStore('workStation', {
                 this.isCompanyEdited = true;
                 this.getCompanyList();
                 await companies.getCompany();
+            }
+        },
+        async switchCompany(switchCompId) {
+            const token = useCookie('token');
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/switch-company`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`
+                },
+                body: {
+                    company_id: switchCompId
+                }
+            });
+            // console.log('switchCompany', data.value.message);
+            if (data.value?.code === 200) {
+                this.isCompanySwitched = true;
+                this.companySwitchToast = data.value.message;
+                // localStorage.removeItem('userCompany');
+                // localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+                
+                // await companies.getCompany();
+                // this.getSingleCompany(switchCompId);
+            }else{
+                this.isCompanySwitched = false;
+                this.companySwitchToast = 'Unable to switch company';
             }
         },
         async deleteCompany(id) {

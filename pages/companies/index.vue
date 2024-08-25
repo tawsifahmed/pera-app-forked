@@ -9,6 +9,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Toast from 'primevue/toast';
 import accessPermission from "~/composables/usePermission";
+const createCompanyP = ref(accessPermission('create_company'));
 const updateCompanyP = ref(accessPermission('update_company'));
 const deleteCompanyP = ref(accessPermission('delete_company'));
 
@@ -21,8 +22,8 @@ const visibleEditCompany = ref(false);
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getCompanyList, deleteCompany } = useCompanyStore();
-const { companyList, isCompanyDeleted } = storeToRefs(useCompanyStore());
+const { getCompanyList, deleteCompany, switchCompany } = useCompanyStore();
+const { companyList, isCompanyDeleted, companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());
 
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
@@ -84,6 +85,18 @@ const initFilters = () => {
 };
 
 initFilters();
+
+const switchCompanyHandler = async(switchCompId) => {
+    console.log('companyId', switchCompId)
+    await switchCompany(switchCompId);
+    if(isCompanySwitched.value === true){
+        localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+        toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
+    };
+    // location.reload(); 
+}
 </script>
 
 <template>
@@ -95,10 +108,10 @@ initFilters();
                 <p class="text">Companies</p>
             </div>
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
-            <!-- <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
-            <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                <CreateCompany />
-            </Dialog> -->
+            <Button v-if="createCompanyP" @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
+            
+                <CreateCompany v-model:visible="visibleCreateCompany"  />
+           
         </div>
       
         <div class="flex mb-2 justify-content-end">
@@ -117,7 +130,7 @@ initFilters();
             <Column field="name" header="Company Name" sortable>
               <template #body="slotProps" >
                 <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
-                  <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps?.data?.name }}</p>
+                  <p class="cursor-pointer com-name hover:text-primary font-semibold" @click="switchCompanyHandler(slotProps?.data?.id)">{{ slotProps?.data?.name }}</p>
                 </NuxtLink>
               </template>
             </Column>

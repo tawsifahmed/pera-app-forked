@@ -3,12 +3,14 @@ import { defineStore } from 'pinia';
 export const useActiveCompanyStore = defineStore('ActiveCompany', {
   state: () => ({
     activeCompany: null,
+    companyWithSpaces: null,
+    spaces: null,
   }),
   getters: {
     menu(state) {
-      if (state.activeCompany) {
+      if (state.spaces) {
         const items = []
-        state.activeCompany[0]?.spaces.forEach(element => {
+        state.spaces?.forEach(element => {
           const obj = {
             'label': element?.name,
             'icon': 'pi pi-list',
@@ -38,19 +40,32 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       }
     },
     company(state) {
-      if (state.activeCompany) {
-        return state.activeCompany[0]?.name;
+      if (state.companyWithSpaces) {
+        return state.companyWithSpaces?.label;
       } else {
         return '';
       }
     },
     company_id(state) {
-      if (state.activeCompany) {
-        return state.activeCompany[0]?.id;
+      if (state.companyWithSpaces) {
+        return state.companyWithSpaces?.id;
       } else {
         return '';
       }
     },
+    companyList(state) {
+      if (state.activeCompany) {
+        return state.activeCompany.map(company => ({
+          id: company.id,
+          label: company.name
+        }));
+      } else {
+        return [];
+      }
+    },
+    selectedCompany(state) {
+      return state.companyWithSpaces
+    }
   },
   actions: {
     async getCompany() {
@@ -63,8 +78,21 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
           },
         }),
       )
-      // console.log('process.env.API_URL=>',process.env.API_URL)
+      console.log('process.env.API_URL=>',data.value)
       this.activeCompany = await data.value?.data;
+      console.log('company=>',this.activeCompany[0].id)
+      let userCompanyId = Number(localStorage.getItem('userCompany'));
+          console.log('localId=>', userCompanyId)
+      if (this.activeCompany.length > 0) {
+          let companyWSpaces = this.activeCompany.find(company => company.id === userCompanyId);
+          this.spaces = companyWSpaces.spaces;
+          if (companyWSpaces) {
+            const { id, name } = companyWSpaces;
+            this.companyWithSpaces = { 'id': id, 'label': name };
+            return { name, id };
+          }
+      }
+      return null;
     },
   }
 });
