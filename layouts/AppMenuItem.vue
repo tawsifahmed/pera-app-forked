@@ -38,11 +38,11 @@ const itemKey = ref(null);
 
 const items = ref([
     {
-        label: 'Settings',
+        label: 'Space Settings',
         items: [
             {
                 label: 'Manage Space',
-                icon: 'pi pi-th-large'
+                icon: 'pi pi-table'
             }
             // {
             //     label: 'Show all Space',

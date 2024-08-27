@@ -854,32 +854,6 @@ textarea {
     }
 }
 
-/* width */
-::-webkit-scrollbar {
-    height: 8px;
-    border-radius: 8px;
-    width: 5px;
-    cursor: pointer;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 8px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #c0c0c0;
-    cursor: pointer;
-    border-radius: 8px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #77777793;
-}
-
 /* Status Column */
 .column-container {
     margin: 10px;
@@ -989,28 +963,7 @@ textarea {
     }
 }
 
-/* width */
-::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
-    cursor: pointer;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #d2b5ff;
-    cursor: pointer;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #d3b5ff93;
-}
 
 .excel-export-btn {
     background: #f1f5f9;

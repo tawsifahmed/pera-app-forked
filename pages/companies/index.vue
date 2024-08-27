@@ -23,7 +23,12 @@ const visibleEditCompany = ref(false);
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getCompanyList, deleteCompany, switchCompany } = useCompanyStore();
-const { companyList, isCompanyDeleted, companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());
+const { compList, isCompanyDeleted, companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());
+
+import { useActiveCompanyStore } from '~/store/workCompany';
+const companies = useActiveCompanyStore();
+companies.getCompany();
+const { companyList  } = storeToRefs(useActiveCompanyStore());
 
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
@@ -58,15 +63,31 @@ const confirmdeleteCompany = (companyId) => {
 
 const deletingCompany = async () => {
     console.log('refCompanyIdFin', refCompanyId.value);
-
-    // return
     await deleteCompany(refCompanyId.value);
 
     if (isCompanyDeleted.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
         console.log('company deleted');
-        router.push('/')
+        if(companyList.value.length >= 1){
+            if(refCompanyId.value === Number(localStorage.getItem('userCompany'))){
+                console.log('refCompanyId.value', refCompanyId.value);
+                console.log('locakID.value', Number(localStorage.getItem('userCompany')));
+                await switchCompanyHandler(companyList.value[0].id);
+                localStorage.setItem('userCompany', JSON.stringify(companyList.value[0].id));
+                await companies.getCompany();
+                await getCompanyList();
+                // location.reload();
+            }else{
+                return
+                // localStorage.removeItem('userCompany');
+            }
+        }else {
+            localStorage.removeItem('userCompany');
+            location.reload();
+            router.push('/')
+        }
+
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', group: 'br', life: 3000 });
         console.log('company not deleted');
@@ -88,20 +109,26 @@ initFilters();
 
 const switchCompanyHandler = async(switchCompId) => {
     console.log('companyId', switchCompId)
-    await switchCompany(switchCompId);
-    if(isCompanySwitched.value === true){
-        localStorage.setItem('userCompany', JSON.stringify(switchCompId));
-        toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+    if(switchCompId === Number(localStorage.getItem('userCompany'))){
+        return;
     }else{
-        toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
-    };
+        await switchCompany(switchCompId, 'switchedFromPage');
+        if(isCompanySwitched.value === true){
+            localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+            // router.push(`/companies/${switchCompId}`);
+            toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+        }else{
+            toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
+        };
+    }
     // location.reload(); 
 }
 </script>
 
 <template>
     <div class="card">
-        <div class="d-flex create-btn-wrapper mr-2">
+        <!-- <pre>c lenght => {{companyList.length}}</pre> -->
+        <div class="d-flex create-btn-wrapper mb-3">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
@@ -122,7 +149,7 @@ const switchCompanyHandler = async(switchCompId) => {
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-st" :value="companyList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="compList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
            
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>

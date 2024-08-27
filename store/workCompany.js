@@ -2,15 +2,15 @@ import { defineStore } from 'pinia';
 
 export const useActiveCompanyStore = defineStore('ActiveCompany', {
   state: () => ({
-    activeCompany: null,
-    companyWithSpaces: null,
-    spaces: null,
+    availableCompanies: null,
+    compInLoclStrg: null,
+    getSpaces: null,
   }),
   getters: {
     menu(state) {
-      if (state.spaces) {
+      if (state.getSpaces) {
         const items = []
-        state.spaces?.forEach(element => {
+        state.getSpaces?.spaces.forEach(element => {
           const obj = {
             'label': element?.name,
             'icon': 'pi pi-list',
@@ -40,22 +40,22 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       }
     },
     company(state) {
-      if (state.companyWithSpaces) {
-        return state.companyWithSpaces?.label;
+      if (state.compInLoclStrg) {
+        return state.compInLoclStrg?.label;
       } else {
         return '';
       }
     },
     company_id(state) {
-      if (state.companyWithSpaces) {
-        return state.companyWithSpaces?.id;
+      if (state.compInLoclStrg) {
+        return state.compInLoclStrg?.id;
       } else {
         return '';
       }
     },
     companyList(state) {
-      if (state.activeCompany) {
-        return state.activeCompany.map(company => ({
+      if (state.availableCompanies) {
+        return state.availableCompanies.map(company => ({
           id: company.id,
           label: company.name
         }));
@@ -64,7 +64,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       }
     },
     selectedCompany(state) {
-      return state.companyWithSpaces
+      return state.compInLoclStrg
     }
   },
   actions: {
@@ -79,16 +79,16 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
         }),
       )
       console.log('process.env.API_URL=>',data.value)
-      this.activeCompany = await data.value?.data;
-      console.log('company=>',this.activeCompany[0].id)
-      let userCompanyId = Number(localStorage.getItem('userCompany'));
-          console.log('localId=>', userCompanyId)
-      if (this.activeCompany.length > 0) {
-          let companyWSpaces = this.activeCompany.find(company => company.id === userCompanyId);
-          this.spaces = companyWSpaces.spaces;
+      this.availableCompanies = data.value?.data;
+      // console.log('company=>',this.availableCompanies[0].id)
+      let storedCompanyId = Number(localStorage.getItem('userCompany'));
+          console.log('localId=>', storedCompanyId)
+      if (this.availableCompanies) {
+          const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
+          this.getSpaces = companyWSpaces;
           if (companyWSpaces) {
             const { id, name } = companyWSpaces;
-            this.companyWithSpaces = { 'id': id, 'label': name };
+            this.compInLoclStrg = { 'id': id, 'label': name };
             return { name, id };
           }
       }

@@ -7,7 +7,7 @@ import { useAuthStore } from '~/store/auth'; // import the auth store we just cr
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
-companies.getCompany();
+// companies.getCompany();
 const { companyList } = storeToRefs(useActiveCompanyStore());
 
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
