@@ -68,11 +68,8 @@ const deletingCompany = async () => {
     if (isCompanyDeleted.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
-        console.log('company deleted');
         if(companyList.value.length >= 1){
             if(refCompanyId.value === Number(localStorage.getItem('userCompany'))){
-                console.log('refCompanyId.value', refCompanyId.value);
-                console.log('locakID.value', Number(localStorage.getItem('userCompany')));
                 await switchCompanyHandler(companyList.value[0].id);
                 localStorage.setItem('userCompany', JSON.stringify(companyList.value[0].id));
                 await companies.getCompany();
@@ -80,12 +77,11 @@ const deletingCompany = async () => {
                 // location.reload();
             }else{
                 return
-                // localStorage.removeItem('userCompany');
             }
         }else {
             localStorage.removeItem('userCompany');
-            location.reload();
-            router.push('/')
+            // location.reload();
+            window.location.href = '/';
         }
 
     } else {
@@ -108,20 +104,17 @@ const initFilters = () => {
 initFilters();
 
 const switchCompanyHandler = async(switchCompId) => {
-    console.log('companyId', switchCompId)
     if(switchCompId === Number(localStorage.getItem('userCompany'))){
         return;
     }else{
-        await switchCompany(switchCompId, 'switchedFromPage');
+        await switchCompany(switchCompId);
         if(isCompanySwitched.value === true){
             localStorage.setItem('userCompany', JSON.stringify(switchCompId));
-            // router.push(`/companies/${switchCompId}`);
             toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
         }else{
             toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
         };
     }
-    // location.reload(); 
 }
 </script>
 

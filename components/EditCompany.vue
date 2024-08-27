@@ -70,8 +70,8 @@ const solutions = ref([
         label: 'Support'
     },
     {
-        id: 'Seles & CRM',
-        label: 'Seles & CRM'
+        id: 'Sales & CRM',
+        label: 'Sales & CRM'
     },
     {
         id: 'Personal Use',

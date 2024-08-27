@@ -138,11 +138,11 @@ export const useCompanyStore = defineStore('workStation', {
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyEdited = true;
-                // this.getCompanyList();
-                // await companies.getCompany();
+                this.getCompanyList();
+                await companies.getCompany();
             }
         },
-        async switchCompany(switchCompId, switchFrom) {
+        async switchCompany(switchCompId) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/switch-company`, {
                 method: 'POST',
@@ -157,16 +157,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (data.value?.code === 200) {
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
-                
-                // await companies.getCompany();
-                if(switchFrom == 'switchedFromPage'){
-                    console.log('switchedFromPage');
-                    // companies.getCompany();
-                    // this.getSingleCompany(switchCompId);
-                    location.reload();
-                }else{
-                    location.reload();
-                }
+                location.reload();
             }else{
                 this.isCompanySwitched = false;
                 this.companySwitchToast = 'Unable to switch company';
@@ -185,7 +176,6 @@ export const useCompanyStore = defineStore('workStation', {
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyDeleted = true;
-                // localStorage.removeItem('userCompany');
                 await companies.getCompany();
                 this.getCompanyList();
                 // this.getSingleCompany(id);

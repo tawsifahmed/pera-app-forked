@@ -102,13 +102,12 @@ const switchCompanyHandler = async (switchCompId) => {
         return;
     }else{
         await switchCompany(switchCompId);
-        // localStorage.removeItem('userCompany');
         if(isCompanySwitched.value === true){
             localStorage.setItem('userCompany', JSON.stringify(switchCompId));
-            await companies.getCompany();
+            // await companies.getCompany();
             toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
             if (window.location.pathname !== '/' && window.location.pathname !== '/companies') {
-                router.push('/');
+                window.location.href = '/';
             }
         }else{
             toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });

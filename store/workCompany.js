@@ -80,9 +80,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       )
       console.log('process.env.API_URL=>',data.value)
       this.availableCompanies = data.value?.data;
-      // console.log('company=>',this.availableCompanies[0].id)
       let storedCompanyId = Number(localStorage.getItem('userCompany'));
-          console.log('localId=>', storedCompanyId)
       if (this.availableCompanies) {
           const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
           this.getSpaces = companyWSpaces;

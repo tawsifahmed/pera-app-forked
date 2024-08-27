@@ -49,55 +49,55 @@ const selectPeople = (p) => {
 const sSolution = ref(null);
 const solutions = ref([
     {
-        id: 1,
-        label: 'Software Company'
+        id: 'PMO',
+        label: 'PMO'
     },
     {
-        id: 2,
+        id: 'Finance & Accounting',
         label: 'Finance & Accounting'
     },
     {
-        id: 3,
+        id: 'HR & Recruiting',
         label: 'HR & Recruiting'
     },
     {
-        id: 4,
+        id: 'Operations',
         label: 'Operations'
     },
     {
-        id: 5,
+        id: 'Support',
         label: 'Support'
     },
     {
-        id: 6,
-        label: 'Seles & CRM'
+        id: 'Sales & CRM',
+        label: 'Sales & CRM'
     },
     {
-        id: 7,
+        id: 'Personal Use',
         label: 'Personal Use'
     },
     {
-        id: 8,
+        id: 'IT',
         label: 'IT'
     },
     {
-        id: 9,
+        id: 'Creative & Design',
         label: 'Creative & Design'
     },
     {
-        id: 10,
+        id: 'Personal Services',
         label: 'Personal Services'
     },
     {
-        id: 11,
+        id: 'Marketing',
         label: 'Marketing'
     },
     {
-        id: 12,
+        id: 'Engineering & Production',
         label: 'Engineering & Production'
     },
     {
-        id: 13,
+        id: 'Other',
         label: 'Other'
     }
 ]);
