@@ -29,6 +29,7 @@ const signInWithGoogle = async () => {
         });
         console.log('loginData',data.value);
         if(data.value){
+            // console.log('login.value', data.value)
             const userCompany = data?.value?.company?.id;
             if (userCompany) {
                 localStorage.setItem('userCompany', JSON.stringify(userCompany));
