@@ -1,7 +1,7 @@
 <script setup>
 import { useLayout } from '@/layouts/composables/layout';
 import { onMounted, reactive, ref, watch } from 'vue';
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 import { useCompanyStore } from '~/store/company';
@@ -9,21 +9,21 @@ import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
 // companies.getCompany();
 const { companyList } = storeToRefs(useActiveCompanyStore());
-
+const url = useRuntimeConfig();
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
 const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
-const { userCompany } = storeToRefs(useAuthStore()); 
+const { userCompany } = storeToRefs(useAuthStore());
 
-const readEmployee = ref(accessPermission('read_user'))
-const readRole = ref(accessPermission('read_role'))
-const readTags = ref(accessPermission('read_tags'))
-const createCompanyP = ref(accessPermission('create_company'))
+const readEmployee = ref(accessPermission('read_user'));
+const readRole = ref(accessPermission('read_role'));
+const readTags = ref(accessPermission('read_tags'));
+const createCompanyP = ref(accessPermission('create_company'));
 
 definePageMeta({
-      middleware: 'auth',
-      layout: 'default'
-})
+    middleware: 'auth',
+    layout: 'default'
+});
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
@@ -48,7 +48,24 @@ const lineData = ref({
         }
     ]
 });
+const taskList = ref([]);
 
+const fetchTasks = async () => {
+    try {
+        const token = useCookie('token');
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+        taskList.value = data.value.data;
+        console.log('Task list: ', data.value.data);
+    } catch (e) {
+        console.log(e);
+    }
+};
+fetchTasks();
 // const lineOptions = ref({
 //     scales: {
 //         x: {
@@ -72,30 +89,30 @@ const items = ref([
 ]);
 const lineOptions = ref(null);
 
-const visibleCreateCompany  = ref(false);
+const visibleCreateCompany = ref(false);
 
-const hasUserCompany = ref(null)
+const hasUserCompany = ref(null);
 
 const checkUser = () => {
-    if (process.client){
-        hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'))
-        console.log('hasUserCompany =>', hasUserCompany.value)
-        if(hasUserCompany.value === null || hasUserCompany.value?.length  == 0){
-            visibleCreateCompany.value =  true;
-        }else {
-            visibleCreateCompany.value =  false;
+    if (process.client) {
+        hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'));
+        console.log('hasUserCompany =>', hasUserCompany.value);
+        if (hasUserCompany.value === null || hasUserCompany.value?.length == 0) {
+            visibleCreateCompany.value = true;
+        } else {
+            visibleCreateCompany.value = false;
         }
 
-        console.log('visibleCreateCompany =>', visibleCreateCompany.value)
+        console.log('visibleCreateCompany =>', visibleCreateCompany.value);
     }
-}
+};
 
 onMounted(() => {
     getRoles();
     getTaskAssignModalData();
     getTagsAssignModalData();
     getChartData();
-    checkUser()
+    checkUser();
     // ProductService.getProductsSmall().then((data) => (products.value = data));
 });
 
@@ -171,6 +188,21 @@ const applyDarkTheme = () => {
     };
 };
 
+const handleTaskClick = (data) => {
+    console.log('Task click: ', data);
+};
+// Date Formatter
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
 watch(
     isDarkTheme,
     (val) => {
@@ -192,7 +224,7 @@ watch(
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
                         <!-- <pre>{{companyList.length}}</pre> -->
-                        <div class="text-900 font-medium text-xl">{{companyList ? companyList.length : '0'}}</div>
+                        <div class="text-900 font-medium text-xl">{{ companyList ? companyList.length : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
@@ -233,15 +265,13 @@ watch(
                 <span class="text-500">newly registered</span>
             </div>
         </div> -->
-        
+
         <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink to="/employees" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Employees</span>
-                        <div class="text-900 font-medium text-xl" 
-                        style="visibility: visible;"
-                        >{{users.length}}</div>
+                        <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
@@ -256,7 +286,7 @@ watch(
                 <NuxtLink to="/role" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
-                        <div class="text-900 font-medium text-xl">{{rolesLists ? rolesLists.length : '0'}}</div>
+                        <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
@@ -271,7 +301,7 @@ watch(
                 <NuxtLink to="/tags" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
-                        <div class="text-900 font-medium text-xl">{{tags ? tags.length : '0'}}</div>
+                        <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
@@ -281,7 +311,7 @@ watch(
                 <span class="text-500">responded</span> -->
             </div>
         </div>
-<!-- 
+        <!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Recent Sales</h5>
@@ -391,9 +421,28 @@ watch(
             </div>
         </div>
          -->
-
-
-         <div class="col-12 xl:col-8">
+        <div class="col-12 xl:col-6">
+            <div class="card h-full">
+                <div class="">
+                    <h5>All Tasks</h5>
+                </div>
+                <div class="task-container">
+                    <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
+                        <!-- <pre>{{ task }}</pre> -->
+                        <div class="title-group">
+                            <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                            <p class="title" style="font-weight: 600">{{ task?.name }}</p>
+                            <div class="" style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                            <p>{{ task?.project_name }}</p>
+                        </div>
+                        <div class="">
+                            <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>Overview</h5>
                 <Chart type="line" :data="lineData" :options="lineOptions" />
@@ -464,7 +513,49 @@ watch(
             </div> -->
         </div>
         <div v-if="visibleCreateCompany">
-            <CreateCompany/>
+            <CreateCompany />
         </div>
     </div>
 </template>
+
+<style scoped>
+.task-container {
+    max-height: 25rem;
+    overflow-y: auto;
+    padding: 10px;
+}
+.task-card {
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+}
+.task-card:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+.status {
+    height: 12px;
+    width: 12px;
+    border-radius: 25px;
+    background: #000;
+}
+.title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: auto;
+}
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+</style>

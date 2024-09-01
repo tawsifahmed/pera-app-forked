@@ -20,7 +20,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
             'to': `/companies/${element?.company_id}/spaces/${element?.id}`,
             'items': []
           }
-          if (element.projects.length > 0) {
+          if (element?.projects?.length > 0) {
             element.projects.forEach(ele => {
               const proObj = {
                 'label': ele?.name,
@@ -78,17 +78,17 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
           },
         }),
       )
-      console.log('process.env.API_URL=>',data.value)
+      console.log('process.env.API_URL=>', data.value)
       this.availableCompanies = data.value?.data;
       let storedCompanyId = Number(localStorage.getItem('userCompany'));
       if (this.availableCompanies) {
-          const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
-          this.getSpaces = companyWSpaces;
-          if (companyWSpaces) {
-            const { id, name } = companyWSpaces;
-            this.compInLoclStrg = { 'id': id, 'label': name };
-            return { name, id };
-          }
+        const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
+        this.getSpaces = companyWSpaces;
+        if (companyWSpaces) {
+          const { id, name } = companyWSpaces;
+          this.compInLoclStrg = { 'id': id, 'label': name };
+          return { name, id };
+        }
       }
       return null;
     },
