@@ -154,9 +154,12 @@ export const useCompanyStore = defineStore('workStation', {
                 }
             });
             if (data.value?.code === 200) {
-                console.log('data', data);
+                // console.log('data', data);
+                const userType = useCookie('userType');
+                userType.value = data?.value?.user_type;
                 const rolePermission = useCookie('rolePermission');
                 rolePermission.value = data?.value?.permissions;
+                
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
                 location.reload();
