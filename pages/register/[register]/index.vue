@@ -8,6 +8,8 @@ import { useRoute } from 'vue-router';
 import { useAuthStore } from '~/store/auth'; 
 const { registerInviteUser, otpVerify, resendOtp } = useAuthStore();
 const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg } = storeToRefs(useAuthStore());
+
+const url = useRuntimeConfig();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
