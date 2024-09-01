@@ -153,8 +153,10 @@ export const useCompanyStore = defineStore('workStation', {
                     company_id: switchCompId
                 }
             });
-            // console.log('switchCompany', data.value.message);
             if (data.value?.code === 200) {
+                console.log('data', data);
+                const rolePermission = useCookie('rolePermission');
+                rolePermission.value = data?.value?.permissions;
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
                 location.reload();

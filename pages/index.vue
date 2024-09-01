@@ -427,7 +427,7 @@ watch(
                     <h5>All Tasks</h5>
                 </div>
                 <div class="task-container">
-                    <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
+                    <div v-if="task" v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
                         <!-- <pre>{{ task }}</pre> -->
                         <div class="title-group">
                             <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
@@ -438,6 +438,9 @@ watch(
                         <div class="">
                             <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
                         </div>
+                    </div>
+                    <div v-else>
+                        <p class="text-black text-lg text-center">No Tasks found!</p>
                     </div>
                 </div>
             </div>
