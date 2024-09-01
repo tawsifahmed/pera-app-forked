@@ -9,11 +9,13 @@ export const useCompanyStore = defineStore('workStation', {
         isCompanyCreated: false,
         isCompanyDeleted: false,
         isCompanyEdited: false,
-        companyList: null,
+        compList: null,
         companyId: null,
         singleCompany: null,
         singleCompanySpaces: null,
         singleCompanyName: null,
+        isCompanySwitched: false,
+        companySwitchToast: null,
 
         // space api
         spaceList: null,
@@ -73,7 +75,7 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            this.companyList = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+            this.compList = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
             this.singleCompanyName = data.value?.data[0]?.name;
         },
         async getSingleCompany(company) {
@@ -140,6 +142,27 @@ export const useCompanyStore = defineStore('workStation', {
                 await companies.getCompany();
             }
         },
+        async switchCompany(switchCompId) {
+            const token = useCookie('token');
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/switch-company`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`
+                },
+                body: {
+                    company_id: switchCompId
+                }
+            });
+            // console.log('switchCompany', data.value.message);
+            if (data.value?.code === 200) {
+                this.isCompanySwitched = true;
+                this.companySwitchToast = data.value.message;
+                location.reload();
+            }else{
+                this.isCompanySwitched = false;
+                this.companySwitchToast = 'Unable to switch company';
+            }
+        },
         async deleteCompany(id) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/delete/${id}`, {
@@ -153,7 +176,6 @@ export const useCompanyStore = defineStore('workStation', {
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyDeleted = true;
-                localStorage.removeItem('userCompany');
                 await companies.getCompany();
                 this.getCompanyList();
                 // this.getSingleCompany(id);
@@ -202,6 +224,7 @@ export const useCompanyStore = defineStore('workStation', {
             this.singleSpaceProjects = this.singleSpace?.projects.map((item, index) => ({ ...item, index: index + 1 }));
         },
         async createSpace({ name, description, company_id, color }) {
+            
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
                 method: 'POST',
@@ -218,7 +241,7 @@ export const useCompanyStore = defineStore('workStation', {
 
             if (data.value?.app_message === 'success') {
                 this.isSpaceCreated = true;
-                await this.getCompanyList();
+                // await this.getCompanyList();
             }
         },
         async editSpace({ id, name, description, company_id, color }) {

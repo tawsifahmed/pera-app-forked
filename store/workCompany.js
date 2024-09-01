@@ -2,13 +2,15 @@ import { defineStore } from 'pinia';
 
 export const useActiveCompanyStore = defineStore('ActiveCompany', {
   state: () => ({
-    activeCompany: null,
+    availableCompanies: null,
+    compInLoclStrg: null,
+    getSpaces: null,
   }),
   getters: {
     menu(state) {
-      if (state.activeCompany) {
+      if (state.getSpaces) {
         const items = []
-        state.activeCompany[0]?.spaces.forEach(element => {
+        state.getSpaces?.spaces.forEach(element => {
           const obj = {
             'label': element?.name,
             'icon': 'pi pi-list',
@@ -38,19 +40,32 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       }
     },
     company(state) {
-      if (state.activeCompany) {
-        return state.activeCompany[0]?.name;
+      if (state.compInLoclStrg) {
+        return state.compInLoclStrg?.label;
       } else {
         return '';
       }
     },
     company_id(state) {
-      if (state.activeCompany) {
-        return state.activeCompany[0]?.id;
+      if (state.compInLoclStrg) {
+        return state.compInLoclStrg?.id;
       } else {
         return '';
       }
     },
+    companyList(state) {
+      if (state.availableCompanies) {
+        return state.availableCompanies.map(company => ({
+          id: company.id,
+          label: company.name
+        }));
+      } else {
+        return [];
+      }
+    },
+    selectedCompany(state) {
+      return state.compInLoclStrg
+    }
   },
   actions: {
     async getCompany() {
@@ -63,8 +78,19 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
           },
         }),
       )
-      // console.log('process.env.API_URL=>',process.env.API_URL)
-      this.activeCompany = await data.value?.data;
+      console.log('process.env.API_URL=>',data.value)
+      this.availableCompanies = data.value?.data;
+      let storedCompanyId = Number(localStorage.getItem('userCompany'));
+      if (this.availableCompanies) {
+          const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
+          this.getSpaces = companyWSpaces;
+          if (companyWSpaces) {
+            const { id, name } = companyWSpaces;
+            this.compInLoclStrg = { 'id': id, 'label': name };
+            return { name, id };
+          }
+      }
+      return null;
     },
   }
 });

@@ -136,16 +136,16 @@ const init = async () => {
 const getRoleList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch('${url.public.apiUrl}/roles/list', {
+        $fetch(`${url.public.apiUrl}/roles/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        console.log('data', data.value?.data);
+        // console.log('data', data.value?.data);
         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        console.log('rolesLists', rolesLists.value);
+        // console.log('rolesLists', rolesLists.value);
     }
 };
 

@@ -44,6 +44,7 @@ export const useAuthStore = defineStore('auth', {
 
       if (data.value) {
         if (data.value.code === 200) {
+          console.log('login.value', data.value)
           this.userCompany = data?.value?.company?.id;
           if (this.userCompany) {
             localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
@@ -52,7 +53,7 @@ export const useAuthStore = defineStore('auth', {
           token.value = data?.value?.access_token;
           const rolePermission = useCookie('rolePermission');
           rolePermission.value = data?.value?.permissions;
-          this.authenticated = true; //  authenticated state value to true
+          this.authenticated = true;
         } else {
           this.authenticated = false;
           token.value = '';

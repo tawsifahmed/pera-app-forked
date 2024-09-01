@@ -131,7 +131,7 @@ onMounted(() => {
                     <div class="user-selection w-full">
                         <label class="font-bold block mb-2">Employee:</label>
                         <div class="flex justify-content-center">
-                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select/Search User" class="w-full" />
+                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full" />
                         </div>
                     </div>
                 </div>

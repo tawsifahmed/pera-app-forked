@@ -371,27 +371,31 @@ const handleShareTaskId = () => {
 
 <template>
     <div class="grid">
+        <div class="col-12 flex justify-content-between">
+            <h5
+                v-tooltip.top="{
+                    value: `${taskDetails.name}`,
+                    pt: {
+                        width: '200px'
+                    }
+                }"
+                class="m-0 detail-task-name cursor-pointer"
+            >
+                {{ taskDetails.name }}
+            </h5>
+           <div class="flex gap-1">
+                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
+                <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
+                <h5 class="m-0 ml-2">Activity</h5>
+           </div>
+        </div>
         <div class="col-12 lg:col-7">
             <div>
                 <!-- <pre>{{singleTask.key}}</pre> -->
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
                 <!-- <pre>{{singleTask?.data?.tagsObj}}</pre> -->
-                <div class="flex align-items-start gap-2 mb-3">
-                    <h5
-                        v-tooltip.top="{
-                            value: `${taskDetails.name}`,
-                            pt: {
-                                width: '200px'
-                            }
-                        }"
-                        class="m-0 detail-task-name cursor-pointer"
-                    >
-                        {{ taskDetails.name }}
-                    </h5>
-                    <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer share-btn"></span>
-                    <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
-                </div>
+               
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
@@ -456,7 +460,7 @@ const handleShareTaskId = () => {
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
-                                <Textarea id="description" v-model="description" rows="4" cols="20" />
+                                <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -617,7 +621,7 @@ const handleShareTaskId = () => {
         </div>
         <div class="col-12 lg:col-5">
             <div>
-                <h5 class="cmc">Activity</h5>
+               
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">

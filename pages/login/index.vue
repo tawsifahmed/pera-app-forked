@@ -88,16 +88,16 @@ const handleLoginSubmit = async () => {
             verifyUser.value.email = user.value.email;
             verifyUser.value.password = user.value.password;
             startTimer();
-            toast.add({ severity: 'success', summary: 'OTP Verification', detail: 'Please verify OTP', life: 3000 });
+            toast.add({ severity: 'success', summary: 'OTP Verification', detail: 'Please verify OTP', group: 'br', life: 3000 });
         } else if (authenticated.value == true) {
             errorData.value.passwordError = false;
             errorData.value.emailError = false;
-            toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Authorized', detail: 'Login Successful', group: 'br', life: 3000 });
             setTimeout(() => {
                 router.push('/');
             }, 300);
         } else {
-            toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Invalid email or password', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Authorization Failed!', detail: 'Invalid email or password', group: 'br', life: 3000 });
         }
         loginBtnHandle.value = false;
     }
@@ -113,11 +113,11 @@ const handleVerifySubmit = async () => {
         await otpVerify(verifyUser.value);
         if (authenticated.value == true) {
             console.log('authOtpPPP', authOtp.value);
-            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, group: 'br', life: 3000 });
             location.reload();
             router.push('/login');
         } else {
-            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, life: 3000 });
+            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, group: 'br', life: 3000 });
         }
         loginBtnHandle.value = false;
     }
@@ -130,11 +130,11 @@ const handleResendOtp = async () => {
     await resendOtp({ email: verifyUser.value.email });
     if (resendOtpResponse.value === true) {
         clickBlink.value = false;
-        toast.add({ severity: 'info', summary: 'OTP Resent', detail: resendOtpMsg, life: 3000 });
+        toast.add({ severity: 'info', summary: 'OTP Resent', detail: resendOtpMsg, group: 'br', life: 3000 });
         startTimer();
     } else {
         clickBlink.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: resendOtpMsg, life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: resendOtpMsg, group: 'br', life: 3000 });
     }
     // toast.add({ severity: 'info', summary: 'OTP Resent', detail: '', life: 3000 });
 };
@@ -156,7 +156,7 @@ watch(
         <div class="flex flex-column align-items-center justify-content-center">
             <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
             <!-- <h2 class="font-bold">Pera App</h2> -->
-            <Toast />
+            <Toast position="bottom-right" group="br"/>
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">

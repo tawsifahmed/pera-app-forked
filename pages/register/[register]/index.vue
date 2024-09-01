@@ -1,13 +1,15 @@
 <script setup>
 import AppConfig from '@/layouts/AppConfig.vue';
 import { useLayout } from '@/layouts/composables/layout';
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import { storeToRefs } from 'pinia';
 import Toast from 'primevue/toast';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuthStore } from '~/store/auth'; // import the auth store we just created
-const { registerInviteUser, otpVerify, resendOtp } = useAuthStore(); // use authenticateUser action from  auth store
+import { useAuthStore } from '~/store/auth'; 
+const { registerInviteUser, otpVerify, resendOtp } = useAuthStore();
 const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg } = storeToRefs(useAuthStore());
+
+const url = useRuntimeConfig();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
@@ -95,7 +97,7 @@ const handleLoginSubmit = async () => {
         await registerInviteUser(createUser.value);
         if (checkOTP.value === true) {
             console.log('authenticated =>', authenticated.value);
-            toast.add({ severity: 'success', summary: 'Successfully Registered', detail: 'Now verify email using OTP', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfully Registered', detail: 'Now verify email using OTP', group: 'br', life: 3000 });
             // setTimeout(() => {
             //     router.push('/login')
             // }, 300);
@@ -105,7 +107,7 @@ const handleLoginSubmit = async () => {
             verifyOTPForm.value = true;
             startTimer();
         } else {
-            toast.add({ severity: 'error', summary: 'Registration Error', detail: '', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Registration Error', detail: '', group: 'br', life: 3000 });
         }
         regBtnHandle.value = false;
     }
@@ -120,12 +122,12 @@ const handleVerifySubmit = async () => {
     } else {
         await otpVerify(verifyUser.value);
         if (authenticated.value === true) {
-            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successfully Verified', detail: resendOtpMsg, group: 'br', life: 3000 });
             setTimeout(() => {
                 router.push('/login');
             }, 300);
         } else {
-            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, life: 3000 });
+            toast.add({ severity: 'error', summary: 'Verification Failed', detail: resendOtpMsg, group: 'br', life: 3000 });
         }
         regBtnHandle.value = false;
     }
@@ -138,11 +140,11 @@ const handleResendOtp = async () => {
     await resendOtp({ email: verifyUser.value.email });
     if (resendOtpResponse.value === true) {
         clickBlink.value = false;
-        toast.add({ severity: 'info', summary: 'OTP Resent', detail: resendOtpMsg, life: 3000 });
+        toast.add({ severity: 'info', summary: 'OTP Resent', detail: resendOtpMsg, group: 'br', life: 3000 });
         startTimer();
     } else {
         clickBlink.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: resendOtpMsg, life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: resendOtpMsg, group: 'br', life: 3000 });
     }
     // toast.add({ severity: 'info', summary: 'OTP Resent', detail: '', life: 3000 });
 };
@@ -180,7 +182,7 @@ loading.value = false;
 <template>
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden pt-1">
         <div class="flex flex-column align-items-center justify-content-center">
-            <Toast />
+            <Toast position="bottom-right" group="br"/>
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="regForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">

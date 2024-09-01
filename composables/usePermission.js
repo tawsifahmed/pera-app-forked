@@ -6,4 +6,4 @@ export default function accessPermission(permission) {
     } else {
       return false;
     }
-  }
+}

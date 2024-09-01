@@ -91,10 +91,12 @@ const closeEditSpace = (evn) => {
     <!-- <pre class="">{{ singleCompany.name }}</pre> -->
     <div class="card">
         <Toast position="bottom-right" group="br" />
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+        <div class="d-flex create-space-btn-wrapper mb-3">
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
+                <p class="pi pi-angle-right"></p>
+                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
                 <p class="pi pi-angle-right"></p>
                 <p class="text">Company - {{ singleCompany?.name }}</p>
             </div>

@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { createSpace,getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
+const { createSpace, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
 const { isSpaceCreated } = storeToRefs(useCompanyStore());
 const {singleCompany} = defineProps(['singleCompany']);
 const spaceFormInputs = ref(true);
@@ -54,6 +54,8 @@ const handleCreateSpace = async () => {
       await createSpace(createSpaceData);
       if(isSpaceCreated.value === true){
           spaceFormInputs.value = false
+          spaceNameInput.value = null
+          spaceDescripInput.value = null
           showFinalMsg.value = true
       }else{
 

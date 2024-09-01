@@ -5,6 +5,11 @@ import accessPermission from "~/composables/usePermission";
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 import { useCompanyStore } from '~/store/company';
+import { useActiveCompanyStore } from '~/store/workCompany';
+const companies = useActiveCompanyStore();
+// companies.getCompany();
+const { companyList } = storeToRefs(useActiveCompanyStore());
+
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
 const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
@@ -186,7 +191,8 @@ watch(
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <div class="text-900 font-medium text-xl">{{hasUserCompany ? '1' : '0'}}</div>
+                        <!-- <pre>{{companyList.length}}</pre> -->
+                        <div class="text-900 font-medium text-xl">{{companyList ? companyList.length : '0'}}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
