@@ -65,7 +65,22 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
     },
     selectedCompany(state) {
       return state.compInLoclStrg
-    }
+    },
+    totalProjects(state) {
+      let allProjects = [];
+      if (state.getSpaces) {
+        state.getSpaces?.spaces.forEach(element => {
+          if (element?.projects?.length > 0) {
+            element.projects.forEach(ele => {
+              allProjects.push({ name: ele.name, id: ele.id, statuses: ele.statuses });
+            });
+          }
+        });
+      } else return [];
+      return allProjects;
+
+    },
+
   },
   actions: {
     async getCompany() {
