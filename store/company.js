@@ -68,7 +68,7 @@ export const useCompanyStore = defineStore('workStation', {
     actions: {
         async getCompanyList() {
             const token = useCookie('token');
-            const { data, pending, error } = await useAsyncData('companyList', () =>
+            const { data, pending, error } = await useAsyncData('compList', () =>
                 $fetch('https://pbe.singularitybd.net/api/v1/company/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
@@ -159,7 +159,6 @@ export const useCompanyStore = defineStore('workStation', {
                 userType.value = data?.value?.user_type;
                 const rolePermission = useCookie('rolePermission');
                 rolePermission.value = data?.value?.permissions;
-                
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
                 location.reload();
