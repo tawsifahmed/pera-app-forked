@@ -50,7 +50,6 @@ const lineData = ref({
 });
 const taskList = ref([]);
 
-
 // const lineOptions = ref({
 //     scales: {
 //         x: {
@@ -173,30 +172,28 @@ const applyDarkTheme = () => {
     };
 };
 
-
-const selectedProject = ref()
-const statuses = ref()
+const selectedProject = ref();
+const statuses = ref();
 
 const filterStatus = ref();
-const filterDueDate = ref()
+const filterDueDate = ref();
 const isCalendarSelected = ref(false);
 
 watch(selectedProject, (newVal) => {
-    statuses.value = [{ name: 'All', id: '' }, ...selectedProject.value?.statuses?.map(status => ({ name: status.name, id: status.id })) || []];
-});   
+    statuses.value = [{ name: 'All', id: '' }, ...(selectedProject.value?.statuses?.map((status) => ({ name: status.name, id: status.id })) || [])];
+});
 
-const selectedStatus = ref()
+const selectedStatus = ref();
 
 const projectId = ref();
 const sta = ref();
 const enD = ref();
 
-
 const filterTasks = async () => {
     projectId.value = selectedProject.value ? selectedProject.value.id : '';
     sta.value = selectedStatus.value ? selectedStatus.value.id : '';
     enD.value = filterDueDate.value;
-    console.log('sta', sta.value)
+    console.log('sta', sta.value);
     fetchTasks(projectId.value, sta.value, enD.value);
 };
 
@@ -220,7 +217,7 @@ const handleFilterReset = () => {
     filterDueDate.value = '';
     projectId.value = '';
     sta.value = '';
-    statuses.value = null
+    selectedStatus.value = '';
     isCalendarSelected.value = false;
     filterTasks();
 };
@@ -239,11 +236,11 @@ const dateFormatter = (data) => {
     const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
     const day = String(date.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
 };
 
 const fetchTasks = async (projectId = '', status = '', dueDate = '') => {
-    console.log('status', status)
+    console.log('status', status);
     // return
     try {
         const token = useCookie('token');
@@ -486,13 +483,13 @@ watch(
                 <pre>statuses =>{{ statuses }}</pre>
                 <pre>userI =>{{ projectId }}</pre>
                 <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
-                <div class="">
+                <div class="flex gap-2 align-items-center flex-wrap">
                     <h5>All Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
                         <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative">
+                        <div class="mb-2 relative w-full md:w-12rem">
                             <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
                             <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
@@ -597,8 +594,7 @@ watch(
 </template>
 
 <style scoped>
-
-.filter-container{
+.filter-container {
     padding: 0 10px;
 }
 .task-container {
