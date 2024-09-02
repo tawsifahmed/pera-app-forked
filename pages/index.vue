@@ -188,8 +188,10 @@ const applyDarkTheme = () => {
     };
 };
 
-const handleTaskClick = (data) => {
-    console.log('Task click: ', data);
+const handleTaskClick = async (task) => {
+    const companyId = await localStorage.getItem('userCompany');
+    console.log('Task click: ', task);
+    await navigateTo(`/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`);
 };
 // Date Formatter
 const dateFormatter = (data) => {
