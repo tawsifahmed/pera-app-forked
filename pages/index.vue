@@ -189,9 +189,9 @@ const applyDarkTheme = () => {
 };
 
 const handleTaskClick = async (task) => {
-    const companyId = await localStorage.getItem('userCompany');
+    const companyId = localStorage.getItem('userCompany');
     console.log('Task click: ', task);
-    await navigateTo(`/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`);
+    await navigateTo({ path: `/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`, query: { task_key: task.id } });
 };
 // Date Formatter
 const dateFormatter = (data) => {
@@ -429,16 +429,18 @@ watch(
                     <h5>All Tasks</h5>
                 </div>
                 <div class="task-container">
-                    <div v-if="task" v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
-                        <!-- <pre>{{ task }}</pre> -->
-                        <div class="title-group">
-                            <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
-                            <p class="title" style="font-weight: 600">{{ task?.name }}</p>
-                            <div class="" style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                            <p>{{ task?.project_name }}</p>
-                        </div>
-                        <div class="">
-                            <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                    <div v-if="taskList.length > 0" class="">
+                        <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
+                            <!-- <pre>{{ task }}</pre> -->
+                            <div class="title-group">
+                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                                <p class="title" style="font-weight: 600">{{ task?.name }}</p>
+                                <div class="" style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                                <p>{{ task?.project_name }}</p>
+                            </div>
+                            <div class="">
+                                <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                            </div>
                         </div>
                     </div>
                     <div v-else>

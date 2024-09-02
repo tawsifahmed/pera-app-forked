@@ -23,7 +23,8 @@ const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
 const singleTask = ref(null);
-
+const task_key = useRoute().query.task_key;
+console.log(task_key);
 const { projects } = useRoute().params;
 const visible = ref(false);
 
@@ -116,6 +117,9 @@ const updateTaskTable = () => {
 
 getSingleProject(projects);
 
+if (task_key) {
+    handleTaskDetailView({ key: task_key });
+}
 watchEffect(() => {
     loading.value = false;
 });
@@ -128,7 +132,7 @@ watchEffect(() => {
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
-                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
+                <NuxtLink to="/companies" class="text">Companies</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
                 <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
