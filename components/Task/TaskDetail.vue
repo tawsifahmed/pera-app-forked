@@ -22,6 +22,7 @@ const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetail
 const toast = useToast();
 const btnLoading = ref(false);
 const updateTaskP = ref(accessPermission('update_task'));
+const editBounceP = ref(accessPermission('edit_bounce'));
 
 const assignees = ref(null);
 assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
@@ -383,11 +384,11 @@ const handleShareTaskId = () => {
             >
                 {{ taskDetails.name }}
             </h5>
-           <div class="flex gap-1">
+            <div class="flex gap-1">
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
                 <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
                 <h5 class="m-0 ml-2">Activity</h5>
-           </div>
+            </div>
         </div>
         <div class="col-12 lg:col-7">
             <div>
@@ -395,7 +396,7 @@ const handleShareTaskId = () => {
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
                 <!-- <pre>{{singleTask?.data?.tagsObj}}</pre> -->
-               
+
                 <div class="task-wrapper card">
                     <div class="task-det">
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
@@ -610,7 +611,15 @@ const handleShareTaskId = () => {
                                             <span class="pi pi-flag"></span>
                                             <p class="text-nowrap">Bounce Status:</p>
                                         </div>
-                                        <Dropdown @change="changeBounceStatusData(vModelBncStatus)" v-model="vModelBncStatus" :options="bounceStatus" optionLabel="is_bounce" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown
+                                            @change="changeBounceStatusData(vModelBncStatus)"
+                                            :disabled="!editBounceP"
+                                            v-model="vModelBncStatus"
+                                            :options="bounceStatus"
+                                            optionLabel="is_bounce"
+                                            placeholder="Select Status"
+                                            style="width: 146.41px"
+                                        />
                                     </div>
                                 </div>
                             </TabPanel>
@@ -621,7 +630,6 @@ const handleShareTaskId = () => {
         </div>
         <div class="col-12 lg:col-5">
             <div>
-               
                 <div class="comment-wrapper card">
                     <div class="comments">
                         <div class="my-2 text-surface-800">
@@ -659,7 +667,7 @@ const handleShareTaskId = () => {
                             </template>
                         </Card>
                     </div>
-                    <form @submit.prevent="handleTaskComment" class="comment-add"> 
+                    <form @submit.prevent="handleTaskComment" class="comment-add">
                         <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative" v-if="commentFile">
                             <div>
                                 <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
@@ -668,10 +676,10 @@ const handleShareTaskId = () => {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div >
-                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15" class="border-gray-300 mb-1 comment-text" required/>
+                        <div>
+                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15" class="border-gray-300 mb-1 comment-text" required />
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
-                            
+
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
                             <Button class="ml-2" type="submit" icon="pi pi-plus" label="Add" :loading="btnLoading" />
                         </div>
@@ -962,9 +970,9 @@ input[type='file']::file-selector-button:hover {
     font-weight: 600;
 }
 
-@media(max-width: 991px){
+@media (max-width: 991px) {
     .comment-text {
-     height: 75px !important;
+        height: 75px !important;
     }
 }
 
@@ -1044,7 +1052,7 @@ input[type='file']::file-selector-button:hover {
     color: #2a78cc;
 }
 
-.file-up-btn{
+.file-up-btn {
     width: 65% !important;
 }
 </style>
