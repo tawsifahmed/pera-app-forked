@@ -324,7 +324,16 @@ watch(
 
         <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink to="/employees" class="flex justify-content-between mb-3">
+                <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Employees</span>
+                        <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-user text-purple-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
+                <NuxtLink v-else to="/" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Employees</span>
                         <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
@@ -337,9 +346,18 @@ watch(
                 <span class="text-500">responded</span> -->
             </div>
         </div>
-        <div v-if="readRole" class="col-12 lg:col-6 xl:col-3">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink to="/role" class="flex justify-content-between mb-3">
+                <NuxtLink  v-if="readRole" to="/role" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Roles</span>
+                        <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-user-edit text-red-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
+                <NuxtLink  v-else to="/" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
                         <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
@@ -352,9 +370,18 @@ watch(
                 <span class="text-500">responded</span> -->
             </div>
         </div>
-        <div v-if="readTags" class="col-12 lg:col-6 xl:col-3">
+        <div  class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink to="/tags" class="flex justify-content-between mb-3">
+                <NuxtLink v-if="readTags" to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Tags</span>
+                        <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-tags text-green-500 text-xl"></i>
+                    </div>
+                </NuxtLink>
+                <NuxtLink v-else to="/" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
                         <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
