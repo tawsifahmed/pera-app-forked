@@ -483,13 +483,13 @@ watch(
                 <pre>statuses =>{{ statuses }}</pre>
                 <pre>userI =>{{ projectId }}</pre>
                 <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
-                <div class="flex gap-2 align-items-center">
+                <div class="flex gap-2 align-items-center flex-wrap">
                     <h5>All Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
                         <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative">
+                        <div class="mb-2 relative w-full md:w-12rem">
                             <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
                             <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
