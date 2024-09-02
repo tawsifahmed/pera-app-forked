@@ -255,7 +255,7 @@ const handleChange = (event, name) => {
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{tasks}}</pre> -->
+        <!-- <pre>{{modStatusList}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Filter Status" class="w-full md:w-17rem mb-2" />

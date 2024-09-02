@@ -80,6 +80,7 @@ const itemClick = (event, item) => {
     const { overlayMenuActive, staticMenuMobileActive } = layoutState;
 
     if ((item.to || item.url) && (staticMenuMobileActive.value || overlayMenuActive.value)) {
+        
         onMenuToggle();
     }
 
@@ -90,6 +91,14 @@ const itemClick = (event, item) => {
     const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
     console.log(foundItemKey);
     setActiveMenuItem(foundItemKey);
+};
+
+const itemClickSubMenu = (event, item, index) => {
+    console.log('clicked itemPPP', index);
+    const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
+    console.log(foundItemKey);
+    setActiveMenuItem(foundItemKey);
+    isActiveMenu.value = true;
 };
 
 const clickSpaceMenu = (event) => {
@@ -111,6 +120,7 @@ const toggle = (event) => {
 </script>
 
 <template>
+    <!-- <pre>activeMenu=>{{isActiveMenu}}</pre> -->
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
@@ -127,12 +137,12 @@ const toggle = (event) => {
         <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
-                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text" v-tooltip.right="{value: `${item.label}`}">
-                    {{ item.label.length > 18 ? item.label.slice(0, 16) + '...' : item.label }}
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{value: `${item.label}`}">
+                    {{ item.label.length > 13 ? item.label.slice(0, 13) + '...' : item.label }}
                 </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
-                <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+                <i @click="itemClickSubMenu($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject v-if="createProjectP" v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
                 <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             </div>
@@ -199,5 +209,9 @@ const toggle = (event) => {
 .layout-menu ul a {
     padding: 0.65rem 0.75rem;
     border-radius: 6px;
+}
+
+.space-items{
+    text-wrap: nowrap;
 }
 </style>
