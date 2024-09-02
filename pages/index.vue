@@ -50,22 +50,7 @@ const lineData = ref({
 });
 const taskList = ref([]);
 
-const fetchTasks = async () => {
-    try {
-        const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        });
-        taskList.value = data.value.data;
-        console.log('Task list: ', data.value.data);
-    } catch (e) {
-        console.log(e);
-    }
-};
-fetchTasks();
+
 // const lineOptions = ref({
 //     scales: {
 //         x: {
@@ -188,6 +173,58 @@ const applyDarkTheme = () => {
     };
 };
 
+
+const selectedProject = ref()
+const statuses = ref()
+
+const filterStatus = ref();
+const filterDueDate = ref()
+const isCalendarSelected = ref(false);
+
+watch(selectedProject, (newVal) => {
+    statuses.value = [{ name: 'All', id: '' }, ...selectedProject.value?.statuses?.map(status => ({ name: status.name, id: status.id })) || []];
+});   
+
+const selectedStatus = ref()
+
+const projectId = ref();
+const sta = ref();
+const enD = ref();
+
+
+const filterTasks = async () => {
+    projectId.value = selectedProject.value ? selectedProject.value.id : '';
+    sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+    enD.value = filterDueDate.value;
+    console.log('sta', sta.value)
+    fetchTasks(projectId.value, sta.value, enD.value);
+};
+
+const selectFilterDate = (newDate) => {
+    isCalendarSelected.value = true;
+    const date = new Date(newDate);
+    filterDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    filterTasks();
+};
+
+const handleDateDelete = () => {
+    isCalendarSelected.value = false;
+    filterDueDate.value = '';
+    enD.value = '';
+    filterTasks();
+};
+
+const handleFilterReset = () => {
+    selectedProject.value = '';
+    filterStatus.value = '';
+    filterDueDate.value = '';
+    projectId.value = '';
+    sta.value = '';
+    statuses.value = null
+    isCalendarSelected.value = false;
+    filterTasks();
+};
+
 const handleTaskClick = async (task) => {
     const companyId = localStorage.getItem('userCompany');
     console.log('Task click: ', task);
@@ -204,6 +241,25 @@ const dateFormatter = (data) => {
 
     return `${year}-${month}-${day}`;
 };
+
+const fetchTasks = async (projectId = '', status = '', dueDate = '') => {
+    console.log('status', status)
+    // return
+    try {
+        const token = useCookie('token');
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+        taskList.value = data.value.data;
+        console.log('Task list: ', data.value.data);
+    } catch (e) {
+        console.log(e);
+    }
+};
+fetchTasks();
 
 watch(
     isDarkTheme,
@@ -426,16 +482,21 @@ watch(
          -->
         <div class="col-12 xl:col-6">
             <div class="card h-full">
+                <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
+                <pre>statuses =>{{ statuses }}</pre>
+                <pre>userI =>{{ projectId }}</pre>
+                <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
                 <div class="">
                     <h5>All Tasks</h5>
                     <!-- Filter -->
-                    <div class="flex gap-2 flex-wrap">
-                        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-15rem mb-2" />
-                        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="totalProjects" optionLabel="name" placeholder="Status" class="w-full md:w-15rem mb-2" />
+                    <div class="flex gap-2 flex-wrap justify-content-end filter-container">
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
                         <div class="mb-2 relative">
-                            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Due Date" class="w-full md:w-15rem" />
-                            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                            <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
+                        <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
                     </div>
                 </div>
                 <div class="task-container">
@@ -536,6 +597,10 @@ watch(
 </template>
 
 <style scoped>
+
+.filter-container{
+    padding: 0 10px;
+}
 .task-container {
     max-height: 25rem;
     overflow-y: auto;
@@ -572,5 +637,27 @@ watch(
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.pi-times {
+    top: 30%;
+    right: 3%;
+    color: gray;
+}
+
+.pi-times:hover {
+    color: rgb(27, 27, 27);
+    font-weight: 500;
+    animation: hover-animation 0.3s ease-in-out forwards;
+}
+
+@keyframes hover-animation {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
 }
 </style>
