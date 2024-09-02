@@ -8,7 +8,7 @@ import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
 // companies.getCompany();
-const { companyList } = storeToRefs(useActiveCompanyStore());
+const { companyList, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
 const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
@@ -219,6 +219,7 @@ watch(
 </script>
 
 <template>
+    <!-- <pre>{{ totalProjects }}</pre> -->
     <div class="grid">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
@@ -427,6 +428,15 @@ watch(
             <div class="card h-full">
                 <div class="">
                     <h5>All Tasks</h5>
+                    <!-- Filter -->
+                    <div class="flex gap-2 flex-wrap">
+                        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-15rem mb-2" />
+                        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="totalProjects" optionLabel="name" placeholder="Status" class="w-full md:w-15rem mb-2" />
+                        <div class="mb-2 relative">
+                            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Due Date" class="w-full md:w-15rem" />
+                            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                        </div>
+                    </div>
                 </div>
                 <div class="task-container">
                     <div v-if="taskList.length > 0" class="">
@@ -434,7 +444,7 @@ watch(
                             <!-- <pre>{{ task }}</pre> -->
                             <div class="title-group">
                                 <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
-                                <p class="title" style="font-weight: 600">{{ task?.name }}</p>
+                                <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
                                 <div class="" style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
                                 <p>{{ task?.project_name }}</p>
                             </div>
@@ -554,10 +564,8 @@ watch(
     background: #000;
 }
 .title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: auto;
+    margin: auto 0;
+    max-width: 300px;
 }
 .title-group {
     display: flex;
