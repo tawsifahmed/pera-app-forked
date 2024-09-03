@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
@@ -555,7 +556,7 @@ const handleChange = (event, name) => {
     </div>
 </template>
 
-<style>
+<style lang="scss">
 .sub-card {
     background-color: #fff;
     box-shadow: 0px 3px 8px #e2e2e2;

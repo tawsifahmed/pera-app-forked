@@ -4,6 +4,8 @@ import { useClockStore } from '~/store/clock';
 import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
 import accessPermission from '~/composables/usePermission';
+import Editor from 'primevue/editor';
+
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
@@ -72,7 +74,14 @@ const bounceStatus = ref([{ is_bounce: 'No' }, { is_bounce: 'Yes' }]);
 
 const vModelBncStatus = ref();
 
-const description = ref(taskDetails.value?.description);
+const description = ref(taskDetails.value?.description || ' ');
+
+watch(description, (newValue) => {
+    if (newValue.length === 0) {
+        description.value = ' ';
+    }
+});
+
 const taskCommentInput = ref(null);
 const selectedfile = ref();
 
@@ -461,7 +470,9 @@ const handleShareTaskId = () => {
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
-                                <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" />
+                                <!-- <pre>description {{ description.length}}</pre> -->
+                                <!-- <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" /> -->
+                                <Editor v-if="description" v-model="description" editorStyle="height: 200px"/>
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -642,7 +653,7 @@ const handleShareTaskId = () => {
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
-                                <li v-html="act.title" style="font-size: smaller"></li>
+                                <li v-html="act.title" style="font-size: smaller !important"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
