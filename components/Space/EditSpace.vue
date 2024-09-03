@@ -33,7 +33,7 @@ const loading = ref(false);
 
 const handleEditSpace = async () => {
         loading.value = true
-        if(spaceNameInput.value === null || spaceDescripInput.value === null || spaceAvatarPreview.value === null){
+        if(spaceNameInput.value === null || spaceAvatarPreview.value === null){
             errorHandler.value = true
             loading.value = false
             return

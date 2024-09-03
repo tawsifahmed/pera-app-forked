@@ -99,7 +99,7 @@ const transformKeys = (list) => {
 const loading = ref(false);
 const handleCreateProject = async () => {
     loading.value = true;
-    if(projectNameInput.value === null || projectDescriptionInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null){
+    if(projectNameInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null){
         errorHandler.value = true
         loading.value = false;
     }else{

@@ -18,6 +18,8 @@ const { userCompany } = storeToRefs(useAuthStore());
 const readEmployee = ref(accessPermission('read_user'));
 const readRole = ref(accessPermission('read_role'));
 const readTags = ref(accessPermission('read_tags'));
+const readTask = ref(accessPermission('read_task'));
+
 const createCompanyP = ref(accessPermission('create_company'));
 
 definePageMeta({
@@ -282,7 +284,8 @@ watch(
                         <!-- <pre>{{companyList.length}}</pre> -->
                         <div class="text-900 font-medium text-xl">{{ companyList ? companyList.length : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -329,16 +332,18 @@ watch(
                         <span class="block text-500 font-medium mb-3">Employees</span>
                         <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <NuxtLink v-else to="/" class="flex justify-content-between mb-3">
+                <NuxtLink v-else class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Employees</span>
-                        <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
+                        <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -348,21 +353,23 @@ watch(
         </div>
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <NuxtLink  v-if="readRole" to="/role" class="flex justify-content-between mb-3">
+                <NuxtLink v-if="readRole" to="/role" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
                         <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <NuxtLink  v-else to="/" class="flex justify-content-between mb-3">
+                <NuxtLink v-else class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
-                        <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
+                        <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -370,23 +377,25 @@ watch(
                 <span class="text-500">responded</span> -->
             </div>
         </div>
-        <div  class="col-12 lg:col-6 xl:col-3">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readTags" to="/tags" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
                         <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <NuxtLink v-else to="/" class="flex justify-content-between mb-3">
+                <NuxtLink v-else class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
-                        <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
+                        <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -401,110 +410,111 @@ watch(
                 <DataTable :value="products" :rows="5" :paginator="true" responsiveLayout="scroll">
                     <Column style="width: 15%">
                         <template #header> Image </template>
-                        <template #body="slotProps">
+<template #body="slotProps">
                             <img :src="'/demo/images/product/' + slotProps.data.image" :alt="slotProps.data.image" width="50" class="shadow-2" />
                         </template>
-                    </Column>
-                    <Column field="name" header="Name" :sortable="true" style="width: 35%"></Column>
-                    <Column field="price" header="Price" :sortable="true" style="width: 35%">
-                        <template #body="slotProps">
+</Column>
+<Column field="name" header="Name" :sortable="true" style="width: 35%"></Column>
+<Column field="price" header="Price" :sortable="true" style="width: 35%">
+    <template #body="slotProps">
                             {{ formatCurrency(slotProps.data.price) }}
                         </template>
-                    </Column>
-                    <Column style="width: 15%">
-                        <template #header> View </template>
-                        <template #body>
+</Column>
+<Column style="width: 15%">
+    <template #header> View </template>
+    <template #body>
                             <Button icon="pi pi-search" type="button" class="p-button-text"></Button>
                         </template>
-                    </Column>
-                </DataTable>
-            </div>
-            <div class="card">
-                <div class="flex justify-content-between align-items-center mb-5">
-                    <h5>Best Selling Products</h5>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu2.toggle($event)"></Button>
-                        <Menu ref="menu2" :popup="true" :model="items"></Menu>
-                    </div>
-                </div>
-                <ul class="list-none p-0 m-0">
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Space T-Shirt</span>
-                            <div class="mt-1 text-600">Clothing</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-orange-500 h-full" style="width: 50%"></div>
-                            </div>
-                            <span class="text-orange-500 ml-3 font-medium">%50</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Portal Sticker</span>
-                            <div class="mt-1 text-600">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-cyan-500 h-full" style="width: 16%"></div>
-                            </div>
-                            <span class="text-cyan-500 ml-3 font-medium">%16</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Supernova Sticker</span>
-                            <div class="mt-1 text-600">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-pink-500 h-full" style="width: 67%"></div>
-                            </div>
-                            <span class="text-pink-500 ml-3 font-medium">%67</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Wonders Notebook</span>
-                            <div class="mt-1 text-600">Office</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-green-500 h-full" style="width: 35%"></div>
-                            </div>
-                            <span class="text-green-500 ml-3 font-medium">%35</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Mat Black Case</span>
-                            <div class="mt-1 text-600">Accessories</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-purple-500 h-full" style="width: 75%"></div>
-                            </div>
-                            <span class="text-purple-500 ml-3 font-medium">%75</span>
-                        </div>
-                    </li>
-                    <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
-                        <div>
-                            <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Robots T-Shirt</span>
-                            <div class="mt-1 text-600">Clothing</div>
-                        </div>
-                        <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
-                            <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
-                                <div class="bg-teal-500 h-full" style="width: 40%"></div>
-                            </div>
-                            <span class="text-teal-500 ml-3 font-medium">%40</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+</Column>
+</DataTable>
+</div>
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-5">
+        <h5>Best Selling Products</h5>
+        <div>
+            <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded"
+                @click="$refs.menu2.toggle($event)"></Button>
+            <Menu ref="menu2" :popup="true" :model="items"></Menu>
         </div>
-         -->
-        <div class="col-12 xl:col-6">
+    </div>
+    <ul class="list-none p-0 m-0">
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Space T-Shirt</span>
+                <div class="mt-1 text-600">Clothing</div>
+            </div>
+            <div class="mt-2 md:mt-0 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-orange-500 h-full" style="width: 50%"></div>
+                </div>
+                <span class="text-orange-500 ml-3 font-medium">%50</span>
+            </div>
+        </li>
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Portal Sticker</span>
+                <div class="mt-1 text-600">Accessories</div>
+            </div>
+            <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-cyan-500 h-full" style="width: 16%"></div>
+                </div>
+                <span class="text-cyan-500 ml-3 font-medium">%16</span>
+            </div>
+        </li>
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Supernova Sticker</span>
+                <div class="mt-1 text-600">Accessories</div>
+            </div>
+            <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-pink-500 h-full" style="width: 67%"></div>
+                </div>
+                <span class="text-pink-500 ml-3 font-medium">%67</span>
+            </div>
+        </li>
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Wonders Notebook</span>
+                <div class="mt-1 text-600">Office</div>
+            </div>
+            <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-green-500 h-full" style="width: 35%"></div>
+                </div>
+                <span class="text-green-500 ml-3 font-medium">%35</span>
+            </div>
+        </li>
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Mat Black Case</span>
+                <div class="mt-1 text-600">Accessories</div>
+            </div>
+            <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-purple-500 h-full" style="width: 75%"></div>
+                </div>
+                <span class="text-purple-500 ml-3 font-medium">%75</span>
+            </div>
+        </li>
+        <li class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4">
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0">Robots T-Shirt</span>
+                <div class="mt-1 text-600">Clothing</div>
+            </div>
+            <div class="mt-2 md:mt-0 ml-0 md:ml-8 flex align-items-center">
+                <div class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem" style="height: 8px">
+                    <div class="bg-teal-500 h-full" style="width: 40%"></div>
+                </div>
+                <span class="text-teal-500 ml-3 font-medium">%40</span>
+            </div>
+        </li>
+    </ul>
+</div>
+</div>
+-->
+        <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
                 <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
                 <pre>statuses =>{{ statuses }}</pre>
@@ -514,23 +524,32 @@ watch(
                     <h5>All Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
+                            optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses"
+                            :disabled="!selectedProject" optionLabel="name" placeholder="Select Status"
+                            class="w-full md:w-12rem mb-2" />
                         <div class="mb-2 relative w-full md:w-12rem">
-                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
-                            <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate"
+                                placeholder="Select Date" class="w-full md:w-12rem" />
+                            <p v-if="isCalendarSelected" @click="handleDateDelete"
+                                class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
                         <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
                     </div>
                 </div>
                 <div class="task-container">
                     <div v-if="taskList.length > 0" class="">
-                        <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)" class="task-card">
+                        <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)"
+                            class="task-card">
                             <!-- <pre>{{ task }}</pre> -->
                             <div class="title-group">
-                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`"
+                                    :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
-                                <div class="" style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                                <div class=""
+                                    style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px">
+                                </div>
                                 <p>{{ task?.project_name }}</p>
                             </div>
                             <div class="">
@@ -624,11 +643,13 @@ watch(
 .filter-container {
     padding: 0 10px;
 }
+
 .task-container {
     max-height: 25rem;
     overflow-y: auto;
     padding: 10px;
 }
+
 .task-card {
     border-radius: 5px;
     padding: 10px 10px;
@@ -642,19 +663,23 @@ watch(
     width: 100%;
     flex-wrap: wrap;
 }
+
 .task-card:hover {
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
+
 .status {
     height: 12px;
     width: 12px;
     border-radius: 25px;
     background: #000;
 }
+
 .title {
     margin: auto 0;
     max-width: 300px;
 }
+
 .title-group {
     display: flex;
     align-items: center;
@@ -682,5 +707,9 @@ watch(
     100% {
         transform: scale(1.1);
     }
+}
+
+.role-hide {
+    visibility: hidden;
 }
 </style>

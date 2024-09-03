@@ -434,11 +434,11 @@ const handleShareTaskId = () => {
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
-                                        <div class="clock-wrapper">
+                                        <div class="clock-wrapper relative">
                                             <div :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
                                                 <i :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
-                                            <div class="text-sm">{{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}</div>
+                                            <div class="text-sm absolute">{{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}</div>
                                         </div>
 
                                         <div>
@@ -1020,6 +1020,9 @@ input[type='file']::file-selector-button:hover {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     cursor: pointer;
     transition: all 0.1s ease-in-out;
+    position: absolute;
+    right: 7px;
+
 }
 
 .clock-btn:hover {
@@ -1029,14 +1032,12 @@ input[type='file']::file-selector-button:hover {
 .stop {
     color: white;
     font-size: 8px;
-    margin-top: 1px;
-    margin-left: 1px;
 }
 
 .start {
     color: white;
     font-size: 10px;
-    margin-left: 2px;
+    margin-left: 1px;
 }
 
 .attch-w {

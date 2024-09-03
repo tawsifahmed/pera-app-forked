@@ -127,7 +127,7 @@ const toggle = (event) => {
 
             <div v-if="item.option == 'space_option'">
                 <div class="flex align-items-center">
-                    <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                    <Button v-tooltip.top="{ value: 'Manage Space' }" type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" @click="clickSpaceMenu(items)" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
                     <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
