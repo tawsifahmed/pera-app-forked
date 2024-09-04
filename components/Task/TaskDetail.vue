@@ -31,7 +31,7 @@ assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name:
 
 const tags = ref(taskDetails.value?.tags?.map((obj) => ({ id: obj.id, name: obj.name })));
 
-const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US') : null);
+const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null);
 
 const status = ref();
 const timeTrack = ref('00:00:00');
@@ -1096,5 +1096,9 @@ input[type='file']::file-selector-button:hover {
 
 a{
     cursor: pointer !important;
+}
+
+.ql-editing{
+    left: 0px !important;
 }
 </style>

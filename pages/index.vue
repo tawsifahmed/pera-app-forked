@@ -521,7 +521,7 @@ watch(
                 <pre>userI =>{{ projectId }}</pre>
                 <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
                 <div class="flex gap-2 align-items-center flex-wrap">
-                    <h5>All Tasks</h5>
+                    <h5 class="mb-2">Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
