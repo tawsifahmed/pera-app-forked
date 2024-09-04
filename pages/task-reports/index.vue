@@ -1,4 +1,6 @@
 <script setup>
+import accessPermission from '~/composables/usePermission';
+const readTask = ref(accessPermission('read_task'));
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
@@ -56,7 +58,7 @@ const handleChange = (field, event) => {
 };
 </script>
 <template>
-    <div class="card">
+    <div class="card" v-if="readTask">
         <div class="d-flex mr-2">
             <h5 class="mb-1">Task Summery Reports</h5>
         </div>
