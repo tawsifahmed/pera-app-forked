@@ -159,7 +159,7 @@ const handleCreateCompanyModal = () => {
                 <div class="comp-switch"  v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
                     <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList"  optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
                 </div>
-                <Button type="button" icon="pi pi-ellipsis-v" class="p-button-sm w-2rem h-2rem ml-1" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                <Button v-tooltip.right="{ value: 'Manage Company' }" type="button" icon="pi pi-ellipsis-v" class="p-button-sm w-2rem h-2rem ml-1" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                 <Menu ref="menu1" id="overlay_menu" @click="clickCompanyMenu(cItems)" :model="cItems" :popup="true" />
            </div>
         </div>

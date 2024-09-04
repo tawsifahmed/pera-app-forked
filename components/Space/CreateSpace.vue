@@ -31,11 +31,12 @@ const handleCreateSpace = async () => {
         loading.value = false;
         return;
     }
-    if (spaceDescripInput.value === null) {
-        spaceDescriptionError.value = true;
-        loading.value = false;
-        return;
-    } else {
+    // if (spaceDescripInput.value === null) {
+    //     spaceDescriptionError.value = true;
+    //     loading.value = false;
+    //     return;
+    // } 
+    else {
         const createSpaceData = {
             name: spaceNameInput.value,
             description: spaceDescripInput.value,

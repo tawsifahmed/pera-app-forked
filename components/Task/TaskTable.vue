@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
@@ -313,7 +314,7 @@ const handleChange = (event, name) => {
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP" optionLabel="name">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
                                     <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
@@ -367,7 +368,7 @@ const handleChange = (event, name) => {
                 <div class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" optionLabel="name">
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP" optionLabel="name">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
                                     <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{ slotProps.value.name }}</div>
@@ -555,7 +556,7 @@ const handleChange = (event, name) => {
     </div>
 </template>
 
-<style>
+<style lang="scss">
 .sub-card {
     background-color: #fff;
     box-shadow: 0px 3px 8px #e2e2e2;
