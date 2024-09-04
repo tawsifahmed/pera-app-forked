@@ -9,32 +9,19 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 
-
 const {refProjectId, singleSpace} = defineProps(['singleSpace', 'refProjectId']);
 
 const emit = defineEmits(['closeEditProject']);
 
 const spaceFormInputs = ref(true);
-const showFinalMsg = ref(false);
+
 const errorHandler = ref(false);
-
-const progress = ref(12.5);
-
-const dynamicDiv = ref(null);
-
-const spaceAvatarPreview = ref(null);
-
 
 const taskStatusName = ref('');
 
 const taskStatusList = ref(refProjectId?.statuses);
 
 const dummyStatusList = ref([...taskStatusList.value]);
-
-console.log('dummyStatusList', dummyStatusList.value);
-
-// taskStatusList.value = refProjectId?.statuses;
-
 
 const colorHEX = ref('6466f1');
 
@@ -45,7 +32,6 @@ const addTaskSTatusError= ref(false);
 const projectNameInput = ref(refProjectId?.name);
 
 const projectDescriptionInput = ref(refProjectId?.description);
-
 
 const addTaskStatus = () => {
   taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
@@ -67,8 +53,6 @@ const addTaskStatus = () => {
   }
 };
 
-console.log('taskStatusList', taskStatusList.value);
-
 const handleDeleteTask = (index) => {
   dummyStatusList.value.splice(index, 1);
   if (dummyStatusList.value.length == 0){
@@ -77,7 +61,6 @@ const handleDeleteTask = (index) => {
 };
 
 const selectedCloseStatus = ref(null);
-
 selectedCloseStatus.value = refProjectId?.statuses.find(status => status.is_closed_status === 1);
 
 watch(selectedCloseStatus, (newStatus) => {
@@ -115,7 +98,6 @@ const handleCreateProject = async () => {
         });
 
         const transformedTaskStatusList = transformKeys(dummyStatusList.value);
-
         
         const createProjectData = {
             'id': refProjectId?.id,
@@ -124,7 +106,6 @@ const handleCreateProject = async () => {
             'space_id': refProjectId?.space_id,
             'statuses': transformedTaskStatusList,
         }
-
       
         await editProject(createProjectData);
         if(isProjectEdited.value === true){
@@ -133,14 +114,13 @@ const handleCreateProject = async () => {
             toast.add({ severity: 'success', summary: 'Project creation', detail: 'Project updated successfully!', group: 'br', life: 3000 });
         }else{
             loading.value = false;
-            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Project update Failed!', group: 'br', life: 3000 });
+            toast.add({ severity: 'error', summary: 'Project creation', detail: 'Failed to update project!', group: 'br', life: 3000 });
         }
     }
 }
 
 const hideDialog = () => {
   emit('closeEditProject', false);
-  
 }
 
 onMounted(() => {
