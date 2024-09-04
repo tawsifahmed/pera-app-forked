@@ -6,10 +6,13 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
+const toast = useToast();
 
 const startDate = ref('');
 const endDate = ref('');
 const loading = ref(false);
+const loading1 = ref(false);
+const previewData = ref(null);
 
 // Date Formatter
 const dateFormatter = (data) => {
@@ -23,9 +26,33 @@ const dateFormatter = (data) => {
     return `${year}-${month}-${day}`;
 };
 
-const handleReportDownload = async () => {
+const handleGenerate = async () => {
+    if (startDate.value == '' || endDate.value == '') {
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Start Date and End Date', group: 'br', life: 3000 });
+    }
     const token = useCookie('token');
     loading.value = true;
+    const formattedStartDate = dateFormatter(startDate.value);
+    const formattedEndDate = dateFormatter(endDate.value);
+
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-view?start_date=${startDate.value}&end_date=${endDate.value}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (data.value.code == 200) {
+        previewData.value = data.value.data;
+        console.log('Report Value', data.value.data);
+        return (loading.value = false);
+    } else {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+    }
+};
+const handleReportDownload = async () => {
+    const token = useCookie('token');
+    loading1.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
@@ -40,10 +67,10 @@ const handleReportDownload = async () => {
         link.href = data.value.download_path;
         link.target = '_blank';
         link.click();
-        loading.value = false;
+        loading1.value = false;
         return;
     } else {
-        loading.value = false;
+        loading1.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
 };
@@ -77,9 +104,25 @@ const handleChange = (field, event) => {
             </template>
 
             <template #end>
-                <Button @click="handleReportDownload" class="w-full" label="Download" :loading="loading" />
+                <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
             </template>
         </Toolbar>
+    </div>
+    <div v-if="previewData" class="card">
+        <div>
+            <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                <h5 class="m-0">Preview</h5>
+                <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+            </div>
+            <DataTable :value="previewData" tableStyle="min-width: 50rem">
+                <template #empty> <p class="text-center">No Data found...</p> </template>
+                <Column field="name" header="Name"></Column>
+                <Column field="total_tasks_count" header="Total Task"></Column>
+                <Column field="completed_count" header="Completed"></Column>
+                <Column field="overdue_count" header="Over Due"></Column>
+                <Column field="bounce_count" header="Bounce"></Column>
+            </DataTable>
+        </div>
     </div>
 </template>
 
