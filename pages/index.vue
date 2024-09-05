@@ -325,7 +325,7 @@ watch(
             </div>
         </div> -->
 
-        <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
                     <div>
@@ -520,7 +520,7 @@ watch(
                 <pre>statuses =>{{ statuses }}</pre>
                 <pre>userI =>{{ projectId }}</pre>
                 <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
-                <div class="flex gap-2 align-items-center flex-wrap">
+                <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px;">
                     <h5 class="mb-2">Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
