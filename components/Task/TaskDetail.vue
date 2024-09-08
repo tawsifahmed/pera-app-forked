@@ -483,7 +483,7 @@ const handleShareTaskId = () => {
                                 <!-- <pre>description {{ description.length}}</pre> -->
                                 <!-- <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" /> -->
                                 <!-- <Editor v-if="description" v-model="description" editorStyle="height: 200px"/> -->
-                                <Editor v-model="description" editorStyle="height: 200px" :readonly="!updateTaskP">
+                                <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
                                     <template v-slot:toolbar>
                                         <span class="ql-formats flex justify-content-end">
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
