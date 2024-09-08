@@ -1,39 +1,10 @@
-<template>
-    <div>
-        <div class="field">
-            <label for="company">Name</label>
-            <InputText v-model="name" class="w-full" />
-        </div>
 
-        <div class="field">
-            <label for="email">Email address</label>
-            <InputText type="email" v-model="email" class="w-full" />
-        </div>
-        <div class="field">
-            <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="number" class="w-full" />
-        </div>
-        <div class="field">
-            <label for="company">Address</label>
-            <Textarea v-model="address" rows="3" cols="20" class="w-full" />
-        </div>
-        <!-- <div class="field">
-            <label for="company">Password</label>
-            <InputText type="password" v-model="password" class="w-full" />
-        </div> -->
-
-        <!-- <pre>{{user_type}}</pre> -->
-        <div class="field flex flex-column">
-            <label>Role</label>
-            <Dropdown v-model="user_type" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
-        </div>
-        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
-        <div class="create-btn-wrappe">
-            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
-        </div>
-    </div>
-</template>
 <script setup>
+import { storeToRefs } from 'pinia';
+
+import { useCompanyStore } from '~/store/company';
+const usersListStore = useCompanyStore();
+const {getTaskAssignModalData } = useCompanyStore();
 const url = useRuntimeConfig();
 const props = defineProps({
     param: {
@@ -45,17 +16,17 @@ const toast = useToast();
 
 const id = ref(props.param.id);
 
-const name = ref(props.param.name);
+const editName = ref(props.param.editName);
 
-const email = ref(props.param.email);
+const editDescription = ref(props.param.editDescription);
 
-const phone = ref(props.param.phone);
+const editLineManager = ref(props.param.editLineManager);
 
-const address = ref(props.param.address);
+const editTeamLead = ref(props.param.editTeamLead);
 
-const rolesLists = ref(props.param.rolesLists);
+const editMembers = ref(props.param.editMembers);
 
-const user_type = ref(props.param.user_type);
+const usersLists = ref(usersListStore.users);
 // user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
 const errorHandler = ref(false);
@@ -68,12 +39,13 @@ const loading = ref(false);
 
 const handleSubmitData = async () => {
     loading.value = true;
-    if (name.value === '' || email.value === '') {
+    if (editName.value === '' || editTeamLead.value.length === 0 || editLineManager.value.length === 0 || editMembers.value.length === 0) {
         errorHandler.value = true;
         loading.value = false;
         return;
     } else {
         errorHandler.value = false;
+        return; // work will be done on the next day 
         if (!errorHandler.value) {
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`${url.public.apiUrl}/users/update/${id.value}`, {
@@ -110,8 +82,46 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(async() => {
+    await getTaskAssignModalData();
+    usersLists.value = usersListStore.users;
+});
 </script>
 
+<template>
+    <div>
+        <div class="field">
+            <label for="company">Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <InputText v-model="editName" class="w-full" />
+        </div>
+
+        <div class="field flex flex-column">
+            <label for="email">Description <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <Textarea id="description" class="border-gray-300" v-model="editDescription" rows="3" cols="20" :invalid="teamDescriptionError" />        
+        </div>
+        <div class="field flex flex-column">
+            <!-- <pre>rol {{rolesLists}}</pre> -->
+            <label>Team Lead</label>
+            <!-- {{ selectedTeamLead.id }} -->
+            <Dropdown v-model="editLineManager" :options="usersLists" optionLabel="name" placeholder="Select Team Lead" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
+        <div class="field flex flex-column">
+            <!-- <pre>rol {{rolesLists}}</pre> -->
+            <label>Line Manager</label>
+            <Dropdown v-model="editTeamLead" :options="usersLists" optionLabel="name" placeholder="Select Line Manager" checkmark :highlightOnSelect="false" class="w-full" />
+        </div>
+        <div class="field">
+            <!-- <pre>{{usersLists}}</pre> -->
+            <label>Team Members <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <MultiSelect display="chip" v-model="editMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Team Members" class="w-full" />
+        </div>
+        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
+        <div class="create-btn-wrappe">
+            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" :loading="loading" />
+        </div>
+    </div>
+</template>
 <style lang="scss" scoped>
 .text-danger {
     color: red;

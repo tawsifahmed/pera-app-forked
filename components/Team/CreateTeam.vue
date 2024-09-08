@@ -84,7 +84,8 @@ const handleSubmitData = async () => {
 
         <div class="field flex flex-column">
             <label for="email">Description <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Textarea id="description" class="border-gray-300" v-model="teamDescripInput" rows="3" cols="20" :invalid="teamDescriptionError" />        </div>
+            <Textarea id="description" class="border-gray-300" v-model="teamDescripInput" rows="3" cols="20" :invalid="teamDescriptionError" />        
+        </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
             <label>Team Lead</label>

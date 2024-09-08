@@ -512,8 +512,7 @@ watch(
         </li>
     </ul>
 </div>
-</div>
--->
+</div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
                 <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
@@ -544,8 +543,7 @@ watch(
                             class="task-card">
                             <!-- <pre>{{ task }}</pre> -->
                             <div class="title-group">
-                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`"
-                                    :style="`background-color: ${task?.status_color};`"></div>
+                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
                                 <div class=""
                                     style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px">

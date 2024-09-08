@@ -79,10 +79,10 @@ const handleCreateCompanyModal = async () => {
 
 const selectedRole = ref([]);
 
-const editTeam = (data) => {
+const editTeam =  (data) => {
     console.log('editTeamdata', data);
-    visibleEditTeam.value = true;
     id.value = data.id;
+    visibleEditTeam.value = true;
     editName.value = data.name;
     editDescription.value = data.description;
     editLineManager.value = {
@@ -96,17 +96,7 @@ const editTeam = (data) => {
     };
     console.log('editTeamLead', editTeamLead.value);
     editMembers.value = data.children.children.children.map((item) => ({ id: item.data.id, name: item.data.name }));
-        
     console.log('editMembers', editMembers.value);
-    
-    
-
-    return
-    rolesLists.value.map((item) => {
-        if (item.name === data.user_type) {
-            user_type.value = item;
-        }
-    });
 };
 
 const deleteEmployee = (key) => {
@@ -134,7 +124,7 @@ const confirmDeleteTeam = async () => {
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
+    const { data, pending, error } = await useAsyncData('getTeams', () =>
         $fetch(`${url.public.apiUrl}/teams/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -146,21 +136,22 @@ const init = async () => {
     }
 };
 
-const getRoleList = async () => {
-    const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch(`${url.public.apiUrl}/roles/list`, {
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        })
-    );
-    if (data.value?.data?.length > 0) {
-        // console.log('data', data.value?.data);
-        rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        // console.log('rolesLists', rolesLists.value);
-    }
-};
+
+// const getRoleList = async () => {
+//     const token = useCookie('token');
+//     const { data, pending, error } = await useAsyncData('roleLiist', () =>
+//         $fetch(`${url.public.apiUrl}/roles/list`, {
+//             headers: {
+//                 Authorization: `Bearer ${token.value}`
+//             }
+//         })
+//     );
+//     if (data.value?.data?.length > 0) {
+//         // console.log('data', data.value?.data);
+//         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+//         // console.log('rolesLists', rolesLists.value);
+//     }
+// };
 
 const initFilters = () => {
     filters.value = {
@@ -172,7 +163,7 @@ const rolePermission = useCookie('rolePermission');
 
 onMounted(() => {
     init();
-    getRoleList();
+    // getRoleList();
     loading.value = false;
 });
 
@@ -206,8 +197,8 @@ initFilters();
 
         <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
-            <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="index" header="Serial" sortable style="width: 5%;"</Column>
+            <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /></template>
+            <Column field="index" header="Serial" sortable style="width: 5%;"></Column>
             <Column field="name" sortable header="Team Name" style="width: 15%;"></Column>
             <Column field="description" sortable header="Description" style="width: 20%;"></Column>
             <Column field="Line Manager" sortable header="Line Manager" style="width: 10%;">
@@ -228,7 +219,7 @@ initFilters();
                 <template #body="slotProps"  > 
                     <div style="display: flex; flex-wrap: wrap;">
                         <div v-for="child in slotProps.data.children.children.children" :key="child" style="display: flex; flex-wrap: wrap; gap: 5px">
-                            <div v-for="ch in child" >
+                            <div v-for="ch in child" :key="ch">
                                 <div class="mb-1" :style="ch.name ? 'border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px' : ' '">
                                     {{ch.name}}
                                 </div>
@@ -255,7 +246,7 @@ initFilters();
 
         <!-- Edit -->
         <Dialog v-model:visible="visibleEditTeam" modal header="Edit Team" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditTeam :param="{ id, name, address, phone, email, user_type, rolesLists }" @closeEditModal="closeEditModal($event)" />
+            <EditTeam :param="{ id, editName, editDescription, editLineManager, editTeamLead, editMembers }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteTeam" header=" " :style="{ width: '25rem' }">
