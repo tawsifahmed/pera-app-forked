@@ -5,7 +5,13 @@ const quaterList = ref([]);
 const editingRows = ref([]);
 const modal = ref(false);
 // Create Data
-const quarterCreate = ref({});
+const quarterCreate = ref({
+    name: '',
+    start_date: '',
+    end_date: '',
+    year: ''
+});
+const errorMsg = ref('');
 const init = async () => {
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi-quater/list`, {
@@ -15,7 +21,6 @@ const init = async () => {
         }
     });
     if (data) {
-        console.log('Quater data: ', data.value.data);
         quaterList.value = data.value.data;
     }
 };
@@ -81,6 +86,44 @@ const onDelete = async (item) => {
 
 const closeCreateModal = (event) => {
     console.log(event);
+};
+const handleKpiCreation = async () => {
+    console.log(Object.keys(quarterCreate.value));
+    const formData = new FormData();
+    if (quarterCreate.value.name != '') {
+        formData.append('name', quarterCreate.value.name);
+    } else if (quarterCreate.value.start_date != '') {
+        formData.append('start_date', formatDate(quarterCreate.value.start_date));
+    } else if (quarterCreate.value.end_date != '') {
+        formData.append('end_date', formatDate(quarterCreate.value.end_date));
+    } else if (quarterCreate.value.year != '') {
+        formData.append('year', formatDate(quarterCreate.value.year));
+    } else {
+        errorMsg.value = 'Please fill the required fields';
+        return;
+    }
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi-quater/create`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
+    if (data) {
+        init();
+        modal.value = false;
+        quarterCreate.value = {
+            name: '',
+            start_date: '',
+            end_date: '',
+            year: ''
+        };
+        errorMsg.value = null;
+        return toast.add({ severity: 'success', summary: 'Updated', detail: 'Successfully Created', group: 'br', life: 3000 });
+    } else {
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to update', group: 'br', life: 3000 });
+    }
 };
 onMounted(() => {
     init();
@@ -154,7 +197,7 @@ onMounted(() => {
     </div>
     <Dialog v-model:visible="modal" modal header="Create Quarter" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
-        <form class="" action="" @submit.prevent="handleReportDownload">
+        <form class="" action="" @submit.prevent="handleKpiCreation">
             <div class="card">
                 <div class="kpi-form grid">
                     <div class="col-12">
@@ -166,7 +209,7 @@ onMounted(() => {
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">Start Date:</label>
-                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
+                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required />
                         </div>
                     </div>
                     <div class="col-12">
@@ -177,10 +220,11 @@ onMounted(() => {
                     </div>
                     <div class="col-12">
                         <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
-                            <Calendar v-model="quarterCreate.year" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
+                            <label for="icondisplay" class="font-bold block mb-2">Year:</label>
+                            <Calendar v-model="quarterCreate.year" view="year" dateFormat="yy" fluid :manualInputs="false" class="w-full" />
                         </div>
                     </div>
+                    <p class="text-center w-full text-red-500">{{ errorMsg }}</p>
                     <div class="col-12 mx-auto flex justify-content-center">
                         <Button label="Create" severity="info" type="submit" />
                     </div>
