@@ -41,6 +41,8 @@ const visibleEditTeam = ref(false);
 
 const usersLists = ref([]);
 
+const teamLists = ref([]);
+
 const visibleDeleteTeam = ref(false);
 
 const id = ref('');
@@ -132,7 +134,7 @@ const init = async () => {
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        teamLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -195,7 +197,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="teamLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /></template>
             <Column field="index" header="Serial" sortable style="width: 5%;"></Column>
