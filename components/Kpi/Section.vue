@@ -407,7 +407,7 @@ onMounted(() => {
                         <div class="kpi-form grid">
                             <div class="col-12">
                                 <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
-                                <pre>{{subSectionCreate.section}}</pre>
+                                <!-- <pre>{{subSectionCreate.section}}</pre> -->
                                 <Dropdown v-model="subSectionCreate.section" :options="sectionList" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
                             </div>
                             <div class="col-12">
