@@ -5,13 +5,17 @@ const sectionList = ref([]);
 const subSectionList = ref([]);
 const sectionModal = ref(false);
 const subModal = ref(false);
-// Create Data
+const visibleEditSection = ref(false);
+const visibleEditSubModal = ref(false);
 const sectionCreate = ref({});
 const subSectionCreate = ref({});
 const sectionEdit = ref({});
+const subSectionEdit = ref({})
 const sectionCreateLoading = ref(false);
 const subSectionCreateLoading = ref(false);
 const sectionEditLoading = ref(false);
+const subSectionEditLoading = ref(false);
+
 
 const init = async () => {
     const token = useCookie('token');
@@ -24,7 +28,7 @@ const init = async () => {
     if (data) {
         console.log('Section data: ', data.value.data);
         sectionList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        // permissionsList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        
     }
 };
 
@@ -39,14 +43,14 @@ const initSub = async () => {
     if (data) {
         console.log('Section data: ', data.value.data);
         subSectionList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        // permissionsList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        
     }
 };
 
-const sectionStatuses = [
+const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
-];
+]);
 
 
 const handleSectionCreation = async () => {
@@ -127,12 +131,29 @@ const formatDate = (data) => {
     return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
 };
 
-const visibleEditSection = ref(false);
+
 const editSection = async (data) => {
     visibleEditSection.value = true;
     sectionEdit.value = { ...data, status: data.status === 1 ? { name: 'Active', label: 1 } : { name: 'Inactive', label: 0 } };
     console.log('Edit Data:', sectionEdit.value);
 };
+
+const structuredSectionList = ref()
+const editSubSection = async (data) => {
+    console.log('data', data)
+    
+    visibleEditSubModal.value = true
+    structuredSectionList.value = sectionList.value.map(item => ({ name: item.name, id: item.id }));
+    subSectionEdit.value = {
+        subSectionId : data.id,
+        section_id: structuredSectionList.value.find(item => item.id === data.section_id),
+        title: data.title,
+        target_mark: data.target_mark,
+        comment: data.comment,
+        status: sectionStatuses.value.find(item => item.label === data.status)
+    };
+    console.log('Edit Data:', subSectionEdit.value);
+}
 
 const handleEditSection = async () => {
     sectionEditLoading.value = true;
@@ -166,6 +187,43 @@ const handleEditSection = async () => {
     }
 };
 
+const handleEditSubSection = async () => {
+    subSectionEditLoading.value = true;
+    if (!subSectionEdit.value.section_id || !subSectionEdit.value.title || !subSectionEdit.value.target_mark || !subSectionEdit.value.status) {
+        subSectionEditLoading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
+    }
+
+    const formData = new FormData();
+    formData.append('section_id', subSectionEdit.value.section_id?.id);
+    formData.append('title', subSectionEdit.value.title);
+    formData.append('target_mark', subSectionEdit.value.target_mark);
+    formData.append('comment', subSectionEdit.value.comment);
+    formData.append('status', subSectionEdit.value.status?.label); // optional chaining to avoid undefined errors
+
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-update/${subSectionEdit.value.subSectionId}`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
+
+    if (data) {
+        initSub();
+        visibleEditSubModal.value = false;
+        subSectionEdit.value = {};
+        subSectionEditLoading.value = false;
+        toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Updated Successfully', group: 'br', life: 3000 });
+    } else {
+        subSectionEditLoading.value = false;
+        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to update sub section!', group: 'br', life: 3000 });
+    }
+};
+
+
+
 const deleteSection = async (id) => {
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
@@ -183,6 +241,25 @@ const deleteSection = async (id) => {
     }
 };
 
+
+const deleteSubSection = async (id) => {
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+
+    if (data) {
+        initSub();
+        toast.add({ severity: 'success', summary: 'Deleted', detail: 'Sub Section Deleted Successfully', group: 'br', life: 3000 });
+    } else {
+        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete sub section!', group: 'br', life: 3000 });
+    }
+};
+
+
 const closeCreateModal = (event) => {
     console.log(event);
 };
@@ -192,7 +269,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <TabView class="mt-3">
+    <TabView :activeIndex="0">
         <TabPanel header="Sections">
             <div class="grid">
                 <div class="col-12">
@@ -328,9 +405,9 @@ onMounted(() => {
                 <form class="" action="" @submit.prevent="handleSubSectionCreation">
                     <div class="card">
                         <div class="kpi-form grid">
-                            <div class="user-selection w-full">
+                            <div class="col-12">
                                 <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
-                                <!-- <pre>{{subSectionCreate.section}}</pre> -->
+                                <pre>{{subSectionCreate.section}}</pre>
                                 <Dropdown v-model="subSectionCreate.section" :options="sectionList" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
                             </div>
                             <div class="col-12">
@@ -359,6 +436,50 @@ onMounted(() => {
                             </div>
                             <div class="col-12 mx-auto flex justify-content-center">
                                 <Button label="Create" severity="info" type="submit" :loading="subSectionCreateLoading"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </Dialog>
+
+
+            <!-- edit sub section modal -->
+            <Dialog v-model:visible="visibleEditSubModal" modal header="Edit Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
+                <form class="" action="" @submit.prevent="handleEditSubSection">
+                    <div class="card">
+                        <div class="kpi-form grid">
+                            <div class="col-12">
+                                <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
+                                <!-- <pre>{{structuredSectionList}}</pre> -->
+                                <Dropdown v-model="subSectionEdit.section_id" :options="structuredSectionList" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
+                                    <InputText type="text" v-model="subSectionEdit.title" placeholder="Title" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Target Mark:</label>
+                                    <InputText type="number" v-model="subSectionEdit.target_mark" placeholder="Set Mark" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Sub Section Comment:</label>
+                                    <InputText type="text" v-model="subSectionEdit.comment" placeholder="Comment" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Sub Section Status:</label>
+                                    <Dropdown v-model="subSectionEdit.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12 mx-auto flex justify-content-center">
+                                <Button label="Update" severity="info" type="submit" :loading="subSectionEditLoading"/>
                             </div>
                         </div>
                     </div>
