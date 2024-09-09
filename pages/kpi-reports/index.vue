@@ -222,7 +222,7 @@ onMounted(() => {
                 </TabView>
             </TabPanel>
             <TabPanel header="Sections">
-                <p class="">Sections</p>
+                <KpiSection />    
             </TabPanel>
             <TabPanel header="Quarter">
                 <KpiQuater />
