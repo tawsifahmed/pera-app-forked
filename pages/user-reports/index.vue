@@ -74,6 +74,9 @@ const handleReportDownload = async () => {
             }
         }
     );
+    if (error) {
+        return (loading.value = false);
+    }
     if (data.value.code == 200) {
         const link = document.createElement('a');
         link.href = data.value.download_path;
