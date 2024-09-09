@@ -94,7 +94,7 @@ const handleTaskDetailView = async (task) => {
     overlayD.style.width = '100%';
     overlayD.style.height = '100%';
     overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-    overlayD.style.zIndex = '100000';
+    overlayD.style.zIndex = '1000000';
     document.documentElement.appendChild(overlayD);
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
@@ -108,6 +108,15 @@ const handleTaskDetailView = async (task) => {
     document.documentElement.style.cursor = 'auto';
     document.documentElement.removeChild(overlayD);
 };
+
+console.log('visibleTaskDetailView', visibleTaskDetailView.value);
+watch(visibleTaskDetailView, (value) => {
+    if(value === true) {
+        return 0;
+    }else{
+        localStorage.removeItem('taskDetailID')
+    }
+});
 
 const initFilters = () => {
     filters.value = {

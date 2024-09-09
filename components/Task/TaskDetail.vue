@@ -17,6 +17,10 @@ const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompan
 
 const { isTaskEdited, isTaskCommentCreated, singleTaskComments, subTasks, taskStatus, taskDetails, taskActivity } = storeToRefs(useCompanyStore());
 
+
+// saved the task id in local storage
+localStorage.setItem('taskDetailID', JSON.stringify(taskDetails.value.id));
+
 const { usersLists, tagsLists, projID } = defineProps(['usersLists', 'tagsLists', 'projID']);
 
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask', 'updateTaskTable']);
@@ -25,6 +29,7 @@ const toast = useToast();
 const btnLoading = ref(false);
 const updateTaskP = ref(accessPermission('update_task'));
 const editBounceP = ref(accessPermission('edit_bounce'));
+const createTaskP = ref(accessPermission('create_task'));
 
 const assignees = ref(null);
 assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
@@ -206,7 +211,9 @@ const closeCommentAttachment = () => {
     commentAttachment.value = false;
 };
 
+
 onMounted(async () => {
+    
     await getTaskDetails(taskDetails.value?.id);
     const obg = {
         name: taskDetails.value.status_name,
@@ -597,20 +604,21 @@ const handleShareTaskId = () => {
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
+                                <Button v-if="createTaskP" icon="pi pi-plus" label="Create" v-tooltip.left="{value: `Create Sub Task`}" @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')" class="mr-2 sub-create" severity="secondary" />
                                 <TreeTable class="tree-table" :value="subTasks" :lazy="true"
                                     :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer" field="name" header="Name" expander
-                                        :style="{ width: '30%' }">
+                                    <Column class="cursor-pointer tone" field="name" header="Name" expander
+                                        :style="{ width: '45%' }">
                                         <template #body="slotProps">
                                             <span class="taskTitle"
                                                 @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{value: `${slotProps.node.data.name}`}">{{ slotProps.node.data.name}}
                                             </span>
                                         </template>
                                     </Column>
-                                    <Column field="assignee" header="Assignee" :style="{ width: '20%' }"></Column>
+                                    <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
                                     <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
                                     <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
                                     <Column field="action" header="Action">
@@ -619,15 +627,15 @@ const handleShareTaskId = () => {
                                                 <Button style="width: 30px; height: 30px; border-radius: 50%"
                                                     icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
                                                 <div class="action-dropdown-content-det">
-                                                    <!-- <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
                                                         @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
                                                         rounded />
                                                     <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded /> -->
-                                                    <Button icon="pi pi-cog" class="ac-btn" severity="info"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
                                                         @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <!-- <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
-                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" /> -->
+                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -927,7 +935,7 @@ const handleShareTaskId = () => {
     gap: 3px;
     padding: 10px 5px;
     top: -10px;
-    left: -40px;
+    left: -154px;
     /*left: -158px;*/
     border-radius: 5px;
 }
@@ -1100,5 +1108,19 @@ a{
 
 .ql-editing{
     left: 0px !important;
+}
+
+.tone {
+    overflow: hidden !important;
+    /*text-overflow: ellipsis !important;*/
+    white-space: nowrap !important;
+}
+
+.sub-create{
+    font-size: 12px !important;
+}
+
+.sub-create .pi-plus {
+    font-size: 12px !important;
 }
 </style>
