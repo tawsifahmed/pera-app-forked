@@ -201,23 +201,23 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /></template>
             <Column field="index" header="Serial" sortable style="width: 5%;"></Column>
-            <Column field="name" sortable header="Team Name" style="width: 15%;"></Column>
-            <Column field="description" sortable header="Description" style="width: 20%;"></Column>
-            <Column field="Line Manager" sortable header="Line Manager" style="width: 10%;">
+            <Column field="name" header="Team Name" style="width: 15%;"></Column>
+            <Column field="description" header="Description" style="width: 20%;"></Column>
+            <Column field="Line Manager" header="Line Manager" style="width: 10%;">
                 <template #body="slotProps"> 
                     <div>
                         {{slotProps.data.children.data.name}}
                     </div>
                 </template>
             </Column>
-            <Column field="Line Manager" sortable header="Team Lead" style="width: 10%;">
+            <Column field="Line Manager" header="Team Lead" style="width: 10%;">
                 <template #body="slotProps"> 
                     <div>
                         {{slotProps.data.children.children.data.name}}
                     </div>
                 </template>
             </Column>
-            <Column field="Members" sortable header="Members" style="width: 30%;">
+            <Column field="Members" header="Members" style="width: 30%;">
                 <template #body="slotProps"  > 
                     <div style="display: flex; flex-wrap: wrap;">
                         <div v-for="child in slotProps.data.children.children.children" :key="child" style="display: flex; flex-wrap: wrap; gap: 5px">

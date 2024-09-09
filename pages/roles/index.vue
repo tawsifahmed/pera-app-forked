@@ -140,8 +140,8 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column style="text-wrap: nowrap" field="name" sortable header="Role Name"></Column>
-            <Column field="permissions" sortable header="Permission">
+            <Column style="text-wrap: nowrap" field="name" header="Role Name"></Column>
+            <Column field="permissions" header="Permission">
                 <template #body="slotProps">
                     <div style="display: flex; flex-wrap: wrap; gap: 5px">
                         <div class="border rounded" v-for="perrmission in slotProps.data.permissions" :key="permission" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">

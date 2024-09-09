@@ -197,10 +197,10 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column field="name" sortable header="Employee Name"></Column>
-            <Column field="email" sortable header="Email Address"></Column>
-            <Column field="phone" sortable header="Phone"></Column>
-            <Column field="user_type" sortable header="User Type"></Column>
+            <Column field="name" header="Employee Name"></Column>
+            <Column field="email" header="Email Address"></Column>
+            <Column field="phone" header="Phone"></Column>
+            <Column field="user_type" header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
