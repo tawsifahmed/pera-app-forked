@@ -172,13 +172,13 @@ onMounted(() => {
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
-                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
+                            <Calendar v-model="quarterCreate.end_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
-                            <InputText type="number" v-model="quarterCreate.year" placeholder="0-10" min="0" class="w-full" />
+                            <Calendar v-model="quarterCreate.year" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
                         </div>
                     </div>
                     <div class="col-12 mx-auto flex justify-content-center">
