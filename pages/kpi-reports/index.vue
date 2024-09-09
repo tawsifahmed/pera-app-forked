@@ -112,61 +112,68 @@ onMounted(() => {
         <div class="d-flex mr-2">
             <h5 class="mb-1">KPI Report</h5>
         </div>
-        <form class="" action="" @submit.prevent="handleReportDownload">
-            <h3 class="text-center my-4">KPI Report Generation form</h3>
-            <div class="kpi-form grid">
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label class="font-bold block mb-2">Employee:</label>
-                        <div class="flex justify-content-center">
-                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label class="font-bold block mb-2">Team Members:</label>
-                        <div class="flex justify-content-center">
-                            <MultiSelect v-model="members" :options="employees" optionLabel="name" filter placeholder="Select Members" :maxSelectedLabels="3" class="w-full" />
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label for="icondisplay" class="font-bold block mb-2">Quarter:</label>
-                        <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
-                    </div>
-                    <!-- <div class="flex gap-2 flew-wrap">
-                        <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">Year:</label>
-                            <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Year" class="w-full" />
+        <!-- kpi tabs -->
+
+        <TabView class="mt-3">
+            <TabPanel class="file-upload" header="KPI Generate">
+                <form class="" action="" @submit.prevent="handleReportDownload">
+                    <h3 class="text-center my-4">KPI Report Generation form</h3>
+                    <div class="kpi-form grid">
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label class="font-bold block mb-2">Employee:</label>
+                                <div class="flex justify-content-center">
+                                    <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full" />
+                                </div>
+                            </div>
                         </div>
-                    </div> -->
-                </div>
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label for="icondisplay" class="font-bold block mb-2">Project Team Mark:</label>
-                        <InputText type="number" v-model="pmMark" placeholder="0-10" min="0" />
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label class="font-bold block mb-2">Team Members:</label>
+                                <div class="flex justify-content-center">
+                                    <MultiSelect v-model="members" :options="employees" optionLabel="name" filter placeholder="Select Members" :maxSelectedLabels="3" class="w-full" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label for="icondisplay" class="font-bold block mb-2">Quarter:</label>
+                                <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label for="icondisplay" class="font-bold block mb-2">Project Team Mark:</label>
+                                <InputText type="number" v-model="pmMark" placeholder="0-10" min="0" />
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label for="icondisplay" class="font-bold block mb-2">Team Building Mark:</label>
+                                <InputText type="number" v-model="teamBuilding" placeholder="0-10" min="0" />
+                            </div>
+                        </div>
+                        <div class="col-12 md:col-6">
+                            <div class="user-selection w-full">
+                                <label for="icondisplay" class="font-bold block mb-2">HR Mark:</label>
+                                <InputText type="number" v-model="hrMark" placeholder="0-10" min="0" />
+                            </div>
+                        </div>
+                        <div class="col-12 mx-auto flex justify-content-center">
+                            <Button label="Generate KPI" severity="info" type="submit" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label for="icondisplay" class="font-bold block mb-2">Team Building Mark:</label>
-                        <InputText type="number" v-model="teamBuilding" placeholder="0-10" min="0" />
-                    </div>
-                </div>
-                <div class="col-12 md:col-6">
-                    <div class="user-selection w-full">
-                        <label for="icondisplay" class="font-bold block mb-2">HR Mark:</label>
-                        <InputText type="number" v-model="hrMark" placeholder="0-10" min="0" />
-                    </div>
-                </div>
-                <div class="col-12 mx-auto flex justify-content-center">
-                    <Button label="Generate KPI" severity="info" type="submit" />
-                </div>
-            </div>
-        </form>
+                </form>
+            </TabPanel>
+            <TabPanel header="Sections">
+                <p class="">Sections</p>
+            </TabPanel>
+            <TabPanel header="Quarter">
+                <KpiQuater />
+            </TabPanel>
+        </TabView>
     </div>
 </template>
 
