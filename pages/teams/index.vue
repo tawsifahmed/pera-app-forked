@@ -1,28 +1,21 @@
 <script setup>
+import { FilterMatchMode } from 'primevue/api';
+import Column from 'primevue/column';
+import DataTable from 'primevue/datatable';
+import CreateTeam from '@/components/Team/CreateTeam.vue';
+import EditTeam from '@/components/Team/EditTeam.vue';
+import accessPermission from '~/composables/usePermission';
+import Dialog from 'primevue/dialog';
+import { useCompanyStore } from '~/store/company';
+const usersListStore = useCompanyStore();
+const {getTaskAssignModalData } = useCompanyStore();
+const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
-import { storeToRefs } from 'pinia';
-import { useCompanyStore } from '~/store/company';
-const usersListStore = useCompanyStore();
-const {getTaskAssignModalData } = useCompanyStore();
-
-const url = useRuntimeConfig();
-import { FilterMatchMode } from 'primevue/api';
-
-import Column from 'primevue/column';
-
-import DataTable from 'primevue/datatable';
-
-import CreateTeam from '@/components/Team/CreateTeam.vue';
-
-import EditTeam from '@/components/Team/EditTeam.vue';
-
-import accessPermission from '~/composables/usePermission';
 
 const readUser = ref(accessPermission('read_user'));
-
 const createUserP = ref(accessPermission('create_user'));
 const updateUserP = ref(accessPermission('update_user'));
 const deleteUserP = ref(accessPermission('delete_user'));
@@ -32,8 +25,6 @@ const filters = ref();
 const loading = ref(true);
 
 const toast = useToast();
-
-import Dialog from 'primevue/dialog';
 
 const visibleCreateTeam = ref(false);
 
@@ -57,10 +48,6 @@ const editTeamLead = ref(null)
 
 const editMembers = ref(null)
 
-const rolesLists = ref([]);
-
-const user_type = ref([]);
-
 const closeCreateModal = (evn) => {
     visibleCreateTeam.value = false;
     init();
@@ -77,9 +64,6 @@ const handleCreateCompanyModal = async () => {
     usersLists.value = usersListStore.users;
     visibleCreateTeam.value = true;
 };
-
-
-const selectedRole = ref([]);
 
 const editTeam =  (data) => {
     console.log('editTeamdata', data);
@@ -139,33 +123,14 @@ const init = async () => {
 };
 
 
-// const getRoleList = async () => {
-//     const token = useCookie('token');
-//     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-//         $fetch(`${url.public.apiUrl}/roles/list`, {
-//             headers: {
-//                 Authorization: `Bearer ${token.value}`
-//             }
-//         })
-//     );
-//     if (data.value?.data?.length > 0) {
-//         // console.log('data', data.value?.data);
-//         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-//         // console.log('rolesLists', rolesLists.value);
-//     }
-// };
-
 const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
 };
 
-const rolePermission = useCookie('rolePermission');
-
 onMounted(() => {
     init();
-    // getRoleList();
     loading.value = false;
 });
 
@@ -206,21 +171,21 @@ initFilters();
             <Column field="Line Manager" header="Line Manager" style="width: 10%;">
                 <template #body="slotProps"> 
                     <div>
-                        {{slotProps.data.children.data.name}}
+                        {{slotProps?.data?.children?.data?.name}}
                     </div>
                 </template>
             </Column>
             <Column field="Line Manager" header="Team Lead" style="width: 10%;">
                 <template #body="slotProps"> 
                     <div>
-                        {{slotProps.data.children.children.data.name}}
+                        {{slotProps?.data?.children?.children?.data?.name}}
                     </div>
                 </template>
             </Column>
             <Column field="Members" header="Members" style="width: 30%;">
                 <template #body="slotProps"  > 
                     <div style="display: flex; flex-wrap: wrap;">
-                        <div v-for="child in slotProps.data.children.children.children" :key="child" style="display: flex; flex-wrap: wrap; gap: 5px">
+                        <div v-for="child in slotProps?.data?.children?.children?.children" :key="child" style="display: flex; flex-wrap: wrap; gap: 5px">
                             <div v-for="ch in child" :key="ch">
                                 <div class="mb-1" :style="ch.name ? 'border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px' : ' '">
                                     {{ch.name}}
