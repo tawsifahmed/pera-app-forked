@@ -38,8 +38,8 @@ const model = ref([
         label: 'Reports',
         option: 'reports_option',
         items: [
-            { label: 'Task Wise Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
-            { label: 'User Wise Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' },
+            { label: 'Task Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
+            { label: 'User Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' },
             { label: 'KPI Report', icon: 'pi pi-fw pi-book', to: '/kpi-reports' }
         ]
     }

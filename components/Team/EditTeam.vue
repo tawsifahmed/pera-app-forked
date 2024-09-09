@@ -45,38 +45,32 @@ const handleSubmitData = async () => {
         return;
     } else {
         errorHandler.value = false;
-        return; // work will be done on the next day 
+    
         if (!errorHandler.value) {
             const token = useCookie('token');
-            const { data, error, pending } = await useFetch(`${url.public.apiUrl}/users/update/${id.value}`, {
+            const { data, error, pending } = await useFetch(`${url.public.apiUrl}/teams/update/${id.value}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
                 body: {
-                    name: name.value,
-                    email: email.value,
-                    address: address.value,
-                    phone: phone.value,
-                    role: user_type.value.name
+                    name: editName.value,
+                    description: editDescription.value,
+                    team_lead_id: editTeamLead.value.id,
+                    line_manager_id: editLineManager.value.id,
+                    members: editMembers.value.map((item) => item.id)
                 }
             });
 
-            if (error?.value) {
-                if (error?.value?.data?.code === 500) {
-                    loading.value = false;
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Email already exists!', group: 'br', life: 3000 });
-                    return;
-                }
-            } else if (data?.value?.code === 200) {
+            if (data?.value?.code === 200) {
                 loading.value = false;
                 employeeForm.value = false;
                 emit('closeEditModal', false);
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated successfully!', group: 'br', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Team Updated successfully!', group: 'br', life: 3500 });
                 return;
             } else {
                 loading.value = false;
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update employee!', group: 'br', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update team!', group: 'br', life: 3000 });
                 return;
             }
         }
@@ -92,12 +86,12 @@ onMounted(async() => {
 <template>
     <div>
         <div class="field">
-            <label for="company">Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Name <span class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="editName" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label for="email">Description <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="email">Description <span class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Textarea id="description" class="border-gray-300" v-model="editDescription" rows="3" cols="20" :invalid="teamDescriptionError" />        
         </div>
         <div class="field flex flex-column">
