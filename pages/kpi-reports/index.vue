@@ -5,14 +5,29 @@ definePageMeta({
     layout: 'default'
 });
 const employees = ref([]);
+const employee = ref('');
 const quater = ref([]);
+const selectedQuarter = ref();
+const sections = ref([]);
+const selectedSection = ref('');
+const subSection = ref([]);
+const selectedSubSection = ref([]);
+const achievedMark = ref('');
+const comment = ref('');
+const dynamicSection = ref([
+    {
+        // user_id: employee.value,
+        section_id: null,
+        subsection_id: null,
+        quater_id: null,
+        achive_mark: '',
+        comment: ''
+    }
+]);
 const quaterYear = ref('');
 const loading = ref(false);
 const toast = useToast();
-
-const employee = ref('');
 const members = ref([]);
-const selectedQuarter = ref();
 const pmMark = ref();
 const teamBuilding = ref();
 const hrMark = ref();
@@ -93,14 +108,61 @@ const fetchQuater = async () => {
             Authorization: `Bearer ${token.value}`
         }
     });
-    console.log('Quater:', data);
     if (data.value?.data?.length > 0) {
         quater.value = data.value?.data;
     }
 };
+const fetchSection = async () => {
+    const token = useCookie('token');
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/section`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (data.value?.data?.length > 0) {
+        sections.value = data.value?.data;
+    }
+};
+const fetchSubSection = async () => {
+    const token = useCookie('token');
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/sub-section`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (data.value?.data?.length > 0) {
+        subSection.value = data.value?.data;
+    }
+};
+
+// Function to add a new section
+const addSection = (index) => {
+    console.log(index, dynamicSection.value[index]);
+    const data = dynamicSection.value[index];
+    // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
+    if (data.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
+    if (data.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
+    if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    if (data.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
+    dynamicSection.value.push({
+        // user_id: employee,
+        section_id: null,
+        subsection_id: null,
+        quater_id: null,
+        achive_mark: '',
+        comment: ''
+    });
+};
+
 onMounted(() => {
     init();
     fetchQuater();
+    fetchSection();
+    fetchSubSection();
+    // Initial call to add the first section
+    // addSection();
     const date = new Date();
     quaterYear.value = date.getFullYear();
 });
@@ -116,56 +178,48 @@ onMounted(() => {
         <!-- kpi tabs -->
 
         <TabView class="mt-3">
-            <TabPanel class="file-upload" header="KPI Generate">
-                <form class="" action="" @submit.prevent="handleReportDownload">
-                    <h3 class="text-center my-4">KPI Report Generation form</h3>
-                    <div class="kpi-form grid">
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label class="font-bold block mb-2">Employee:</label>
-                                <div class="flex justify-content-center">
-                                    <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full" />
+            <TabPanel class="file-upload" header="KPI">
+                <TabView>
+                    <TabPanel header="KPI Generate">
+                        <div class="card mx-auto" style="max-width: 50rem">
+                            <form action="" class="grid" style="gap: 10px">
+                                <div class="w-full col-12">
+                                    <label for="icondisplay" class="font-bold block mb-2">Employee</label>
+                                    <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select User" class="w-full" />
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label class="font-bold block mb-2">Team Members:</label>
-                                <div class="flex justify-content-center">
-                                    <MultiSelect v-model="members" :options="employees" optionLabel="name" filter placeholder="Select Members" :maxSelectedLabels="3" class="w-full" />
+                                <!-- Dynamic section -->
+                                <div class="" v-if="employee != ''">
+                                    <div v-for="(section, index) in dynamicSection" :key="index" class="card">
+                                        <div class="w-full col-12 grid">
+                                            <div class="col-12 md:col-6">
+                                                <label for="icondisplay" class="font-bold block mb-2">Section</label>
+                                                <Dropdown v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
+                                            </div>
+                                            <div class="col-12 md:col-6">
+                                                <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
+                                                <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" />
+                                            </div>
+                                            <div class="col-12 md:col-6">
+                                                <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
+                                                <Dropdown v-model="dynamicSection[index].quater_id" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
+                                            </div>
+                                            <div class="col-12 md:col-6">
+                                                <label for="icondisplay" class="font-bold block mb-2">Achieved Mark</label>
+                                                <InputText v-model="dynamicSection[index].achive_mark" placeholder="Input Mark" class="w-full" />
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="icondisplay" class="font-bold block mb-2">Comment</label>
+                                                <InputText v-model="dynamicSection[index].comment" placeholder="Write comment" class="w-full" />
+                                            </div>
+                                            <Button v-if="dynamicSection.length === index + 1" label="Add" class="mx-auto" @click.prevent="addSection(index)" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
-
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label for="icondisplay" class="font-bold block mb-2">Quarter:</label>
-                                <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label for="icondisplay" class="font-bold block mb-2">Project Team Mark:</label>
-                                <InputText type="number" v-model="pmMark" placeholder="0-10" min="0" />
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label for="icondisplay" class="font-bold block mb-2">Team Building Mark:</label>
-                                <InputText type="number" v-model="teamBuilding" placeholder="0-10" min="0" />
-                            </div>
-                        </div>
-                        <div class="col-12 md:col-6">
-                            <div class="user-selection w-full">
-                                <label for="icondisplay" class="font-bold block mb-2">HR Mark:</label>
-                                <InputText type="number" v-model="hrMark" placeholder="0-10" min="0" />
-                            </div>
-                        </div>
-                        <div class="col-12 mx-auto flex justify-content-center">
-                            <Button label="Generate KPI" severity="info" type="submit" />
-                        </div>
-                    </div>
-                </form>
+                    </TabPanel>
+                    <TabPanel header="KPI Report"> Report </TabPanel>
+                </TabView>
             </TabPanel>
             <TabPanel header="Sections">
                 <p class="">Sections</p>
