@@ -80,7 +80,6 @@ const itemClick = (event, item) => {
     const { overlayMenuActive, staticMenuMobileActive } = layoutState;
 
     if ((item.to || item.url) && (staticMenuMobileActive.value || overlayMenuActive.value)) {
-        
         onMenuToggle();
     }
 
@@ -137,7 +136,7 @@ const toggle = (event) => {
         <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
-                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{value: `${item.label}`}">
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{ value: `${item.label}` }">
                     {{ item.label.length > 16 ? item.label.slice(0, 16) + '...' : item.label }}
                 </NuxtLink>
             </div>
@@ -157,7 +156,7 @@ const toggle = (event) => {
         >
             <div class="flex flex-row">
                 <i :class="item.icon" class="layout-menuitem-icon"></i>
-                <span v-tooltip.right="{value: `${item.label.length > 20 ? item.label : ''}`}" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
+                <span v-tooltip.right="{ value: `${item.label.length > 20 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
             </div>
             <span
                 v-if="item.label == 'Employees'"
@@ -165,12 +164,7 @@ const toggle = (event) => {
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
-            <span
-                v-if="item.label == 'Teams'"
-                style="left: 7px; position: relative"
-                v-tooltip.right="{ value: 'Demo Text Text For Teams.' }"
-                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
+            <span v-if="item.label == 'Teams'" style="left: 7px; position: relative" v-tooltip.right="{ value: 'Demo Text Text For Teams.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             <span
                 v-if="item.label == 'Roles'"
                 style="left: 7px; position: relative"
@@ -184,13 +178,13 @@ const toggle = (event) => {
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
             <span
-                v-if="item.label == 'Task Wise Reports'"
+                v-if="item.label == 'Task Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
             <span
-                v-if="item.label == 'User Wise Reports'"
+                v-if="item.label == 'User Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
@@ -217,7 +211,7 @@ const toggle = (event) => {
     border-radius: 6px;
 }
 
-.space-items{
+.space-items {
     text-wrap: nowrap;
 }
 </style>

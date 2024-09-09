@@ -8,7 +8,9 @@ const startDate = ref('');
 const endDate = ref('');
 const employee = ref('');
 const employees = ref([]);
+const previewData = ref(null);
 const loading = ref(false);
+const loading1 = ref(false);
 const toast = useToast();
 
 // Date Formatter
@@ -21,6 +23,33 @@ const dateFormatter = (data) => {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+};
+
+const handleGenerate = async () => {
+    if (employee.value == '') {
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select User First', group: 'br', life: 3000 });
+    } else if (startDate.value == '' || endDate.value == '') {
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Start Date and End Date', group: 'br', life: 3000 });
+    }
+    const token = useCookie('token');
+    loading.value = true;
+    const formattedStartDate = dateFormatter(startDate.value);
+    const formattedEndDate = dateFormatter(endDate.value);
+
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/task-report-view?start_date=${startDate.value}&end_date=${endDate.value}&user_id=${employee.value.id}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
+    if (data.value.code == 200) {
+        previewData.value = data.value.data;
+        console.log('Report Value', data.value.data);
+        return (loading.value = false);
+    } else {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+    }
 };
 
 const handleReportDownload = async () => {
@@ -57,6 +86,15 @@ const handleReportDownload = async () => {
     }
 };
 
+const handleChange = (field, event) => {
+    const date = new Date(event);
+    if (field == 'startDate') {
+        startDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    } else {
+        endDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    }
+};
+
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
@@ -79,7 +117,7 @@ onMounted(() => {
         <!-- <pre>{{ usersListStore }}</pre> -->
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
-            <h5 class="mb-1">User Wise Reports</h5>
+            <h5 class="mb-1">User Reports</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
@@ -92,19 +130,39 @@ onMounted(() => {
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                        <Calendar v-model="startDate" showIcon iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2"> To: </label>
-                        <Calendar v-model="endDate" showIcon iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>
             </template>
 
             <template #end>
-                <Button @click="handleReportDownload" class="w-full" label="Download" :loading="loading" />
+                <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
             </template>
         </Toolbar>
+    </div>
+    <div v-if="previewData" class="card">
+        <div>
+            <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                <h5 class="m-0">Preview</h5>
+                <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+            </div>
+            <DataTable :value="previewData" tableStyle="min-width: 50rem">
+                <template #empty> <p class="text-center">No Data found...</p> </template>
+                <Column field="task_name" header="Task"></Column>
+                <Column field="project_name" header="Project"></Column>
+                <Column field="assignee_name" header="Assignee"></Column>
+                <Column field="task_status" header="Status"></Column>
+                <Column field="task_due_date" header="Due Date"></Column>
+                <Column field="task_date_done" header="Completed Date"></Column>
+                <Column field="formatted_time_tracked" header="Time Track"></Column>
+                <Column field="overdue" header="Over Due"></Column>
+                <Column field="bounce" header="Bounce"></Column>
+            </DataTable>
+        </div>
     </div>
 </template>
 
