@@ -138,7 +138,7 @@ const toggle = (event) => {
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
                 <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{value: `${item.label}`}">
-                    {{ item.label.length > 13 ? item.label.slice(0, 13) + '...' : item.label }}
+                    {{ item.label.length > 16 ? item.label.slice(0, 16) + '...' : item.label }}
                 </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
@@ -157,12 +157,18 @@ const toggle = (event) => {
         >
             <div class="flex flex-row">
                 <i :class="item.icon" class="layout-menuitem-icon"></i>
-                <span class="layout-menuitem-text">{{ item.label }}</span>
+                <span v-tooltip.right="{value: `${item.label.length > 20 ? item.label : ''}`}" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
             </div>
             <span
                 v-if="item.label == 'Employees'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'Teams'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text For Teams.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
             <span

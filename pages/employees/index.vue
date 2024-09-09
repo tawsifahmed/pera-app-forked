@@ -77,6 +77,7 @@ const handleInviteUserModal = () => {
 
 const closeInviteModal = (evn) => {
     visibleInviteUser.value = false;
+    init();
 };
 
 const selectedRole = ref([]);

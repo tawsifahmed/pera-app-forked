@@ -325,7 +325,7 @@ watch(
             </div>
         </div> -->
 
-        <div v-if="readEmployee" class="col-12 lg:col-6 xl:col-3">
+        <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
                     <div>
@@ -512,16 +512,15 @@ watch(
         </li>
     </ul>
 </div>
-</div>
--->
+</div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
                 <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
                 <pre>statuses =>{{ statuses }}</pre>
                 <pre>userI =>{{ projectId }}</pre>
                 <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
-                <div class="flex gap-2 align-items-center flex-wrap">
-                    <h5>All Tasks</h5>
+                <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px;">
+                    <h5 class="mb-2">Tasks</h5>
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
@@ -544,8 +543,7 @@ watch(
                             class="task-card">
                             <!-- <pre>{{ task }}</pre> -->
                             <div class="title-group">
-                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`"
-                                    :style="`background-color: ${task?.status_color};`"></div>
+                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
                                 <div class=""
                                     style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px">
