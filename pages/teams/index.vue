@@ -23,6 +23,8 @@ const deleteUserP = ref(accessPermission('delete_user'));
 const filters = ref();
 
 const loading = ref(true);
+const loading1 = ref(false);
+const loading2 = ref(false);
 
 const toast = useToast();
 
@@ -59,10 +61,11 @@ const closeEditModal = (evn) => {
 };
 
 const handleCreateCompanyModal = async () => {
-    
+    loading1.value = true;
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     visibleCreateTeam.value = true;
+    loading1.value = false;
 };
 
 const editTeam =  (data) => {
@@ -85,14 +88,15 @@ const editTeam =  (data) => {
     console.log('editMembers', editMembers.value);
 };
 
-const deleteEmployee = (key) => {
+const deleteTeam = (key) => {
     visibleDeleteTeam.value = true;
     id.value = key;
 };
 
 const confirmDeleteTeam = async () => {
+    loading2.value = true;
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/users/delete/${id.value}`, {
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/teams/delete/${id.value}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -102,10 +106,13 @@ const confirmDeleteTeam = async () => {
     if (data.value.code === 200) {
         visibleDeleteTeam.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', group: 'br', life: 3000 });
+        loading2.value = false;
+        init();
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', group: 'br', life: 3000 });
+        loading2.value = false;
     }
-    init();
+    
 };
 
 const init = async () => {
@@ -142,12 +149,12 @@ initFilters();
         <div class="d-flex mr-2">
             <Toast position="bottom-right" group="br" />
             <div class="d-flex mr-2">
-                <h5 class="mb-1">Team</h5>
+                <h5 class="mb-1">Teams</h5>
             </div>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
+                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" :loading="loading1" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             </template>
@@ -199,7 +206,7 @@ initFilters();
                 <template #body="slotProps">
                     <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editTeam(slotProps.data)" />
                     <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" />
-                    <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteEmployee(slotProps.data.id)" />
+                    <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTeam(slotProps.data.id)" />
                     <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
@@ -219,7 +226,7 @@ initFilters();
         <Dialog v-model:visible="visibleDeleteTeam" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTeam = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTeam" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTeam" :loading="loading2" />
         </Dialog>
     </div>
 </template>

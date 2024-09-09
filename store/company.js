@@ -62,7 +62,7 @@ export const useCompanyStore = defineStore('workStation', {
         chartProjectInfo: null,
         chartTaskInfo: null,
         chartClosedTaskInfo: null,
-        rolesLists: null
+        rolesLists: null,
     }),
 
     actions: {
@@ -396,6 +396,33 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getSingleSpace(spaceId);
             }
         },
+        async getTaskDetails(id) {
+            const token = useCookie('token');
+            const { data, pending, error } = await useAsyncData('taskDetails', () =>
+                $fetch(`https://pbe.singularitybd.net/api/v1/tasks/show/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token.value}`
+                    }
+                })
+            );
+
+            this.taskDetails = data.value?.data;
+            this.taskActivity = data.value?.taskActivity;
+            this.singleTaskComments = data.value?.data.comments;
+            this.subTasks = data.value?.subTasks;
+            this.taskStatus = [];
+            let status = data.value?.taskStatus;
+
+            if (status && status.length > 0) {
+                status.forEach((element) => {
+                    let obj = {
+                        name: element.name,
+                        code: element.id
+                    };
+                    this.taskStatus.push(obj);
+                });
+            }
+        },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
@@ -426,6 +453,10 @@ export const useCompanyStore = defineStore('workStation', {
                     this.isTaskCreated = true;
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
+                    let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                    if(taskIdInLclStrg){
+                        this.getTaskDetails(taskIdInLclStrg);
+                    }
                 }
             }
         },
@@ -460,6 +491,10 @@ export const useCompanyStore = defineStore('workStation', {
                     this.isTaskEdited = true;
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
+                    let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                    if(taskIdInLclStrg){
+                        this.getTaskDetails(taskIdInLclStrg);
+                    }
                 }
             }
         },
@@ -478,9 +513,12 @@ export const useCompanyStore = defineStore('workStation', {
                 this.isTaskDeleted = true;
                 // this.getSpaceList();
                 this.getSingleProject(projectId);
+                let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                if(taskIdInLclStrg){
+                this.getTaskDetails(taskIdInLclStrg);
+                }
             }
         },
-
         async getTaskAssignModalData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
@@ -520,33 +558,6 @@ export const useCompanyStore = defineStore('workStation', {
                         name: element.name
                     };
                     this.tags.push(obj);
-                });
-            }
-        },
-        async getTaskDetails(id) {
-            const token = useCookie('token');
-            const { data, pending, error } = await useAsyncData('taskDetails', () =>
-                $fetch(`https://pbe.singularitybd.net/api/v1/tasks/show/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token.value}`
-                    }
-                })
-            );
-
-            this.taskDetails = data.value?.data;
-            this.taskActivity = data.value?.taskActivity;
-            this.singleTaskComments = data.value?.data.comments;
-            this.subTasks = data.value?.subTasks;
-            this.taskStatus = [];
-            let status = data.value?.taskStatus;
-
-            if (status && status.length > 0) {
-                status.forEach((element) => {
-                    let obj = {
-                        name: element.name,
-                        code: element.id
-                    };
-                    this.taskStatus.push(obj);
                 });
             }
         },
