@@ -87,7 +87,7 @@ const handleChange = (field, event) => {
 <template>
     <div class="card" v-if="readTask">
         <div class="d-flex mr-2">
-            <h5 class="mb-1">Task Summery Reports</h5>
+            <h5 class="mb-1">Task Reports</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
