@@ -147,15 +147,15 @@ const switchCompanyHandler = async(switchCompId) => {
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column field="name" header="Company Name" sortable>
+            <Column field="name" header="Company Name">
               <template #body="slotProps" >
                 <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
                   <p class="cursor-pointer com-name hover:text-primary font-semibold" @click="switchCompanyHandler(slotProps?.data?.id)">{{ slotProps?.data?.name }}</p>
                 </NuxtLink>
               </template>
             </Column>
-            <Column field="number_of_employees" sortable header="Number of Employees"></Column>
-            <Column field="company_type" sortable header="Type"></Column>
+            <Column field="number_of_employees" header="Number of Employees"></Column>
+            <Column field="company_type" header="Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                    

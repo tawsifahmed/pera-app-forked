@@ -144,7 +144,7 @@ initFilters();
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
 
-            <Column field="name" sortable header="Tag Name"></Column>
+            <Column field="name" header="Tag Name"></Column>
             <!-- <Column field="email" sortable header="Email Address"></Column> -->
             <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
             <Column field="action" header="Action">
