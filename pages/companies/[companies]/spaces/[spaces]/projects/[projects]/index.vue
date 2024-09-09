@@ -85,6 +85,17 @@ const deletingTask = async () => {
 };
 
 const handleTaskDetailView = async (task) => {
+    document.documentElement.style.cursor = 'wait';
+    document.documentElement.style.position = 'relative';
+    const overlayD = document.createElement('div');
+    overlayD.style.position = 'absolute';
+    overlayD.style.top = '0';
+    overlayD.style.left = '0';
+    overlayD.style.width = '100%';
+    overlayD.style.height = '100%';
+    overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    overlayD.style.zIndex = '100000';
+    document.documentElement.appendChild(overlayD);
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
@@ -94,6 +105,8 @@ const handleTaskDetailView = async (task) => {
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
     visibleTaskDetailView.value = true;
+    document.documentElement.style.cursor = 'auto';
+    document.documentElement.removeChild(overlayD);
 };
 
 const initFilters = () => {
