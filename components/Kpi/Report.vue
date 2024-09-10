@@ -13,7 +13,7 @@ const previewKpiReportData = ref(null);
 
 const handleKpiReportGenerate = async () => {
     if (employee.value == '' || selectedQuarter.value == '') {
-        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Employee Date and Quarter', group: 'br', life: 3000 });
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Employee and Quarter', group: 'br', life: 3000 });
     }
     const token = useCookie('token');
     loading.value = true;
@@ -75,13 +75,13 @@ const handleReportDownload = async () => {
                         <label class="font-bold block mb-2">Employee:</label>
                         <!-- <pre>{{employee.id}}</pre> -->
                         <div class="flex justify-content-center">
-                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select/Search User" class="w-full md:w-14rem" />
+                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full md:w-14rem" />
                         </div>
                     </div>
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">Quarter:</label>
                         <div class="flex justify-content-center">
-                            <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select/Search User" class="w-full md:w-14rem" />
+                            <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full md:w-14rem" />
                         </div>
                     </div>
                 </div>
