@@ -258,7 +258,9 @@ onMounted(() => {
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel header="KPI Report"> Report </TabPanel>
+                    <TabPanel header="KPI Report">
+                        <KpiReport :employees="employees" :quater="quater" />
+                    </TabPanel>
                 </TabView>
             </TabPanel>
             <TabPanel header="Sections">
