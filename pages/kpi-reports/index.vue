@@ -138,9 +138,9 @@ const fetchSubSection = async () => {
 };
 
 // Function to add a new section
-const addSection = (index) => {
-    console.log(index, dynamicSection.value[index]);
-    const data = dynamicSection.value[index];
+const addSection = () => {
+    // console.log(dynamicSection.value[index]);
+    const data = dynamicSection.value[dynamicSection.value.length - 1];
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
     if (data.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (data.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
@@ -155,7 +155,44 @@ const addSection = (index) => {
         comment: ''
     });
 };
+// form Submission
+const handleSubmit = async () => {
+    const token = useCookie('token');
+    if (employee.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Employee not selected', group: 'br', life: 3000 });
+    // console.log(dynamicSection.value[index]);
+    const lastFormData = dynamicSection.value[dynamicSection.value.length - 1];
+    // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
+    if (lastFormData.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
+    if (lastFormData.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
+    if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    if (lastFormData.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
+    const kpiData = dynamicSection.value.map((section) => {
+        return {
+            user_id: employee.value.id,
+            section_id: section.section_id.id,
+            subsection_id: section.subsection_id.id,
+            quater_id: section.quater_id.id,
+            achive_mark: section.achive_mark,
+            comment: section.comment
+        };
+    });
 
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/store`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: kpiData
+    });
+    if (data.value.code == 201) {
+        toast.add({ severity: 'success', summary: 'KPI Information', detail: 'KPI Submission Complete', group: 'br', life: 3000 });
+        return (loading.value = false);
+    } else {
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to submit', group: 'br', life: 3000 });
+    }
+    console.log(kpiData);
+};
 onMounted(() => {
     init();
     fetchQuater();
@@ -182,7 +219,7 @@ onMounted(() => {
                 <TabView>
                     <TabPanel header="KPI Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
-                            <form action="" class="grid" style="gap: 10px">
+                            <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
                                 <div class="w-full col-12">
                                     <label for="icondisplay" class="font-bold block mb-2">Employee</label>
                                     <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select User" class="w-full" />
@@ -211,18 +248,23 @@ onMounted(() => {
                                                 <label for="icondisplay" class="font-bold block mb-2">Comment</label>
                                                 <InputText v-model="dynamicSection[index].comment" placeholder="Write comment" class="w-full" />
                                             </div>
-                                            <Button v-if="dynamicSection.length === index + 1" label="Add" class="mx-auto" @click.prevent="addSection(index)" />
                                         </div>
                                     </div>
+                                </div>
+                                <div class="gap-2 flex justify-content-center w-full">
+                                    <Button label="New Section" class="bg-green-500 border-none" @click.prevent="addSection(index)" />
+                                    <Button type="submit" label="Submit" class="" />
                                 </div>
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel header="KPI Report"> Report </TabPanel>
+                    <TabPanel header="KPI Report">
+                        <KpiReport :employees="employees" :quater="quater" />
+                    </TabPanel>
                 </TabView>
             </TabPanel>
             <TabPanel header="Sections">
-                <KpiSection />    
+                <KpiSection />
             </TabPanel>
             <TabPanel header="Quarter">
                 <KpiQuater />
