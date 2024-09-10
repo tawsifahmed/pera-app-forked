@@ -41,9 +41,10 @@ const handleGenerate = async () => {
             Authorization: `Bearer ${token.value}`
         }
     });
-    if (error) {
-        return (loading.value = false);
-    }
+
+    // if (error) {
+    //     return (loading.value = false);
+    // }
     if (data.value.code == 200) {
         previewData.value = data.value.data;
         console.log('Report Value', data.value.data);
