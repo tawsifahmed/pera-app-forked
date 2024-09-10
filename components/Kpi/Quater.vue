@@ -185,12 +185,12 @@ onMounted(() => {
                             <Calendar v-model="data[field]" view="year" dateFormat="yy" fluid :manualInputs="false" />
                         </template>
                     </Column>
-                    <Column header="Edit" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
-                    <Column header=" " style="width: 1%; min-width: 1rem; padding: 0 auto" bodyStyle="text-align:start">
+                    <Column header="Action" style="width: 1%; min-width: 1rem; padding: 0" bodyStyle="text-align:start">
                         <template #body="{ data }">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="onDelete(data)" />
                         </template>
                     </Column>
+                    <Column header="" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
                 </DataTable>
             </div>
         </div>
