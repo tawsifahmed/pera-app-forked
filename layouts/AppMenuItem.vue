@@ -189,6 +189,12 @@ const toggle = (event) => {
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
+            <span
+                v-if="item.label == 'KPI Reports'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
 
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
