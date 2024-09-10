@@ -1,5 +1,8 @@
 <script setup>
 import accessPermission from '~/composables/usePermission';
+import { storeToRefs } from 'pinia';
+import { useActiveCompanyStore } from '~/store/workCompany';
+const { companyList, totalProjects } = storeToRefs(useActiveCompanyStore());
 const readTask = ref(accessPermission('read_task'));
 const url = useRuntimeConfig();
 definePageMeta({
@@ -13,6 +16,7 @@ const endDate = ref('');
 const loading = ref(false);
 const loading1 = ref(false);
 const previewData = ref(null);
+const selectedProject = ref('');
 
 // Date Formatter
 const dateFormatter = (data) => {
@@ -35,7 +39,7 @@ const handleGenerate = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-view?start_date=${startDate.value}&end_date=${endDate.value}`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-view?start_date=${startDate.value}&end_date=${endDate.value}&project_id=${selectedProject.value.id ? selectedProject.value.id : ''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -60,7 +64,7 @@ const handleReportDownload = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}&project_id=${selectedProject.value.id}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -97,11 +101,17 @@ const handleChange = (field, event) => {
             <template #start>
                 <div class="flex gap-2">
                     <div class="flex-auto">
-                        <label for="icondisplay" class="font-bold block mb-2">From: </label>
+                        <!-- <pre>{{selectedProject.id}}</pre> -->
+                        <label for="icondisplay" class="font-bold block mb-2">Project: </label>
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
+                        optionLabel="name" placeholder="Select Project (Optional)" />
+                    </div>
+                    <div class="flex-auto">
+                        <label for="icondisplay" class="font-bold block mb-2">Start Date: </label>
                         <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
-                        <label for="icondisplay" class="font-bold block mb-2"> To: </label>
+                        <label for="icondisplay" class="font-bold block mb-2"> End Date: </label>
                         <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>
