@@ -40,7 +40,7 @@ const model = ref([
         items: [
             { label: 'Task Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
             { label: 'User Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' },
-            { label: 'KPI Report', icon: 'pi pi-fw pi-book', to: '/kpi-reports' }
+            { label: 'KPI Reports', icon: 'pi pi-fw pi-book', to: '/kpi-reports' }
         ]
     }
 ]);

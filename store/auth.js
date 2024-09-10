@@ -210,6 +210,7 @@ export const useAuthStore = defineStore('auth', {
       const token = useCookie('token');
       const rolePermission = useCookie('rolePermission');
       localStorage.removeItem('userCompany')
+      localStorage.removeItem('taskDetailID');
       this.authenticated = false;
       token.value = null;
       rolePermission.value = null;
