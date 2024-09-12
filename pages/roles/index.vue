@@ -120,7 +120,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createRoleP" icon="pi pi-plus" label="Create Role" @click="handleCreateRoleModal" class="mr-2" severity="secondary" />
+                <Button v-if="createRoleP" icon="pi pi-plus" label="Create" @click="handleCreateRoleModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->

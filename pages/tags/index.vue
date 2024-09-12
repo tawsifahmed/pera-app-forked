@@ -89,7 +89,7 @@ const confirmDeleteTag = async () => {
         init();
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Deleted Failed!', group: 'br', life: 3000 });
-        loading1.value = false; 
+        loading1.value = false;
     }
 };
 
@@ -127,7 +127,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tag" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button v-if="createTagsP" icon="pi pi-plus" label="Create" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -175,7 +175,7 @@ initFilters();
         <Dialog v-model:visible="visibleDeleteTag" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1"/>
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
         </Dialog>
 
         <!-- Invite User -->
