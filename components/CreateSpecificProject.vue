@@ -83,7 +83,7 @@ watch(selectedCloseStatus, (newStatus) => {
 const loading = ref(false);
 const handleCreateProject = async () => {
     loading.value = true;
-    if (projectNameInput.value === null || projectDescriptionInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null) {
+    if (projectNameInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null) {
         errorHandler.value = true;
         loading.value = false;
     } else {

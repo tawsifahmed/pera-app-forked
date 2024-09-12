@@ -314,7 +314,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Title:</label>
-                                    <InputText type="text" v-model="sectionCreate.name" placeholder="TItle" min="0" class="w-full" />
+                                    <InputText type="text" v-model="sectionCreate.name" placeholder="Title" min="0" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -345,7 +345,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Status:</label>
-                                    <Dropdown v-model="sectionEdit.status" :options="sectionStatuses" optionLabel="name" placeholder="Select" checkmark :highlightOnSelect="false" class="w-full" />
+                                    <Dropdown v-model="sectionEdit.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12 mx-auto flex justify-content-center">
@@ -408,7 +408,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
                                 <!-- <pre>{{subSectionCreate.section}}</pre> -->
-                                <Dropdown v-model="subSectionCreate.section" :options="sectionList" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+                                <Dropdown v-model="subSectionCreate.section" :options="sectionList" optionLabel="name" placeholder="Select Section" checkmark :highlightOnSelect="false" class="w-full" />
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
@@ -419,7 +419,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Target Mark:</label>
-                                    <InputText type="number" v-model="subSectionCreate.targetMark" placeholder="Set Mark" min="0" class="w-full" />
+                                    <InputText type="number" v-model="subSectionCreate.targetMark" placeholder="Set Target Mark" min="0" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -452,7 +452,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
                                 <!-- <pre>{{structuredSectionList}}</pre> -->
-                                <Dropdown v-model="subSectionEdit.section_id" :options="structuredSectionList" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+                                <Dropdown v-model="subSectionEdit.section_id" :options="structuredSectionList" optionLabel="name" placeholder="Select Section" checkmark :highlightOnSelect="false" class="w-full" />
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
@@ -463,7 +463,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Target Mark:</label>
-                                    <InputText type="number" v-model="subSectionEdit.target_mark" placeholder="Set Mark" min="0" class="w-full" />
+                                    <InputText type="number" v-model="subSectionEdit.target_mark" placeholder="Set Target Mark" min="0" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
