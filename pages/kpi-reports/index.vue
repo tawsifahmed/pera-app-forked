@@ -7,13 +7,8 @@ definePageMeta({
 const employees = ref([]);
 const employee = ref('');
 const quater = ref([]);
-const selectedQuarter = ref();
 const sections = ref([]);
-const selectedSection = ref('');
 const subSection = ref([]);
-const selectedSubSection = ref([]);
-const achievedMark = ref('');
-const comment = ref('');
 const dynamicSection = ref([
     {
         // user_id: employee.value,
@@ -27,65 +22,6 @@ const dynamicSection = ref([
 const quaterYear = ref('');
 const loading = ref(false);
 const toast = useToast();
-const members = ref([]);
-const pmMark = ref();
-const teamBuilding = ref();
-const hrMark = ref();
-
-const handleReportDownload = async (e) => {
-    e.preventDefault();
-    // Validation
-
-    if (!employee.value) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
-    }
-    if (members.value.length == 0) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Please select team members', group: 'br', life: 3000 });
-    }
-    if (!selectedQuarter.value) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Please select Quarter', group: 'br', life: 3000 });
-    }
-    if (!pmMark.value) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Please input Project Team Mark', group: 'br', life: 3000 });
-    }
-    if (!teamBuilding.value) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Please input Team building Mark', group: 'br', life: 3000 });
-    }
-    if (!hrMark.value) {
-        return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Please input HR Mark', group: 'br', life: 3000 });
-    }
-    const token = useCookie('token');
-    const membersList = members.value.map((member) => member.id);
-    const kpiData = new FormData();
-    kpiData.append('user_id', employee.value.id);
-    kpiData.append('quater_start_date', `${quaterYear.value}-${selectedQuarter.value.start_date}`);
-    kpiData.append('quater_end_date', `${quaterYear.value}-${selectedQuarter.value.end_date}`);
-    kpiData.append('team_members', JSON.stringify(membersList));
-    kpiData.append('project_team_mark', pmMark.value);
-    kpiData.append('team_building', teamBuilding.value);
-    kpiData.append('hr_mark', hrMark.value);
-    // for (const pair of kpiData.entries()) {
-    //     console.log(pair[0] + ': ' + pair[1]);
-    // }
-    loading.value = true;
-    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/report`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token.value}`
-        },
-        body: kpiData
-    });
-    if (data.value.code == 200) {
-        const link = document.createElement('a');
-        link.href = data.value.download_path;
-        link.target = '_blank';
-        link.click();
-        return (loading.value = false);
-    } else {
-        loading.value = false;
-        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
-    }
-};
 
 const init = async () => {
     const token = useCookie('token');
@@ -186,6 +122,17 @@ const handleSubmit = async () => {
     });
     if (data.value.code == 201) {
         toast.add({ severity: 'success', summary: 'KPI Information', detail: 'KPI Submission Complete', group: 'br', life: 3000 });
+        dynamicSection.value = [
+            {
+                // user_id: employee.value,
+                section_id: null,
+                subsection_id: null,
+                quater_id: null,
+                achive_mark: '',
+                comment: ''
+            }
+        ];
+        employee.value = '';
         return (loading.value = false);
     } else {
         loading.value = false;
@@ -193,13 +140,15 @@ const handleSubmit = async () => {
     }
     console.log(kpiData);
 };
+
+const handleRemove = (index) => {
+    dynamicSection.value.splice(index, 1);
+};
 onMounted(() => {
     init();
     fetchQuater();
     fetchSection();
     fetchSubSection();
-    // Initial call to add the first section
-    // addSection();
     const date = new Date();
     quaterYear.value = date.getFullYear();
 });
@@ -226,7 +175,8 @@ onMounted(() => {
                                 </div>
                                 <!-- Dynamic section -->
                                 <div class="" v-if="employee != ''">
-                                    <div v-for="(section, index) in dynamicSection" :key="index" class="card">
+                                    <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
+                                        <button type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Section</label>
@@ -285,5 +235,14 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 2px;
+}
+.close {
+    position: absolute;
+    top: 8px;
+    right: 3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: red;
 }
 </style>
