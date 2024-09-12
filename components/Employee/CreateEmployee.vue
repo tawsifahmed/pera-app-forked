@@ -86,12 +86,12 @@ const handleSubmitData = async () => {
 <template>
     <div>
         <div class="field">
-            <label for="company">Name<span class="text-red-500">*</span><span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText v-model="name" class="w-full" />
         </div>
 
         <div class="field">
-            <label for="email">Email address<span class="text-red-500">*</span> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="email">Email address<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" v-model="email" class="w-full" />
         </div>
         <div class="field">
@@ -103,13 +103,13 @@ const handleSubmitData = async () => {
             <Textarea v-model="address" rows="3" cols="20" class="w-full" />
         </div>
         <div class="field">
-            <label for="company">Password<span class="text-red-500">*</span> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Password<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="password" v-model="password" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Role<span class="text-red-500">*</span><span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Role<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 

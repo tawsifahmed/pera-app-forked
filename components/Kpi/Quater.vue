@@ -205,7 +205,7 @@ onMounted(() => {
                             <Calendar v-model="data[field]" view="year" dateFormat="yy" fluid :manualInputs="false" />
                         </template>
                     </Column>
-                    <Column v-if="deleteQuarter" header="" style="width: 1%; min-width: 1rem; padding: 0" bodyStyle="text-align:start">
+                    <Column v-if="deleteQuarter" header="" style="width: 1%; min-width: 1rem; padding: 0;" bodyStyle="text-align:start">
                         <template #body="{ data }">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="onDelete(data)" />
                         </template>
