@@ -1,4 +1,16 @@
 <script setup>
+import accessPermission from '~/composables/usePermission';
+
+const readSection = ref(accessPermission('read_section'));
+const createSection = ref(accessPermission('create_section'));
+const updateSection = ref(accessPermission('update_section'));
+const deleteSectionP = ref(accessPermission('delete_section'));
+
+const readSubSection = ref(accessPermission('read_sub_section'));
+const createSubSection = ref(accessPermission('create_sub_section'));
+const updateSubSection = ref(accessPermission('update_sub_section'));
+const deleteSubSectionP = ref(accessPermission('delete_sub_section'));
+
 const url = useRuntimeConfig();
 const toast = useToast();
 const sectionList = ref([]);
@@ -259,11 +271,11 @@ onMounted(() => {
 </script>
 <template>
     <TabView :activeIndex="0">
-        <TabPanel header="Sections">
+        <TabPanel v-if="readSection" header="Sections">
             <div class="grid">
                 <div class="col-12">
                     <div class="flex justify-content-end my-4">
-                        <Button @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
+                        <Button v-if="createSection" @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
                         <DataTable v-model:filters="filters" class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
@@ -283,9 +295,9 @@ onMounted(() => {
                             </Column> -->
                             <Column field="action" header="Action">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSection(slotProps.data)" />
+                                    <Button v-if="updateSection" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSection(slotProps.data)" />
                                     <!-- <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" /> -->
-                                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSection(slotProps.data.id)" />
+                                    <Button v-if="deleteSectionP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSection(slotProps.data.id)" />
                                 </template>
                             </Column>
                             <!-- <template #footer> In total there are {{ rolesLists ? rolesLists.length : 0 }} rows. </template> -->
@@ -347,11 +359,11 @@ onMounted(() => {
         </TabPanel>
 
         <!-- sub section panel -->
-        <TabPanel header="Sub Sections">
+        <TabPanel v-if="readSubSection" header="Sub Sections">
             <div class="grid">
                 <div class="col-12">
                     <div class="flex justify-content-end my-4">
-                        <Button @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
+                        <Button v-if="createSubSection" @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
                         <DataTable v-model:filters="filters" class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
@@ -373,8 +385,8 @@ onMounted(() => {
                             </Column> -->
                             <Column field="action" header="Action">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSubSection(slotProps.data)" />
-                                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSubSection(slotProps.data.id)" />
+                                    <Button v-if="updateSubSection" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSubSection(slotProps.data)" />
+                                    <Button v-if="deleteSubSectionP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSubSection(slotProps.data.id)" />
                                 </template>
                             </Column>
                         </DataTable>

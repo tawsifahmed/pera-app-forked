@@ -4,6 +4,10 @@ definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
+import accessPermission from '~/composables/usePermission';
+
+const readKpi = ref(accessPermission('read_kpi'));
+const createKpi = ref(accessPermission('create_kpi'));
 const employees = ref([]);
 const employee = ref('');
 const quater = ref([]);
@@ -164,9 +168,9 @@ onMounted(() => {
         <!-- kpi tabs -->
 
         <TabView class="mt-3">
-            <TabPanel class="file-upload" header="KPI">
+            <TabPanel v-if="readKpi" class="file-upload" header="KPI">
                 <TabView>
-                    <TabPanel header="KPI Generate">
+                    <TabPanel v-if="createKpi" header="KPI Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
                             <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
                                 <div class="w-full col-12">
