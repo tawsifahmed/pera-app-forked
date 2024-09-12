@@ -86,12 +86,12 @@ onMounted(async() => {
 <template>
     <div>
         <div class="field">
-            <label for="company">Name <span class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Name</label>
             <InputText v-model="editName" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label for="email">Description <span class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="email">Description</label>
             <Textarea id="description" class="border-gray-300" v-model="editDescription" rows="3" cols="20" :invalid="teamDescriptionError" />        
         </div>
         <div class="field flex flex-column">
@@ -107,7 +107,7 @@ onMounted(async() => {
         </div>
         <div class="field">
             <!-- <pre>{{usersLists}}</pre> -->
-            <label>Team Members <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Team Members</label>
             <MultiSelect display="chip" v-model="editMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Team Members" class="w-full" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>

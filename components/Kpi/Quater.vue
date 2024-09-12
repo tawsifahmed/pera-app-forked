@@ -1,4 +1,11 @@
 <script setup>
+import accessPermission from '~/composables/usePermission';
+
+const readQuarter = ref(accessPermission('read_quater'));
+const createQuarter = ref(accessPermission('create_quater'));
+const updateQuarter = ref(accessPermission('update_quater'));
+const deleteQuarter = ref(accessPermission('delete_quater'));
+
 const url = useRuntimeConfig();
 const toast = useToast();
 const quaterList = ref([]);
@@ -143,10 +150,10 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="grid">
+    <div v-if="readQuarter" class="grid">
         <div class="col-12">
             <div class="flex justify-content-end my-4">
-                <Button @click="() => (modal = true)" label="Create" icon="pi pi-plus" class="" />
+                <Button v-if="createQuarter" @click="() => (modal = true)" label="Create" icon="pi pi-plus" class="" />
             </div>
             <div class="card">
                 <DataTable
@@ -198,12 +205,13 @@ onMounted(() => {
                             <Calendar v-model="data[field]" view="year" dateFormat="yy" fluid :manualInputs="false" />
                         </template>
                     </Column>
-                    <Column header="Action" style="width: 1%; min-width: 1rem; padding: 0" bodyStyle="text-align:start">
+                    <Column v-if="deleteQuarter" header="" style="width: 1%; min-width: 1rem; padding: 0;" bodyStyle="text-align:start">
                         <template #body="{ data }">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="onDelete(data)" />
                         </template>
                     </Column>
-                    <Column header="" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
+                    <Column v-if="updateQuarter" header="Action" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
+                    <Column v-if="!updateQuarter" header="Action" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
                 </DataTable>
             </div>
         </div>
