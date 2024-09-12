@@ -15,10 +15,10 @@ definePageMeta({
     layout: 'default'
 });
 
-const readUser = ref(accessPermission('read_user'));
-const createUserP = ref(accessPermission('create_user'));
-const updateUserP = ref(accessPermission('update_user'));
-const deleteUserP = ref(accessPermission('delete_user'));
+const readTeam = ref(accessPermission('read_team'));
+const createTeamP = ref(accessPermission('create_team'));
+const updateTeamP = ref(accessPermission('update_team'));
+const deleteTeamP = ref(accessPermission('delete_team'));
 
 const filters = ref();
 
@@ -145,7 +145,7 @@ initFilters();
 </script>
 
 <template>
-    <div v-if="readUser" class="card">
+    <div v-if="readTeam" class="card">
         <div class="d-flex mr-2">
             <Toast position="bottom-right" group="br" />
             <div class="d-flex mr-2">
@@ -154,7 +154,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" :loading="loading1" />
+                <Button v-if="createTeamP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" :loading="loading1" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
             </template>
@@ -204,10 +204,8 @@ initFilters();
             </Column>
             <Column field="action" header="Action" style="width: 10%;">
                 <template #body="slotProps">
-                    <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editTeam(slotProps.data)" />
-                    <Button v-if="!updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" />
-                    <Button v-if="deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTeam(slotProps.data.id)" />
-                    <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
+                    <Button v-if="updateTeamP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editTeam(slotProps.data)" />
+                    <Button v-if="deleteTeamP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteTeam(slotProps.data.id)" />    
                 </template>
             </Column>
             <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>

@@ -1,4 +1,11 @@
 <script setup>
+import accessPermission from '~/composables/usePermission';
+
+const readQuarter = ref(accessPermission('read_quater'));
+const createQuarter = ref(accessPermission('create_quater'));
+const updateQuarter = ref(accessPermission('update_quater'));
+const deleteQuarter = ref(accessPermission('delete_quater'));
+
 const url = useRuntimeConfig();
 const toast = useToast();
 const quaterList = ref([]);
@@ -89,14 +96,27 @@ const closeCreateModal = (event) => {
 };
 const handleKpiCreation = async () => {
     console.log(Object.keys(quarterCreate.value));
+    console.log(quarterCreate.value);
     const formData = new FormData();
     if (quarterCreate.value.name != '') {
         formData.append('name', quarterCreate.value.name);
-    } else if (quarterCreate.value.start_date != '') {
+    } else {
+        errorMsg.value = 'Please fill the required fields';
+        return;
+    }
+    if (quarterCreate.value.start_date != '') {
         formData.append('start_date', formatDate(quarterCreate.value.start_date));
-    } else if (quarterCreate.value.end_date != '') {
+    } else {
+        errorMsg.value = 'Please fill the required fields';
+        return;
+    }
+    if (quarterCreate.value.end_date != '') {
         formData.append('end_date', formatDate(quarterCreate.value.end_date));
-    } else if (quarterCreate.value.year != '') {
+    } else {
+        errorMsg.value = 'Please fill the required fields';
+        return;
+    }
+    if (quarterCreate.value.year != '') {
         formData.append('year', formatDate(quarterCreate.value.year));
     } else {
         errorMsg.value = 'Please fill the required fields';
@@ -130,10 +150,10 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="grid">
+    <div v-if="readQuarter" class="grid">
         <div class="col-12">
             <div class="flex justify-content-end my-4">
-                <Button @click="() => (modal = true)" label="Create" icon="pi pi-check" class="" />
+                <Button v-if="createQuarter" @click="() => (modal = true)" label="Create" icon="pi pi-plus" class="" />
             </div>
             <div class="card">
                 <DataTable
@@ -185,12 +205,13 @@ onMounted(() => {
                             <Calendar v-model="data[field]" view="year" dateFormat="yy" fluid :manualInputs="false" />
                         </template>
                     </Column>
-                    <Column header="Action" style="width: 1%; min-width: 1rem; padding: 0" bodyStyle="text-align:start">
+                    <Column v-if="deleteQuarter" header="" style="width: 1%; min-width: 1rem; padding: 0;" bodyStyle="text-align:start">
                         <template #body="{ data }">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="onDelete(data)" />
                         </template>
                     </Column>
-                    <Column header="" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
+                    <Column v-if="updateQuarter" header="Action" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
+                    <Column v-if="!updateQuarter" header="Action" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
                 </DataTable>
             </div>
         </div>
@@ -209,19 +230,19 @@ onMounted(() => {
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">Start Date:</label>
-                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required />
+                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
-                            <Calendar v-model="quarterCreate.end_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" />
+                            <Calendar v-model="quarterCreate.end_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="user-selection w-full">
                             <label for="icondisplay" class="font-bold block mb-2">Year:</label>
-                            <Calendar v-model="quarterCreate.year" view="year" dateFormat="yy" fluid :manualInputs="false" class="w-full" />
+                            <Calendar v-model="quarterCreate.year" view="year" dateFormat="yy" fluid :manualInputs="false" class="w-full" placeholder="YYYY" />
                         </div>
                     </div>
                     <p class="text-center w-full text-red-500">{{ errorMsg }}</p>

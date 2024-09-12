@@ -1,4 +1,16 @@
 <script setup>
+import accessPermission from '~/composables/usePermission';
+
+const readSection = ref(accessPermission('read_section'));
+const createSection = ref(accessPermission('create_section'));
+const updateSection = ref(accessPermission('update_section'));
+const deleteSectionP = ref(accessPermission('delete_section'));
+
+const readSubSection = ref(accessPermission('read_sub_section'));
+const createSubSection = ref(accessPermission('create_sub_section'));
+const updateSubSection = ref(accessPermission('update_sub_section'));
+const deleteSubSectionP = ref(accessPermission('delete_sub_section'));
+
 const url = useRuntimeConfig();
 const toast = useToast();
 const sectionList = ref([]);
@@ -10,12 +22,11 @@ const visibleEditSubModal = ref(false);
 const sectionCreate = ref({});
 const subSectionCreate = ref({});
 const sectionEdit = ref({});
-const subSectionEdit = ref({})
+const subSectionEdit = ref({});
 const sectionCreateLoading = ref(false);
 const subSectionCreateLoading = ref(false);
 const sectionEditLoading = ref(false);
 const subSectionEditLoading = ref(false);
-
 
 const init = async () => {
     const token = useCookie('token');
@@ -28,7 +39,6 @@ const init = async () => {
     if (data) {
         console.log('Section data: ', data.value.data);
         sectionList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        
     }
 };
 
@@ -43,7 +53,6 @@ const initSub = async () => {
     if (data) {
         console.log('Section data: ', data.value.data);
         subSectionList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        
     }
 };
 
@@ -51,7 +60,6 @@ const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
 ]);
-
 
 const handleSectionCreation = async () => {
     sectionCreateLoading.value = true;
@@ -64,7 +72,6 @@ const handleSectionCreation = async () => {
     if (!sectionCreate.value.name || !sectionCreate.value.status) {
         sectionCreateLoading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
-
     }
 
     const token = useCookie('token');
@@ -95,7 +102,7 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
-    formData.append('comment', subSectionCreate.value.comment);
+    formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
 
     // Check if any required field is empty or undefined
@@ -125,12 +132,10 @@ const handleSubSectionCreation = async () => {
     }
 };
 
-
 const formatDate = (data) => {
     const date = new Date(data);
     return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
 };
-
 
 const editSection = async (data) => {
     visibleEditSection.value = true;
@@ -138,22 +143,22 @@ const editSection = async (data) => {
     console.log('Edit Data:', sectionEdit.value);
 };
 
-const structuredSectionList = ref()
+const structuredSectionList = ref();
 const editSubSection = async (data) => {
-    console.log('data', data)
-    
-    visibleEditSubModal.value = true
-    structuredSectionList.value = sectionList.value.map(item => ({ name: item.name, id: item.id }));
+    console.log('data', data);
+
+    visibleEditSubModal.value = true;
+    structuredSectionList.value = sectionList.value.map((item) => ({ name: item.name, id: item.id }));
     subSectionEdit.value = {
-        subSectionId : data.id,
-        section_id: structuredSectionList.value.find(item => item.id === data.section_id),
+        subSectionId: data.id,
+        section_id: structuredSectionList.value.find((item) => item.id === data.section_id),
         title: data.title,
         target_mark: data.target_mark,
         comment: data.comment,
-        status: sectionStatuses.value.find(item => item.label === data.status)
+        status: sectionStatuses.value.find((item) => item.label === data.status)
     };
     console.log('Edit Data:', subSectionEdit.value);
-}
+};
 
 const handleEditSection = async () => {
     sectionEditLoading.value = true;
@@ -222,8 +227,6 @@ const handleEditSubSection = async () => {
     }
 };
 
-
-
 const deleteSection = async (id) => {
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
@@ -240,7 +243,6 @@ const deleteSection = async (id) => {
         toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete section!', group: 'br', life: 3000 });
     }
 };
-
 
 const deleteSubSection = async (id) => {
     const token = useCookie('token');
@@ -259,7 +261,6 @@ const deleteSubSection = async (id) => {
     }
 };
 
-
 const closeCreateModal = (event) => {
     console.log(event);
 };
@@ -270,11 +271,11 @@ onMounted(() => {
 </script>
 <template>
     <TabView :activeIndex="0">
-        <TabPanel header="Sections">
+        <TabPanel v-if="readSection" header="Sections">
             <div class="grid">
                 <div class="col-12">
                     <div class="flex justify-content-end my-4">
-                        <Button @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
+                        <Button v-if="createSection" @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
                         <DataTable v-model:filters="filters" class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
@@ -294,9 +295,9 @@ onMounted(() => {
                             </Column> -->
                             <Column field="action" header="Action">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSection(slotProps.data)" />
+                                    <Button v-if="updateSection" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSection(slotProps.data)" />
                                     <!-- <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded style="visibility: hidden" /> -->
-                                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSection(slotProps.data.id)" />
+                                    <Button v-if="deleteSectionP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSection(slotProps.data.id)" />
                                 </template>
                             </Column>
                             <!-- <template #footer> In total there are {{ rolesLists ? rolesLists.length : 0 }} rows. </template> -->
@@ -304,7 +305,7 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-        
+
             <!-- create section modal -->
             <Dialog v-model:visible="sectionModal" modal header="Create Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
@@ -330,7 +331,7 @@ onMounted(() => {
                     </div>
                 </form>
             </Dialog>
-        
+
             <!-- edit section modal -->
             <Dialog v-model:visible="visibleEditSection" modal header="Edit Section" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <form class="" action="" @submit.prevent="handleEditSection">
@@ -355,20 +356,14 @@ onMounted(() => {
                     </div>
                 </form>
             </Dialog>
-        
-
-           
         </TabPanel>
 
-
-
-
         <!-- sub section panel -->
-        <TabPanel header="Sub Sections">
+        <TabPanel v-if="readSubSection" header="Sub Sections">
             <div class="grid">
                 <div class="col-12">
                     <div class="flex justify-content-end my-4">
-                        <Button @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
+                        <Button v-if="createSubSection" @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
                         <DataTable v-model:filters="filters" class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
@@ -390,15 +385,15 @@ onMounted(() => {
                             </Column> -->
                             <Column field="action" header="Action">
                                 <template #body="slotProps">
-                                    <Button icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSubSection(slotProps.data)" />
-                                    <Button icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSubSection(slotProps.data.id)" />
+                                    <Button v-if="updateSubSection" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editSubSection(slotProps.data)" />
+                                    <Button v-if="deleteSubSectionP" icon="pi pi-trash" text class="" severity="warning" rounded @click="deleteSubSection(slotProps.data.id)" />
                                 </template>
                             </Column>
                         </DataTable>
                     </div>
                 </div>
             </div>
-        
+
             <!-- sub section modal -->
             <Dialog v-model:visible="subModal" modal header="Create Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
@@ -435,13 +430,12 @@ onMounted(() => {
                                 </div>
                             </div>
                             <div class="col-12 mx-auto flex justify-content-center">
-                                <Button label="Create" severity="info" type="submit" :loading="subSectionCreateLoading"/>
+                                <Button label="Create" severity="info" type="submit" :loading="subSectionCreateLoading" />
                             </div>
                         </div>
                     </div>
                 </form>
             </Dialog>
-
 
             <!-- edit sub section modal -->
             <Dialog v-model:visible="visibleEditSubModal" modal header="Edit Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
@@ -479,7 +473,7 @@ onMounted(() => {
                                 </div>
                             </div>
                             <div class="col-12 mx-auto flex justify-content-center">
-                                <Button label="Update" severity="info" type="submit" :loading="subSectionEditLoading"/>
+                                <Button label="Update" severity="info" type="submit" :loading="subSectionEditLoading" />
                             </div>
                         </div>
                     </div>
@@ -487,7 +481,5 @@ onMounted(() => {
             </Dialog>
         </TabPanel>
     </TabView>
-    
-    
 </template>
 <style scoped></style>

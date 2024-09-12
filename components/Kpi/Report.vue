@@ -8,7 +8,6 @@ const loading1 = ref(false);
 const employee = ref('');
 const selectedQuarter = ref('');
 
-
 const previewKpiReportData = ref(null);
 
 const handleKpiReportGenerate = async () => {
@@ -31,7 +30,7 @@ const handleKpiReportGenerate = async () => {
     if (data.value.code == 200) {
         previewKpiReportData.value = data.value;
         console.log('Report Value', data.value);
-        return loading.value = false;
+        return (loading.value = false);
     } else {
         loading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to show report', group: 'br', life: 3000 });
@@ -93,7 +92,6 @@ const handleReportDownload = async () => {
         </Toolbar>
     </div>
     <div v-if="previewKpiReportData" class="card">
-       
         <!-- <pre>{{previewKpiReportData}}</pre> -->
         <div>
             <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-5">
@@ -101,16 +99,16 @@ const handleReportDownload = async () => {
                 <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
             </div>
             <div class="flex align-items-center justify-content-between my-4">
-                <h6 class="m-0 font-bold">Name: {{previewKpiReportData?.user_name}}</h6>
-                <h6 class="m-0 font-bold">Section: {{previewKpiReportData?.data[0]?.section.name}}</h6>
-                <h6 class="m-0 font-bold">Achieved: {{previewKpiReportData?.overAllKpi}}</h6>
+                <h6 class="m-0 font-bold">Name: {{ previewKpiReportData?.user_name }}</h6>
+                <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6>
+                <h6 class="m-0 font-bold">Achieved: {{ previewKpiReportData?.overAllKpi }}</h6>
             </div>
             <DataTable :value="previewKpiReportData?.data[0]?.sub_section_data" tableStyle="min-width: 50rem">
                 <template #empty> <p class="text-center">No Data found...</p> </template>
                 <Column field="achive_mark" header="Sub Section">
-                 <template #body="slotProps">
-                    <div>{{slotProps?.data?.sub_section.title}}</div>
-                 </template>
+                    <template #body="slotProps">
+                        <div>{{ slotProps?.data?.sub_section?.title }}</div>
+                    </template>
                 </Column>
                 <Column field="achive_mark" header="Achieved Mark"></Column>
                 <Column field="target_mark" header="Target Mark"></Column>
