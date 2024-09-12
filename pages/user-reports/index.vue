@@ -44,7 +44,6 @@ const handleGenerate = async () => {
     });
     if (data.value.code == 200) {
         previewData.value = data.value.data;
-        console.log('Report Value', data.value.data);
         return (loading.value = false);
     } else {
         loading.value = false;
@@ -54,13 +53,13 @@ const handleGenerate = async () => {
 
 const handleReportDownload = async () => {
     const token = useCookie('token');
-    loading.value = true;
+    loading1.value = true;
     if (employee.value == '') {
-        loading.value = false;
+        loading1.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please Select Employee', group: 'br', life: 3000 });
     }
     if (startDate.value == '' && endDate.value !== '') {
-        loading.value = false;
+        loading1.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please Select Start Date', group: 'br', life: 3000 });
     }
     const formattedStartDate = dateFormatter(startDate.value);
@@ -74,17 +73,18 @@ const handleReportDownload = async () => {
             }
         }
     );
-    if (error) {
-        return (loading.value = false);
+    if (error.value) {
+        console.log(error);
+        return (loading1.value = false);
     }
     if (data.value.code == 200) {
         const link = document.createElement('a');
         link.href = data.value.download_path;
         link.target = '_blank';
         link.click();
-        return (loading.value = false);
+        return (loading1.value = false);
     } else {
-        loading.value = false;
+        loading1.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
 };
@@ -128,7 +128,7 @@ onMounted(() => {
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">User:</label>
                         <div class="flex justify-content-center">
-                            <Dropdown v-model="employee" editable :options="employees" optionLabel="name" placeholder="Select/Search User" class="w-full md:w-14rem" />
+                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select/Search User" class="w-full md:w-14rem" />
                         </div>
                     </div>
                     <div class="flex-auto">
