@@ -358,7 +358,7 @@ const handleShare = async () => {
     } else {
         // navigator.clipboard.writeText('http://localhost:3000/sharedtask/' + data.value.shared_token);
         const el = document.createElement('textarea');
-        el.value = 'https://pera.singularitybd.net/sharedTask/' + data.value.shared_token;
+        el.value = data.value.shared_web_link;
         document.body.appendChild(el);
         el.select();
         document.execCommand('copy');
