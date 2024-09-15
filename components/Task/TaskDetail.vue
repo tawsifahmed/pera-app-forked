@@ -612,8 +612,8 @@ const handleShareTaskId = () => {
                                         </template>
                                     </Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
-                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '12.5%' }"></Column>
-                                    <Column field="priority" header="Priority" :style="{ width: '8%' }"></Column>
+                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '11.5%' }" style="text-wrap: nowrap;"></Column>
+                                    <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown-det">
