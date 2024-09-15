@@ -37,6 +37,14 @@ const tags = ref(taskDetails.value?.tags?.map((obj) => ({ id: obj.id, name: obj.
 
 const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null);
 
+const checkDate = ref(dueDate.value);
+watch(dueDate, (newValue, oldValue) => {
+    if (newValue) {
+        checkDate.value = new Date(newValue).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    }
+});
+
+
 const status = ref();
 const timeTrack = ref('00:00:00');
 let interval = null;
@@ -128,21 +136,27 @@ const formattedTime = (time) => {
     return `${day} ${month}'${year}, ${formattedHours}:${formattedMinutes}${ampm}`;
 };
 
+
 const handleTaskDetailSubmit = async () => {
     if (dueDate.value) {
         const selectedDate = new Date(dueDate.value);
         selectedDate.setDate(selectedDate.getDate() + 1);
         dueDate.value = selectedDate.toISOString();
     }
+
+    console.log('checkDate', checkDate.value);
+    const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    console.log('formattedDueDate', formattedDueDate);
     const taskDetailData = {
         id: taskDetails.value?.id,
         name: taskDetails.value?.name,
         description: description.value,
         project_id: projID,
-        dueDate: dueDate.value,
+        ...(checkDate.value !== formattedDueDate ? { dueDate: dueDate.value } : {}),
         assignees: assignees.value.map((obj) => obj.id),
         tags: tags.value.map((obj) => obj.id)
     };
+
 
     if (dueDate.value) {
         const postSubDate = new Date(dueDate.value);
