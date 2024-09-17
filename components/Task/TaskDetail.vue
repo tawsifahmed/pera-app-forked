@@ -32,8 +32,17 @@ const createTaskP = ref(accessPermission('create_task'));
 
 const assignees = ref(null);
 assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
+const isAsigneeEdited = ref(false); 
+watch(assignees, (newValue) => {
+    isAsigneeEdited.value = true;
+});
 
 const tags = ref(taskDetails.value?.tags?.map((obj) => ({ id: obj.id, name: obj.name })));
+
+const isTagsEdited = ref(false);
+watch(tags, (newValue) => {
+    isTagsEdited.value = true;
+});
 
 const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null);
 
@@ -88,10 +97,12 @@ const vModelBncStatus = ref();
 
 const description = ref(taskDetails.value?.description || ' ');
 
+const isDescriptionEdited = ref(false);
 watch(description, (newValue) => {
     if (newValue.length === 0) {
         description.value = ' ';
     }
+    isDescriptionEdited.value = true;
 });
 
 const taskCommentInput = ref(null);
@@ -149,12 +160,14 @@ const handleTaskDetailSubmit = async () => {
     console.log('formattedDueDate', formattedDueDate);
     const taskDetailData = {
         id: taskDetails.value?.id,
-        name: taskDetails.value?.name,
-        description: description.value,
+        // name: taskDetails.value?.name,
+        ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
         project_id: projID,
         ...(checkDate.value !== formattedDueDate ? { dueDate: dueDate.value } : {}),
-        assignees: assignees.value.map((obj) => obj.id),
-        tags: tags.value.map((obj) => obj.id)
+        // assignees: assignees.value.map((obj) => obj.id),
+        ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
+        // tags: tags.value.map((obj) => obj.id)
+        ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {}),
     };
 
 
@@ -168,6 +181,18 @@ const handleTaskDetailSubmit = async () => {
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
+        if(isDescriptionEdited.value === true) {
+            isDescriptionEdited.value = false;
+            console.log('isDescriptionEdited Flagged');
+        }
+        if(isAsigneeEdited.value === true) {
+            isAsigneeEdited.value = false;
+            console.log('isAsigneeEdited Flagged');
+        }
+        if(isTagsEdited.value === true) {
+            isTagsEdited.value = false;
+            console.log('isTagsEdited Flagged');
+        }
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
     }
@@ -415,6 +440,7 @@ const handleShareTaskId = () => {
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
                 <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
                 <h5 class="m-0 ml-2">Activity</h5>
+                <!-- <pre>isTagsEdited {{isTagsEdited}}</pre> -->
             </div>
         </div>
         <div class="col-12 lg:col-7">
@@ -444,7 +470,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input" />
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input"/>
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -616,7 +642,7 @@ const handleShareTaskId = () => {
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
                                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create" v-tooltip.left="{ value: `Create Sub Task` }" @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')" class="mr-2 sub-create" severity="secondary" />
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto">
+                                <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
