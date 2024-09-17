@@ -11,6 +11,8 @@ const { company_id } = storeToRefs(useActiveCompanyStore());
 const { companyId } = storeToRefs(useCompanyStore());
 const space = useWorkSpaceStore();
 const { save } = storeToRefs(useWorkSpaceStore());
+const { spacePage } = defineProps(['spacePage']);
+
 const spaceFormInputs = ref(false);
 const spaceNameError = ref(false);
 const spaceDescriptionError = ref(false);
@@ -72,9 +74,10 @@ const hideDialog = () => {
 
 <template>
     <div>
-        <Button icon="pi pi-plus" class="p-button-sm" @click="showDialog" severity="secondary" aria-label="Bookmark" text />
+        <Button :icon="spacePage ? '' : 'pi pi-plus'" :class="spacePage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'" :label="spacePage ? 'Create +' : ''" @click="showDialog" :severity="spacePage ? 'primary' : 'secondary'" aria-label="Bookmark" :text="!spacePage" />
         <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid">
             <div class="field">
+                <!-- <pre>{{spacePage}}</pre> -->
                 <label for="name">Space Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
             </div>

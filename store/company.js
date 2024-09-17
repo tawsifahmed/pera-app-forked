@@ -424,6 +424,8 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
+            console.log('dueDate formatted', dueDate);
+            // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
                 method: 'POST',
@@ -461,6 +463,7 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async editTask({ id, name, description, project_id, dueDate, priority, assignees, tags }) {
+            
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${id}`, {
                 method: 'POST',
@@ -472,6 +475,7 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     due_date: dueDate,
+                    // due_date: dueDate,
                     priority: priority,
                     assignees: assignees,
                     tags: tags,
@@ -479,6 +483,7 @@ export const useCompanyStore = defineStore('workStation', {
                     // 'attachments' : attachments,
                 }
             });
+            console.log('data', data);
 
             if (error.value) {
                 if (error.value.data.code === 400) {

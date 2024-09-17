@@ -2,7 +2,7 @@
     <div>
         <InputText type="hidden" v-model="tskId" />
         <div class="field flex flex-column">
-            <label for="name">Set Task Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="name">Set Task Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Textarea id="description" class="border-gray-300" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div>
         <!-- <div class="field">
@@ -21,7 +21,7 @@
         </div>
         <div class="field">
             <label>Due Date <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
+            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hourFormat="12" />
         </div>
         <div class="field">
             <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
@@ -75,14 +75,15 @@ const handleCreateTask = async () => {
         btnLoading.value = false;
     } else {
         errorHandler.value = false;
+        let sendDate;
         if (dueDate.value) {
             const selectedDate = new Date(dueDate.value);
             selectedDate.setDate(selectedDate.getDate() + 1);
-            dueDate.value = selectedDate.toISOString();
+            sendDate = selectedDate.toISOString();
         }
         const createTaskData = {
             name: name.value, 
-            dueDate: dueDate.value,
+            dueDate: sendDate ? new Date(new Date(sendDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             assignees: assignees.value?.map((assignee) => assignee.id),
             tags: tags.value?.map((tag) => tag.id),
             priority: priority.value?.name,
@@ -92,7 +93,7 @@ const handleCreateTask = async () => {
         if(dueDate.value){
             const postSubDate = new Date(dueDate.value)
             postSubDate.setDate(postSubDate.getDate() - 1);
-            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '') : null;
         }
         
         await createTask(createTaskData);
@@ -119,5 +120,9 @@ const handleCreateTask = async () => {
 .create-btn-wrapper {
     display: flex;
     justify-content: end;
+}
+
+.clndr{
+    cursor: pointer;
 }
 </style>

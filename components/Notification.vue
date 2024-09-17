@@ -32,6 +32,7 @@ const fetchData = async () => {
         });
 
         if (data.value) {
+            console.log('notification data =>', data.value);
             notificationData.value = data.value.data;
             totalPage.value = Math.ceil(data.value.total / 5);
         }
@@ -56,15 +57,19 @@ const handleNavigate = async (type) => {
 };
 </script>
 <template>
-    <div class="bg-white card1">
+    <div v-if="notificationData.length > 0" class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-for="notify in notificationData" :key="notify" class="">
             <div @click="handleClick(notify.id)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
         </div>
+        
         <div class="flex gap-2 justify-content-center">
             <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
             <Button @click="handleNavigate('')" :disabled="totalPage === page ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
         </div>
+    </div>
+    <div class="bg-white card2 text-center text-lg" v-else>
+        No notifications!
     </div>
 </template>
 
@@ -75,6 +80,15 @@ const handleNavigate = async (type) => {
     margin-bottom: 20px;
     width: 30rem;
     padding: 10px;
+}
+.card2 {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 30rem;
+    padding: 10px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 .title {

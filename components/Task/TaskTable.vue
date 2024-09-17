@@ -282,16 +282,9 @@ const handleChange = (event, name) => {
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
                 <!-- task report download -->
-                 <Button
-                    v-if="downloadTaskP"
-                    @click="downloadTaskSheet(tasks)"
-                    v-tooltip.right="{ value: `Download Tasks` }" 
-                    :loading="loading"
-                    :style="`${loading === true ? 'backGround: red' : ''}`"
-                    class="excel-export-btn">
-                    <img  src="/assets/icons/excel-export-icon.png" />
-
-                 </Button>
+                <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" v-tooltip.right="{ value: `Download Tasks` }" :loading="loading" :style="`${loading === true ? 'backGround: red' : ''}`" class="excel-export-btn">
+                    <img src="/assets/icons/excel-export-icon.png" />
+                </Button>
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
             </div>
@@ -314,7 +307,14 @@ const handleChange = (event, name) => {
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP" optionLabel="name">
+                        <Dropdown
+                            class="mr-1 flex justify-content-center align-items-center"
+                            @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
+                            v-model="slotProps.node.data.status"
+                            :options="statuslist"
+                            :disabled="!updateTaskP"
+                            optionLabel="name"
+                        >
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
                                     <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
@@ -332,8 +332,14 @@ const handleChange = (event, name) => {
                         </Dropdown>
                     </div>
                     <!-- <div>{{slotProps.node.data.status.name}}</div> -->
-                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{
-                        value: `${slotProps.node.data.name}`}">{{ slotProps.node.data.name }}</span>
+                    <span
+                        class="taskTitle"
+                        @click="emit('handleTaskDetailView', slotProps.node)"
+                        v-tooltip.left="{
+                            value: `${slotProps.node.data.name}`
+                        }"
+                        >{{ slotProps.node.data.name }}</span
+                    >
                 </div>
             </template>
         </Column>
@@ -368,7 +374,14 @@ const handleChange = (event, name) => {
                 <div class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center" @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)" v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP" optionLabel="name">
+                        <Dropdown
+                            class="mr-1 flex justify-content-center align-items-center"
+                            @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
+                            v-model="slotProps.node.data.status"
+                            :options="statuslist"
+                            :disabled="!updateTaskP"
+                            optionLabel="name"
+                        >
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
                                     <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{ slotProps.value.name }}</div>
@@ -429,8 +442,8 @@ const handleChange = (event, name) => {
                                     <div class="">
                                         <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate text-sm title" v-tooltip.top="{value: `${element.data.name}`}">{{ element.data.name }}</p>
-                                                <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p>
+                                                <p class="font-semibold truncate text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
+                                                <!-- <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
@@ -487,6 +500,7 @@ const handleChange = (event, name) => {
                                                         }
                                                     "
                                                 >
+                                                    <p class="mb-1">Subtask</p>
                                                     <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
                                                 </div>
@@ -964,8 +978,6 @@ textarea {
     }
 }
 
-
-
 .excel-export-btn {
     background: #f1f5f9;
     border: 1px solid #f1f5f9;
@@ -984,18 +996,18 @@ textarea {
     border-color: #e2e8f0;
 }
 
-.table-btn{
+.table-btn {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     min-width: 91.22px;
 }
 
-.board-btn{
+.board-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
 }
 
-.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler{
+.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler {
     margin-right: 0.2rem !important;
 }
 </style>
