@@ -424,6 +424,8 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
+            console.log('dueDate formatted', dueDate);
+            // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
                 method: 'POST',

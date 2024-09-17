@@ -85,6 +85,8 @@ watchEffect(() => {
 const closeEditSpace = (evn) => {
     visibleEditSpace.value = evn;
 };
+
+const spacePage = ref(true);
 </script>
 
 <template>
@@ -101,7 +103,7 @@ const closeEditSpace = (evn) => {
                 <p class="text">Company - {{ singleCompany?.name }}</p>
             </div>
             <div class="create-btn-wrapper ">
-                <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }" />
+                <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }" :spacePage="spacePage" />
             </div>
         </div>
 

@@ -1,8 +1,9 @@
 <template>
     <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
         <div>
+            <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
-                <label for="name">Edit Task Name</label>
+                <label for="name">Edit Task Name<i class="text-red-400 text-italic">*</i></label>
                 <Textarea id="description" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
                     :invalid="spaceDescriptionError" />
             </div>
@@ -17,8 +18,9 @@
                     placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
+                <!-- <pre>date{{dueDate}}</pre> -->
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" />
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hourFormat="12"/>
             </div>
             <div class="field">
                 <label>Priority</label>
@@ -47,7 +49,7 @@ const btnLoading = ref(false);
 const taskEditDescriptionInput = ref(null);
 
 const taskNameEditInput = ref(singleTask?.data?.name);
-const dueDate = ref(singleTask?.data?.dueDate);
+const dueDate = ref(singleTask?.data?.dueDate ? new Date(singleTask.data.dueDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
 
 const assignees = ref(null);
 assignees.value = singleTask?.data?.assigneeObj ? singleTask?.data?.assigneeObj.map((obj) => ({ id: obj.id, name: obj.name  })) : '';
@@ -75,17 +77,18 @@ const handleUpdateTask = async () => {
         btnLoading.value = false;
     } else {
         EditErrorHandler.value = false;
+        let sendEditDate;
         if (dueDate.value) {
             const selectedDate = new Date(dueDate.value);
             selectedDate.setDate(selectedDate.getDate() + 1);
-            dueDate.value = selectedDate.toISOString();
+            sendEditDate = selectedDate.toISOString();
         }
         const editTaskData = {
             id: singleTask.key,
             name: taskNameEditInput.value,
             description: taskEditDescriptionInput.value,
             priority: priority.value.name,
-            dueDate: dueDate.value,
+            dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             assignees: assignees.value.map((obj) => obj.id),
             tags: tags.value.map((obj) => obj.id),
             project_id: projects
@@ -94,7 +97,7 @@ const handleUpdateTask = async () => {
         if(dueDate.value){
             const postSubDate = new Date(dueDate.value)
             postSubDate.setDate(postSubDate.getDate() - 1);
-            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
         }
         
         await editTask(editTaskData);
