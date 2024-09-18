@@ -4,10 +4,12 @@ const token = useCookie('token');
 const notificationData = ref([]);
 const page = ref(1);
 const totalPage = ref(1);
+const emit = defineEmits(['closeNotification']);
 
-const handleClick = async (id) => {
+
+const handleClick = async (element) => {
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${id}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${element.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -16,6 +18,23 @@ const handleClick = async (id) => {
                 is_read: 1
             }
         });
+        const companyId = localStorage.getItem('userCompany');
+        console.log('Notification_element =>', element);
+        // console.log('Task click: ', task);
+        if (element.payload?.type === "task_details"){
+            await navigateTo({ path: `/companies/${companyId}/spaces/${element?.space_id}/projects/${element?.project_id}`, query: { task_key: element?.task_id } });
+            emit('closeNotification', false);
+        } 
+        // else if (element.payload?.type === "project_details") {
+        //     await navigateTo({ path: `/companies/${companyId}/spaces/${element.payload.space_id}/projects/${element.payload.project_id}` });
+        // } 
+        // else if (element.payload?.type === "space_details") {
+        //     await navigateTo({ path: `/companies/${companyId}/spaces/${element.payload.space_id}` });
+        // } 
+        // else if (element.payload?.type === "company_details") {
+        //     await navigateTo({ path: `/companies/${companyId}` });
+        // }
+        // await navigateTo({ path: `/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`, query: { task_key: task.id } });
         await fetchData();
     } catch (e) {
         console.log(e);
@@ -60,7 +79,7 @@ const handleNavigate = async (type) => {
     <div v-if="notificationData.length > 0" class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-for="notify in notificationData" :key="notify" class="">
-            <div @click="handleClick(notify.id)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
+            <div @click="handleClick(notify)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
         </div>
         
         <div class="flex gap-2 justify-content-center">

@@ -214,14 +214,18 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    selectedProject.value = '';
-    filterStatus.value = '';
-    filterDueDate.value = '';
-    projectId.value = '';
-    sta.value = '';
-    selectedStatus.value = '';
-    isCalendarSelected.value = false;
-    filterTasks();
+    if(selectedProject.value || filterStatus.value || filterDueDate.value) {
+        selectedProject.value = '';
+        filterStatus.value = '';
+        filterDueDate.value = '';
+        projectId.value = '';
+        sta.value = '';
+        selectedStatus.value = '';
+        isCalendarSelected.value = false;
+        filterTasks();
+    }else{
+        return;
+    }
 };
 
 const handleTaskClick = async (task) => {

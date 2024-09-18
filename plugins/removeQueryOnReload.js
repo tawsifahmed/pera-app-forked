@@ -7,7 +7,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         const { task_key, ...remainingQuery } = to.query;
   
         // Push the new URL without 'task_key' query parameter
-        router.replace({ query: remainingQuery });
+        setTimeout(()=>{
+          router.replace({ query: remainingQuery });
+        }, 1500);
       }
     });
   });

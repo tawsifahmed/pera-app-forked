@@ -43,21 +43,26 @@ const strD = ref();
 const enD = ref();
 const activeSubTask = ref(null);
 const handleFilterReset = () => {
-    filterAssignees.value = '';
-    filterPriorities.value = '';
-    filterStatus.value = '';
-    filterSearch.value = '';
-    filterStartDueDate.value = '';
-    filterEndDueDate.value = '';
-    userI.value = '';
-    prio.value = '';
-    sta.value = '';
-    que.value = '';
-    strD.value = '';
-    enD.value = '';
-    isCalendarSelected1.value = false;
-    isCalendarSelected2.value = false;
-    changeAttribute();
+    if(filterAssignees.value || filterPriorities.value || filterStatus.value || filterSearch.value || filterStartDueDate.value || filterEndDueDate.value) {
+        filterAssignees.value = '';
+        filterPriorities.value = '';
+        filterStatus.value = '';
+        filterSearch.value = '';
+        filterStartDueDate.value = '';
+        filterEndDueDate.value = '';
+        userI.value = '';
+        prio.value = '';
+        sta.value = '';
+        que.value = '';
+        strD.value = '';
+        enD.value = '';
+        isCalendarSelected1.value = false;
+        isCalendarSelected2.value = false;
+        changeAttribute();
+    }else{
+        return;
+    }
+    
 };
 
 const changeAttribute = async () => {
