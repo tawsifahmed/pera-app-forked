@@ -521,7 +521,7 @@ const handleShareTaskId = () => {
                                 <!-- <Editor v-if="description" v-model="description" editorStyle="height: 200px"/> -->
                                 <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
                                     <template v-slot:toolbar>
-                                        <span class="ql-formats flex justify-content-end">
+                                        <span class="ql-formats flex justify-content-end mr-0">
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
                                             <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
                                             <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
@@ -1145,5 +1145,9 @@ a {
 }
 .no-scrollbar::-webkit-scrollbar {
     display: none !important;
+}
+
+.ql-toolbar.ql-snow{
+    padding: 4px !important;
 }
 </style>

@@ -4,9 +4,9 @@ import ColorPicker from 'primevue/colorpicker';
 import { useWorkProjectStore } from '../store/workProjects';
 import { useToast } from 'primevue/usetoast';
 const toast = useToast();
-const project = useWorkProjectStore(); // use authenticateUser action from  auth store
+const project = useWorkProjectStore();
 const { save } = storeToRefs(useWorkProjectStore());
-const { singleSpace, spaces } = defineProps(['singleSpace', 'spaces']);
+const { singleSpace, spaces, isPage } = defineProps(['singleSpace', 'spaces', 'isPage']);
 const companyFormInputs = ref(false);
 const errorHandler = ref(false);
 
@@ -128,7 +128,7 @@ const handleCreateProject = async () => {
 
 <template>
     <div>
-        <Button icon="pi pi-plus" class="p-button-sm w-2rem h-2rem" @click="showDialog" severity="secondary" aria-label="Bookmark" text />
+        <Button :icon="isPage ? '' : 'pi pi-plus'" :class="isPage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'" :label="isPage ? 'Create +' : ''" @click="showDialog" :severity="isPage ? 'primary' : 'secondary'" aria-label="Bookmark" :text="!isPage" />
         <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Project" :modal="true" class="p-fluid">
             <div class="field">
                 <label for="name"
@@ -148,7 +148,7 @@ const handleCreateProject = async () => {
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
-                            <ColorPicker class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
+                            <ColorPicker class="color-pick" style="width: 1.5rem;" v-model="colorHEX" inputId="cp-hex" format="hex" />
                         </InputGroupAddon>
                         <InputText class="form-control" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
                         <InputGroupAddon @click="addTaskStatus" class="btn btn-outline-secondary cursor-pointer">

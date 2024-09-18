@@ -81,13 +81,15 @@ const edittProject = (id) => {
 const closeEditProject = (evn) => {
     visibleEditProject.value = evn;
 };
+
+const isPage = ref(true);
 </script>
 
 <template>
     <div class="card">
         <Toast position="bottom-right" group="br" />
         <!-- <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5> -->
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+        <div class="d-flex create-space-btn-wrapper mb-3">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home responsive-text"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
@@ -98,7 +100,7 @@ const closeEditProject = (evn) => {
                 <p class="text cursor-pointer responsive-text">Space - {{ singleSpace?.name }}</p>
             </div>
             <div class="create-btn-wrapper">
-                <CreateSpecificProject v-if="createProjectP" v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
+                <CreateSpecificProject v-if="createProjectP" v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" :isPage="isPage" />
             </div>
         </div>
         <div class="flex justify-content-end mb-2">
