@@ -149,6 +149,7 @@ watch(() => useRoute().query.task_key, (newTaskKey) => {
 if (task_key) {
     handleTaskDetailView({ key: task_key });
 }
+
 watchEffect(() => {
     loading.value = false;
 });
