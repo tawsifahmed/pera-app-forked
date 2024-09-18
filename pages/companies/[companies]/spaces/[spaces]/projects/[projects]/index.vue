@@ -139,6 +139,13 @@ const updateTaskTable = () => {
 
 getSingleProject(projects);
 
+
+watch(() => useRoute().query.task_key, (newTaskKey) => {
+    if (newTaskKey) {
+        handleTaskDetailView({ key: newTaskKey });
+    }
+});
+
 if (task_key) {
     handleTaskDetailView({ key: task_key });
 }

@@ -87,6 +87,10 @@ const handleOutsideClick = () => {
     showNotify.value = false;
 };
 
+const closeNotification = (evn) => {
+    showNotify.value = evn;
+};
+
 // Register directive
 const vClickOutside = {
     beforeMount(el, binding) {
@@ -196,7 +200,7 @@ const onDarkModeChange = (value) => {
                     <span class="ml-4">Notification</span>
                 </button>
                 <div v-if="showNotify" class="notification">
-                    <Notification />
+                    <Notification @closeNotification="closeNotification($event)"/>
                 </div>
             </div>
             <button @click="logout" class="p-link layout-topbar-button">
