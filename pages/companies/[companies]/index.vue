@@ -131,7 +131,12 @@ const spacePage = ref(true);
                 </template>
             </Column>
             <Column field="description" header="Description"></Column>
-            <Column field="color" header="Space Color"></Column>
+            <Column field="color" header="Space Color">
+               <template #body="slotProps">
+                <div id="dynamic-div" :style="`background-color: ${slotProps.data.color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-2 px-2 w-fit text-white">{{slotProps.data.name ? slotProps.data.name.charAt(0).toUpperCase() : 'S'}}</div>
+
+               </template>
+            </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <!-- <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">

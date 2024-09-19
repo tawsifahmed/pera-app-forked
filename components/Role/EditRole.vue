@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Role Name</label>
+            <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
 
         <div class="field permission_selection">
-            <label>Permissions</label>
+            <label>Permissions<i class="text-red-400 text-italic">*</i> </label>
             <!-- <pre>{{selectedPermissions}}</pre> -->
             <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>

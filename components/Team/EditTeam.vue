@@ -86,7 +86,7 @@ onMounted(async() => {
 <template>
     <div>
         <div class="field">
-            <label for="company">Name</label>
+            <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText v-model="editName" class="w-full" />
         </div>
 
@@ -96,18 +96,18 @@ onMounted(async() => {
         </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Team Lead</label>
+            <label>Team Lead<i class="text-red-400 text-italic">*</i> </label>
             <!-- {{ selectedTeamLead.id }} -->
             <Dropdown v-model="editLineManager" :options="usersLists" optionLabel="name" placeholder="Select Team Lead" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Line Manager</label>
+            <label>Line Manager<i class="text-red-400 text-italic">*</i> </label>
             <Dropdown v-model="editTeamLead" :options="usersLists" optionLabel="name" placeholder="Select Line Manager" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <div class="field">
             <!-- <pre>{{usersLists}}</pre> -->
-            <label>Team Members</label>
+            <label>Team Members<i class="text-red-400 text-italic">*</i> </label>
             <MultiSelect display="chip" v-model="editMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Team Members" class="w-full" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>

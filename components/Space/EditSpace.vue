@@ -66,6 +66,11 @@ const handleEditSpace = async () => {
           }
         }
     }
+
+  const hideDialog = () => {
+  emit('closeEditSpace', false);
+}
+
 </script>
 
 <template>
@@ -76,7 +81,7 @@ const handleEditSpace = async () => {
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div> -->
           <div class="field flex flex-column">
-              <label for="name">Space Name</label>
+              <label for="name">Space Name<i class="text-red-400 text-italic">*</i> </label>
               <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
           </div>
           <div class="field flex flex-column">
@@ -85,7 +90,7 @@ const handleEditSpace = async () => {
           </div>
           
           <div class="field">
-            <label for="name">Space Color</label>
+            <label for="name">Space Color<i class="text-red-400 text-italic">*</i> </label>
             <div class="m-0 d-flex colorpicker-wrapper">
                 <div class="flex justify-center align-items-center">
                     <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S'}}</div>
@@ -108,14 +113,18 @@ const handleEditSpace = async () => {
                 </div>
             </div>
         </div>
-          <br>
-          <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
-          <br>
-          <div class="create-btn-wrapper">
-            <Button @click="handleEditSpace" class="text-white py-2 px-6 tracking-wide" label="Update Space" :loading="loading"/>
-          </div>
-      </div>
 
+          <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
+
+          <!-- <div class="create-btn-wrapper">
+            <Button @click="handleEditSpace" class="text-white py-2 px-6 tracking-wide" label="Update Space" :loading="loading"/>
+          </div> -->
+      </div>
+      <br>
+      <div class="flex justify-content-end mt-2">
+        <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
+        <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleEditSpace" />
+      </div>
 
      
 

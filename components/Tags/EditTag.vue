@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Name</label>
+            <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText v-model="name" class="w-full" placeholder="Edit tag name" />
         </div>
 

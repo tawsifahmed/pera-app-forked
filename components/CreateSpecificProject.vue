@@ -136,7 +136,7 @@ const handleCreateProject = async () => {
                 >
             </div>
             <div class="field">
-                <label for="name">Project Name <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Project Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <InputText id="name" v-model="projectNameInput" required="true" />
             </div>
             <div class="field">
@@ -144,7 +144,7 @@ const handleCreateProject = async () => {
                 <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput" rows="3" cols="20" />
             </div>
             <div class="mb-4">
-                <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
+                <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status<i class="text-red-400 text-italic">*</i>  <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
@@ -176,7 +176,7 @@ const handleCreateProject = async () => {
                 </div>
             </div>
             <div class="mb-4">
-                <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
+                <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
                     <div class="field">
                         <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName" placeholder="Select Status" class="w-full" />

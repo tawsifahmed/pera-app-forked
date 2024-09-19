@@ -78,7 +78,7 @@ const hideDialog = () => {
         <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid">
             <div class="field">
                 <!-- <pre>{{spacePage}}</pre> -->
-                <label for="name">Space Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Space Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
             </div>
             <div class="field">
@@ -86,7 +86,7 @@ const hideDialog = () => {
                 <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
-                <label for="name">Space Color <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Space Color<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <div class="m-0 d-flex colorpicker-wrapper">
                     <div class="flex justify-center align-items-center">
                         <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{ spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S' }}</div>
