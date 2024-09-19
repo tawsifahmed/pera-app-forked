@@ -16,12 +16,14 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 
 import { useAuthStore } from '~/store/auth';
+const url = useRuntimeConfig();
 
 const name = ref('name');
 const userImage = ref(null);
 const { logUserOut } = useAuthStore(); 
 const { authenticated } = storeToRefs(useAuthStore()); 
 const visibleProfile = ref(false);
+
 const showNotify = ref(false);
 const logout = () => {
     logUserOut();
@@ -89,6 +91,8 @@ const handleOutsideClick = () => {
 
 const closeNotification = (evn) => {
     showNotify.value = evn;
+    fetchNotifyData();
+
 };
 
 // Register directive
@@ -142,10 +146,40 @@ const onDarkModeChange = (value) => {
     layoutConfig.darkTheme.value = value;
     onChangeTheme(newThemeName, value);
 };
+
+const notifiData = ref(false);
+const fetchNotifyData = async () => {
+    const token = useCookie('token');
+    try {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=10&page=1`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+            console.log('notification data =>', data.value);
+            if(data.value.data.find((item) => item.is_read === 0)){
+                notifiData.value = true
+            }else{
+                notifiData.value = false
+            }
+            console.log('notification data =>', notifiData.value);
+            // totalPage.value = Math.ceil(data.value.total / 5);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+fetchNotifyData();
+
 </script>
 
 <template>
     <div class="layout-topbar">
+        <!-- <pre>{{notifiData}}</pre> -->
         <Toast position="bottom-right" group="br" />
         <router-link to="/" class="layout-topbar-logo">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
@@ -188,6 +222,10 @@ const onDarkModeChange = (value) => {
             </button>
             
             <div class="relative">
+                <div v-if="notifiData" class="ping-container">
+                    <span class="ping-outer"></span>
+                    <span class="ping-inner"></span>
+                  </div>
                 <button
                     @click="
                         () => {
@@ -196,6 +234,7 @@ const onDarkModeChange = (value) => {
                     "
                     class="p-link layout-topbar-button notify-btn"
                 >
+                
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
@@ -274,4 +313,41 @@ const onDarkModeChange = (value) => {
     right: 0;
     top: 4rem;
 }
+
+.ping-container {
+    position: absolute;
+    display: inline-flex;
+    height: 12px;
+    width: 12px;
+    left: 36px;
+    top: 5px;
+    z-index: 1000;
+  }
+  
+  .ping-outer {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+    background-color: #6366f1;
+    opacity: 0.75;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  
+  .ping-inner {
+    position: relative;
+    display: inline-flex;
+    height: 12px;
+    width: 12px;
+    border-radius: 9999px;
+    background-color: #0ea5e9;
+  }
+  
+  @keyframes ping {
+    75%, 100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+  
 </style>
