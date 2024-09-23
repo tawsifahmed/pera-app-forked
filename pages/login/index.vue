@@ -14,7 +14,7 @@ definePageMeta({
 
 const loginForm = ref(true);
 const verifyOTPForm = ref(false);
-const resetForm = ref(true);
+const resetForm = ref(false);
 // const loginForm = ref(false)
 // const verifyOTPForm = ref(true)
 
