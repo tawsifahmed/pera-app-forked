@@ -87,6 +87,7 @@ const isOutsideClicked = (event) => {
 
 const handleOutsideClick = () => {
     showNotify.value = false;
+    notifiData.value = false;
 };
 
 const closeNotification = (evn) => {

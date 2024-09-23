@@ -198,7 +198,7 @@ const formattedTime = (time) => {
                                 <template #content>
                                     <div v-if="setFileUrl(comment?.file)" class="flex justify-content-start my-2">
                                         <a
-                                            :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
+                                            :href="`https://pbe.singularitybd.net/public/storage/${comment?.file}`"
                                             target="_blank"
                                             class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
                                             style="background-color: #f7fafc"
