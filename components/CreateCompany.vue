@@ -28,10 +28,6 @@ const companyLargeAmount = ref([
     {
         id: 5,
         label: '501-2000'
-    },
-    {
-        id: 6,
-        label: '2000+'
     }
 ]);
 
