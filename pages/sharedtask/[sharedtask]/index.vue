@@ -196,7 +196,7 @@ const formattedTime = (time) => {
                                     </div>
                                 </template>
                                 <template #content>
-                                    <div v-if="setFileUrl(comment?.file)" class="flex justify-content-end">
+                                    <div v-if="setFileUrl(comment?.file)" class="flex justify-content-start my-2">
                                         <a
                                             :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
                                             target="_blank"
@@ -209,8 +209,11 @@ const formattedTime = (time) => {
                                             </div>
                                         </a>
                                     </div>
-                                    <p class="m-0 ml-1">
-                                        {{ comment?.comment ? comment?.comment : '' }}
+                                    <p v-if="comment?.comment" class="m-0 ml-1">
+                                        {{ comment?.comment }}
+                                    </p>
+                                    <p v-else class="m-0 ml-1" style="visibility: hidden;"> 
+                                        .
                                     </p>
                                     <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(comment.created_at) }}</i>
                                 </template>
