@@ -233,7 +233,7 @@ onMounted(() => {
                             <InputText id="email" v-model="user.email" type="email" placeholder="Enter your work email" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
-                        <div class="field md:w-28rem mb-5">
+                        <div class="field md:w-28rem mb-4">
                             <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
                             <Password id="password" v-model="user.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
                             <small id="password-help" class="error-report red-text" v-if="errorData.passwordError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required! </small>
@@ -259,7 +259,7 @@ onMounted(() => {
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
-                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mt-1 mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleVerifySubmit">
                         <!-- <div class="field md:w-28rem mb-4">
@@ -286,7 +286,7 @@ onMounted(() => {
                 <div v-if="resetForm == 'email'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
-                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mt-1 mb-3">Reset Password</div>
                     </div>
                     <form @submit.prevent="handleEmailSubmit">
                         <div class="field md:w-28rem mb-4">
@@ -300,7 +300,7 @@ onMounted(() => {
                 <div v-if="resetForm == 'otp'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
-                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mt-1 mb-3">Verify OTP</div>
                     </div>
                     <form @submit.prevent="forgotOtpHandler">
                         <!-- <div class="field md:w-28rem mb-4">
@@ -321,7 +321,7 @@ onMounted(() => {
                 <div v-if="resetForm == 'new-password'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
-                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Set Your New Password</div>
                     </div>
                     <form @submit.prevent="newPasswordHandler">
                         <div class="field md:w-28rem mb-5">
