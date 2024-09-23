@@ -14,14 +14,20 @@ definePageMeta({
 
 const loginForm = ref(true);
 const verifyOTPForm = ref(false);
-const resetForm = ref(true);
+const resetForm = ref('');
+const newPassword = ref({
+    password: '',
+    confirm_password: ''
+});
+const loading = ref(false);
+const forgotOtp = ref('');
 // const loginForm = ref(false)
 // const verifyOTPForm = ref(true)
 
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
-const { authenticateUser, otpVerify, resendOtp } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp } = storeToRefs(useAuthStore());
+const { authenticateUser, otpVerify, resendOtp, forgotPassword, forgotPasswordOtp, passwordReset } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, resetState } = storeToRefs(useAuthStore());
 
 import Checkbox from 'primevue/checkbox';
 import RadioButton from 'primevue/radiobutton';
@@ -146,12 +152,48 @@ const handleResendOtp = async () => {
 // Reset Functionality
 const resetEmail = ref('');
 const handleReset = () => {
-    resetForm.value = true;
+    resetForm.value = 'email';
     loginForm.value = false;
 };
 
-const handleEmailSubmit = () => {
-    // Reset functionality
+const handleEmailSubmit = async () => {
+    loading.value = true;
+    const response = await forgotPassword(resetEmail.value);
+    if (response.code == 200) {
+        resetForm.value = response.message;
+        loading.value = false;
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+    }
+};
+
+const forgotOtpHandler = async () => {
+    loading.value = true;
+    const response = await forgotPasswordOtp(resetEmail.value, forgotOtp.value);
+    if (response.code == 200) {
+        resetForm.value = response.message;
+        loading.value = false;
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+    }
+};
+
+const newPasswordHandler = async () => {
+    loading.value = true;
+    const response = await passwordReset(resetEmail.value, newPassword);
+    console.log(response);
+    if (response.code == 200) {
+        resetForm.value = '';
+        loginForm.value = true;
+        resetForm.value = response.message;
+        loading.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+    }
 };
 watch(
     () => verifyOTPForm.value,
@@ -201,7 +243,7 @@ onMounted(() => {
                                 <Checkbox inputId="rememberme1" v-model="user.remember" binary class="mr-2"></Checkbox>
                                 <label for="rememberme1">Remember me</label>
                             </div>
-                            <!-- <a @click="handleReset" class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a> -->
+                            <a @click="handleReset" class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div>
                         <Button type="submit" label="Sign In" :loading="loginBtnHandle" class="w-full p-3 text-xl" />
                     </form>
@@ -241,18 +283,56 @@ onMounted(() => {
                         <span class="" v-else>Resend OTP? &nbsp;<button @click="handleResendOtp" class="forgot_pass md:mb-0 cursor-pointer text-blue-600" :disabled="clickBlink" :class="clickBlink ? 'blink_text' : ''">Click Here</button></span>
                     </div>
                 </div>
-                <div v-if="resetForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+                <div v-if="resetForm == 'email'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
                     </div>
                     <form @submit.prevent="handleEmailSubmit">
                         <div class="field md:w-28rem mb-4">
-                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
                             <InputText id="email" v-model="resetEmail" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
-                        <Button type="submit" label="Submit" :loading="loginBtnHandle" class="w-full p-3 text-xl"></Button>
+                        <Button type="submit" label="Submit" :loading="loading" class="w-full p-3 text-xl"></Button>
+                    </form>
+                </div>
+                <div v-if="resetForm == 'otp'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+                    <div class="text-center mb-5">
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                    </div>
+                    <form @submit.prevent="forgotOtpHandler">
+                        <!-- <div class="field md:w-28rem mb-4">
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <InputText id="email" v-model="verifyUser.email" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
+                            <small id="email-help" class="error-report red-text"  v-if="errorData.emailError">
+                                <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required!
+                            </small>
+                        </div> -->
+                        <div class="field md:w-28rem mb-4">
+                            <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
+                            <InputText id="name" v-model="forgotOtp" type="text" placeholder="Enter OTP" class="w-full" style="padding: 1rem" />
+                            <small id="name-help" class="error-report red-text" v-if="errorData.otpError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required! </small>
+                        </div>
+                        <Button type="submit" label="Verify" :loading="loading" class="w-full p-3 text-xl"></Button>
+                    </form>
+                </div>
+                <div v-if="resetForm == 'new-password'" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+                    <div class="text-center mb-5">
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                    </div>
+                    <form @submit.prevent="newPasswordHandler">
+                        <div class="field md:w-28rem mb-5">
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password</label>
+                            <Password id="password" v-model="newPassword.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+                        </div>
+                        <div class="field md:w-28rem mb-5">
+                            <label for="confirm-password" class="block text-900 font-medium text-xl mb-2">Confirm Password</label>
+                            <Password id="confirm-password" v-model="newPassword.confirm_password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
+                        </div>
+                        <Button type="submit" label="Submit" :loading="loading" class="w-full p-3 text-xl"></Button>
                     </form>
                 </div>
             </div>
