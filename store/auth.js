@@ -13,6 +13,8 @@ export const useAuthStore = defineStore('auth', {
     userCompany: null,
     resendOtpMsg: null,
     detectDuplicateEmail: false,
+    resetState: null,
+    resetToken: ''
   }),
 
   actions: {
@@ -205,7 +207,56 @@ export const useAuthStore = defineStore('auth', {
       console.log('resendOtpResponse', this.resendOtpResponse)
 
     },
-
+    async forgotPassword(email) {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          email
+        },
+      });
+      if (data.value) {
+        return { code: 200, message: 'otp' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
+    async forgotPasswordOtp(email, otp) {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          email,
+          otp
+        },
+      });
+      if (data.value) {
+        this.resetToken = data.value.token;
+        return { code: 200, message: 'new-password' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
+    async passwordReset(email, password) {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.resetToken}`,
+        },
+        body: {
+          email,
+          password: password.value.password,
+          password_confirmation: password.value.confirm_password
+        },
+      });
+      if (data.value) {
+        this.resetToken = '';
+        return { code: 200, message: 'Password Changed' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
     logUserOut() {
       const token = useCookie('token');
       const rolePermission = useCookie('rolePermission');
@@ -215,6 +266,5 @@ export const useAuthStore = defineStore('auth', {
       token.value = null;
       rolePermission.value = null;
     },
-
   },
 });
