@@ -3,9 +3,6 @@ import { useLayout } from '@/layouts/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layouts/AppConfig.vue';
 const { layoutConfig } = useLayout();
-const email = ref('');
-const password = ref('');
-const checked = ref(false);
 const logoUrl = computed(() => {
     return `/layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
@@ -17,7 +14,7 @@ definePageMeta({
 
 const loginForm = ref(true);
 const verifyOTPForm = ref(false);
-
+const resetForm = ref(true);
 // const loginForm = ref(false)
 // const verifyOTPForm = ref(true)
 
@@ -40,7 +37,8 @@ const router = useRouter();
 
 const user = ref({
     email: null,
-    password: null
+    password: null,
+    remember: false
 });
 
 const verifyUser = ref({
@@ -74,6 +72,7 @@ const showResendButton = ref(false);
 let countdown = null;
 
 const handleLoginSubmit = async () => {
+    console.log(user.value);
     loginBtnHandle.value = true;
     user.value.email ? (errorData.value.emailError = false) : (errorData.value.emailError = true);
     user.value.password ? (errorData.value.passwordError = false) : (errorData.value.passwordError = true);
@@ -81,6 +80,11 @@ const handleLoginSubmit = async () => {
         loginBtnHandle.value = false;
     } else {
         loginBtnHandle.value = true;
+        if (user.value.remember) {
+            localStorage.setItem('credentials', JSON.stringify(user.value));
+        } else {
+            localStorage.removeItem('credentials');
+        }
         await authenticateUser(user.value); // call authenticateUser and pass the user object
         if (checkOTP.value === true) {
             loginForm.value = false;
@@ -139,6 +143,16 @@ const handleResendOtp = async () => {
     // toast.add({ severity: 'info', summary: 'OTP Resent', detail: '', life: 3000 });
 };
 
+// Reset Functionality
+const resetEmail = ref('');
+const handleReset = () => {
+    resetForm.value = true;
+    loginForm.value = false;
+};
+
+const handleEmailSubmit = () => {
+    // Reset functionality
+};
 watch(
     () => verifyOTPForm.value,
     (newVal) => {
@@ -149,6 +163,13 @@ watch(
         }
     }
 );
+onMounted(() => {
+    const userData = localStorage.getItem('credentials');
+    console.log('User Data storage: ', userData);
+    if (userData) {
+        user.value = JSON.parse(userData);
+    }
+});
 </script>
 
 <template>
@@ -156,7 +177,7 @@ watch(
         <div class="flex flex-column align-items-center justify-content-center">
             <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
             <!-- <h2 class="font-bold">Pera App</h2> -->
-            <Toast position="bottom-right" group="br"/>
+            <Toast position="bottom-right" group="br" />
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
@@ -167,7 +188,7 @@ watch(
                     <form @submit.prevent="handleLoginSubmit">
                         <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
-                            <InputText id="email" v-model="user.email" type="text" placeholder="Enter your work email" class="w-full" style="padding: 1rem" />
+                            <InputText id="email" v-model="user.email" type="email" placeholder="Enter your work email" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
                         <div class="field md:w-28rem mb-5">
@@ -175,13 +196,13 @@ watch(
                             <Password id="password" v-model="user.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
                             <small id="password-help" class="error-report red-text" v-if="errorData.passwordError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Password required! </small>
                         </div>
-                        <!-- <div class="flex align-items-center justify-content-between mb-5 gap-5">
+                        <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <div class="flex align-items-center">
-                                <Checkbox id="rememberme1" v-model="checked" binary class="mr-2"></Checkbox>
+                                <Checkbox inputId="rememberme1" v-model="user.remember" binary class="mr-2"></Checkbox>
                                 <label for="rememberme1">Remember me</label>
                             </div>
-                            <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
-                        </div> -->
+                            <!-- <a @click="handleReset" class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a> -->
+                        </div>
                         <Button type="submit" label="Sign In" :loading="loginBtnHandle" class="w-full p-3 text-xl" />
                     </form>
                     <div class="w-full mt-4">
@@ -219,6 +240,20 @@ watch(
                         <span v-if="timer > 0">Resend OTP in {{ timer }}s</span>
                         <span class="" v-else>Resend OTP? &nbsp;<button @click="handleResendOtp" class="forgot_pass md:mb-0 cursor-pointer text-blue-600" :disabled="clickBlink" :class="clickBlink ? 'blink_text' : ''">Click Here</button></span>
                     </div>
+                </div>
+                <div v-if="resetForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+                    <div class="text-center mb-5">
+                        <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
+                        <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Verify Your Email</div>
+                    </div>
+                    <form @submit.prevent="handleEmailSubmit">
+                        <div class="field md:w-28rem mb-4">
+                            <label for="email" class="block text-900 text-xl font-medium mb-2">Work Email</label>
+                            <InputText id="email" v-model="resetEmail" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
+                            <small id="email-help" class="error-report red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
+                        </div>
+                        <Button type="submit" label="Submit" :loading="loginBtnHandle" class="w-full p-3 text-xl"></Button>
+                    </form>
                 </div>
             </div>
         </div>
