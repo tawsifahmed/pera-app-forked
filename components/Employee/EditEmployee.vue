@@ -1,21 +1,21 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Name<span class="text-red-500">*</span></label>
-            <InputText v-model="name" class="w-full" />
+            <label for="company">Name<i class="text-red-500">*</i></label>
+            <InputText v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
         <div class="field">
-            <label for="email">Email address<span class="text-red-500">*</span></label>
-            <InputText type="email" v-model="email" class="w-full" />
+            <label for="email">Email address<i class="text-red-500">*</i></label>
+            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="number" class="w-full" />
+            <InputText v-model="phone" type="number" class="w-full" placeholder="Enter Phone No."/>
         </div>
         <div class="field">
             <label for="company">Address</label>
-            <Textarea v-model="address" rows="3" cols="20" class="w-full" />
+            <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Enter Address"/>
         </div>
         <!-- <div class="field">
             <label for="company">Password</label>
@@ -24,7 +24,7 @@
 
         <!-- <pre>{{user_type}}</pre> -->
         <div class="field flex flex-column">
-            <label>Role<span class="text-red-500">*</span></label>
+            <label>Role<i class="text-red-500">*</i></label>
             <Dropdown v-model="user_type" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>

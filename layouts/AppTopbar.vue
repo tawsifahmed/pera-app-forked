@@ -1,6 +1,8 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
+import Password from 'primevue/password';
+
 // import clickOutside from '../composables/clickOutside';
 
 const { getUserData } = useUserStore();

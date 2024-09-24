@@ -108,6 +108,7 @@ const validateEmail = (mail) => {
 
 const showValidEmail = ref(null);
 const validEmailStatus = ref(null);
+showValidEmail.value = refCompanyId?.email;
 
 const handleEmail = () => {
     validEmailStatus.value = false;
@@ -128,7 +129,7 @@ const errorHandler = ref(false);
 const btnLoading = ref(false);
 const handleEditCompany = async () => {
     btnLoading.value = true;
-    if (numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === '') {
+    if (numEmployees.value === null || sSolution.value === null || showValidEmail.value === null || workSpaceName.value === null || workSpaceName.value === '') {
         errorHandler.value = true;
         btnLoading.value = false;
         return;
@@ -141,7 +142,7 @@ const handleEditCompany = async () => {
         const workspaceData = {
             id: refCompanyId.id,
             name: workSpaceName.value,
-            email: invite.value,
+            email: showValidEmail.value,
             address: null,
             contact_number: null,
             number_of_employees: nE,
@@ -180,7 +181,6 @@ const handleEditCompany = async () => {
                 <label for="worktype">Company Work Type?<i class="text-red-400 text-italic">*</i></label>
                 <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" placeholder="Select Type" class="w-full" />
             </div>
-          
             <div class="field">
                 <label for="email">Email Address<i class="text-red-400 text-italic">*</i></label>
                 <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Email" v-model="invite" @Input="handleEmail" />
@@ -191,7 +191,7 @@ const handleEditCompany = async () => {
                 <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
             </div>
             <br />
-            <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
+            <p v-if="errorHandler" style="color: red">Please fill/check up all the fields properly</p>
             <div class="create-btn-wrapper">
                 <Button @click="handleEditCompany" class="text-white py-2 px-6 tracking-wide" label="Update Company" :loading="btnLoading" />
             </div>

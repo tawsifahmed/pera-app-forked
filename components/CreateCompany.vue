@@ -99,6 +99,7 @@ const solutions = ref([
 ]);
 // Invite people to your Workspace
 const invite = ref(null);
+
 const validateEmail = (mail) => {
     return String(mail)
         .toLowerCase()
@@ -107,6 +108,9 @@ const validateEmail = (mail) => {
 
 const showValidEmail = ref(null);
 const validEmailStatus = ref(null);
+if(invite.value === null){
+    validEmailStatus.value = false;
+}
 const pForEmail = ref(null);
 const handleEmail = () => {
     validEmailStatus.value = false;
@@ -124,7 +128,7 @@ const errorHandler = ref(false);
 const loading = ref(false);
 const handleCreateWorkspace = async () => {
     loading.value = true;
-    if (numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === '') {
+    if (numEmployees.value === null || sSolution.value === null || showValidEmail.value === null || workSpaceName.value === null || workSpaceName.value === '') {
         errorHandler.value = true;
         loading.value = false;
         return;
@@ -134,7 +138,7 @@ const handleCreateWorkspace = async () => {
         let sS = sSolution.value?.label;
         const workspaceData = {
             name: workSpaceName.value,
-            email: invite.value,
+            email: showValidEmail.value,
             address: null,
             contact_number: null,
             number_of_employees: nE,
@@ -147,6 +151,7 @@ const handleCreateWorkspace = async () => {
             numEmployees.value = null;
             sSolution.value = null;
             invite.value = null;
+            showValidEmail.value = null;
             workSpaceName.value = null;
             loading.value = false;
             toast.add({ severity: 'success', summary: 'Company creation', detail: 'Company created successfully!', group: 'br', life: 3000 });
@@ -171,6 +176,7 @@ const handleCreateWorkspace = async () => {
             <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" placeholder="Select Type" class="w-full" />
         </div>
         <div class="field">
+            <pre>{{showValidEmail}}</pre>
             <label for="email">Email Address<i class="text-red-400 text-italic">*</i> <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Email" v-model="invite" @Input="handleEmail" />
             <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
@@ -179,7 +185,7 @@ const handleCreateWorkspace = async () => {
             <label for="company">Company Name<i class="text-red-400 text-italic">*</i> <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
         </div>
-        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
+        <p v-if="errorHandler" style="color: red">Please fill/check up all the fields properly</p>
         <template #footer>
             <Button label="Save" icon="pi pi-check" text="" :loading="loading" @click="handleCreateWorkspace" />
         </template>
