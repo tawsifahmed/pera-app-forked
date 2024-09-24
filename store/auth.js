@@ -238,11 +238,15 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async passwordReset(email, password) {
+      const token = useCookie('token');
+      const authToken = token.value ? token.value : this.resetToken;
+      console.log('token', token.value)
+      console.log('this.resetToken', this.resetToken)
       const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.resetToken}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: {
           email,

@@ -182,17 +182,29 @@ const forgotOtpHandler = async () => {
 
 const newPasswordHandler = async () => {
     loading.value = true;
-    const response = await passwordReset(resetEmail.value, newPassword);
-    console.log(response);
-    if (response.code == 200) {
-        resetForm.value = '';
-        loginForm.value = true;
-        resetForm.value = response.message;
+    if(newPassword.value.password === '' || newPassword.value.confirm_password === ''){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Password required', group: 'br', life: 3000 });
         loading.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
-    } else {
+        return;
+
+    }else if (newPassword.value.password !== newPassword.value.confirm_password) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match', group: 'br', life: 3000 });
         loading.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+        return;
+    }
+    else{
+        const response = await passwordReset(resetEmail.value, newPassword);
+        console.log(response);
+        if (response.code == 200) {
+            resetForm.value = '';
+            loginForm.value = true;
+            resetForm.value = response.message;
+            loading.value = false;
+            toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
+        } else {
+            loading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+        }
     }
 };
 watch(
@@ -325,7 +337,7 @@ onMounted(() => {
                     </div>
                     <form @submit.prevent="newPasswordHandler">
                         <div class="field md:w-28rem mb-5">
-                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password</label>
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password1</label>
                             <Password id="password" v-model="newPassword.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
                         </div>
                         <div class="field md:w-28rem mb-5">

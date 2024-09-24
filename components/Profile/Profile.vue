@@ -2,6 +2,10 @@
 // const profileData = ref(userProfile);
 import { useUserStore } from '~/store/user';
 import Password from 'primevue/password';
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import { useAuthStore } from '~/store/auth'; // import the auth store we just created
+const {  passwordReset } = useAuthStore(); // use authenticateUser action from  auth store
+// const { authenticated, checkOTP, resendOtpResponse, resendOtpMsg, authOtp, resetState } = storeToRefs(useAuthStore());
 
 
 const { userProfile } = defineProps(['userProfile']);
@@ -15,9 +19,23 @@ const uploadedImage = ref(null);
 const phone = ref(userProfile?.data?.phone);
 const email = ref(userProfile?.data?.email);
 const address = ref(userProfile?.data?.address);
-const newPassword = ref(null);
-const confirmPassword = ref(null);
+const newPassword = ref({
+    password: '',
+    confirm_password: ''
+});
 
+const newPassError = ref(false);
+const confirmPassError = ref(false);
+
+watch(newPassword.value, () => {
+    if(newPassword.value.password !== newPassword.value.confirm_password && newPassword.value.confirm_password !== '' && newPassword.value.password !== '')  {
+        newPassError.value = true;
+        confirmPassError.value = true;
+    } else {
+        newPassError.value = false;
+        confirmPassError.value = false;
+    }
+});
 // Form submission
 
 const handleSubmit = async () => {
@@ -35,10 +53,45 @@ const handleImageUpload = (value) => {
     uploadedImage.value = value.target.files[0];
     imageData.value = URL.createObjectURL(uploadedImage.value);
 };
+
+
+const newPasswordHandler = async () => {
+    loading.value = true;
+    loading.value = true;
+    if(newPassword.value.password === '' || newPassword.value.confirm_password === ''){
+        newPassError.value = true;
+        confirmPassError.value = true;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Password required', group: 'br', life: 3000 });
+        loading.value = false;
+        return;
+
+    }else if (newPassword.value.password !== newPassword.value.confirm_password) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match', group: 'br', life: 3000 });
+        loading.value = false;
+        newPassError.value = true;
+        confirmPassError.value = true;
+        return;
+    }
+    else{
+    const response = await passwordReset(email.value, newPassword);
+    console.log(response);
+    if (response.code == 200) {
+        newPassword.value.password = '';
+        newPassword.value.confirm_password = '';
+        newPassError.value = false;
+        confirmPassError.value = false;
+        loading.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
+    } else {
+        loading.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+    }
+ }
+};
 </script>
 <template>
     <!-- <pre>{{ userProfile }}</pre> -->
-    <TabView class="mt-3">
+    <TabView>
         <TabPanel  header="General Info">
             <form @submit.prevent="handleSubmit" class="grid">
                 <div class="col-12 text-center mb-5">
@@ -78,7 +131,7 @@ const handleImageUpload = (value) => {
                     </FloatLabel>
                 </div>
                 <div class="col-12 mb-3 flex justify-content-center">
-                    <Button type="submit" label="Save" :loading="loading" />
+                    <Button class="px-4" type="submit" label="Save" :loading="loading" />
                 </div>
             </form>
         </TabPanel>
@@ -86,23 +139,23 @@ const handleImageUpload = (value) => {
             <br>
             <br>
 
-            <form @submit.prevent="handleSubmit" class="grid form-width mx-auto">
+            <form @submit.prevent="newPasswordHandler" class="grid form-width mx-auto">
                 <div class="col-12 mb-3">
                     <FloatLabel>
-                        <Password id="passw" v-model="newPassword" placeholder="Enter new password" :feedback="false" toggleMask class="w-full" inputClass="w-full" :inputStyle="{ padding: '0.78rem' }"></Password>
+                        <Password id="passw" v-model="newPassword.password" placeholder="Enter new password" :feedback="false" :invalid="newPassError" toggleMask class="w-full" inputClass="w-full" :inputStyle="{ padding: '0.78rem' }"></Password>
 
                         <label for="passw">New Password</label>
                     </FloatLabel>
                 </div>
                 <div class="col-12 ">
                     <FloatLabel>
-                        <Password id="password2" v-model="confirmPassword" placeholder="Confirm new password" :feedback="false" toggleMask class="w-full" inputClass="w-full" :inputStyle="{ padding: '0.78rem' }"></Password>
+                        <Password id="password2" v-model="newPassword.confirm_password" placeholder="Confirm new password" :feedback="false" :invalid="confirmPassError" toggleMask class="w-full" inputClass="w-full" :inputStyle="{ padding: '0.78rem' }"></Password>
 
                         <label for="password2">Confirm Password</label>
                     </FloatLabel>
                 </div>
                 <div class="col-12 mt-3 mb-3 px-5 flex justify-content-center">
-                    <Button type="submit" label="Save" :loading="loading" />
+                    <Button class="px-4" type="submit" label="Save" :loading="loading" />
                 </div>
             </form>
         </TabPanel>
