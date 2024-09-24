@@ -158,22 +158,37 @@ const handleReset = () => {
 
 const handleEmailSubmit = async () => {
     loading.value = true;
-    const response = await forgotPassword(resetEmail.value);
-    if (response.code == 200) {
-        resetForm.value = response.message;
+    if(resetEmail.value === ''){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Email required', group: 'br', life: 3000 });
         loading.value = false;
-    } else {
-        loading.value = false;
-        toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+        return;
+    }else{
+        const response = await forgotPassword(resetEmail.value);
+        if (response.code == 200) {
+            resetForm.value = response.message;
+            loading.value = false;
+        } else {
+            loading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
+        }
     }
 };
 
+const confirmPasswordOtp = ref(false)
 const forgotOtpHandler = async () => {
     loading.value = true;
+    if(forgotOtp.value === ''){
+        confirmPasswordOtp.value = true;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'OTP required', group: 'br', life: 3000 });
+        loading.value = false;
+        return;
+    }
     const response = await forgotPasswordOtp(resetEmail.value, forgotOtp.value);
     if (response.code == 200) {
+        confirmPasswordOtp.value = false;
         resetForm.value = response.message;
         loading.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });        
     } else {
         loading.value = false;
         toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
@@ -303,7 +318,7 @@ onMounted(() => {
                     <form @submit.prevent="handleEmailSubmit">
                         <div class="field md:w-28rem mb-4">
                             <label for="email" class="block text-900 text-xl font-medium mb-2">Email</label>
-                            <InputText id="email" v-model="resetEmail" type="email" placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
+                            <InputText id="email" v-model="resetEmail" type="email" required placeholder="example@gmail.com" class="w-full" style="padding: 1rem" />
                             <small id="email-help" class="error-report red-text" v-if="errorData.emailError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Email required! </small>
                         </div>
                         <Button type="submit" label="Submit" :loading="loading" class="w-full p-3 text-xl"></Button>
@@ -324,7 +339,7 @@ onMounted(() => {
                         </div> -->
                         <div class="field md:w-28rem mb-4">
                             <label for="name" class="block text-900 text-xl font-medium mb-2">OTP</label>
-                            <InputText id="name" v-model="forgotOtp" type="text" placeholder="Enter OTP" class="w-full" style="padding: 1rem" />
+                            <InputText id="name" v-model="forgotOtp" type="text" placeholder="Enter OTP" :invalid="confirmPasswordOtp" class="w-full" style="padding: 1rem" />
                             <small id="name-help" class="error-report red-text" v-if="errorData.otpError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> OTP required! </small>
                         </div>
                         <Button type="submit" label="Verify" :loading="loading" class="w-full p-3 text-xl"></Button>
