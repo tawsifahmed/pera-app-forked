@@ -8,7 +8,7 @@
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
-        <div class="create-btn-wrapper">
+        <div class="create-btn-wrapper mb-0">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>

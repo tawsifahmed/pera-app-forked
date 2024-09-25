@@ -30,7 +30,7 @@
             <br />
             <p class="text-center" v-if="EditErrorHandler" style="color: red">Please add/fill/check up all the fields
             </p>
-            <div class="create-btn-wrapper">
+            <div class="create-btn-wrapper mb-0">
                 <Button label="Update" icon="pi pi-check" text="" @click="handleUpdateTask" :loading="btnLoading" />
             </div>
         </div>

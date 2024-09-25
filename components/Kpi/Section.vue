@@ -172,7 +172,7 @@ const handleEditSection = async () => {
     formData.append('status', sectionEdit.value.status?.label); // optional chaining to avoid undefined errors
 
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-update/${sectionEdit.value.id}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-update/${sectionEdit.value.id}`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -180,7 +180,7 @@ const handleEditSection = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         init();
         visibleEditSection.value = false;
         sectionEdit.value = {};
@@ -188,7 +188,7 @@ const handleEditSection = async () => {
         toast.add({ severity: 'success', summary: 'Updated', detail: 'Section Updated Successfully', group: 'br', life: 3000 });
     } else {
         sectionEditLoading.value = false;
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to update section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: error.value.data.app_message, detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
@@ -207,7 +207,7 @@ const handleEditSubSection = async () => {
     formData.append('status', subSectionEdit.value.status?.label); // optional chaining to avoid undefined errors
 
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-update/${subSectionEdit.value.subSectionId}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-update/${subSectionEdit.value.subSectionId}`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -215,7 +215,7 @@ const handleEditSubSection = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         initSub();
         visibleEditSubModal.value = false;
         subSectionEdit.value = {};
@@ -223,7 +223,7 @@ const handleEditSubSection = async () => {
         toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Updated Successfully', group: 'br', life: 3000 });
     } else {
         subSectionEditLoading.value = false;
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to update sub section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: error.value.data.app_message, detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
@@ -236,7 +236,7 @@ const deleteSection = async (id) => {
         }
     });
 
-    if (data) {
+    if (data.value) {
         init();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
@@ -253,7 +253,7 @@ const deleteSubSection = async (id) => {
         }
     });
 
-    if (data) {
+    if (data.value) {
         initSub();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Sub Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
@@ -372,7 +372,7 @@ onMounted(() => {
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="title" header="Sub Section Name"></Column>
                             <Column style="text-wrap: nowrap" field="target_mark" header="Target Mark"></Column>
-                            <Column style="text-wrap: nowrap" field="section_id" header="Section ID"></Column>
+                            <Column style="text-wrap: nowrap" field="section_name" header="Section"></Column>
                             <Column style="text-wrap: nowrap" field="comment" header="Comment"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
                                 <template #body="slotProps">
