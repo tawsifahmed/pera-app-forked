@@ -372,7 +372,7 @@ onMounted(() => {
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="title" header="Sub Section Name"></Column>
                             <Column style="text-wrap: nowrap" field="target_mark" header="Target Mark"></Column>
-                            <Column style="text-wrap: nowrap" field="section_id" header="Section ID"></Column>
+                            <Column style="text-wrap: nowrap" field="section_name" header="Section"></Column>
                             <Column style="text-wrap: nowrap" field="comment" header="Comment"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
                                 <template #body="slotProps">
