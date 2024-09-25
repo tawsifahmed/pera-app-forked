@@ -103,7 +103,7 @@ const handleSubmitData = async () => {
         </div>
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
-        <div class="create-btn-wrapper">
+        <div class="create-btn-wrapper mb-0">
             <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>
