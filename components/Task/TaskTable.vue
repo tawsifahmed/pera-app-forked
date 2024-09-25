@@ -482,7 +482,7 @@ const handleChange = (event, name) => {
             <template #body="slotProps">
                 <div class="flex justify-content-start align-items-center" style="width: fit-content;"
                     @mouseover="showSpeedDial(slotProps.node.key)" 
-                    @mouseleave="hideSpeedDial(slotProps.node.key)">     
+                    @mouseleave="hideSpeedDial(slotProps.node.key)"     
                     >
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
                         :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
@@ -1111,7 +1111,7 @@ textarea {
 
 .p-speeddial-list {
     position: absolute;
-    right: 28px;
+    right: 30px;
     top: 1.2px;
         li {
             a {
@@ -1124,20 +1124,29 @@ textarea {
         }
 }
 
-.p-speeddial-list {
+.custom-speed-dial:hover{
+    .p-speeddial-list {
+        background: rgba(255, 255, 255, 0.23);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        padding: 0px 0px 0 100px !important;
+    }     
+}
 
-        li:nth-child(1) a {
-            background-color: #f97316;
-        }
-        li:nth-child(2) a {
-            background-color: #0ea5e9;
-        }
-        li:nth-child(3) a {
-            background-color: #25df69;
-        }
-        li:nth-child(4) a {
-            background-color: #22c55e;
-        }
+.p-speeddial-list {
+    
+    li:nth-child(1) a {
+        background-color: #f97316;
+    }
+    li:nth-child(2) a {
+        background-color: #0ea5e9;
+    }
+    li:nth-child(3) a {
+        background-color: #25df69;
+    }
+    li:nth-child(4) a {
+        background-color: #22c55e;
+    }
 }
 
 .p-speeddial-opened .p-speeddial-rotate {
