@@ -44,12 +44,12 @@ watch(tags, (newValue) => {
     isTagsEdited.value = true;
 });
 
-const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null);
+const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
 
 const checkDate = ref(dueDate.value);
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
-        checkDate.value = new Date(newValue).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        checkDate.value = new Date(newValue).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase();
     }
 });
 
@@ -149,10 +149,11 @@ const formattedTime = (time) => {
 
 
 const handleTaskDetailSubmit = async () => {
+    let sendEditDate;
     if (dueDate.value) {
         const selectedDate = new Date(dueDate.value);
         selectedDate.setDate(selectedDate.getDate() + 1);
-        dueDate.value = selectedDate.toISOString();
+        sendEditDate = selectedDate.toISOString();
     }
 
     console.log('checkDate', checkDate.value);
@@ -163,7 +164,7 @@ const handleTaskDetailSubmit = async () => {
         // name: taskDetails.value?.name,
         ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
         project_id: projID,
-        ...(checkDate.value !== formattedDueDate ? { dueDate: dueDate.value } : {}),
+        ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
         // assignees: assignees.value.map((obj) => obj.id),
         ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
         // tags: tags.value.map((obj) => obj.id)
@@ -174,7 +175,7 @@ const handleTaskDetailSubmit = async () => {
     if (dueDate.value) {
         const postSubDate = new Date(dueDate.value);
         postSubDate.setDate(postSubDate.getDate() - 1);
-        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : null;
+        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
     }
 
     await editTask(taskDetailData);
@@ -470,7 +471,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" showIcon iconDisplay="input"/>
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12"/>
                                         </FloatLabel>
                                     </div>
                                 </div>
