@@ -1,10 +1,13 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
+import { useClockStore } from '~/store/clock';
+
 import Password from 'primevue/password';
 
 // import clickOutside from '../composables/clickOutside';
-
+const { getStoreTimer } = useClockStore();
+const { timerData, isTImerStopped } = storeToRefs(useClockStore());
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
 
@@ -180,6 +183,43 @@ const fetchNotifyData = async () => {
 };
 
 fetchNotifyData();
+const showTimer = ref(false);
+
+const timerTaskId = ref();
+timerTaskId.value = localStorage.getItem('storeTaskID');
+
+
+
+
+// watch(isTImerStopped, (oldValue, newValue) => {
+//     if (newValue === true) {
+//         timerTaskId.value = null;
+//     }
+// });
+const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
+const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
+const storeTaskCompanyID = localStorage.getItem('storeTaskCompanyID');
+
+
+getStoreTimer();
+watchEffect(async () => {
+    if (isTImerStopped.value === true) {
+        timerTaskId.value = null;
+        console.log('timerTaskIdFOLO', timerTaskId.value);
+    }
+    if (timerData.value || timerTaskId.value) {
+        showTimer.value = true;
+    } else {
+        showTimer.value = false;
+    }
+
+});
+
+
+// Watch for changes in timerTaskId or localStorage changes
+
+// Detect localStorage changes and update timerTaskId
+
 
 const timeTrack = ref('00:00:00');
 
@@ -217,9 +257,10 @@ const timeTrack = ref('00:00:00');
            
                 <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
             </section> -->
+            <!-- <pre>{{ isTImerStopped }}</pre> -->
 
-            
-            <!-- <div class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2">
+            <div v-if="showTimer"
+                class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2">
                 <div class="clock-wrapper relative ml-2">
                     <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
                         <i :class="`pi-stop stop`"></i>
@@ -228,7 +269,7 @@ const timeTrack = ref('00:00:00');
                         {{ timeTrack }}
                     </div>
                 </div>
-            </div> -->
+            </div>
 
             <button @click="openProfile" class="p-link layout-topbar-button">
                 <div v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image"
@@ -250,8 +291,8 @@ const timeTrack = ref('00:00:00');
                     <span class="ping-inner"></span>
                 </div>
                 <button @click="() => {
-                        showNotify = !showNotify;
-                    }
+                    showNotify = !showNotify;
+                }
                     " class="p-link layout-topbar-button notify-btn">
 
                     <i class="pi pi-bell"></i>
@@ -381,7 +422,8 @@ const timeTrack = ref('00:00:00');
 
 .task-detail-wrapper {
     width: 100%;
-    border: 2px solid #9596e4; /* Project theme color */
+    border: 2px solid #9596e4;
+    /* Project theme color */
     padding: 0 40px;
     border-radius: 5px;
     cursor: pointer;
@@ -433,6 +475,6 @@ const timeTrack = ref('00:00:00');
     color: white;
     background-color: white;
     font-size: 7px;
-    
+
 }
 </style>

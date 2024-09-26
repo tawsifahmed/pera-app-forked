@@ -58,23 +58,14 @@ const hideSpeedDial = (key) => {
 const getActionItems = (node) => {
     return [
         {
-            label: 'Delete Task',
-            icon: 'pi pi-trash text-white',
+            label: 'Add Sub Task',
+            icon: 'pi pi-plus text-white',
             command: () => {
-                // Emit the event for deleting the task
-                emit('confirmDeleteTask', node.key);
-                // toast.add({ severity: 'error', summary: 'Delete Task', detail: `Deleted ${node.data.name}`, life: 3000 });
+                // Emit the event for creating a sub-task
+                emit('openCreateSpace', node.key, 'sub-task');
+                // toast.add({ severity: 'info', summary: 'Add Sub Task', detail: `Sub Task Added to ${node.data.name}`, life: 3000 });
             },
-            disabled: !deleteTaskP, // Disable if the user cannot delete the task
-        },
-        {
-            label: 'Task Detail',
-            icon: 'pi pi-window-maximize text-white',
-            command: () => {
-                // Emit the event for task details
-                emit('handleTaskDetailView', node);
-                // toast.add({ severity: 'info', summary: 'Task Details', detail: `Viewing details of ${node.data.name}`, life: 3000 });
-            }
+            disabled: !createTaskP, // Disable if the user cannot create a task
         },
         {
             label: 'Edit Task',
@@ -88,15 +79,25 @@ const getActionItems = (node) => {
             disabled: !updateTaskP, // Disable if the user cannot update the task
         },
         {
-            label: 'Add Sub Task',
-            icon: 'pi pi-plus text-white',
+            label: 'Task Detail',
+            icon: 'pi pi-window-maximize text-white',
             command: () => {
-                // Emit the event for creating a sub-task
-                emit('openCreateSpace', node.key, 'sub-task');
-                // toast.add({ severity: 'info', summary: 'Add Sub Task', detail: `Sub Task Added to ${node.data.name}`, life: 3000 });
-            },
-            disabled: !createTaskP, // Disable if the user cannot create a task
+                // Emit the event for task details
+                emit('handleTaskDetailView', node);
+                // toast.add({ severity: 'info', summary: 'Task Details', detail: `Viewing details of ${node.data.name}`, life: 3000 });
+            }
         },
+        {
+            label: 'Delete Task',
+            icon: 'pi pi-trash text-white',
+            command: () => {
+                // Emit the event for deleting the task
+                emit('confirmDeleteTask', node.key);
+                // toast.add({ severity: 'error', summary: 'Delete Task', detail: `Deleted ${node.data.name}`, life: 3000 });
+            },
+            disabled: !deleteTaskP, // Disable if the user cannot delete the task
+        },
+
 
     ];
 };

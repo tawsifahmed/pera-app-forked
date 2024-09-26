@@ -10,7 +10,7 @@ const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData } = useClockStore();
+const { getTaskTimerData, storeTaskTimer } = useClockStore();
 const { trackedTime } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
@@ -60,17 +60,40 @@ let interval = null;
 
 const handleClickClock = async () => {
     const taskId = taskDetails.value.id;
-
+    console.log('taskDetails', taskDetails.value);
     if (taskDetails.value?.is_timer_start === 'false') {
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
         await getTaskDetails(taskDetails.value?.id);
         startTimer();
+        localStorage.setItem('storeTaskID', JSON.stringify(taskDetails.value?.id));
+        localStorage.setItem('storeTaskProjectID', JSON.stringify(projID));
+        localStorage.setItem('storeTaskSpaceID', JSON.stringify(taskDetails.value?.project.space_id));
+        localStorage.setItem('storeTaskCompanyID', JSON.stringify(taskDetails.value?.project.company_id));
+        let storeTimerObj = {
+            task_id: taskDetails.value.id,
+            project_id: projID,
+            space_id: taskDetails.value.project.space_id,
+            company_id: taskDetails.value.project.company_id
+        }
+        await storeTaskTimer(storeTimerObj)
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
         await getSingleProject(projID);
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(taskDetails.value?.id);
         stopTimer();
+        localStorage.removeItem('storeTaskID');
+        localStorage.removeItem('storeTaskProjectID');
+        localStorage.removeItem('storeTaskSpaceID');
+        localStorage.removeItem('storeTaskCompanyID');
+
+        let storeTimerObj = {
+            task_id: null,
+            project_id: null,
+            space_id: null,
+            company_id: null
+        }
+        await storeTaskTimer(storeTimerObj);
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
         await getSingleProject(projID);
     }
