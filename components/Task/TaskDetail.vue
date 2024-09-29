@@ -222,7 +222,7 @@ const checkAttachmentType = (file) => {
     const imageExtensions = ['jpg', 'JPG', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif', 'heic', 'heif'];
     const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp', 'mkv'];
     const pdfExtensions = ['pdf', 'PDF', 'ppt', 'pptx'];
-    const wordExtensions = ['doc', 'docx'];
+    const wordExtensions = ['doc', 'docx', 'rtf'];
     const excelExtensions = ['xls', 'xlsx', 'csv'];
 
     if (imageExtensions.some((ext) => file.endsWith('.' + ext))) {
@@ -625,7 +625,7 @@ const handleShareTaskId = () => {
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
                                             :href="item?.file"
                                         >
-                                            <div class="pi pi-file-excel text-6xl text-primary attach-icon"></div>
+                                            <div class="pi pi-file-excel text-6xl attach-icon" style="color: #04aa6d;"></div>
                                             <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
