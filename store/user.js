@@ -58,5 +58,5 @@ export const useUserStore = defineStore('user', () => {
             isLoading.value = false
         }
     }
-    return { getUserData, updateUser, userProfile }
+    return { getUserData, updateUser, userProfile } 
 })

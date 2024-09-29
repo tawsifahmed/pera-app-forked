@@ -22,8 +22,8 @@ const url = useRuntimeConfig();
 
 const name = ref('name');
 const userImage = ref(null);
-const { logUserOut } = useAuthStore(); 
-const { authenticated } = storeToRefs(useAuthStore()); 
+const { logUserOut } = useAuthStore();
+const { authenticated } = storeToRefs(useAuthStore());
 const visibleProfile = ref(false);
 
 const showNotify = ref(false);
@@ -88,7 +88,7 @@ const isOutsideClicked = (event) => {
 
 
 const handleOutsideClick = () => {
-    if(showNotify.value){
+    if (showNotify.value) {
         // fetchNotifyData();
         showNotify.value = false;
         notifiData.value = false;
@@ -166,9 +166,9 @@ const fetchNotifyData = async () => {
 
         if (data.value) {
             console.log('notification data =>', data.value);
-            if(data.value.data.find((item) => item.is_read === 0)){
+            if (data.value.data.find((item) => item.is_read === 0)) {
                 notifiData.value = true
-            }else{
+            } else {
                 notifiData.value = false
             }
             console.log('notification data =>', notifiData.value);
@@ -180,6 +180,8 @@ const fetchNotifyData = async () => {
 };
 
 fetchNotifyData();
+
+const timeTrack = ref('00:00:00');
 
 </script>
 
@@ -202,7 +204,7 @@ fetchNotifyData();
                 <i class="pi pi-ellipsis-v"></i>
             </button>
         </div>
-       
+
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <!-- <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
                 <i class="pi pi-calendar"></i>
@@ -215,37 +217,48 @@ fetchNotifyData();
            
                 <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
             </section> -->
+
             
-            <button @click="openProfile" class="p-link layout-topbar-button">
-                <div  v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
-                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
-                    <div class="userImage">
-                        <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
+            <!-- <div class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2">
+                <div class="clock-wrapper relative ml-2">
+                    <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
+                        <i :class="`pi-stop stop`"></i>
+                    </div>
+                    <div class="text-sm absolute">
+                        {{ timeTrack }}
                     </div>
                 </div>
-                <img  v-tooltip.left="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
+            </div> -->
+
+            <button @click="openProfile" class="p-link layout-topbar-button">
+                <div v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image"
+                    class="flex align-items-center gap-2">
+                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
+                    <div class="userImage">
+                        <img :src="`${userProfile?.data?.image}`" class=""
+                            style="height: 100%; width: 100%; object-fit: cover" />
+                    </div>
+                </div>
+                <img v-tooltip.left="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt=""
+                    style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
-            
+
             <div class="relative">
                 <div v-if="notifiData" class="ping-container">
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
-                  </div>
-                <button
-                    @click="
-                        () => {
-                            showNotify = !showNotify;
-                        }
-                    "
-                    class="p-link layout-topbar-button notify-btn"
-                >
-                
+                </div>
+                <button @click="() => {
+                        showNotify = !showNotify;
+                    }
+                    " class="p-link layout-topbar-button notify-btn">
+
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
                 <div v-if="showNotify" class="notification">
-                    <Notification @closeNotification="closeNotification($event)"/>
+                    <Notification @closeNotification="closeNotification($event)" />
                 </div>
             </div>
             <button @click="logout" class="p-link layout-topbar-button">
@@ -253,8 +266,9 @@ fetchNotifyData();
                 <span>Sign Out</span>
             </button>
         </div>
-        
-        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
     </div>
@@ -266,6 +280,7 @@ fetchNotifyData();
         display: none !important;
     }
 }
+
 .userImage {
     height: 42px;
     width: 42px;
@@ -291,20 +306,25 @@ fetchNotifyData();
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1.1);
     }
 }
+
 @keyframes backwardAnimation {
     0% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
+
     100% {
         transform: scale(1.1);
     }
@@ -314,6 +334,7 @@ fetchNotifyData();
     background: none !important;
     border: none;
 }
+
 .notification {
     position: absolute;
     right: 0;
@@ -328,9 +349,9 @@ fetchNotifyData();
     left: 36px;
     top: 5px;
     z-index: 1000;
-  }
-  
-  .ping-outer {
+}
+
+.ping-outer {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -338,22 +359,80 @@ fetchNotifyData();
     background-color: #6366f1;
     opacity: 0.75;
     animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-  
-  .ping-inner {
+}
+
+.ping-inner {
     position: relative;
     display: inline-flex;
     height: 12px;
     width: 12px;
     border-radius: 9999px;
     background-color: #0ea5e9;
-  }
-  
-  @keyframes ping {
-    75%, 100% {
-      transform: scale(2);
-      opacity: 0;
+}
+
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
     }
-  }
-  
+}
+
+.task-detail-wrapper {
+    width: 100%;
+    border: 2px solid #9596e4; /* Project theme color */
+    padding: 0 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+
+    &:hover {
+        box-shadow: 0 -1px 0 rgba(99, 102, 241, 0.04), 0 2px 4px rgba(99, 102, 241, 0.25);
+    }
+
+    &:active {
+        background-color: #eeeeee;
+        box-shadow: 0 -1px 0 rgba(99, 102, 241, 0.04), 0 2px 4px rgba(99, 102, 241, 0.25);
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 -1px 0 rgba(99, 102, 241, 0.04), 0 2px 4px rgba(99, 102, 241, 0.25), 0 0 0 3px rgba(99, 102, 241, 0.5);
+    }
+
+    &:disabled {
+        filter: grayscale(100%);
+        background-color: #ebebeb;
+        box-shadow: 0 -1px 0 rgba(99, 102, 241, 0.04), 0 1px 1px rgba(99, 102, 241, 0.25);
+        cursor: not-allowed;
+    }
+}
+
+.clock-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.clock-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    position: absolute;
+    right: 7px;
+}
+
+.stop {
+    color: white;
+    background-color: white;
+    font-size: 7px;
+    
+}
 </style>
