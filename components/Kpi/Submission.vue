@@ -14,7 +14,7 @@
                         <Dropdown class="w-full" v-model="selectedQuarter" :options="quater" optionLabel="name"
                             placeholder="Select Quarter" />
                     </div>
-                    <Button type="submit" label="Load" @click="loadSubmission" class="" style="width: 15%;" />
+                    <Button type="submit" label="Load" @click="loadSubmission" class="" style="width: 15%;" :loading="loading" />
                 </div>
             </div>
             <!-- Dynamic section -->
@@ -25,12 +25,12 @@
                     <div class="w-full col-12 grid">
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Section</label>
-                            <p class="user-name">{{ section.section_name }}</p>
+                            <p v-tooltip.top="{ value: section.section_name }" class="user-name">{{ section.section_name }}</p>
                             <!-- <Dropdown v-model="dynamicSection.section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" /> -->
                         </div>
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
-                            <p class="user-name">{{ section.subSection_name }}</p>
+                            <p v-tooltip.top="{ value: section.subSection_name }" class="user-name">{{ section.subSection_name }}</p>
                         </div>
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
@@ -44,13 +44,13 @@
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">Comment</label>
-                            <InputText v-model="section.comment" placeholder="Write comment"
+                            <InputText v-tooltip.top="{ value: section.comment }" v-model="section.comment" placeholder="Write comment"
                                 class="w-full" />
                         </div>
                     </div>
                 </div>
                 <div class="gap-2 flex justify-content-center w-full">
-                    <Button label="Submit" class="bg-green-500 border-none" @click.prevent="addSection(index)" />
+                    <Button label="Submit" class="bg-green-500 border-none" type="submit" />
 
                 </div>
             </form>
@@ -66,7 +66,7 @@ const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
 const toast = useToast();
 const url = useRuntimeConfig();
-
+const loading = ref(false);
 const { quater } = defineProps(['quater']);
 
 // const employee = ref({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
@@ -76,23 +76,20 @@ const { quater } = defineProps(['quater']);
 const employeeLoaded = ref(false);
 
 const selectedQuarter = ref('');
-const dynamicSection = ref([
-    {
-        // user_id: employee.value,
-        section_name: '',
-        section_id: null,
-        subSection_name: '',
-        subsection_id: null,
-        quater_id: null,
-        achive_mark: '',
-        comment: ''
+const dynamicSection = ref([]);
+
+watch(selectedQuarter, (value) => {
+    if (value) {
+        employeeLoaded.value = false;
+        dynamicSection.value = [];
     }
-]
-);
+});
 
 
 const loadSubmission = async () => {
+    loading.value = true;
     if (selectedQuarter.value === '') {
+        loading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please select quarter', group: 'br', life: 3000 });
     }
 
@@ -106,30 +103,28 @@ const loadSubmission = async () => {
             Authorization: `Bearer ${token.value}`
         }
     });
-    console.log('Data Value', data.value.data);
-    data.value.data.forEach((item, idx) => {
-        if (dynamicSection.value[idx]) {
-            dynamicSection.value[idx].section_name = item.section.name;
-            dynamicSection.value[idx].section_id = item.section.id;
-            dynamicSection.value[idx].subSection_name = item.sub_section_data[0].sub_section.title;
-            dynamicSection.value[idx].subsection_id = item.sub_section_data[0].sub_section.id;
-            dynamicSection.value[idx].quater_id = item.sub_section_data[0].quater_id;
-            dynamicSection.value[idx].achive_mark = item.sub_section_data[0].achive_mark;
-            dynamicSection.value[idx].comment = item.sub_section_data[0].comment;
 
-        } else {
-            dynamicSection.value.push({
-                section_name: item.section.name,
-                section_id: item.section.id,
-                subSection_name: item.sub_section_data[0].sub_section.title,
-                subsection_id: item.sub_section_data[0].sub_section.id,
-                quater_id: item.sub_section_data[0].quater_id,
-                achive_mark: item.sub_section_data[0].achive_mark,
-                comment: item.sub_section_data[0].comment
+    if(data.value){
+        loading.value = false;
+        data.value.data.forEach((item) => {
+            console.log('Item Value', item);
+            item.sub_section_data.forEach((subItem) => {
+                dynamicSection.value.push({
+                    section_name: item.section.name,
+                    section_id: item.section.id,
+                    subSection_name: subItem.sub_section.title,
+                    subsection_id: subItem.sub_section.id,
+                    quater_id: subItem.quater_id,
+                    achive_mark: subItem.achive_mark,
+                    comment: subItem.comment
+                });
             });
-        }
-    });
-    console.log('Submission Value', data?.value.data[0].section.name);
+        });
+        console.log('Submission Value', data?.value);
+    }else{
+        loading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to show report', group: 'br', life: 3000 });
+    }
 
 
 };
@@ -153,5 +148,8 @@ getUserData();
     appearance: none;
     border-radius: 6px;
     outline-color: transparent;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 </style>
