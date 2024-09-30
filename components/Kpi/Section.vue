@@ -60,7 +60,10 @@ const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
 ]);
-
+const markType = ref([
+    { name: 'Percentage (%)', label: 1 },
+    { name: 'Number (01)', label: 0 }
+]);
 const handleSectionCreation = async () => {
     sectionCreateLoading.value = true;
     console.log(Object.keys(sectionCreate.value));
@@ -102,7 +105,7 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
-    formData.append('mark_type', subSectionCreate.value.mark_type.value);
+    formData.append('mark_type', subSectionCreate.value.mark_type.label);
     formData.append('weightage', subSectionCreate.value.weightage);
     formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
@@ -147,8 +150,6 @@ const editSection = async (data) => {
 
 const structuredSectionList = ref();
 const editSubSection = async (data) => {
-    console.log('data', data);
-
     visibleEditSubModal.value = true;
     structuredSectionList.value = sectionList.value.map((item) => ({ name: item.name, id: item.id }));
     subSectionEdit.value = {
@@ -156,11 +157,11 @@ const editSubSection = async (data) => {
         section_id: structuredSectionList.value.find((item) => item.id === data.section_id),
         title: data.title,
         target_mark: data.target_mark,
-        mark_type: data.mark_type.value,
+        mark_type: markType.value.find((item) => item.label === data.mark_type),
+        weightage: data.weightage,
         comment: data.comment,
         status: sectionStatuses.value.find((item) => item.label === data.status)
     };
-    console.log('Edit Data:', subSectionEdit.value);
 };
 
 const handleEditSection = async () => {
@@ -207,7 +208,7 @@ const handleEditSubSection = async () => {
     formData.append('title', subSectionEdit.value.title);
     formData.append('weightage', subSectionEdit.value.weightage);
     formData.append('target_mark', subSectionEdit.value.target_mark);
-    formData.append('mark_type', subSectionEdit.value.mark_type.value);
+    formData.append('mark_type', subSectionEdit.value.mark_type.label);
     formData.append('comment', subSectionEdit.value.comment);
     formData.append('status', subSectionEdit.value.status?.label); // optional chaining to avoid undefined errors
 
@@ -438,18 +439,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
-                                    <Dropdown
-                                        v-model="subSectionCreate.mark_type"
-                                        :options="[
-                                            { name: 'Percentage (%)', value: 1 },
-                                            { name: 'Number (01)', value: 0 }
-                                        ]"
-                                        optionLabel="name"
-                                        placeholder="Select Status"
-                                        checkmark
-                                        :highlightOnSelect="false"
-                                        class="w-full"
-                                    />
+                                    <Dropdown v-model="subSectionCreate.mark_type" :options="markType" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -504,18 +494,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
-                                    <Dropdown
-                                        v-model="subSectionEdit.mark_type"
-                                        :options="[
-                                            { name: 'Percentage (%)', value: 1 },
-                                            { name: 'Number (01)', value: 0 }
-                                        ]"
-                                        optionLabel="name"
-                                        placeholder="Select Status"
-                                        checkmark
-                                        :highlightOnSelect="false"
-                                        class="w-full"
-                                    />
+                                    <Dropdown v-model="subSectionEdit.mark_type" :options="markType" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">

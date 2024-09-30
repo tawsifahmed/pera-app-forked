@@ -13,6 +13,8 @@ const readSection = ref(accessPermission('read_section'));
 const employees = ref([]);
 const employee = ref('');
 const quater = ref([]);
+const deadline = ref('');
+const selectedQuarter = ref('');
 const sections = ref([]);
 const sectionStatuses = ref([
     { name: 'Active', label: 1 },
@@ -94,7 +96,7 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
-    formData.append('mark_type', subSectionCreate.value.mark_type);
+    formData.append('mark_type', subSectionCreate.value.mark_type.label);
     formData.append('weightage', subSectionCreate.value.weightage);
     formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
@@ -213,7 +215,6 @@ fetchSection();
 fetchSubSection();
 const date = new Date();
 quaterYear.value = date.getFullYear();
-onMounted(() => {});
 </script>
 <template>
     <div class="card">
@@ -231,12 +232,22 @@ onMounted(() => {});
                     <TabPanel v-if="createKpi" header="Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
                             <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
-                                <div class="w-full col-12">
-                                    <label for="icondisplay" class="font-bold block mb-2">Employee</label>
-                                    <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select User" class="w-full" />
+                                <div class="grid col-12 w-full">
+                                    <div class="col-12 md:col-4">
+                                        <label for="icondisplay" class="font-bold block mb-2">Employee</label>
+                                        <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select User" class="w-full" />
+                                    </div>
+                                    <div class="col-12 md:col-4">
+                                        <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
+                                        <Dropdown v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
+                                    </div>
+                                    <div class="col-12 md:col-4">
+                                        <label for="icondisplay" class="font-bold block mb-2">Deadline</label>
+                                        <Calendar v-model="deadline" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" />
+                                    </div>
                                 </div>
                                 <!-- Dynamic section -->
-                                <div class="" v-if="employee != ''">
+                                <div class="" v-if="employee != '' && selectedQuarter !== ''">
                                     <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
                                         <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
@@ -275,8 +286,8 @@ onMounted(() => {});
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel header="Submission"> 
-                        <KpiSubmission :quater="quater"/>
+                    <TabPanel header="Submission">
+                        <KpiSubmission :quater="quater" />
                     </TabPanel>
                     <TabPanel header="Report">
                         <KpiReport :employees="employees" :quater="quater" />
@@ -320,8 +331,8 @@ onMounted(() => {});
                             <Dropdown
                                 v-model="subSectionCreate.mark_type"
                                 :options="[
-                                    { name: 'Percentage (%)', value: 1 },
-                                    { name: 'Number (01)', value: 0 }
+                                    { name: 'Percentage (%)', label: 1 },
+                                    { name: 'Number (01)', label: 0 }
                                 ]"
                                 optionLabel="name"
                                 placeholder="Select Status"
