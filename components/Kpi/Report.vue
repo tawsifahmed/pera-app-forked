@@ -14,8 +14,7 @@ const handleKpiReportGenerate = async () => {
     if (employee.value == '' || selectedQuarter.value == '') {
         return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Employee and Quarter', group: 'br', life: 3000 });
     }
-    const token = useCookie('token');
-    loading.value = true;
+    
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/show/${employee.value.id}?quater_id=${selectedQuarter.value.id}`, {
         method: 'GET',
@@ -100,18 +99,26 @@ const handleReportDownload = async () => {
             </div>
             <div class="flex align-items-center justify-content-between my-4">
                 <h6 class="m-0 font-bold">Name: {{ previewKpiReportData?.user_name }}</h6>
-                <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6>
+                <!-- <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6> -->
                 <h6 class="m-0 font-bold">Achieved: {{ previewKpiReportData?.overAllKpi }}</h6>
             </div>
-            <DataTable :value="previewKpiReportData?.data[0]?.sub_section_data" tableStyle="min-width: 50rem">
+            <DataTable v-for="(section, index) in previewKpiReportData?.data" :value="section.sub_section_data" v-bind:key="index" showGridlines tableStyle="min-width: 50rem" class="my-4">
                 <template #empty> <p class="text-center">No Data found...</p> </template>
-                <Column field="achive_mark" header="Sub Section">
+                <template #header>
+                    <div class="flex flex-wrap align-items-center justify-content-between gap-2 py-2">
+                        <span class="text-xl text-900 font-bold">{{ section.section.name }}</span>
+                    </div>
+                </template>
+                <Column field="" header="Sub Section" style="width: 30%">
                     <template #body="slotProps">
                         <div>{{ slotProps?.data?.sub_section?.title }}</div>
                     </template>
                 </Column>
-                <Column field="achive_mark" header="Achieved Mark"></Column>
-                <Column field="target_mark" header="Target Mark"></Column>
+                <Column field="target_mark" header="Key result Target"></Column>
+                <Column field="achive_mark" header="Key result Achivement"></Column>
+                <Column field="achive_mark_parcentage" header="Achievement Percentage"></Column>
+                <Column field="weightage" header="Weightage"></Column>
+                <Column field="weightage_score" header="Weightage Score"></Column>
                 <Column field="comment" header="Comment"></Column>
                 <!-- <Column field="task_due_date" header="Due Date"></Column>
                 <Column field="task_date_done" header="Completed Date"></Column>

@@ -97,7 +97,8 @@ const handleOutsideClick = () => {
 
 const closeNotification = (evn) => {
     showNotify.value = evn;
-    fetchNotifyData();
+    // fetchNotifyData();
+    // notifiData.value = false;
 
 };
 
@@ -181,6 +182,13 @@ const fetchNotifyData = async () => {
 
 fetchNotifyData();
 
+const handleNotificationComp = () => {
+    showNotify.value = !showNotify.value;
+    if(notifiData.value) {
+        notifiData.value = false;
+    }
+};
+
 const timeTrack = ref('00:00:00');
 
 </script>
@@ -249,10 +257,7 @@ const timeTrack = ref('00:00:00');
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
                 </div>
-                <button @click="() => {
-                        showNotify = !showNotify;
-                    }
-                    " class="p-link layout-topbar-button notify-btn">
+                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn">
 
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>

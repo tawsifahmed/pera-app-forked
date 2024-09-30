@@ -8,23 +8,34 @@ import accessPermission from '~/composables/usePermission';
 
 const readKpi = ref(accessPermission('read_kpi'));
 const createKpi = ref(accessPermission('create_kpi'));
+const readQuarter = ref(accessPermission('read_quater'));
+const readSection = ref(accessPermission('read_section'));
 const employees = ref([]);
 const employee = ref('');
 const quater = ref([]);
 const sections = ref([]);
+const sectionStatuses = ref([
+    { name: 'Active', label: 1 },
+    { name: 'Inactive', label: 0 }
+]);
+const subSectionCreateLoading = ref(false);
 const subSection = ref([]);
+const filteredSubSection = ref([]);
+const subSectionCreate = ref({});
 const dynamicSection = ref([
     {
         // user_id: employee.value,
         section_id: null,
         subsection_id: null,
         quater_id: null,
-        achive_mark: '',
+        achive_mark: 0,
+        target_mark: 0,
         comment: ''
     }
 ]);
 const quaterYear = ref('');
 const loading = ref(false);
+const subModal = ref(false);
 const toast = useToast();
 
 const init = async () => {
@@ -76,7 +87,44 @@ const fetchSubSection = async () => {
         subSection.value = data.value?.data;
     }
 };
+const handleSubSectionCreation = async () => {
+    subSectionCreateLoading.value = true;
+    console.log(Object.keys(subSectionCreate.value));
+    const formData = new FormData();
+    formData.append('section_id', subSectionCreate.value.section?.id);
+    formData.append('title', subSectionCreate.value.name);
+    formData.append('target_mark', subSectionCreate.value.targetMark);
+    formData.append('mark_type', subSectionCreate.value.mark_type);
+    formData.append('weightage', subSectionCreate.value.weightage);
+    formData.append('comment', subSectionCreate.value.comment || '');
+    formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
 
+    // Check if any required field is empty or undefined
+    if (!subSectionCreate.value.section || !subSectionCreate.value.name || !subSectionCreate.value.targetMark || !subSectionCreate.value.status) {
+        subSectionCreateLoading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
+    }
+
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-create`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
+
+    if (data.value) {
+        fetchSubSection();
+        subModal.value = false;
+        subSectionCreate.value = {};
+        subSectionCreateLoading.value = false;
+        toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Created Successfully', group: 'br', life: 3000 });
+    } else {
+        subSectionCreateLoading.value = false;
+        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to create sub section!', group: 'br', life: 3000 });
+    }
+};
 // Function to add a new section
 const addSection = () => {
     // console.log(dynamicSection.value[index]);
@@ -85,15 +133,17 @@ const addSection = () => {
     if (data.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (data.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
     if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
-    if (data.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
     dynamicSection.value.push({
         // user_id: employee,
         section_id: null,
         subsection_id: null,
         quater_id: null,
-        achive_mark: '',
+        achive_mark: 0,
         comment: ''
     });
+};
+const handleSectionChange = (section) => {
+    filteredSubSection.value = subSection.value.filter((item) => item.section_id == section);
 };
 // form Submission
 const handleSubmit = async () => {
@@ -105,7 +155,7 @@ const handleSubmit = async () => {
     if (lastFormData.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (lastFormData.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
     if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
-    if (lastFormData.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
+    // if (lastFormData.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
     const kpiData = dynamicSection.value.map((section) => {
         return {
             user_id: employee.value.id,
@@ -132,7 +182,7 @@ const handleSubmit = async () => {
                 section_id: null,
                 subsection_id: null,
                 quater_id: null,
-                achive_mark: '',
+                achive_mark: 0,
                 comment: ''
             }
         ];
@@ -148,14 +198,22 @@ const handleSubmit = async () => {
 const handleRemove = (index) => {
     dynamicSection.value.splice(index, 1);
 };
-onMounted(() => {
-    init();
-    fetchQuater();
-    fetchSection();
-    fetchSubSection();
-    const date = new Date();
-    quaterYear.value = date.getFullYear();
-});
+
+const onTabChange = (event) => {
+    if (event.index == 0) {
+        init();
+        fetchQuater();
+        fetchSection();
+        fetchSubSection();
+    }
+};
+init();
+fetchQuater();
+fetchSection();
+fetchSubSection();
+const date = new Date();
+quaterYear.value = date.getFullYear();
+onMounted(() => {});
 </script>
 <template>
     <div class="card">
@@ -167,10 +225,10 @@ onMounted(() => {
 
         <!-- kpi tabs -->
 
-        <TabView class="mt-3">
+        <TabView @tabChange="onTabChange" class="mt-3">
             <TabPanel v-if="readKpi" class="file-upload" header="KPI">
                 <TabView>
-                    <TabPanel v-if="createKpi" header="KPI Generate">
+                    <TabPanel v-if="createKpi" header="Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
                             <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
                                 <div class="w-full col-12">
@@ -180,22 +238,27 @@ onMounted(() => {
                                 <!-- Dynamic section -->
                                 <div class="" v-if="employee != ''">
                                     <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
-                                        <button type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
+                                        <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Section</label>
-                                                <Dropdown v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
+                                                <Dropdown @change="(event) => handleSectionChange(event.value.id)" v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
-                                                <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" />
+                                                <div class="flex gap-2 w-full">
+                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="filteredSubSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" style="max-width: 17rem" />
+                                                    <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" class="" />
+                                                </div>
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
                                                 <Dropdown v-model="dynamicSection[index].quater_id" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
-                                                <label for="icondisplay" class="font-bold block mb-2">Achieved Mark</label>
+                                                <label for="icondisplay" class="font-bold block mb-2"
+                                                    >Achieved Mark (Target: {{ dynamicSection[index].subsection_id?.target_mark || 0 }}{{ dynamicSection[index].subsection_id?.mark_type == 1 ? '%' : '' || 0 }})</label
+                                                >
                                                 <InputText v-model="dynamicSection[index].achive_mark" placeholder="Input Mark" class="w-full" />
                                             </div>
                                             <div class="col-12">
@@ -212,19 +275,87 @@ onMounted(() => {
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel header="KPI Report">
+                    <TabPanel header="Submission"> 
+                        <KpiSubmission :quater="quater"/>
+                    </TabPanel>
+                    <TabPanel header="Report">
                         <KpiReport :employees="employees" :quater="quater" />
                     </TabPanel>
                 </TabView>
             </TabPanel>
-            <TabPanel header="Sections">
+            <TabPanel v-if="readSection" header="Sections">
                 <KpiSection />
             </TabPanel>
-            <TabPanel header="Quarter">
+            <TabPanel v-if="readQuarter" header="Quarter">
                 <KpiQuater />
             </TabPanel>
         </TabView>
     </div>
+    <!-- sub section modal -->
+    <Dialog v-model:visible="subModal" modal header="Create Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
+        <form class="" action="" @submit.prevent="handleSubSectionCreation">
+            <div class="">
+                <div class="kpi-form grid">
+                    <div class="col-12">
+                        <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
+                        <!-- <pre>{{subSectionCreate.section}}</pre> -->
+                        <Dropdown v-model="subSectionCreate.section" :options="sections" optionLabel="name" placeholder="Select Section" checkmark :highlightOnSelect="false" class="w-full" />
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
+                            <InputText type="text" v-model="subSectionCreate.name" placeholder="Title" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                            <InputText type="text" v-model="subSectionCreate.weightage" placeholder="Weightage" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
+                            <Dropdown
+                                v-model="subSectionCreate.mark_type"
+                                :options="[
+                                    { name: 'Percentage (%)', value: 1 },
+                                    { name: 'Number (01)', value: 0 }
+                                ]"
+                                optionLabel="name"
+                                placeholder="Select Status"
+                                checkmark
+                                :highlightOnSelect="false"
+                                class="w-full"
+                            />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Key result Target:</label>
+                            <InputText type="number" v-model="subSectionCreate.targetMark" placeholder="Set Target Mark" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Comment:</label>
+                            <InputText type="text" v-model="subSectionCreate.comment" placeholder="Comment" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Status:</label>
+                            <Dropdown v-model="subSectionCreate.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12 mx-auto flex justify-content-center">
+                        <Button label="Create" severity="info" type="submit" :loading="subSectionCreateLoading" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </Dialog>
 </template>
 
 <style scoped>
