@@ -134,7 +134,7 @@ const addSection = () => {
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
     if (data.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (data.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
-    if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    // if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
     dynamicSection.value.push({
         // user_id: employee,
         section_id: null,
@@ -151,21 +151,22 @@ const handleSectionChange = (section) => {
 const handleSubmit = async () => {
     const token = useCookie('token');
     if (employee.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Employee not selected', group: 'br', life: 3000 });
-    // console.log(dynamicSection.value[index]);
+    if (deadline.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Deadline not selected', group: 'br', life: 3000 });
     const lastFormData = dynamicSection.value[dynamicSection.value.length - 1];
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
     if (lastFormData.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (lastFormData.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
-    if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    // if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
     // if (lastFormData.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
     const kpiData = dynamicSection.value.map((section) => {
         return {
             user_id: employee.value.id,
             section_id: section.section_id.id,
             subsection_id: section.subsection_id.id,
-            quater_id: section.quater_id.id,
+            quater_id: selectedQuarter.value.id,
             achive_mark: section.achive_mark,
-            comment: section.comment
+            comment: section.comment,
+            deadline: formatDate(deadline.value)
         };
     });
 
@@ -176,17 +177,18 @@ const handleSubmit = async () => {
         },
         body: kpiData
     });
-    if (data.value.code == 201) {
+    if (data.value) {
         toast.add({ severity: 'success', summary: 'KPI Information', detail: 'KPI Submission Complete', group: 'br', life: 3000 });
         dynamicSection.value = [
-            {
-                // user_id: employee.value,
-                section_id: null,
-                subsection_id: null,
-                quater_id: null,
-                achive_mark: 0,
-                comment: ''
-            }
+        {
+        // user_id: employee.value,
+        section_id: null,
+        subsection_id: null,
+        quater_id: null,
+        achive_mark: 0,
+        target_mark: 0,
+        comment: ''
+    }
         ];
         employee.value = '';
         return (loading.value = false);
@@ -200,7 +202,10 @@ const handleSubmit = async () => {
 const handleRemove = (index) => {
     dynamicSection.value.splice(index, 1);
 };
-
+const formatDate = (data) => {
+    const date = new Date(data);
+    return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+};
 const onTabChange = (event) => {
     if (event.index == 0) {
         init();
@@ -215,6 +220,8 @@ fetchSection();
 fetchSubSection();
 const date = new Date();
 quaterYear.value = date.getFullYear();
+
+
 </script>
 <template>
     <div class="card">
@@ -243,7 +250,7 @@ quaterYear.value = date.getFullYear();
                                     </div>
                                     <div class="col-12 md:col-4">
                                         <label for="icondisplay" class="font-bold block mb-2">Deadline</label>
-                                        <Calendar v-model="deadline" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" />
+                                        <Calendar v-model="deadline"  dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" />
                                     </div>
                                 </div>
                                 <!-- Dynamic section -->
@@ -264,7 +271,7 @@ quaterYear.value = date.getFullYear();
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
-                                                <Dropdown v-model="dynamicSection[index].quater_id" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
+                                                <Dropdown disabled v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2"

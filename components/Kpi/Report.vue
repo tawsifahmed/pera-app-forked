@@ -93,16 +93,18 @@ const handleReportDownload = async () => {
     <div v-if="previewKpiReportData" class="card">
         <!-- <pre>{{previewKpiReportData}}</pre> -->
         <div>
-            <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-5">
-                <h5 class="m-0">Preview</h5>
-                <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+            <div class="flex flex-wrap align-items-top justify-content-between gap-2 mb-5">
+                <div class="">
+                    <h6 class="my-1 font-bold">{{ previewKpiReportData?.user_name }}</h6>
+                    <!-- <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6> -->
+                    <h6 class="my-1 font-bold">Achievement: {{ previewKpiReportData?.overAllKpi }}</h6>
+                    <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6>
+                </div>
+                <Button @click="handleReportDownload" class="w-fit h-fit" label="Download" :loading="loading1" />
             </div>
-            <div class="flex align-items-center justify-content-between my-4">
-                <h6 class="m-0 font-bold">Name: {{ previewKpiReportData?.user_name }}</h6>
-                <!-- <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6> -->
-                <h6 class="m-0 font-bold">Achieved: {{ previewKpiReportData?.overAllKpi }}</h6>
-            </div>
+
             <DataTable v-for="(section, index) in previewKpiReportData?.data" :value="section.sub_section_data" v-bind:key="index" showGridlines tableStyle="min-width: 50rem" class="my-4">
+                <!-- <pre>{{ section.section_summary }}</pre> -->
                 <template #empty> <p class="text-center">No Data found...</p> </template>
                 <template #header>
                     <div class="flex flex-wrap align-items-center justify-content-between gap-2 py-2">
@@ -114,13 +116,13 @@ const handleReportDownload = async () => {
                         <div>{{ slotProps?.data?.sub_section?.title }}</div>
                     </template>
                 </Column>
-                <Column field="target_mark" header="Key result Target"></Column>
-                <Column field="achive_mark" header="Key result Achivement"></Column>
-                <Column field="achive_mark_parcentage" header="Achievement Percentage"></Column>
-                <Column field="weightage" header="Weightage"></Column>
-                <Column field="weightage_score" header="Weightage Score"></Column>
+                <Column field="target_mark" header="Key result Target" style="width: 8%"></Column>
+                <Column field="achive_mark" header="Key result Achivement" style="width: 8%"></Column>
+                <Column field="achive_mark_parcentage" header="Achievement Percentage" style="width: 8%"></Column>
+                <Column field="weightage" header="Weightage" style="width: 8%"></Column>
+                <Column field="weightage_score" header="Weightage Score" style="width: 8%"></Column>
                 <Column field="comment" header="Comment"></Column>
-                <Column field="" header="File">
+                <Column field="" header="File" style="width: 8%">
                     <template #body="slotProps">
                         <a v-if="slotProps?.data?.file_link !== ''" :href="slotProps?.data?.file_link" target="_blank" class="text-blue-500"> Attechment </a>
                     </template>
@@ -128,13 +130,13 @@ const handleReportDownload = async () => {
                 <ColumnGroup type="footer">
                     <Row>
                         <Column footer="Summery:" :colspan="1" footerStyle="text-align:left" />
-                        <Column :footer="lastYearTotal" />
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="'hello world'" />
-                        <Column> hello world </Column>
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="thisYearTotal" />
+                        <Column :footer="''" />
+                        <Column :footer="''" />
+                        <Column :footer="section?.section_summary?.achivementpercentage_sum" />
+                        <Column :footer="section?.section_summary?.section_weightage" />
+                        <Column :footer="section?.section_summary?.weighted_score_sum" />
+                        <Column :footer="''" />
+                        <Column :footer="''" />
                     </Row>
                 </ColumnGroup>
             </DataTable>
