@@ -8,11 +8,19 @@ import accessPermission from '~/composables/usePermission';
 
 const readKpi = ref(accessPermission('read_kpi'));
 const createKpi = ref(accessPermission('create_kpi'));
+const readQuarter = ref(accessPermission('read_quater'));
+const readSection = ref(accessPermission('read_section'));
 const employees = ref([]);
 const employee = ref('');
 const quater = ref([]);
 const sections = ref([]);
+const sectionStatuses = ref([
+    { name: 'Active', label: 1 },
+    { name: 'Inactive', label: 0 }
+]);
+const subSectionCreateLoading = ref(false);
 const subSection = ref([]);
+const subSectionCreate = ref({});
 const dynamicSection = ref([
     {
         // user_id: employee.value,
@@ -25,6 +33,7 @@ const dynamicSection = ref([
 ]);
 const quaterYear = ref('');
 const loading = ref(false);
+const subModal = ref(false);
 const toast = useToast();
 
 const init = async () => {
@@ -76,7 +85,42 @@ const fetchSubSection = async () => {
         subSection.value = data.value?.data;
     }
 };
+const handleSubSectionCreation = async () => {
+    subSectionCreateLoading.value = true;
+    console.log(Object.keys(subSectionCreate.value));
+    const formData = new FormData();
+    formData.append('section_id', subSectionCreate.value.section?.id);
+    formData.append('title', subSectionCreate.value.name);
+    formData.append('target_mark', subSectionCreate.value.targetMark);
+    formData.append('comment', subSectionCreate.value.comment || '');
+    formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
 
+    // Check if any required field is empty or undefined
+    if (!subSectionCreate.value.section || !subSectionCreate.value.name || !subSectionCreate.value.targetMark || !subSectionCreate.value.status) {
+        subSectionCreateLoading.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
+    }
+
+    const token = useCookie('token');
+    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-create`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
+
+    if (data) {
+        fetchSubSection();
+        subModal.value = false;
+        subSectionCreate.value = {};
+        subSectionCreateLoading.value = false;
+        toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Created Successfully', group: 'br', life: 3000 });
+    } else {
+        subSectionCreateLoading.value = false;
+        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to create sub section!', group: 'br', life: 3000 });
+    }
+};
 // Function to add a new section
 const addSection = () => {
     // console.log(dynamicSection.value[index]);
@@ -95,6 +139,7 @@ const addSection = () => {
         comment: ''
     });
 };
+
 // form Submission
 const handleSubmit = async () => {
     const token = useCookie('token');
@@ -170,7 +215,7 @@ onMounted(() => {
         <TabView class="mt-3">
             <TabPanel v-if="readKpi" class="file-upload" header="KPI">
                 <TabView>
-                    <TabPanel v-if="createKpi" header="KPI Generate">
+                    <TabPanel v-if="createKpi" header="Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
                             <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
                                 <div class="w-full col-12">
@@ -180,7 +225,7 @@ onMounted(() => {
                                 <!-- Dynamic section -->
                                 <div class="" v-if="employee != ''">
                                     <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
-                                        <button type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
+                                        <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Section</label>
@@ -188,7 +233,10 @@ onMounted(() => {
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
-                                                <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" />
+                                                <div class="flex gap-2">
+                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" />
+                                                    <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" />
+                                                </div>
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
@@ -212,19 +260,61 @@ onMounted(() => {
                             </form>
                         </div>
                     </TabPanel>
-                    <TabPanel header="KPI Report">
+                    <TabPanel header="Submission"> Hello world </TabPanel>
+                    <TabPanel header="Report">
                         <KpiReport :employees="employees" :quater="quater" />
                     </TabPanel>
                 </TabView>
             </TabPanel>
-            <TabPanel header="Sections">
+            <TabPanel v-if="readSection" header="Sections">
                 <KpiSection />
             </TabPanel>
-            <TabPanel header="Quarter">
+            <TabPanel v-if="readQuarter" header="Quarter">
                 <KpiQuater />
             </TabPanel>
         </TabView>
     </div>
+    <!-- sub section modal -->
+    <Dialog v-model:visible="subModal" modal header="Create Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
+        <form class="" action="" @submit.prevent="handleSubSectionCreation">
+            <div class="">
+                <div class="kpi-form grid">
+                    <div class="col-12">
+                        <label for="icondisplay" class="font-bold block mb-2">Select Section:</label>
+                        <Dropdown v-model="subSectionCreate.section" :options="sections" optionLabel="name" placeholder="Select Section" checkmark :highlightOnSelect="false" class="w-full" />
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
+                            <InputText type="text" v-model="subSectionCreate.name" placeholder="Title" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Target Mark:</label>
+                            <InputText type="number" v-model="subSectionCreate.targetMark" placeholder="Set Target Mark" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Comment:</label>
+                            <InputText type="text" v-model="subSectionCreate.comment" placeholder="Comment" min="0" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="user-selection w-full">
+                            <label for="icondisplay" class="font-bold block mb-2">Sub Section Status:</label>
+                            <Dropdown v-model="subSectionCreate.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
+                        </div>
+                    </div>
+                    <div class="col-12 mx-auto flex justify-content-center">
+                        <Button label="Create" severity="info" type="submit" :loading="subSectionCreateLoading" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </Dialog>
 </template>
 
 <style scoped>
