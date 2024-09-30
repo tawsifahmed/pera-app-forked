@@ -67,7 +67,7 @@ const handleSectionCreation = async () => {
     const formData = new FormData();
     formData.append('name', sectionCreate.value.name);
     formData.append('status', sectionCreate.value.status?.label); // optional chaining to avoid undefined errors
-
+    formData.append('section_weightage', sectionCreate.value.section_weightage);
     // Check if name or status is empty or undefined
     if (!sectionCreate.value.name || !sectionCreate.value.status) {
         sectionCreateLoading.value = false;
@@ -75,7 +75,7 @@ const handleSectionCreation = async () => {
     }
 
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-create`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-create`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -83,7 +83,7 @@ const handleSectionCreation = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         init();
         sectionModal.value = false;
         sectionCreate.value = {};
@@ -102,6 +102,8 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
+    formData.append('mark_type', subSectionCreate.value.mark_type);
+    formData.append('weightage', subSectionCreate.value.weightage);
     formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
 
@@ -170,7 +172,7 @@ const handleEditSection = async () => {
     const formData = new FormData();
     formData.append('name', sectionEdit.value.name);
     formData.append('status', sectionEdit.value.status?.label); // optional chaining to avoid undefined errors
-
+    formData.append('section_weightage', sectionEdit.value.section_weightage);
     const token = useCookie('token');
     const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-update/${sectionEdit.value.id}`, {
         method: 'POST',
@@ -229,7 +231,7 @@ const handleEditSubSection = async () => {
 
 const deleteSection = async (id) => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -240,13 +242,13 @@ const deleteSection = async (id) => {
         init();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Failed', detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
 const deleteSubSection = async (id) => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-delete/${id}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-delete/${id}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -257,7 +259,7 @@ const deleteSubSection = async (id) => {
         initSub();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Sub Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete sub section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Failed', detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
@@ -283,7 +285,7 @@ onMounted(() => {
                             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="name" header="Section Name"></Column>
-                            <Column style="text-wrap: nowrap" field="status" header="Status"></Column>
+                            <Column style="text-wrap: nowrap" field="section_weightage" header="Weightage"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
                                 <template #body="slotProps">
                                     <div style="display: flex; flex-wrap: wrap; gap: 5px">
@@ -320,6 +322,12 @@ onMounted(() => {
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="sectionCreate.section_weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Status:</label>
                                     <Dropdown v-model="sectionCreate.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
@@ -341,6 +349,12 @@ onMounted(() => {
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Title:</label>
                                     <InputText type="text" v-model="sectionEdit.name" placeholder="Title" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="sectionEdit.section_weightage" placeholder="Weightage" min="0" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -413,6 +427,29 @@ onMounted(() => {
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="subSectionCreate.weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
+                                    <Dropdown
+                                        v-model="subSectionCreate.mark_type"
+                                        :options="[
+                                            { name: 'Percentage (%)', value: 1 },
+                                            { name: 'Number (01)', value: 0 }
+                                        ]"
+                                        optionLabel="name"
+                                        placeholder="Select Status"
+                                        checkmark
+                                        :highlightOnSelect="false"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Target Mark:</label>
                                     <InputText type="number" v-model="subSectionCreate.targetMark" placeholder="Set Target Mark" min="0" class="w-full" />
                                 </div>
@@ -452,6 +489,29 @@ onMounted(() => {
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
                                     <InputText type="text" v-model="subSectionEdit.title" placeholder="Title" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="subSectionEdit.weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
+                                    <Dropdown
+                                        v-model="subSectionEdit.mark_type"
+                                        :options="[
+                                            { name: 'Percentage (%)', value: 1 },
+                                            { name: 'Number (01)', value: 0 }
+                                        ]"
+                                        optionLabel="name"
+                                        placeholder="Select Status"
+                                        checkmark
+                                        :highlightOnSelect="false"
+                                        class="w-full"
+                                    />
                                 </div>
                             </div>
                             <div class="col-12">
