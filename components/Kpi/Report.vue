@@ -120,11 +120,23 @@ const handleReportDownload = async () => {
                 <Column field="weightage" header="Weightage"></Column>
                 <Column field="weightage_score" header="Weightage Score"></Column>
                 <Column field="comment" header="Comment"></Column>
-                <!-- <Column field="task_due_date" header="Due Date"></Column>
-                <Column field="task_date_done" header="Completed Date"></Column>
-                <Column field="formatted_time_tracked" header="Time Track"></Column>
-                <Column field="overdue" header="Over Due"></Column>
-                <Column field="bounce" header="Bounce"></Column> -->
+                <Column field="" header="File">
+                    <template #body="slotProps">
+                        <a v-if="slotProps?.data?.file_link !== ''" :href="slotProps?.data?.file_link" target="_blank" class="text-blue-500"> Attechment </a>
+                    </template>
+                </Column>
+                <ColumnGroup type="footer">
+                    <Row>
+                        <Column footer="Summery:" :colspan="1" footerStyle="text-align:left" />
+                        <Column :footer="lastYearTotal" />
+                        <Column :footer="thisYearTotal" />
+                        <Column :footer="thisYearTotal" />
+                        <Column :footer="'hello world'" />
+                        <Column> hello world </Column>
+                        <Column :footer="thisYearTotal" />
+                        <Column :footer="thisYearTotal" />
+                    </Row>
+                </ColumnGroup>
             </DataTable>
         </div>
     </div>
