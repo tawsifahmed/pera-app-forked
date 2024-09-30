@@ -14,8 +14,7 @@ const handleKpiReportGenerate = async () => {
     if (employee.value == '' || selectedQuarter.value == '') {
         return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Employee and Quarter', group: 'br', life: 3000 });
     }
-    const token = useCookie('token');
-    loading.value = true;
+    
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/show/${employee.value.id}?quater_id=${selectedQuarter.value.id}`, {
         method: 'GET',
