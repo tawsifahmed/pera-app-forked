@@ -18,8 +18,8 @@
                 </div>
             </div>
             <!-- Dynamic section -->
+            <pre>{{submittedFiles}}</pre>
             <form class="" v-if="employeeLoaded">
-                <!-- <pre>{{dynamicSection}}</pre> -->
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
 
                     <div class="w-full col-12 grid">
@@ -38,19 +38,41 @@
                                 placeholder="Select Quarter" class="w-full" />
                         </div>
                         <div class="col-12 md:col-6">
-                            <label for="icondisplay" class="font-bold block mb-2">Achieved Mark</label>
-                            <InputText v-model="section.achive_mark" placeholder="Input Mark"
+                            <label for="icondisplay" class="font-bold block mb-2">
+                                Achieved Mark (Target: {{ section?.target_mark || 0 }}{{ section?.mark_type == 1 ? '%' : '' || 0 }})
+                            </label>
+                            <InputText v-model="submittedMarks[index]" placeholder="Input Mark"
                                 class="w-full" />
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">Comment</label>
-                            <InputText v-tooltip.top="{ value: section.comment }" v-model="section.comment" placeholder="Write comment"
+                            <InputText v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" placeholder="Write comment"
                                 class="w-full" />
                         </div>
+                        <div class="col-12">
+                            <label for="icondisplay" class="font-bold block mb-2">File</label>
+                            <div v-if="submittedFiles[index] && submittedFiles[index].length" class="mb-2">
+                                <div v-for="(file, fileIndex) in submittedFiles[index]" :key="fileIndex" class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-items-center mb-1 relative">
+                                    <div>
+                                        <span class="pi pi-file-import mr-2"></span> <span>{{ file.name }}</span>
+                                    </div>
+                                    <div @click="handleCloseCommentFile(index, fileIndex)" class="close-comment">
+                                        <i class="pi pi-times"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <!-- Unique file input for each section, hidden from view -->
+                                <input type="file" class="hidden" :id="`submittedFiles${index}`" @change="handleFileChange(index, $event)" multiple />
+                                <!-- Button that triggers file input click for the specific index -->
+                                <Button icon="pi pi-cloud-upload" @click="handleFileUp(index)" aria-label="Filter" />
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
                 <div class="gap-2 flex justify-content-center w-full">
-                    <Button label="Submit" class="bg-green-500 border-none" type="submit" />
+                    <Button label="Submit" class="bg-green-500 border-none" type="submit" @click="handleSubmission" :loading="loading1" />
 
                 </div>
             </form>
@@ -67,6 +89,7 @@ const { userProfile } = storeToRefs(useUserStore());
 const toast = useToast();
 const url = useRuntimeConfig();
 const loading = ref(false);
+const loading1 = ref(false);
 const { quater } = defineProps(['quater']);
 
 // const employee = ref({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
@@ -78,12 +101,50 @@ const employeeLoaded = ref(false);
 const selectedQuarter = ref('');
 const dynamicSection = ref([]);
 
+const submittedIds = ref([]);
+const submittedMarks = ref([]);
+const submittedComments = ref([]);
+const submittedFiles = ref([]);
+
 watch(selectedQuarter, (value) => {
     if (value) {
         employeeLoaded.value = false;
         dynamicSection.value = [];
+        submittedIds.value = [];
+        submittedMarks.value = [];
+        submittedComments.value = [];
+        submittedFiles.value = [];
     }
 });
+
+// Handle file input change for each section
+const handleFileChange = (index, event) => {
+    const files = Array.from(event.target.files);
+    if (!submittedFiles.value[index]) {
+        // Initialize array for this section if it doesn't exist
+        submittedFiles.value[index] = [];
+    }
+    // Add selected files to the section's file array
+    submittedFiles.value[index].push(...files);
+};
+
+// Handle button click to open the specific file input field
+const handleFileUp = (index) => {
+    const fileInput = document.getElementById(`submittedFiles${index}`);
+    if (fileInput) {
+        fileInput.click();
+    }
+};
+
+// Handle removing the uploaded file
+const handleCloseCommentFile = (sectionIndex, fileIndex) => {
+    // Remove the file from the specific section's array of files
+    if (submittedFiles.value[sectionIndex]) {
+        submittedFiles.value[sectionIndex].splice(fileIndex, 1);
+    }
+};
+
+
 
 
 const loadSubmission = async () => {
@@ -114,12 +175,25 @@ const loadSubmission = async () => {
                     section_id: item.section.id,
                     subSection_name: subItem.sub_section.title,
                     subsection_id: subItem.sub_section.id,
+                    target_mark: subItem.target_mark,
+                    mark_type: subItem.mark_type,
                     quater_id: subItem.quater_id,
                     achive_mark: subItem.achive_mark,
                     comment: subItem.comment
                 });
+                submittedIds.value.push(subItem.id);
+                submittedMarks.value.push(subItem.achive_mark);
+                submittedComments.value.push(subItem.comment);
+                submittedFiles.value.push(null);
             });
+            console.log('Submitted Ids', submittedIds.value);
+            console.log('Submitted submittedMarks', submittedMarks.value);
+            console.log('Submitted submittedComments', submittedComments.value);
+            console.log('Submitted submittedFiles', submittedFiles.value);
+
         });
+
+        
         console.log('Submission Value', data?.value);
     }else{
         loading.value = false;
@@ -127,6 +201,40 @@ const loadSubmission = async () => {
     }
 
 
+};
+
+
+const handleSubmission = async () => {
+    loading1.value = true;
+    const token = useCookie('token');
+    const formData = new FormData();
+    dynamicSection.value.forEach((section, index) => {
+        formData.append('id[]', submittedIds.value[index]);
+        formData.append('achive_mark[]', submittedMarks.value[index]);
+        formData.append('comment[]', submittedComments.value[index]);
+        if (submittedFiles.value[index]) {
+            submittedFiles.value[index].forEach((file) => {
+                formData.append('file[]', file);
+            });
+        }
+    });
+
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/update`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
+
+    if (data?.value?.code === 200) {
+        loading1.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Submission successful!', group: 'br', life: 3000 });
+        return;
+    } else {
+        loading1.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to submit', group: 'br', life: 3000 });
+    }
 };
 
 
@@ -151,5 +259,28 @@ getUserData();
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.comment-add {
+    padding: 20px;
+    margin-bottom: 15px;
+    border-top: 1px solid #e2e8f0;
+    padding: 10px;
+    width: 100%;
+}
+
+.close-comment {
+    position: absolute;
+    top: 7px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.comment-form input {
+    width: 75%;
+}
+
+.attch-w {
+    visibility: hidden;
 }
 </style>
