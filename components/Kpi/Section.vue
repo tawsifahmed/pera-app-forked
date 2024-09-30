@@ -27,7 +27,7 @@ const sectionCreateLoading = ref(false);
 const subSectionCreateLoading = ref(false);
 const sectionEditLoading = ref(false);
 const subSectionEditLoading = ref(false);
-
+const loading = ref(false);
 const init = async () => {
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section`, {
@@ -102,7 +102,7 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
-    formData.append('mark_type', subSectionCreate.value.mark_type);
+    formData.append('mark_type', subSectionCreate.value.mark_type.value);
     formData.append('weightage', subSectionCreate.value.weightage);
     formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
@@ -122,7 +122,7 @@ const handleSubSectionCreation = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         initSub();
         subModal.value = false;
         subSectionCreate.value = {};
@@ -156,6 +156,7 @@ const editSubSection = async (data) => {
         section_id: structuredSectionList.value.find((item) => item.id === data.section_id),
         title: data.title,
         target_mark: data.target_mark,
+        mark_type: data.mark_type.value,
         comment: data.comment,
         status: sectionStatuses.value.find((item) => item.label === data.status)
     };
@@ -200,11 +201,13 @@ const handleEditSubSection = async () => {
         subSectionEditLoading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
     }
-
+    console.log(subSectionEdit);
     const formData = new FormData();
     formData.append('section_id', subSectionEdit.value.section_id?.id);
     formData.append('title', subSectionEdit.value.title);
+    formData.append('weightage', subSectionEdit.value.weightage);
     formData.append('target_mark', subSectionEdit.value.target_mark);
+    formData.append('mark_type', subSectionEdit.value.mark_type.value);
     formData.append('comment', subSectionEdit.value.comment);
     formData.append('status', subSectionEdit.value.status?.label); // optional chaining to avoid undefined errors
 
@@ -225,7 +228,7 @@ const handleEditSubSection = async () => {
         toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Updated Successfully', group: 'br', life: 3000 });
     } else {
         subSectionEditLoading.value = false;
-        toast.add({ severity: 'error', summary: error.value.data.app_message, detail: error.value.data.user_message, group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: error.value.data.app_message || 'Error', detail: error.value.data.user_message || 'Failed To Update', group: 'br', life: 3000 });
     }
 };
 
@@ -280,7 +283,7 @@ onMounted(() => {
                         <Button v-if="createSection" @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
-                        <DataTable v-model:filters="filters" class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+                        <DataTable class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
                             <template #empty> <p class="text-center">No Data found...</p> </template>
                             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                             <Column field="index" header="Serial" sortable></Column>
@@ -380,12 +383,13 @@ onMounted(() => {
                         <Button v-if="createSubSection" @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
-                        <DataTable v-model:filters="filters" class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+                        <DataTable class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
                             <template #empty> <p class="text-center">No Data found...</p> </template>
                             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="title" header="Sub Section Name"></Column>
                             <Column style="text-wrap: nowrap" field="target_mark" header="Target Mark"></Column>
+                            <Column style="text-wrap: nowrap" field="weightage" header="Weightage"></Column>
                             <Column style="text-wrap: nowrap" field="section_name" header="Section"></Column>
                             <Column style="text-wrap: nowrap" field="comment" header="Comment"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
