@@ -209,14 +209,18 @@ const handleSubmission = async () => {
     const token = useCookie('token');
     const formData = new FormData();
     dynamicSection.value.forEach((section, index) => {
+        console.log('SubIDSValue', submittedIds.value[index]);
         formData.append('id[]', submittedIds.value[index]);
         formData.append('achive_mark[]', submittedMarks.value[index]);
         formData.append('comment[]', submittedComments.value[index]);
-        if (submittedFiles.value[index]) {
-            submittedFiles.value[index].forEach((file) => {
-                formData.append('file[]', file);
-            });
-        }
+        formData.append('files[]', submittedFiles.value[index]);
+        console.log('Submitted Files', submittedFiles.value[index]);
+        // if (submittedFiles.value[index]) {
+        //     submittedFiles.value[index].forEach((file) => {
+        //         console.log('File Value', file);
+        //         formData.append('files[]', file);
+        //     });
+        // }
     });
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/update`, {
