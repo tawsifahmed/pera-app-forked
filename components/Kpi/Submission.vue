@@ -18,7 +18,7 @@
                 </div>
             </div>
             <!-- Dynamic section -->
-            <pre>{{submittedFiles}}</pre>
+            <!-- <pre>{{submittedIds}}</pre> -->
             <form class="" v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
 
@@ -46,7 +46,7 @@
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">Comment</label>
-                            <InputText v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" placeholder="Write comment"
+                            <InputText v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" id="description" rows="3" cols="20" placeholder="Write comment"
                                 class="w-full" />
                         </div>
                         <div class="col-12">
@@ -106,6 +106,7 @@ const submittedMarks = ref([]);
 const submittedComments = ref([]);
 const submittedFiles = ref([]);
 
+
 watch(selectedQuarter, (value) => {
     if (value) {
         employeeLoaded.value = false;
@@ -148,6 +149,13 @@ const handleCloseCommentFile = (sectionIndex, fileIndex) => {
 
 
 const loadSubmission = async () => {
+    if(submittedIds.value.length > 0 || submittedMarks.value.length > 0 || submittedComments.value.length > 0 || submittedFiles.value.length > 0){
+        submittedIds.value = [];
+        submittedMarks.value = [];
+        submittedComments.value = [];
+        submittedFiles.value = [];
+    }
+
     loading.value = true;
     if (selectedQuarter.value === '') {
         loading.value = false;
@@ -181,7 +189,7 @@ const loadSubmission = async () => {
                     achive_mark: subItem.achive_mark,
                     comment: subItem.comment
                 });
-                submittedIds.value.push(subItem.id);
+                submittedIds.value.push(subItem.sub_section.id);
                 submittedMarks.value.push(subItem.achive_mark);
                 submittedComments.value.push(subItem.comment);
                 submittedFiles.value.push(null);
@@ -233,6 +241,8 @@ const handleSubmission = async () => {
 
     if (data?.value?.code === 200) {
         loading1.value = false;
+        employeeLoaded.value = false;
+        selectedQuarter.value = '';
         toast.add({ severity: 'success', summary: 'Success', detail: 'Submission successful!', group: 'br', life: 3000 });
         return;
     } else {
@@ -263,6 +273,7 @@ getUserData();
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    cursor: default;
 }
 
 .comment-add {
