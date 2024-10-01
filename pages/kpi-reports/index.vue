@@ -149,11 +149,11 @@ const handleSectionChange = (section) => {
     selectedSection.value = section;
     filteredSubSection.value = subSection.value.filter((item) => item.section_id == section);
 };
-watch(subSection, (newV, oldV) => {
-    // handleSubSectionChange(selectedSection.value);
-    filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
-    console.log(filteredSubSection.value);
-});
+// watch(subSection, (newV, oldV) => {
+//     // handleSubSectionChange(selectedSection.value);
+//     filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
+//     console.log(filteredSubSection.value);
+// });
 
 // form Submission
 const handleSubmit = async () => {
@@ -272,7 +272,7 @@ quaterYear.value = date.getFullYear();
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
                                                 <div class="flex gap-2 w-full">
-                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="filteredSubSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" style="max-width: 17rem" />
+                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" style="max-width: 17rem" />
                                                     <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" class="" />
                                                 </div>
                                             </div>
