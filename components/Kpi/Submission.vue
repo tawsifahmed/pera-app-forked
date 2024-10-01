@@ -16,8 +16,11 @@
             </div>
             <!-- Dynamic section -->
             <!-- <pre>{{submittedIds}}</pre>
-            <pre>{{submittedFiles}}</pre>
-            <pre>{{fileCheck}}</pre>
+            <br>
+            <pre>files{{submittedFiles}}</pre>
+            <br>
+            <pre>files lipped{{fileCheck}}</pre>
+            <br>
             <pre>{{submittedFilesId}}</pre> -->
             <form v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
@@ -60,7 +63,7 @@
                                     <!-- Unique file input for each section, hidden from view -->
                                     <input type="file" class="hidden" :id="`submittedFiles${index}`" @change="handleFileChange(section, index, $event)" />
                                     <!-- Button that triggers file input click for the specific index -->
-                                    <Button icon="pi pi-cloud-upload" label="Upload" @click="handleFileUp(index)" aria-label="Filter" />
+                                    <Button icon="pi pi-cloud-upload" :disabled="submittedFiles[index] && submittedFiles[index].length > 0" label="Upload" @click="handleFileUp(index)" aria-label="Filter" />
                                 </div>
                             </div>
                         </div>
