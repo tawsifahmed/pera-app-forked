@@ -2,8 +2,6 @@
     <div class="card mx-auto" style="max-width: 55rem">
         <div action="" class="grid" style="gap: 10px">
             <div class="w-full col-12">
-                <pre>{{ employee }}</pre>
-
                 <div class="flex gap-2 align-items-end justify-content-center">
                     <div class="" style="width: 42.5%;">
                         <label for="icondisplay" class="font-bold block mb-2">Employee</label>
@@ -22,7 +20,7 @@
             <pre>{{submittedFiles}}</pre>
             <pre>{{fileCheck}}</pre>
             <pre>{{submittedFilesId}}</pre> -->
-            <form class="" v-if="employeeLoaded">
+            <form v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
 
                     <div class="w-full col-12 grid">
@@ -49,7 +47,7 @@
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">Comment</label>
-                            <InputText v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" id="description" rows="3" cols="20" placeholder="Write comment"
+                            <Textarea v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" id="description" rows="3" cols="20" placeholder="Write comment"
                                 class="w-full" />
                         </div>
                         <div class="col-12">
@@ -78,6 +76,12 @@
                         
                     </div>
                 </div>
+                <div class="col-12 my-3">
+                    <label for="icondisplay" class="font-bold block mb-2">Employee Self Remarks</label>
+                    <Textarea v-tooltip.top="{ value: selfRemarks }" v-model="selfRemarks" id="description" rows="5" cols="20" placeholder="Write your self remarks"
+                        class="w-full" />
+                </div>
+
                 <div class="gap-2 flex justify-content-center w-full">
                     <Button label="Submit" class="bg-green-500 border-none" type="submit" @click="handleSubmission" :loading="loading1" />
 
@@ -113,7 +117,7 @@ const submittedMarks = ref([]);
 const submittedComments = ref([]);
 const submittedFiles = ref([]);
 const submittedFilesId = ref([]);
-
+const selfRemarks = ref('');
 
 watch(selectedQuarter, (value) => {
     if (value) {
@@ -124,6 +128,7 @@ watch(selectedQuarter, (value) => {
         submittedComments.value = [];
         submittedFiles.value = [];
         submittedFilesId.value = [];
+        fileCheck.value = [];
     }
 });
 
@@ -195,14 +200,14 @@ const loadSubmission = async () => {
                     section_name: item.section.name,
                     section_id: item.section.id,
                     subSection_name: subItem.sub_section.title,
-                    subsection_id: subItem.sub_section.id,
+                    subsection_id: subItem.id,
                     target_mark: subItem.target_mark,
                     mark_type: subItem.mark_type,
                     quater_id: subItem.quater_id,
                     achive_mark: subItem.achive_mark,
                     comment: subItem.comment
                 });
-                submittedIds.value.push(subItem.sub_section.id);
+                submittedIds.value.push(subItem.id);
                 submittedMarks.value.push(subItem.achive_mark);
                 submittedComments.value.push(subItem.comment);
                 submittedFiles.value.push(null);
@@ -253,6 +258,7 @@ const handleSubmission = async () => {
     submittedFilesId.value.forEach((fileId) => {
         formData.append('files_id[]', fileId);
     });
+    formData.append('self_remarks', selfRemarks.value);
     // formData.append('files_id[]', submittedFilesId.value);
     // console.log('Submitted Files ID', submittedFilesId.value);
 
@@ -268,6 +274,13 @@ const handleSubmission = async () => {
         loading1.value = false;
         employeeLoaded.value = false;
         selectedQuarter.value = '';
+        submittedIds.value = [];
+        submittedMarks.value = [];
+        submittedComments.value = [];
+        submittedFiles.value = [];
+        submittedFilesId.value = [];
+        selfRemarks.value = '';
+        fileCheck.value = [];
         toast.add({ severity: 'success', summary: 'Success', detail: 'Submission successful!', group: 'br', life: 3000 });
         return;
     } else {
