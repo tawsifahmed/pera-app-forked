@@ -1,5 +1,5 @@
 <template>
-    <div class="card mx-auto" style="max-width: 50rem">
+    <div class="card mx-auto" style="max-width: 55rem">
         <div action="" class="grid" style="gap: 10px">
             <div class="w-full col-12">
                 <pre>{{ employee }}</pre>
@@ -18,7 +18,10 @@
                 </div>
             </div>
             <!-- Dynamic section -->
-            <!-- <pre>{{submittedIds}}</pre> -->
+            <!-- <pre>{{submittedIds}}</pre>
+            <pre>{{submittedFiles}}</pre>
+            <pre>{{fileCheck}}</pre>
+            <pre>{{submittedFilesId}}</pre> -->
             <form class="" v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
 
@@ -51,21 +54,25 @@
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">File</label>
-                            <div v-if="submittedFiles[index] && submittedFiles[index].length" class="mb-2">
-                                <div v-for="(file, fileIndex) in submittedFiles[index]" :key="fileIndex" class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-items-center mb-1 relative">
-                                    <div>
-                                        <span class="pi pi-file-import mr-2"></span> <span>{{ file.name }}</span>
-                                    </div>
-                                    <div @click="handleCloseCommentFile(index, fileIndex)" class="close-comment">
-                                        <i class="pi pi-times"></i>
+                            <div class="flex gap-2 align-items-center upload-wrapper w-full">
+
+                                <div v-if="submittedFiles[index] && submittedFiles[index].length" class="w-full">
+                                    
+                                    <div v-for="(file, fileIndex) in submittedFiles[index]" :key="fileIndex" class="text-sm file-name font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-items-center rounded relative">
+                                        <div>
+                                            <span class="pi pi-file-import mr-2"></span> <span>{{ file.name }}</span>
+                                        </div>
+                                        <div @click="handleCloseCommentFile(section, index, fileIndex)" class="close-comment">
+                                            <i class="pi pi-times"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div>
-                                <!-- Unique file input for each section, hidden from view -->
-                                <input type="file" class="hidden" :id="`submittedFiles${index}`" @change="handleFileChange(index, $event)" multiple />
-                                <!-- Button that triggers file input click for the specific index -->
-                                <Button icon="pi pi-cloud-upload" @click="handleFileUp(index)" aria-label="Filter" />
+                                <div>
+                                    <!-- Unique file input for each section, hidden from view -->
+                                    <input type="file" class="hidden" :id="`submittedFiles${index}`" @change="handleFileChange(section, index, $event)" />
+                                    <!-- Button that triggers file input click for the specific index -->
+                                    <Button icon="pi pi-cloud-upload" label="Upload" @click="handleFileUp(index)" aria-label="Filter" />
+                                </div>
                             </div>
                         </div>
                         
@@ -105,6 +112,7 @@ const submittedIds = ref([]);
 const submittedMarks = ref([]);
 const submittedComments = ref([]);
 const submittedFiles = ref([]);
+const submittedFilesId = ref([]);
 
 
 watch(selectedQuarter, (value) => {
@@ -115,11 +123,12 @@ watch(selectedQuarter, (value) => {
         submittedMarks.value = [];
         submittedComments.value = [];
         submittedFiles.value = [];
+        submittedFilesId.value = [];
     }
 });
 
 // Handle file input change for each section
-const handleFileChange = (index, event) => {
+const handleFileChange = (section, index, event) => {
     const files = Array.from(event.target.files);
     if (!submittedFiles.value[index]) {
         // Initialize array for this section if it doesn't exist
@@ -127,6 +136,9 @@ const handleFileChange = (index, event) => {
     }
     // Add selected files to the section's file array
     submittedFiles.value[index].push(...files);
+    if (!submittedFilesId.value.includes(section.subsection_id)) {
+        submittedFilesId.value.push(section.subsection_id);
+    }
 };
 
 // Handle button click to open the specific file input field
@@ -138,10 +150,11 @@ const handleFileUp = (index) => {
 };
 
 // Handle removing the uploaded file
-const handleCloseCommentFile = (sectionIndex, fileIndex) => {
+const handleCloseCommentFile = (section, sectionIndex, fileIndex) => {
     // Remove the file from the specific section's array of files
     if (submittedFiles.value[sectionIndex]) {
         submittedFiles.value[sectionIndex].splice(fileIndex, 1);
+        submittedFilesId.value = submittedFilesId.value.filter((id) => id !== section.subsection_id);
     }
 };
 
@@ -211,7 +224,7 @@ const loadSubmission = async () => {
 
 };
 
-
+const fileCheck = ref([]);
 const handleSubmission = async () => {
     loading1.value = true;
     const token = useCookie('token');
@@ -221,15 +234,27 @@ const handleSubmission = async () => {
         formData.append('id[]', submittedIds.value[index]);
         formData.append('achive_mark[]', submittedMarks.value[index]);
         formData.append('comment[]', submittedComments.value[index]);
-        formData.append('files[]', submittedFiles.value[index]);
-        console.log('Submitted Files', submittedFiles.value[index]);
-        // if (submittedFiles.value[index]) {
-        //     submittedFiles.value[index].forEach((file) => {
-        //         console.log('File Value', file);
-        //         formData.append('files[]', file);
-        //     });
-        // }
+        // formData.append('files[]', submittedFiles.value[index]);
+        // console.log('Submitted Files', submittedFiles.value[index]);
+        if (submittedFiles.value[index]) {
+            submittedFiles.value[index].forEach((file) => {
+                console.log('File Value', file);
+                fileCheck.value.push(file);
+                // formData.append('files[]', file);
+            });
+        }
     });
+    fileCheck.value.forEach((file) => {
+                console.log('File Value', file);
+                formData.append('files[]', file);
+    });
+    // Data.append('files[]', fileCheck.value);
+
+    submittedFilesId.value.forEach((fileId) => {
+        formData.append('files_id[]', fileId);
+    });
+    // formData.append('files_id[]', submittedFilesId.value);
+    // console.log('Submitted Files ID', submittedFilesId.value);
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/update`, {
         method: 'POST',
@@ -286,7 +311,7 @@ getUserData();
 
 .close-comment {
     position: absolute;
-    top: 7px;
+    top: 9px;
     right: 10px;
     cursor: pointer;
 }
@@ -297,5 +322,14 @@ getUserData();
 
 .attch-w {
     visibility: hidden;
+}
+
+.upload-wrapper{
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.file-name{
+    
 }
 </style>
