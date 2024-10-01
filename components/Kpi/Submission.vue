@@ -106,6 +106,7 @@ const submittedComments = ref([]);
 const submittedFiles = ref([]);
 const submittedFilesId = ref([]);
 const selfRemarks = ref('');
+const fileCheck = ref([]);
 
 watch(selectedQuarter, (value) => {
     if (value) {
@@ -211,7 +212,6 @@ const loadSubmission = async () => {
     }
 };
 
-const fileCheck = ref([]);
 const handleSubmission = async () => {
     loading1.value = true;
     const token = useCookie('token');

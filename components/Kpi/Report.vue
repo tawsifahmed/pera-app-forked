@@ -87,6 +87,8 @@ const feedbackSubmit = async () => {
     if (data.value) {
         feedbackModal.value = false;
         handleKpiReportGenerate();
+        lineManagerAssessment.value = '';
+        lineMangaerFeedback.value = '';
         return toast.add({ severity: 'success', summary: 'Success', detail: 'Feedback submitted successfully', group: 'br', life: 3000 });
     } else {
         // feedbackModal.value = false;
@@ -162,7 +164,7 @@ const feedbackSubmit = async () => {
                     <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6> -->
                 </div>
                 <div class="">
-                    <Button class="w-fit h-fit mx-1 bg-green-500" label="Feedback" :loading="loading1" v-if="previewKpiReportData?.can_set_feedback" @click="handleFdbckModal" />
+                    <Button class="w-fit h-fit mx-1 bg-green-500" style="border: 1px solid #22c55e;" label="Feedback" :loading="loading1" v-if="previewKpiReportData?.can_set_feedback" @click="handleFdbckModal" />
                     <Button @click="handleReportDownload" class="w-fit h-fit mx-1" label="Download" :loading="loading1" />
                 </div>
             </div>
