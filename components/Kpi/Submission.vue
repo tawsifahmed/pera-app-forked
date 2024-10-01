@@ -3,16 +3,15 @@
         <div action="" class="grid" style="gap: 10px">
             <div class="w-full col-12">
                 <div class="flex gap-2 align-items-end justify-content-center">
-                    <div class="" style="width: 42.5%;">
+                    <div class="" style="width: 42.5%">
                         <label for="icondisplay" class="font-bold block mb-2">Employee</label>
                         <p class="user-name">{{ userProfile?.data?.name }}</p>
                     </div>
-                    <div style="width: 42.5%;">
+                    <div style="width: 42.5%">
                         <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
-                        <Dropdown class="w-full" v-model="selectedQuarter" :options="quater" optionLabel="name"
-                            placeholder="Select Quarter" />
+                        <Dropdown class="w-full" v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" />
                     </div>
-                    <Button type="submit" label="Load" @click="loadSubmission" class="" style="width: 15%;" :loading="loading" />
+                    <Button type="submit" label="Load" @click="loadSubmission" class="" style="width: 15%" :loading="loading" />
                 </div>
             </div>
             <!-- Dynamic section -->
@@ -22,7 +21,6 @@
             <pre>{{submittedFilesId}}</pre> -->
             <form v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
-
                     <div class="w-full col-12 grid">
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Section</label>
@@ -35,27 +33,20 @@
                         </div>
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
-                            <Dropdown v-model="selectedQuarter" disabled :options="quater" optionLabel="name"
-                                placeholder="Select Quarter" class="w-full" />
+                            <Dropdown v-model="selectedQuarter" disabled :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
                         </div>
                         <div class="col-12 md:col-6">
-                            <label for="icondisplay" class="font-bold block mb-2">
-                                Achieved Mark (Target: {{ section?.target_mark || 0 }}{{ section?.mark_type == 1 ? '%' : '' || 0 }})
-                            </label>
-                            <InputText v-model="submittedMarks[index]" placeholder="Input Mark"
-                                class="w-full" />
+                            <label for="icondisplay" class="font-bold block mb-2"> Achieved Mark (Target: {{ section?.target_mark || 0 }}{{ section?.mark_type == 1 ? '%' : '' || 0 }}) </label>
+                            <InputText v-model="submittedMarks[index]" placeholder="Input Mark" class="w-full" />
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">Comment</label>
-                            <Textarea v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" id="description" rows="3" cols="20" placeholder="Write comment"
-                                class="w-full" />
+                            <Textarea v-tooltip.top="{ value: section.comment }" v-model="submittedComments[index]" id="description" rows="3" cols="20" placeholder="Write comment" class="w-full" />
                         </div>
                         <div class="col-12">
                             <label for="icondisplay" class="font-bold block mb-2">File</label>
                             <div class="flex gap-2 align-items-center upload-wrapper w-full">
-
                                 <div v-if="submittedFiles[index] && submittedFiles[index].length" class="w-full">
-                                    
                                     <div v-for="(file, fileIndex) in submittedFiles[index]" :key="fileIndex" class="text-sm file-name font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-items-center rounded relative">
                                         <div>
                                             <span class="pi pi-file-import mr-2"></span> <span>{{ file.name }}</span>
@@ -73,18 +64,15 @@
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
                 <div class="col-12 my-3">
                     <label for="icondisplay" class="font-bold block mb-2">Employee Self Remarks</label>
-                    <Textarea v-tooltip.top="{ value: selfRemarks }" v-model="selfRemarks" id="description" rows="5" cols="20" placeholder="Write your self remarks"
-                        class="w-full" />
+                    <Textarea v-tooltip.top="{ value: selfRemarks }" v-model="selfRemarks" id="description" rows="5" cols="20" placeholder="Write your self remarks" class="w-full" />
                 </div>
 
                 <div class="gap-2 flex justify-content-center w-full">
                     <Button label="Submit" class="bg-green-500 border-none" type="submit" @click="handleSubmission" :loading="loading1" />
-
                 </div>
             </form>
         </div>
@@ -104,7 +92,7 @@ const loading1 = ref(false);
 const { quater } = defineProps(['quater']);
 
 // const employee = ref({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
-// employee.value = ({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id}); 
+// employee.value = ({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
 // employee.value =  ({ id: userProfile.value.data.id, name: userProfile.value.data.name });
 
 const employeeLoaded = ref(false);
@@ -163,11 +151,8 @@ const handleCloseCommentFile = (section, sectionIndex, fileIndex) => {
     }
 };
 
-
-
-
 const loadSubmission = async () => {
-    if(submittedIds.value.length > 0 || submittedMarks.value.length > 0 || submittedComments.value.length > 0 || submittedFiles.value.length > 0){
+    if (submittedIds.value.length > 0 || submittedMarks.value.length > 0 || submittedComments.value.length > 0 || submittedFiles.value.length > 0) {
         submittedIds.value = [];
         submittedMarks.value = [];
         submittedComments.value = [];
@@ -182,7 +167,6 @@ const loadSubmission = async () => {
 
     const token = useCookie('token');
     // loading.value = true;
-    employeeLoaded.value = true;
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/show/${userProfile?.value?.data?.id}?quater_id=${selectedQuarter.value.id}`, {
         method: 'GET',
@@ -191,7 +175,8 @@ const loadSubmission = async () => {
         }
     });
 
-    if(data.value){
+    if (data.value?.data.length !== 0) {
+        employeeLoaded.value = true;
         loading.value = false;
         data.value.data.forEach((item) => {
             console.log('Item Value', item);
@@ -216,17 +201,14 @@ const loadSubmission = async () => {
             console.log('Submitted submittedMarks', submittedMarks.value);
             console.log('Submitted submittedComments', submittedComments.value);
             console.log('Submitted submittedFiles', submittedFiles.value);
-
         });
 
-        
         console.log('Submission Value', data?.value);
-    }else{
+    } else {
+        employeeLoaded.value = false;
         loading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to show report', group: 'br', life: 3000 });
     }
-
-
 };
 
 const fileCheck = ref([]);
@@ -250,8 +232,8 @@ const handleSubmission = async () => {
         }
     });
     fileCheck.value.forEach((file) => {
-                console.log('File Value', file);
-                formData.append('files[]', file);
+        console.log('File Value', file);
+        formData.append('files[]', file);
     });
     // Data.append('files[]', fileCheck.value);
 
@@ -289,12 +271,7 @@ const handleSubmission = async () => {
     }
 };
 
-
 getUserData();
-
-
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -337,12 +314,11 @@ getUserData();
     visibility: hidden;
 }
 
-.upload-wrapper{
+.upload-wrapper {
     flex-direction: row-reverse;
     justify-content: flex-end;
 }
 
-.file-name{
-    
+.file-name {
 }
 </style>

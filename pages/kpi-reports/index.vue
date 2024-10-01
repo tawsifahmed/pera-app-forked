@@ -149,11 +149,11 @@ const handleSectionChange = (section) => {
     selectedSection.value = section;
     filteredSubSection.value = subSection.value.filter((item) => item.section_id == section);
 };
-// watch(subSection, (newV, oldV) => {
-//     // handleSubSectionChange(selectedSection.value);
-//     filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
-//     console.log(filteredSubSection.value);
-// });
+watch(dynamicSection, (newV, oldV) => {
+    // handleSubSectionChange(selectedSection.value);
+    // filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
+    console.log(newV);
+});
 
 // form Submission
 const handleSubmit = async () => {
@@ -263,16 +263,24 @@ quaterYear.value = date.getFullYear();
                                 <!-- Dynamic section -->
                                 <div class="" v-if="employee != '' && selectedQuarter !== ''">
                                     <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
+                                        <!-- <pre>{{ dynamicSection[index]?.section_id?.sub_section }}</pre> -->
                                         <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Section</label>
-                                                <Dropdown @change="(event) => handleSectionChange(event.value.id)" v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
+                                                <Dropdown v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
                                                 <div class="flex gap-2 w-full">
-                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="subSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" style="max-width: 17rem" />
+                                                    <Dropdown
+                                                        v-model="dynamicSection[index].subsection_id"
+                                                        :options="dynamicSection[index]?.section_id?.sub_section"
+                                                        optionLabel="title"
+                                                        placeholder="Select Sub Section"
+                                                        class="w-full"
+                                                        style="max-width: 17rem"
+                                                    />
                                                     <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" class="" />
                                                 </div>
                                             </div>
