@@ -16,6 +16,7 @@ const quater = ref([]);
 const deadline = ref('');
 const selectedQuarter = ref('');
 const sections = ref([]);
+const selectedSection = ref('');
 const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
@@ -145,12 +146,20 @@ const addSection = () => {
     });
 };
 const handleSectionChange = (section) => {
+    selectedSection.value = section;
     filteredSubSection.value = subSection.value.filter((item) => item.section_id == section);
 };
+watch(subSection, (newV, oldV) => {
+    // handleSubSectionChange(selectedSection.value);
+    filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
+    console.log(filteredSubSection.value);
+});
+
 // form Submission
 const handleSubmit = async () => {
     const token = useCookie('token');
     if (employee.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Employee not selected', group: 'br', life: 3000 });
+    if (selectedQuarter.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Quarter not selected', group: 'br', life: 3000 });
     if (deadline.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Deadline not selected', group: 'br', life: 3000 });
     const lastFormData = dynamicSection.value[dynamicSection.value.length - 1];
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
@@ -180,15 +189,15 @@ const handleSubmit = async () => {
     if (data.value) {
         toast.add({ severity: 'success', summary: 'KPI Information', detail: 'KPI Submission Complete', group: 'br', life: 3000 });
         dynamicSection.value = [
-        {
-        // user_id: employee.value,
-        section_id: null,
-        subsection_id: null,
-        quater_id: null,
-        achive_mark: 0,
-        target_mark: 0,
-        comment: ''
-    }
+            {
+                // user_id: employee.value,
+                section_id: null,
+                subsection_id: null,
+                quater_id: null,
+                achive_mark: 0,
+                target_mark: 0,
+                comment: ''
+            }
         ];
         employee.value = '';
         return (loading.value = false);
@@ -220,8 +229,6 @@ fetchSection();
 fetchSubSection();
 const date = new Date();
 quaterYear.value = date.getFullYear();
-
-
 </script>
 <template>
     <div class="card">
@@ -250,7 +257,7 @@ quaterYear.value = date.getFullYear();
                                     </div>
                                     <div class="col-12 md:col-4">
                                         <label for="icondisplay" class="font-bold block mb-2">Deadline</label>
-                                        <Calendar v-model="deadline"  dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" />
+                                        <Calendar v-model="deadline" dateFormat="dd-mm-yy" placeholder="DD-MM-YYYY" />
                                     </div>
                                 </div>
                                 <!-- Dynamic section -->
@@ -288,7 +295,7 @@ quaterYear.value = date.getFullYear();
                                 </div>
                                 <div class="gap-2 flex justify-content-center w-full">
                                     <Button label="New Section" class="bg-green-500 border-none" @click.prevent="addSection(index)" />
-                                    <Button type="submit" label="Submit" class="" />
+                                    <Button type="submit" label="Submit" class="" :disabled="employee === '' || selectedQuarter === '' || deadline === ''" />
                                 </div>
                             </form>
                         </div>

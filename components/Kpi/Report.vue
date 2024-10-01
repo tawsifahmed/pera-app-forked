@@ -95,10 +95,32 @@ const handleReportDownload = async () => {
         <div>
             <div class="flex flex-wrap align-items-top justify-content-between gap-2 mb-5">
                 <div class="">
-                    <h6 class="my-1 font-bold">{{ previewKpiReportData?.user_name }}</h6>
-                    <!-- <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6> -->
+                    <table>
+                        <tr class="font-bold">
+                            <td>Name</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.user_name }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td>Designation</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.user_name }}</td>
+                        </tr>
+                        <!-- <tr class="font-bold">
+                            <td>Department</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.user_name }}</td>
+                        </tr> -->
+                        <tr class="font-bold">
+                            <td>Achievement</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.overAllKpi }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td>Weightage</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.overAllKpi.slice(0, -1) }}</td>
+                        </tr>
+                    </table>
+                    <!-- <h6 class="my-1 font-bold">{{ previewKpiReportData?.user_name }}</h6>
+                    <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6>
                     <h6 class="my-1 font-bold">Achievement: {{ previewKpiReportData?.overAllKpi }}</h6>
-                    <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6>
+                    <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6> -->
                 </div>
                 <Button @click="handleReportDownload" class="w-fit h-fit" label="Download" :loading="loading1" />
             </div>
