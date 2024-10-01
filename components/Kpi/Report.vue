@@ -1,4 +1,6 @@
 <script setup>
+import Dialog from 'primevue/dialog';
+
 const url = useRuntimeConfig();
 const toast = useToast();
 
@@ -7,8 +9,16 @@ const loading = ref(false);
 const loading1 = ref(false);
 const employee = ref('');
 const selectedQuarter = ref('');
+const feedbackModal = ref(false);
 
+const lineMangaerFeedback = ref('');
+const lineManagerAssessment = ref('');
 const previewKpiReportData = ref(null);
+
+const handleFdbckModal = () => {
+    console.log('Modal');
+    feedbackModal.value = true;
+};
 
 const handleKpiReportGenerate = async () => {
     if (employee.value == '' || selectedQuarter.value == '') {
@@ -58,6 +68,31 @@ const handleReportDownload = async () => {
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
     }
 };
+
+const feedbackSubmit = async () => {
+    const token = useCookie('token');
+    const feedbackData = new FormData();
+    feedbackData.append('user_id', employee.value.id);
+    feedbackData.append('quater_id', selectedQuarter.value.id);
+    feedbackData.append('line_manager_feedback', lineMangaerFeedback.value);
+    feedbackData.append('line_manager_assesment', lineManagerAssessment.value);
+    const { data, error } = await useFetch(`${url.public.apiUrl}/kpi/line-manager-feedback`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: feedbackData
+    });
+
+    if (data.value) {
+        feedbackModal.value = false;
+        handleKpiReportGenerate();
+        return toast.add({ severity: 'success', summary: 'Success', detail: 'Feedback submitted successfully', group: 'br', life: 3000 });
+    } else {
+        // feedbackModal.value = false;
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to submit feedback', group: 'br', life: 3000 });
+    }
+};
 </script>
 <template>
     <div class="card">
@@ -93,16 +128,47 @@ const handleReportDownload = async () => {
     <div v-if="previewKpiReportData" class="card">
         <!-- <pre>{{previewKpiReportData}}</pre> -->
         <div>
-            <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-5">
-                <h5 class="m-0">Preview</h5>
-                <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+            <div class="flex flex-wrap align-items-top justify-content-between gap-2 mb-5">
+                <div class="">
+                    <table>
+                        <tr class="font-bold">
+                            <td>Name</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.user_name }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td>Designation</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.designation }}</td>
+                        </tr>
+                        <!-- <tr class="font-bold">
+                            <td>Department</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.user_name }}</td>
+                        </tr> -->
+                        <tr class="font-bold">
+                            <td>Line Manager</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.line_maneger_name }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td>Achievement</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.overAllKpi }}</td>
+                        </tr>
+                        <tr class="font-bold">
+                            <td>Weightage</td>
+                            <td class="pl-2">: {{ previewKpiReportData?.overAllKpi.slice(0, -1) }}</td>
+                        </tr>
+                    </table>
+                    <!-- <h6 class="my-1 font-bold">{{ previewKpiReportData?.user_name }}</h6>
+                    <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6>
+                    <h6 class="my-1 font-bold">Achievement: {{ previewKpiReportData?.overAllKpi }}</h6>
+                    <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6> -->
+                </div>
+                <div class="">
+                    <Button class="w-fit h-fit mx-1 bg-green-500" label="Feedback" :loading="loading1" v-if="previewKpiReportData?.can_set_feedback" @click="handleFdbckModal" />
+                    <Button @click="handleReportDownload" class="w-fit h-fit mx-1" label="Download" :loading="loading1" />
+                </div>
             </div>
-            <div class="flex align-items-center justify-content-between my-4">
-                <h6 class="m-0 font-bold">Name: {{ previewKpiReportData?.user_name }}</h6>
-                <!-- <h6 class="m-0 font-bold">Section: {{ previewKpiReportData?.data[0]?.section?.name }}</h6> -->
-                <h6 class="m-0 font-bold">Achieved: {{ previewKpiReportData?.overAllKpi }}</h6>
-            </div>
+
             <DataTable v-for="(section, index) in previewKpiReportData?.data" :value="section.sub_section_data" v-bind:key="index" showGridlines tableStyle="min-width: 50rem" class="my-4">
+                <!-- <pre>{{ section.section_summary }}</pre> -->
                 <template #empty> <p class="text-center">No Data found...</p> </template>
                 <template #header>
                     <div class="flex flex-wrap align-items-center justify-content-between gap-2 py-2">
@@ -114,30 +180,54 @@ const handleReportDownload = async () => {
                         <div>{{ slotProps?.data?.sub_section?.title }}</div>
                     </template>
                 </Column>
-                <Column field="target_mark" header="Key result Target"></Column>
-                <Column field="achive_mark" header="Key result Achivement"></Column>
-                <Column field="achive_mark_parcentage" header="Achievement Percentage"></Column>
-                <Column field="weightage" header="Weightage"></Column>
-                <Column field="weightage_score" header="Weightage Score"></Column>
+                <Column field="target_mark" header="Key result Target" style="width: 8%"></Column>
+                <Column field="achive_mark" header="Key result Achivement" style="width: 8%"></Column>
+                <Column field="achive_mark_parcentage" header="Achievement Percentage" style="width: 8%"></Column>
+                <Column field="weightage" header="Weightage" style="width: 8%"></Column>
+                <Column field="weightage_score" header="Weightage Score" style="width: 8%"></Column>
                 <Column field="comment" header="Comment"></Column>
-                <Column field="" header="File">
+                <Column field="" header="File" style="width: 8%">
                     <template #body="slotProps">
-                        <a v-if="slotProps?.data?.file_link !== ''" :href="slotProps?.data?.file_link" target="_blank" class="text-blue-500"> Attechment </a>
+                        <a v-if="slotProps?.data?.file_link !== ''" :href="slotProps?.data?.file_link" target="_blank" class="text-blue-500"> Attachment </a>
                     </template>
                 </Column>
                 <ColumnGroup type="footer">
                     <Row>
-                        <Column footer="Summery:" :colspan="1" footerStyle="text-align:left" />
-                        <Column :footer="lastYearTotal" />
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="'hello world'" />
-                        <Column> hello world </Column>
-                        <Column :footer="thisYearTotal" />
-                        <Column :footer="thisYearTotal" />
+                        <Column footer="Summery:" :colspan="3" footerStyle="text-align:left" />
+                        <Column :footer="section?.section_summary?.achivementpercentage_sum" />
+                        <Column :footer="section?.section_summary?.section_weightage" />
+                        <Column :footer="section?.section_summary?.weighted_score_sum" />
+                        <Column :footer="''" />
+                        <Column :footer="''" />
                     </Row>
                 </ColumnGroup>
             </DataTable>
+            <!-- Perfomance Rating -->
+            <!-- <pre>{{ previewKpiReportData?.line_maneger }}</pre> -->
+            <DataTable :value="[previewKpiReportData?.line_maneger]" showGridlines>
+                <Column field="line_manager_feedback" header="Line Manager Feedback on Improvement Areas" />
+                <Column field="line_manager_assesment" header="Training Needs Assessment" />
+            </DataTable>
+            <div class="my-5 flex gap-2 text-lg">
+                <p class="font-bold">Self Remark:</p>
+                <p class="">{{ previewKpiReportData?.line_maneger?.self_remarks }}</p>
+            </div>
         </div>
+        <!-- Feedback Modal -->
+        <Dialog v-model:visible="feedbackModal" modal header="Feedback" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <form @submit.prevent="feedbackSubmit">
+                <div class="col-12">
+                    <label for="icondisplay" class="font-bold block mb-2">Line Manager Feedback:</label>
+                    <Textarea v-model="lineMangaerFeedback" rows="3" cols="20" placeholder="Write comment" class="w-full" required />
+                </div>
+                <div class="col-12">
+                    <label for="icondisplay" class="font-bold block mb-2">Training Needs Assessment:</label>
+                    <Textarea v-model="lineManagerAssessment" rows="3" cols="20" placeholder="Write comment" class="w-full" required />
+                </div>
+                <div class="w-full flex justify-center">
+                    <Button class="w-fit h-fit mx-auto" type="submit" label="Submit" />
+                </div>
+            </form>
+        </Dialog>
     </div>
 </template>

@@ -16,6 +16,7 @@ const quater = ref([]);
 const deadline = ref('');
 const selectedQuarter = ref('');
 const sections = ref([]);
+const selectedSection = ref('');
 const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
@@ -134,7 +135,7 @@ const addSection = () => {
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
     if (data.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (data.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
-    if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    // if (data.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
     dynamicSection.value.push({
         // user_id: employee,
         section_id: null,
@@ -145,27 +146,36 @@ const addSection = () => {
     });
 };
 const handleSectionChange = (section) => {
+    selectedSection.value = section;
     filteredSubSection.value = subSection.value.filter((item) => item.section_id == section);
 };
+watch(dynamicSection, (newV, oldV) => {
+    // handleSubSectionChange(selectedSection.value);
+    // filteredSubSection.value = newV.filter((item) => item.section_id == selectedSection.value);
+    console.log(newV);
+});
+
 // form Submission
 const handleSubmit = async () => {
     const token = useCookie('token');
     if (employee.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Employee not selected', group: 'br', life: 3000 });
-    // console.log(dynamicSection.value[index]);
+    if (selectedQuarter.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Quarter not selected', group: 'br', life: 3000 });
+    if (deadline.value == '') return toast.add({ severity: 'error', summary: 'KPI Information', detail: 'Deadline not selected', group: 'br', life: 3000 });
     const lastFormData = dynamicSection.value[dynamicSection.value.length - 1];
     // if (data.user_id == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Employee Not selected', group: 'br', life: 3000 });
     if (lastFormData.section_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Section Not selected', group: 'br', life: 3000 });
     if (lastFormData.subsection_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Sub-section Not selected', group: 'br', life: 3000 });
-    if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
+    // if (lastFormData.quater_id == null) return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Quarter Not selected', group: 'br', life: 3000 });
     // if (lastFormData.achive_mark == '') return toast.add({ severity: 'warn', summary: 'KPI Information', detail: 'Please input achieved mark', group: 'br', life: 3000 });
     const kpiData = dynamicSection.value.map((section) => {
         return {
             user_id: employee.value.id,
             section_id: section.section_id.id,
             subsection_id: section.subsection_id.id,
-            quater_id: section.quater_id.id,
+            quater_id: selectedQuarter.value.id,
             achive_mark: section.achive_mark,
-            comment: section.comment
+            comment: section.comment,
+            deadline: formatDate(deadline.value)
         };
     });
 
@@ -176,7 +186,7 @@ const handleSubmit = async () => {
         },
         body: kpiData
     });
-    if (data.value.code == 201) {
+    if (data.value) {
         toast.add({ severity: 'success', summary: 'KPI Information', detail: 'KPI Submission Complete', group: 'br', life: 3000 });
         dynamicSection.value = [
             {
@@ -185,6 +195,7 @@ const handleSubmit = async () => {
                 subsection_id: null,
                 quater_id: null,
                 achive_mark: 0,
+                target_mark: 0,
                 comment: ''
             }
         ];
@@ -200,7 +211,10 @@ const handleSubmit = async () => {
 const handleRemove = (index) => {
     dynamicSection.value.splice(index, 1);
 };
-
+const formatDate = (data) => {
+    const date = new Date(data);
+    return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
+};
 const onTabChange = (event) => {
     if (event.index == 0) {
         init();
@@ -249,22 +263,30 @@ quaterYear.value = date.getFullYear();
                                 <!-- Dynamic section -->
                                 <div class="" v-if="employee != '' && selectedQuarter !== ''">
                                     <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
+                                        <!-- <pre>{{ dynamicSection[index]?.section_id?.sub_section }}</pre> -->
                                         <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Section</label>
-                                                <Dropdown @change="(event) => handleSectionChange(event.value.id)" v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
+                                                <Dropdown v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
                                                 <div class="flex gap-2 w-full">
-                                                    <Dropdown v-model="dynamicSection[index].subsection_id" :options="filteredSubSection" optionLabel="title" placeholder="Select Sub Section" class="w-full" style="max-width: 17rem" />
+                                                    <Dropdown
+                                                        v-model="dynamicSection[index].subsection_id"
+                                                        :options="dynamicSection[index]?.section_id?.sub_section"
+                                                        optionLabel="title"
+                                                        placeholder="Select Sub Section"
+                                                        class="w-full"
+                                                        style="max-width: 17rem"
+                                                    />
                                                     <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" class="" />
                                                 </div>
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
-                                                <Dropdown v-model="dynamicSection[index].quater_id" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
+                                                <Dropdown disabled v-model="selectedQuarter" :options="quater" optionLabel="name" placeholder="Select Quarter" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
                                                 <label for="icondisplay" class="font-bold block mb-2"
@@ -281,7 +303,7 @@ quaterYear.value = date.getFullYear();
                                 </div>
                                 <div class="gap-2 flex justify-content-center w-full">
                                     <Button label="New Section" class="bg-green-500 border-none" @click.prevent="addSection(index)" />
-                                    <Button type="submit" label="Submit" class="" />
+                                    <Button type="submit" label="Submit" class="" :disabled="employee === '' || selectedQuarter === '' || deadline === ''" />
                                 </div>
                             </form>
                         </div>
