@@ -7,6 +7,7 @@ const toast = useToast();
 const { employees, quater } = defineProps(['employees', 'quater']);
 const loading = ref(false);
 const loading1 = ref(false);
+const loading2 = ref(false);
 const employee = ref('');
 const selectedQuarter = ref('');
 const feedbackModal = ref(false);
@@ -70,6 +71,7 @@ const handleReportDownload = async () => {
 };
 
 const feedbackSubmit = async () => {
+    loading2.value = true;
     const token = useCookie('token');
     const feedbackData = new FormData();
     feedbackData.append('user_id', employee.value.id);
@@ -85,12 +87,14 @@ const feedbackSubmit = async () => {
     });
 
     if (data.value) {
+        loading2.value = false;
         feedbackModal.value = false;
         handleKpiReportGenerate();
         lineManagerAssessment.value = '';
         lineMangaerFeedback.value = '';
         return toast.add({ severity: 'success', summary: 'Success', detail: 'Feedback submitted successfully', group: 'br', life: 3000 });
     } else {
+        loading2.value = false;
         // feedbackModal.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to submit feedback', group: 'br', life: 3000 });
     }
@@ -164,7 +168,7 @@ const feedbackSubmit = async () => {
                     <h6 class="my-1 font-bold">Weightage: {{ previewKpiReportData?.overAllKpi }}</h6> -->
                 </div>
                 <div class="">
-                    <Button class="w-fit h-fit mx-1 bg-green-500" style="border: 1px solid #22c55e;" label="Feedback" :loading="loading1" v-if="previewKpiReportData?.can_set_feedback" @click="handleFdbckModal" />
+                    <Button class="w-fit h-fit mx-1 bg-green-500" style="border: 1px solid #22c55e;" label="Feedback"  v-if="previewKpiReportData?.can_set_feedback" @click="handleFdbckModal" />
                     <Button @click="handleReportDownload" class="w-fit h-fit mx-1" label="Download" :loading="loading1" />
                 </div>
             </div>
@@ -227,7 +231,7 @@ const feedbackSubmit = async () => {
                     <Textarea v-model="lineManagerAssessment" rows="3" cols="20" placeholder="Write comment" class="w-full" required />
                 </div>
                 <div class="w-full flex justify-center">
-                    <Button class="w-fit h-fit mx-auto" type="submit" label="Submit" />
+                    <Button class="w-fit h-fit mx-auto" type="submit" label="Submit" :loading="loading2" />
                 </div>
             </form>
         </Dialog>
