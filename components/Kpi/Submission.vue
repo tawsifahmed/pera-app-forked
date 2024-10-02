@@ -27,7 +27,7 @@
             <p v-if="deadlineInfo" class="deadline-info mb-0 flex w-full justify-content-end"><span
                     class="font-bold mr-2">Deadline: </span>{{ deadlineInfo?.data[0]?.sub_section_data[0]?.deadline ?
                         deadlineInfo?.data[0]?.sub_section_data[0]?.deadline : 'Not Set'}}</p>
-            <form v-if="employeeLoaded">
+            <form v-if="employeeLoaded" @submit.prevent="handleSubmission">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
                     <div class="w-full col-12 grid">
                         <div class="col-12 md:col-6">
@@ -91,8 +91,7 @@
                 </div>
 
                 <div class="gap-2 flex justify-content-center w-full">
-                    <Button label="Submit" class="bg-green-500 border-none" type="submit"
-                        :disabled="deadlineInfo?.isDeadlineMiss" @click="handleSubmission" :loading="loading1" />
+                    <Button :disabled="deadlineInfo?.isDeadlineMiss" label="Submit" class="bg-green-500 border-none" type="submit" :loading="loading1" />
                 </div>
             </form>
         </div>
@@ -248,6 +247,7 @@ const loadSubmission = async () => {
 
 const handleSubmission = async () => {
     loading1.value = true;
+
     const token = useCookie('token');
     const formData = new FormData();
     dynamicSection.value.forEach((section, index) => {
@@ -286,7 +286,7 @@ const handleSubmission = async () => {
         body: formData
     });
 
-    if (data?.value?.code === 200) {
+    if (data.value?.code === 200) {
         loading1.value = false;
         employeeLoaded.value = false;
         selectedQuarter.value = '';
@@ -298,7 +298,6 @@ const handleSubmission = async () => {
         selfRemarks.value = '';
         fileCheck.value = [];
         deadlineInfo.value = null;
-        dynamicSection.value = [];
         toast.add({ severity: 'success', summary: 'Success', detail: 'Submission successful!', group: 'br', life: 3000 });
         return;
     } else {
@@ -357,5 +356,11 @@ getUserData();
 
 .deadline-info {
     float: right;
+}
+
+
+.pointer-none{
+    pointer-events: none;
+    cursor: not-allowed;
 }
 </style>
