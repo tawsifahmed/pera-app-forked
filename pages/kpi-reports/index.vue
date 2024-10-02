@@ -55,22 +55,8 @@ const init = async () => {
         employees.value = data.value?.team_members.map((member) => ({ id: member.id, name: member.name }));
         console.log('employee',employee.value);
     }
-    let membersArray = [];
-    
-    // if (data.value?.team_members?.length > 0) {
-    //     data.value?.team_members.forEach((team) => {
-    //         membersArray = membersArray.concat(team.members);
-    //     });
-    // }
-
-    // const uniqueMembers = Array.from(
-    //     new Map(membersArray.map((member) => [member.id, member])).values()
-    // );
-
-    // employees.value = uniqueMembers.map((member) => ({ id: member.id, name: member.name }));
-    // console.log('uniqueMembers', uniqueMembers);
-    // console.log('members', employees.value);
 };
+
 const fetchQuater = async () => {
     const token = useCookie('token');
     const { data, error } = await useFetch(`${url.public.apiUrl}/kpi-quater/list`, {
