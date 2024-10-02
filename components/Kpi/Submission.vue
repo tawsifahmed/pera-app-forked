@@ -201,8 +201,9 @@ const loadSubmission = async () => {
     console.log('Data Value', data.value);
     console.log('error Value', error.value);
     if (data.value) {
-        if (data.value?.data.length !== 0) {
-
+        if (data.value?.data?.length !== 0) {
+            loading.value = false;
+            employeeLoaded.value = true;
             deadlineInfo.value = data.value;
             data.value?.data.forEach((item) => {
                 console.log('data gotcha')
@@ -229,9 +230,12 @@ const loadSubmission = async () => {
                 console.log('Submitted submittedComments', submittedComments.value);
                 console.log('Submitted submittedFiles', submittedFiles.value);
             });
-            loading.value = false;
-            employeeLoaded.value = true;
+           
             console.log('Submission Value', data?.value);
+        }else{
+            loading.value = false;
+            employeeLoaded.value = false;
+            return toast.add({ severity: 'error', summary: 'Failed', detail: 'No data found', group: 'br', life: 3000 });
         }
     }
     else {
