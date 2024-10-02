@@ -24,6 +24,7 @@
             <pre>{{submittedFilesId}}</pre> -->
             <form v-if="employeeLoaded">
                 <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
+                    <p class="deadline-info"><span class="font-bold">Deadline: </span>{{deadlineInfo.data[0]?.sub_section_data[0]?.deadline ? deadlineInfo.data[0]?.sub_section_data[0]?.deadline : 'Not Set'}}</p>
                     <div class="w-full col-12 grid">
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Section</label>
@@ -75,7 +76,7 @@
                 </div>
 
                 <div class="gap-2 flex justify-content-center w-full">
-                    <Button label="Submit" class="bg-green-500 border-none" type="submit" @click="handleSubmission" :loading="loading1" />
+                    <Button label="Submit" class="bg-green-500 border-none" type="submit" :disabled="deadlineInfo?.isDeadlineMiss" @click="handleSubmission" :loading="loading1" />
                 </div>
             </form>
         </div>
@@ -93,6 +94,7 @@ const url = useRuntimeConfig();
 const loading = ref(false);
 const loading1 = ref(false);
 const { quater } = defineProps(['quater']);
+const deadlineInfo = ref(null);
 
 // const employee = ref({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
 // employee.value = ({ name: userProfile?.value?.data?.name , id: userProfile?.value?.data?.id});
@@ -178,10 +180,10 @@ const loadSubmission = async () => {
             Authorization: `Bearer ${token.value}`
         }
     });
-
     if (data.value?.data.length !== 0) {
-        employeeLoaded.value = true;
         loading.value = false;
+        employeeLoaded.value = true;
+        deadlineInfo.value = data.value;
         data.value.data.forEach((item) => {
             console.log('Item Value', item);
             item.sub_section_data.forEach((subItem) => {
@@ -322,6 +324,7 @@ getUserData();
     justify-content: flex-end;
 }
 
-.file-name {
+.deadline-info{
+    float: right;
 }
 </style>
