@@ -43,16 +43,33 @@ const toast = useToast();
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch(`${url.public.apiUrl}/users/list`, {
+    const { data, pending, error } = await useAsyncData('getMembers', () =>
+        $fetch(`${url.public.apiUrl}/teams/members`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
-    if (data.value?.data?.length > 0) {
-        employees.value = data.value?.data;
+    console.log('memmbess',data.value?.team_members);
+    if(data.value?.team_members){
+        employees.value = data.value?.team_members.map((member) => ({ id: member.id, name: member.name }));
+        console.log('employee',employee.value);
     }
+    let membersArray = [];
+    
+    // if (data.value?.team_members?.length > 0) {
+    //     data.value?.team_members.forEach((team) => {
+    //         membersArray = membersArray.concat(team.members);
+    //     });
+    // }
+
+    // const uniqueMembers = Array.from(
+    //     new Map(membersArray.map((member) => [member.id, member])).values()
+    // );
+
+    // employees.value = uniqueMembers.map((member) => ({ id: member.id, name: member.name }));
+    // console.log('uniqueMembers', uniqueMembers);
+    // console.log('members', employees.value);
 };
 const fetchQuater = async () => {
     const token = useCookie('token');
@@ -247,8 +264,9 @@ quaterYear.value = date.getFullYear();
                         <div class="card mx-auto" style="max-width: 50rem">
                             <form action="" class="grid" style="gap: 10px" @submit.prevent="handleSubmit">
                                 <div class="grid col-12 w-full">
+                                    <!-- <pre>{{employees}}</pre> -->
                                     <div class="col-12 md:col-4">
-                                        <label for="icondisplay" class="font-bold block mb-2">Employee</label>
+                                        <label for="icondisplay" class="font-bold block mb-2">Team Member</label>
                                         <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select User" class="w-full" />
                                     </div>
                                     <div class="col-12 md:col-4">
@@ -267,11 +285,11 @@ quaterYear.value = date.getFullYear();
                                         <button v-if="index != 0" type="button" class="close" @click="handleRemove(index)"><i class="pi pi-times-circle text-xl"></i></button>
                                         <div class="w-full col-12 grid">
                                             <div class="col-12 md:col-6">
-                                                <label for="icondisplay" class="font-bold block mb-2">Section</label>
+                                                <label for="icondisplay" class="font-bold block mb-2">Section<i class="text-red-400 text-italic">*</i></label>
                                                 <Dropdown v-model="dynamicSection[index].section_id" :options="sections" optionLabel="name" placeholder="Select Section" class="w-full" />
                                             </div>
                                             <div class="col-12 md:col-6">
-                                                <label for="icondisplay" class="font-bold block mb-2">Sub Section</label>
+                                                <label for="icondisplay" class="font-bold block mb-2">Sub Section<i class="text-red-400 text-italic">*</i></label>
                                                 <div class="flex gap-2 w-full">
                                                     <Dropdown
                                                         v-model="dynamicSection[index].subsection_id"

@@ -111,7 +111,7 @@ const feedbackSubmit = async () => {
             <template #start>
                 <div class="flex gap-2 flex-wrap">
                     <div class="user-selection w-full md:w-14rem w-full">
-                        <label class="font-bold block mb-2">Employee:</label>
+                        <label class="font-bold block mb-2">Team Member:</label>
                         <!-- <pre>{{employee.id}}</pre> -->
                         <div class="flex justify-content-center">
                             <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select Employee" class="w-full md:w-14rem" />
@@ -158,7 +158,7 @@ const feedbackSubmit = async () => {
                             <td class="pl-2">: {{ previewKpiReportData?.overAllKpi }}</td>
                         </tr>
                         <tr class="font-bold">
-                            <td>Weightage</td>
+                            <td>Weightage Score</td>
                             <td class="pl-2">: {{ previewKpiReportData?.overAllKpi.slice(0, -1) }}</td>
                         </tr>
                     </table>
@@ -199,7 +199,7 @@ const feedbackSubmit = async () => {
                 </Column>
                 <ColumnGroup type="footer">
                     <Row>
-                        <Column footer="Summery:" :colspan="3" footerStyle="text-align:left" />
+                        <Column footer="Summary:" :colspan="3" footerStyle="text-align:left" />
                         <Column :footer="section?.section_summary?.achivementpercentage_sum" />
                         <Column :footer="section?.section_summary?.section_weightage" />
                         <Column :footer="section?.section_summary?.weighted_score_sum" />

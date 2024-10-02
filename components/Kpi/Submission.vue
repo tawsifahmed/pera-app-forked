@@ -1,19 +1,22 @@
 <template>
-    <div class="card mx-auto" style="max-width: 55rem">
+    <div class=" mx-auto" style="max-width: 55rem">
         <div action="" class="grid" style="gap: 10px">
             <div class="w-full col-12">
-                <div class="flex gap-2 align-items-end justify-content-center">
-                    <div class="" style="width: 42.5%">
-                        <label for="icondisplay" class="font-bold block mb-2">Employee</label>
+                <div class=" w-full col-12 grid">
+                    <div class="col-12 md:col-5" >
+                        <label for="icondisplay" class="font-bold block mb-2">Team Member</label>
                         <p class="user-name">{{ userProfile?.data?.name }}</p>
                     </div>
-                    <div style="width: 42.5%">
+                    <div class="col-12 md:col-5">
                         <label for="icondisplay" class="font-bold block mb-2">Quarter</label>
                         <Dropdown class="w-full" v-model="selectedQuarter" :options="quater" optionLabel="name"
                             placeholder="Select Quarter" />
                     </div>
-                    <Button type="submit" label="Load" @click="loadSubmission" class="" style="width: 15%"
-                        :loading="loading" />
+                    <div class="col-12 md:col-2 flex align-items-end">
+
+                        <Button class="col-12 md:col-2 w-full " type="submit" label="Load" @click="loadSubmission" style="height: max-content; display: flex; align-self: end;"
+                            :loading="loading" />
+                    </div>
                 </div>
             </div>
             <!-- Dynamic section -->
@@ -25,10 +28,9 @@
             <br>
             <pre>{{submittedFilesId}}</pre> -->
             <p v-if="deadlineInfo" class="deadline-info mb-0 flex w-full justify-content-end"><span
-                    class="font-bold mr-2">Deadline: </span>{{ deadlineInfo?.data[0]?.sub_section_data[0]?.deadline ?
-                        deadlineInfo?.data[0]?.sub_section_data[0]?.deadline : 'Not Set'}}</p>
-            <form v-if="employeeLoaded" @submit.prevent="handleSubmission">
-                <div v-for="(section, index) in dynamicSection" :key="index" class="card relative">
+                    class="font-bold mr-2">Deadline: </span>{{formatDeadline(deadlineInfo?.data[0]?.sub_section_data[0]?.deadline) }}</p>
+            <form class="card relative" v-if="employeeLoaded" @submit.prevent="handleSubmission">
+                <div v-for="(section, index) in dynamicSection" :key="index">
                     <div class="w-full col-12 grid">
                         <div class="col-12 md:col-6">
                             <label for="icondisplay" class="font-bold block mb-2">Section</label>
@@ -175,11 +177,12 @@ const handleCloseCommentFile = (section, sectionIndex, fileIndex) => {
 };
 
 const loadSubmission = async () => {
-    if (submittedIds.value.length > 0 || submittedMarks.value.length > 0 || submittedComments.value.length > 0 || submittedFiles.value.length > 0) {
+    if (submittedIds.value.length > 0 || submittedMarks.value.length > 0 || submittedComments.value.length > 0 || submittedFiles.value.length > 0 || dynamicSection.value) {
         submittedIds.value = [];
         submittedMarks.value = [];
         submittedComments.value = [];
         submittedFiles.value = [];
+        dynamicSection.value = [];
     }
 
     loading.value = true;
@@ -204,6 +207,8 @@ const loadSubmission = async () => {
             loading.value = false;
             employeeLoaded.value = true;
             deadlineInfo.value = data.value;
+            selfRemarks.value = data.value?.line_maneger?.self_remarks
+            console.log('selfRemarks', selfRemarks.value);
             data.value?.data.forEach((item) => {
                 console.log('data gotcha')
                 console.log('Item Value', item);
@@ -245,9 +250,19 @@ const loadSubmission = async () => {
     }
 };
 
+const formatDeadline = (dateStr) => {
+    if (!dateStr) return 'Not Set';
+        
+        const dateObj = new Date(dateStr);
+        if (isNaN(dateObj)) return 'Invalid Date';
+
+        // Options to format the date
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return new Intl.DateTimeFormat('en-GB', options).format(dateObj);
+};
+
 const handleSubmission = async () => {
     loading1.value = true;
-
     const token = useCookie('token');
     const formData = new FormData();
     dynamicSection.value.forEach((section, index) => {
@@ -298,6 +313,7 @@ const handleSubmission = async () => {
         selfRemarks.value = '';
         fileCheck.value = [];
         deadlineInfo.value = null;
+        dynamicSection.value = [];
         toast.add({ severity: 'success', summary: 'Success', detail: 'Submission successful!', group: 'br', life: 3000 });
         return;
     } else {
