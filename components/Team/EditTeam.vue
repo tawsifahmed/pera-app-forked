@@ -96,15 +96,16 @@ onMounted(async() => {
         </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Team Lead<i class="text-red-400 text-italic">*</i> </label>
-            <!-- {{ selectedTeamLead.id }} -->
-            <Dropdown v-model="editLineManager" :options="usersLists" optionLabel="name" placeholder="Select Team Lead" checkmark :highlightOnSelect="false" class="w-full" />
+            <label>Line Manager<i class="text-red-400 text-italic">*</i> </label>
+            <Dropdown v-model="editLineManager" :options="usersLists" optionLabel="name" placeholder="Select Line Manager" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Line Manager<i class="text-red-400 text-italic">*</i> </label>
-            <Dropdown v-model="editTeamLead" :options="usersLists" optionLabel="name" placeholder="Select Line Manager" checkmark :highlightOnSelect="false" class="w-full" />
+            <label>Team Lead<i class="text-red-400 text-italic">*</i> </label>
+            <!-- {{ selectedTeamLead.id }} -->
+            <Dropdown v-model="editTeamLead" :options="usersLists" optionLabel="name" placeholder="Select Team Lead" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
+       
         <div class="field">
             <!-- <pre>{{usersLists}}</pre> -->
             <label>Team Members<i class="text-red-400 text-italic">*</i> </label>

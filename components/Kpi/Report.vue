@@ -4,14 +4,14 @@ import Dialog from 'primevue/dialog';
 const url = useRuntimeConfig();
 const toast = useToast();
 
-const { employees, quater } = defineProps(['employees', 'quater']);
+const {  quater } = defineProps([ 'quater']);
 const loading = ref(false);
 const loading1 = ref(false);
 const loading2 = ref(false);
 const employee = ref('');
 const selectedQuarter = ref('');
 const feedbackModal = ref(false);
-
+const employees = ref([]);
 const lineMangaerFeedback = ref('');
 const lineManagerAssessment = ref('');
 const previewKpiReportData = ref(null);
@@ -20,6 +20,38 @@ const handleFdbckModal = () => {
     console.log('Modal');
     feedbackModal.value = true;
 };
+
+const init11 = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('getMembers', () =>
+        $fetch(`${url.public.apiUrl}/teams/members?report=1`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    console.log('memmbess',data.value?.team_members);
+    if(data.value?.team_members){
+        employees.value = data.value?.team_members.map((member) => ({ id: member.id, name: member.name }));
+        console.log('employee',employee.value);
+    }
+    let membersArray = [];
+    
+    // if (data.value?.team_members?.length > 0) {
+    //     data.value?.team_members.forEach((team) => {
+    //         membersArray = membersArray.concat(team.members);
+    //     });
+    // }
+
+    // const uniqueMembers = Array.from(
+    //     new Map(membersArray.map((member) => [member.id, member])).values()
+    // );
+
+    // employees.value = uniqueMembers.map((member) => ({ id: member.id, name: member.name }));
+    // console.log('uniqueMembers', uniqueMembers);
+    // console.log('members', employees.value);
+};
+init11();
 
 const handleKpiReportGenerate = async () => {
     if (employee.value == '' || selectedQuarter.value == '') {

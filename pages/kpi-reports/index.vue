@@ -43,7 +43,7 @@ const toast = useToast();
 
 const init = async () => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('getMembers', () =>
+    const { data, pending, error } = await useAsyncData('getMembers22', () =>
         $fetch(`${url.public.apiUrl}/teams/members`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -330,7 +330,7 @@ quaterYear.value = date.getFullYear();
                         <KpiSubmission :quater="quater" />
                     </TabPanel>
                     <TabPanel header="Report">
-                        <KpiReport :employees="employees" :quater="quater" />
+                        <KpiReport :quater="quater" />
                     </TabPanel>
                 </TabView>
             </TabPanel>
