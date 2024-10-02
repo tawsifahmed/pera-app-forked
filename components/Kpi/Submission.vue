@@ -186,7 +186,7 @@ const loadSubmission = async () => {
     loading.value = true;
     if (selectedQuarter.value === '') {
         loading.value = false;
-        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please select quarter', group: 'br', life: 3000 });
+        return toast.add({ severity: 'warn', summary: 'Failed', detail: 'Please select quarter', group: 'br', life: 3000 });
     }
 
     const token = useCookie('token');
@@ -242,7 +242,7 @@ const loadSubmission = async () => {
         console.log('erorr gotcha');
         employeeLoaded.value = false;
         loading.value = false;
-        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to show report', group: 'br', life: 3000 });
+        return toast.add({ severity: 'error', summary: 'Internal Server Error', detail: 'Failed to show report', group: 'br', life: 3000 });
     }
 };
 
