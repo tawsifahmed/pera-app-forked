@@ -88,12 +88,20 @@ const handleCreateProject = async () => {
         loading.value = false;
     } else {
         errorHandler.value = false;
+        taskStatusList.value = taskStatusList.value.map(status => {
+            if (!status.taskStatusColor.startsWith('#')) {
+            status.taskStatusColor = `#${status.taskStatusColor}`;
+            }
+            return status;
+        });
+
         const createProjectData = {
             name: projectNameInput.value,
             description: projectDescriptionInput.value,
             space_id: spaces,
             statuses: taskStatusList.value
         };
+        console.log('statuses', taskStatusList.value);
         await project.createProjects(createProjectData);
         if (save.value === true) {
             companyFormInputs.value = false;
@@ -124,12 +132,38 @@ const handleCreateProject = async () => {
         }
     }
 };
+
+
+const handleClose = () => {
+    projectNameInput.value = null;
+    projectDescriptionInput.value = null;
+    taskStatusList.value = [
+        {
+            taskStatusName: 'Open',
+            taskStatusColor: `#6466f1`,
+            is_closed_status: 0
+        },
+        {
+            taskStatusName: 'Doing',
+            taskStatusColor: `#ff0084`,
+            is_closed_status: 0
+        },
+        {
+            taskStatusName: 'Dev Done',
+            taskStatusColor: `#12955d`,
+            is_closed_status: 0
+        }
+    ];
+    selectedCloseStatus.value = null;
+
+};
+
 </script>
 
 <template>
     <div>
         <Button :icon="isPage ? '' : 'pi pi-plus'" :class="isPage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'" :label="isPage ? 'Create +' : ''" @click="showDialog" :severity="isPage ? 'primary' : 'secondary'" aria-label="Bookmark" :text="!isPage" />
-        <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Project" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Project" :modal="true" class="p-fluid" @update:visible="handleClose">
             <div class="field">
                 <label for="name"
                     >Create project for <strong>{{ singleSpace?.name }}</strong> space</label
@@ -161,11 +195,15 @@ const handleCreateProject = async () => {
                     <div class="row mt-2">
                         <div class="col-12 d-flex flex-column p-0">
                             <div class="flex delete-task justify-content-between" v-for="(task, index) in taskStatusList" :key="index">
-                                <div class="flex align-items-center">
-                                    <div class="status-colors" :style="{ backgroundColor: task.taskStatusColor }"></div>
-                                    <p class="text-uppercase text-muteds">
+                                <div class="flex align-items-center" style="width: 92%">
+                                    <ColorPicker class="color-pick mr-2 status-colors border-none" v-model="task.taskStatusColor" inputId="cp-hex" format="hex" />
+
+                                    <!-- <div class="status-colors" :style="{ backgroundColor: task.taskStatusColor }"></div> -->
+                                    <!-- <p class="text-uppercase text-muteds">
                                         {{ task.taskStatusName }}
-                                    </p>
+                                    </p> -->
+                                    <InputText class="text-uppercase text-muteds w-full" id="name" v-model="task.taskStatusName" required="true" />
+
                                 </div>
                                 <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1">
                                     <p class="pi pi-times"></p>
@@ -175,6 +213,7 @@ const handleCreateProject = async () => {
                     </div>
                 </div>
             </div>
+            <!-- <pre>{{taskStatusList}}</pre> -->
             <div class="mb-4">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
@@ -202,10 +241,13 @@ const handleCreateProject = async () => {
     }
 }
 .status-colors {
-    height: 24px;
-    width: 24px;
-    border-radius: 5px;
-    margin-right: 8px;
+    .p-colorpicker-preview {
+        height: 24px !important;
+        width: 24px !important;
+        border-radius: 5px !important;
+        /*margin-right: 8px !important;*/
+        border: none !important;
+    }
 }
 .delete-task {
     border: 1px solid rgb(203 213 225);

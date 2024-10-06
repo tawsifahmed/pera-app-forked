@@ -9,7 +9,7 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 
-const { refProjectId, singleSpace } = defineProps(['singleSpace', 'refProjectId']);
+const { refProjectId, singleSpace } = defineProps(['refProjectId', 'singleSpace']);
 
 const emit = defineEmits(['closeEditProject']);
 
@@ -21,7 +21,9 @@ const taskStatusName = ref('');
 
 const taskStatusList = ref(refProjectId?.statuses);
 
-const dummyStatusList = ref([...taskStatusList.value]);
+const dummyStatusList = ref([]);
+dummyStatusList.value = JSON.parse(JSON.stringify(taskStatusList.value));
+
 
 const colorHEX = ref('6466f1');
 
@@ -74,7 +76,7 @@ watch(selectedCloseStatus, (newStatus) => {
 const transformKeys = (list) => {
   return list.map(status => ({
     taskStatusName: status.name,
-    taskStatusColor: status.color_code,
+    taskStatusColor: status.color_code.startsWith('#') ? status.color_code : `#${status.color_code}`,
     is_closed_status: status.is_closed_status
   }));
 }
@@ -130,7 +132,6 @@ onMounted(() => {
 </script>
 <template>
   <div class="position-relative d-flex flex-column justify-content-between w-100 modal-container">
-
     <div v-if="spaceFormInputs">
       <div class="field">
         <!-- <pre>{{refProjectId.statuses}}</pre> -->
@@ -166,11 +167,15 @@ onMounted(() => {
             <div class="col-12 d-flex flex-column p-0">
               <div class="flex delete-task justify-content-between" v-for="(task, index) in dummyStatusList"
                 :key="index">
-                <div class="flex align-items-center">
-                  <div class="status-colors" :style="{ backgroundColor: task.color_code }"></div>
-                  <p class="text-uppercase text-muteds">
+                <div class="flex align-items-center" style="width: 92%">
+                  <!-- <div class="status-colors" :style="`background-color: #${task.color_code}` "></div> -->
+                  <ColorPicker class="color-pick mr-2 status-colors border-none" v-model="task.color_code" inputId="cp-hex" format="hex" />
+
+                  <!-- <p class="text-uppercase text-muteds">
                     {{ task.name }}
-                  </p>
+                  </p> -->
+                  <InputText class="text-uppercase text-muteds w-full" id="name" v-model="task.name" required="true" />
+
                 </div>
                 <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1">
                   <p class="pi pi-times"></p>
@@ -180,6 +185,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
+      <!-- <pre>{{dummyStatusList}}</pre> -->
       <div class="mb-4">
         <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> </p>
         <div class="container">
@@ -217,10 +223,13 @@ onMounted(() => {
 }
 
 .status-colors {
-  height: 24px;
-  width: 24px;
-  border-radius: 5px;
-  margin-right: 8px;
+  .p-colorpicker-preview {
+      height: 24px !important;
+      width: 24px !important;
+      border-radius: 5px !important;
+      /*margin-right: 8px !important;*/
+      border: none !important;
+  }
 }
 
 .delete-task {

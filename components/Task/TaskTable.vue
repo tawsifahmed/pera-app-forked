@@ -181,11 +181,10 @@ const downloadTaskSheet = (taskLists) => {
     if (taskLists.length > 0) {
         const csvContent =
             'data:text/csv;charset=utf-8,' +
-            '"Serial No","Unique ID","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
+            '"Serial No.","Task Name","Project","Assignee","Priority","Status","Time Tracked","Due Date","Overdue"\n' +
             taskLists
                 .map((task, index) => {
                     const serialNo = index + 1;
-                    const uniqueId = task.unique_id;
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
                     const assignees = task.data.assignee.split(', ').join('; ');
@@ -206,7 +205,7 @@ const downloadTaskSheet = (taskLists) => {
                     const dueDate = task.data.dueDateValue;
                     const isOverDue = task.data.is_overdue ? 'Yes' : 'No';
 
-                    return `"${serialNo}","${uniqueId}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
+                    return `"${serialNo}","${taskName}","${projectName}","${assignees}","${priority}","${status}","${timeTracked}","${dueDate}","${isOverDue}"`;
                 })
                 .join('\n');
         const encodedUri = encodeURI(csvContent);
