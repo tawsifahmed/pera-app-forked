@@ -1,4 +1,5 @@
 <script setup>
+import draggable from 'vuedraggable';
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 const { editProject } = useCompanyStore(); // use authenticateUser action from  auth store
@@ -16,6 +17,25 @@ const emit = defineEmits(['closeEditProject']);
 const spaceFormInputs = ref(true);
 
 const errorHandler = ref(false);
+
+const enabled = ref(true);
+const dragging = ref(false);
+
+// Computed
+const editable = ref(true);
+const dragOptions = computed(() => ({
+    animation: 250,
+    group: 'tasks',
+    disabled: !editable.value,
+    ghostClass: 'ghost'
+}));
+
+const taskCardStyle = computed(() => ({
+    backgroundColor: '#fff',
+    boxShadow: '0px 2px 2px #e2e2e2',
+    cursor: 'grab',
+    margin: '8px 0px'
+}));
 
 const taskStatusName = ref('');
 
@@ -73,6 +93,18 @@ watch(selectedCloseStatus, (newStatus) => {
   }
 });
 
+// Ensure only required properties remain after dragging
+watch(dummyStatusList, (newList) => {
+  newList.forEach(status => {
+    const allowedKeys = ['color_code', 'name', 'is_closed_status'];
+    Object.keys(status).forEach(key => {
+      if (!allowedKeys.includes(key)) {
+        delete status[key];
+      }
+    });
+  });
+}, { deep: true });
+
 const transformKeys = (list) => {
   return list.map(status => ({
     taskStatusName: status.name,
@@ -99,8 +131,10 @@ const handleCreateProject = async () => {
       });
     });
 
-    const transformedTaskStatusList = transformKeys(dummyStatusList.value);
+    const shallowStatusList = JSON.parse(JSON.stringify(dummyStatusList.value));
 
+    const transformedTaskStatusList = transformKeys(shallowStatusList);
+    console.log('transformedTaskStatusList', transformedTaskStatusList);
     const createProjectData = {
       'id': refProjectId?.id,
       'name': projectNameInput.value,
@@ -161,19 +195,49 @@ onMounted(() => {
           <p v-if="addTaskSTatusError" class="text-red-600 text-small">
             Please type status name!
           </p>
-
-
           <div class="row mt-2">
+            <div class="col-12 d-flex flex-column p-0">
+                <draggable v-model="dummyStatusList" :options="dragOptions" :disabled="!enabled"
+                    class="list-group" ghost-class="ghost" :move="checkMove" @start="dragging = true"
+                    @end="dragging = false">
+                    <template v-slot:item="{ element, index }">
+                        <div class="flex delete-task justify-content-between" :style="taskCardStyle">
+                            <svg style="margin-right: -4px;" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
+                                <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                  <circle cx="5" cy="5" r="1"/>
+                                  <circle cx="5" cy="12" r="1"/>
+                                  <circle cx="5" cy="19" r="1"/>
+                                  <circle cx="12" cy="5" r="1"/>
+                                  <circle cx="12" cy="12" r="1"/>
+                                  <circle cx="12" cy="19" r="1"/>
+                                 
+                                </g>
+                              </svg>
+                            <div class="flex align-items-center" style="width: 89%">
+                                <ColorPicker class="color-pick mr-2 status-colors border-none"
+                                    v-model="element.color_code" inputId="cp-hex" format="hex" />
+
+                               
+                                <InputText class="text-uppercase text-muteds w-full" id="name"
+                                    v-model="element.name" required="true" />
+
+                            </div>
+                            <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1 flex justify-content-center align-items-center">
+                                <p class="pi pi-times"></p>
+                            </div>
+                        </div>
+                    </template>
+
+                </draggable>
+            </div>
+        </div>
+
+          <!-- <div class="row mt-2">
             <div class="col-12 d-flex flex-column p-0">
               <div class="flex delete-task justify-content-between" v-for="(task, index) in dummyStatusList"
                 :key="index">
                 <div class="flex align-items-center" style="width: 92%">
-                  <!-- <div class="status-colors" :style="`background-color: #${task.color_code}` "></div> -->
                   <ColorPicker class="color-pick mr-2 status-colors border-none" v-model="task.color_code" inputId="cp-hex" format="hex" />
-
-                  <!-- <p class="text-uppercase text-muteds">
-                    {{ task.name }}
-                  </p> -->
                   <InputText class="text-uppercase text-muteds w-full" id="name" v-model="task.name" required="true" />
 
                 </div>
@@ -182,10 +246,10 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
-      <!-- <pre>{{dummyStatusList}}</pre> -->
+      <pre>{{dummyStatusList}}</pre>
       <div class="mb-4">
         <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> </p>
         <div class="container">
