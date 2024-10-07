@@ -220,7 +220,7 @@ const handleClose = () => {
                 <label for="name">Create project for <strong>{{ singleSpace?.name }}</strong> space</label>
             </div>
             <div class="field">
-                <label for="name">Project Name<i class="text-red-400 text-italic">*</i> <span
+                <label for="name">Project Name<i class="text-red-400 text-italic">*</i><span
                         v-tooltip.right="{ value: 'Demo Text Text' }"
                         class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
                 <InputText id="name" v-model="projectNameInput" required="true" />
@@ -233,7 +233,7 @@ const handleClose = () => {
             </div>
             <div class="mb-4">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status<i
-                        class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }"
+                        class="text-red-400 text-italic">*</i><span v-tooltip.right="{ value: 'Demo Text Text' }"
                         class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
                 <div class="container">
                     <InputGroup>
@@ -315,7 +315,7 @@ const handleClose = () => {
                 </p>
                 <div class="container">
                     <div class="field">
-                        {{ selectedCloseStatus }}
+                        <!-- {{ selectedCloseStatus }} -->
                         <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName"
                             placeholder="Select Status" class="w-full" />
                     </div>
