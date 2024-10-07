@@ -357,6 +357,7 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async editProject({ id, name, description, space_id, statuses }) {
+            console.log('statuses Pinia', statuses);
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
