@@ -21,6 +21,9 @@ const errorHandler = ref(false);
 const enabled = ref(true);
 const dragging = ref(false);
 
+const hoveredItemIndex = ref(null); // Index of the hovered item
+
+
 // Computed
 const editable = ref(true);
 const dragOptions = computed(() => ({
@@ -37,9 +40,16 @@ const taskCardStyle = computed(() => ({
     margin: '8px 0px'
 }));
 
+const taskCardHoverStyle = computed(() => ({
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0px 4px 4px #e2e2e3',
+    cursor: 'grab',
+    margin: '8px 0px'
+}));
+
 const taskStatusName = ref('');
 
-const taskStatusList = ref(refProjectId?.statuses);
+const taskStatusList = ref(refProjectId?.statuses.map((item, index) => ({ ...item, serialNo: index + 1 })));
 
 const dummyStatusList = ref([]);
 dummyStatusList.value = JSON.parse(JSON.stringify(taskStatusList.value));
@@ -63,6 +73,7 @@ const addTaskStatus = () => {
       name: taskStatusName.value,
       color_code: `#${colorHEX.value}`,
       is_closed_status: 0,
+      serialNo: dummyStatusList.value.length + 1,
     }
     dummyStatusList.value.push(newTaskStatusList);
     taskStatusName.value = '';
@@ -75,7 +86,11 @@ const addTaskStatus = () => {
   }
 };
 
+
 const handleDeleteTask = (index) => {
+  if(selectedCloseStatus.value.is_closed_status === dummyStatusList.value[index].is_closed_status) {
+    selectedCloseStatus.value = null;
+  }
   dummyStatusList.value.splice(index, 1);
   if (dummyStatusList.value.length == 0) {
     taskStatusNullCheck.value = false;
@@ -83,7 +98,7 @@ const handleDeleteTask = (index) => {
 };
 
 const selectedCloseStatus = ref(null);
-selectedCloseStatus.value = refProjectId?.statuses.find(status => status.is_closed_status === 1);
+selectedCloseStatus.value = dummyStatusList.value.find(status => status.is_closed_status === 1);
 
 watch(selectedCloseStatus, (newStatus) => {
   if (newStatus) {
@@ -93,37 +108,35 @@ watch(selectedCloseStatus, (newStatus) => {
   }
 });
 
-// Ensure only required properties remain after dragging
+
 watch(dummyStatusList, (newList) => {
-  newList.forEach(status => {
-    const allowedKeys = ['color_code', 'name', 'is_closed_status'];
-    Object.keys(status).forEach(key => {
-      if (!allowedKeys.includes(key)) {
-        delete status[key];
-      }
-    });
+  newList.forEach((status, index) => {
+    status.serialNo = index + 1;
   });
-}, { deep: true });
+},
+//  { deep: true }
+);
 
 const transformKeys = (list) => {
   return list.map(status => ({
     taskStatusName: status.name,
     taskStatusColor: status.color_code.startsWith('#') ? status.color_code : `#${status.color_code}`,
-    is_closed_status: status.is_closed_status
+    is_closed_status: status.is_closed_status,
+    serialNo: status.serialNo
   }));
 }
 
 const loading = ref(false);
 const handleCreateProject = async () => {
   loading.value = true;
-  if (projectNameInput.value === null || dummyStatusList.value.length <= 0 || selectedCloseStatus.value === null) {
+  if (projectNameInput.value === null || dummyStatusList.value.length <= 0 || !selectedCloseStatus.value) {
     errorHandler.value = true
     loading.value = false;
   } else {
     errorHandler.value = false
 
     dummyStatusList.value.forEach(status => {
-      const allowedKeys = ['color_code', 'name', 'is_closed_status'];
+      const allowedKeys = ['color_code', 'name', 'is_closed_status', 'serialNo'];
       Object.keys(status).forEach(key => {
         if (!allowedKeys.includes(key)) {
           delete status[key];
@@ -134,6 +147,7 @@ const handleCreateProject = async () => {
     const shallowStatusList = JSON.parse(JSON.stringify(dummyStatusList.value));
 
     const transformedTaskStatusList = transformKeys(shallowStatusList);
+    console.log('shallow List', shallowStatusList)
     console.log('transformedTaskStatusList', transformedTaskStatusList);
     const createProjectData = {
       'id': refProjectId?.id,
@@ -169,7 +183,7 @@ onMounted(() => {
     <div v-if="spaceFormInputs">
       <div class="field">
         <!-- <pre>{{refProjectId.statuses}}</pre> -->
-        <label for="name">Edit project: <strong>{{ refProjectId?.name }}</strong></label>
+        <label for="name">Project: <strong>{{ refProjectId?.name }}</strong></label>
       </div>
       <div class="field flex flex-column">
         <label for="name">Project Name<i class="text-red-400 text-italic">*</i> </label>
@@ -184,9 +198,9 @@ onMounted(() => {
         <div class="container">
           <InputGroup>
             <InputGroupAddon>
-              <ColorPicker class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
+              <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
             </InputGroupAddon>
-            <InputText class="form-control" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
+            <InputText class="form-control" v-tooltip.top="{ value: 'Type Status Name' }" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
             <InputGroupAddon @click="addTaskStatus" class="btn btn-outline-secondary cursor-pointer">
               <p class="pi pi-plus  cursor-pointer"></p>
             </InputGroupAddon>
@@ -201,8 +215,8 @@ onMounted(() => {
                     class="list-group" ghost-class="ghost" :move="checkMove" @start="dragging = true"
                     @end="dragging = false">
                     <template v-slot:item="{ element, index }">
-                        <div class="flex delete-task justify-content-between" :style="taskCardStyle">
-                            <svg style="margin-right: -4px;" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
+                        <div class="flex delete-task justify-content-between" :style="hoveredItemIndex === index ? taskCardHoverStyle : taskCardStyle" @mouseenter="hoveredItemIndex = index" @mouseleave="hoveredItemIndex = null" :key="element.id">
+                            <svg style="margin-right: -3px;" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
                                 <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                                   <circle cx="5" cy="5" r="1"/>
                                   <circle cx="5" cy="12" r="1"/>
@@ -213,21 +227,19 @@ onMounted(() => {
                                  
                                 </g>
                               </svg>
-                            <div class="flex align-items-center" style="width: 89%">
-                                <ColorPicker class="color-pick mr-2 status-colors border-none"
+                            <div class="flex align-items-center" style="width: 88%">
+                                <ColorPicker v-tooltip.left="{ value: 'Change Color' }" class="color-pick mr-2 status-colors border-none"
                                     v-model="element.color_code" inputId="cp-hex" format="hex" />
 
                                
-                                <InputText class="text-uppercase text-muteds w-full" id="name"
+                                <InputText v-tooltip.left="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full" id="name"
                                     v-model="element.name" required="true" />
-
                             </div>
                             <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1 flex justify-content-center align-items-center">
                                 <p class="pi pi-times"></p>
                             </div>
                         </div>
                     </template>
-
                 </draggable>
             </div>
         </div>
@@ -249,12 +261,12 @@ onMounted(() => {
           </div> -->
         </div>
       </div>
-      <pre>{{dummyStatusList}}</pre>
-      <div class="mb-4">
+      <!-- <pre>{{dummyStatusList}}</pre> -->
+      <div class="mb-3">
         <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> </p>
         <div class="container">
           <div class="field">
-
+            <!-- {{selectedCloseStatus}} -->
             <Dropdown v-model="selectedCloseStatus" :options="dummyStatusList" optionLabel="name"
               placeholder="Select Status" class="w-full" />
           </div>

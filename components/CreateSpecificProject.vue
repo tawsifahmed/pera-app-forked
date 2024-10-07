@@ -12,6 +12,8 @@ const companyFormInputs = ref(false);
 const errorHandler = ref(false);
 const enabled = ref(true);
 const dragging = ref(false);
+const hoveredItemIndex = ref(null); // Index of the hovered item
+
 
 // Computed
 const editable = ref(true);
@@ -29,23 +31,33 @@ const taskCardStyle = computed(() => ({
     margin: '8px 0px'
 }));
 
+const taskCardHoverStyle = computed(() => ({
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0px 4px 4px #e2e2e3',
+    cursor: 'grab',
+    margin: '8px 0px'
+}));
+
 const taskStatusName = ref('');
 
 const taskStatusList = ref([
     {
         taskStatusName: 'Open',
         taskStatusColor: `#6466f1`,
-        is_closed_status: 0
+        is_closed_status: 0,
+        serialNo: 1
     },
     {
         taskStatusName: 'Doing',
         taskStatusColor: `#ff0084`,
-        is_closed_status: 0
+        is_closed_status: 0,
+        serialNo: 2
     },
     {
         taskStatusName: 'Dev Done',
         taskStatusColor: `#12955d`,
-        is_closed_status: 0
+        is_closed_status: 0,
+        serialNo: 3
     }
 ]);
 
@@ -68,7 +80,8 @@ const addTaskStatus = () => {
         const newTaskStatusList = {
             taskStatusName: taskStatusName.value,
             taskStatusColor: `#${colorHEX.value}`,
-            is_closed_status: 0
+            is_closed_status: 0,
+            serialNo: taskStatusList.value.length + 1
         };
         taskStatusList.value.push(newTaskStatusList);
         taskStatusName.value = '';
@@ -82,6 +95,9 @@ const addTaskStatus = () => {
 };
 
 const handleDeleteTask = (index) => {
+    if(selectedCloseStatus.value.is_closed_status === taskStatusList.value[index].is_closed_status) {
+        selectedCloseStatus.value = null;
+    }
     taskStatusList.value.splice(index, 1);
     if (taskStatusList.value.length == 0) {
         taskStatusNullCheck.value = false;
@@ -99,10 +115,16 @@ watch(selectedCloseStatus, (newStatus) => {
     console.log('taskStatusList', taskStatusList.value);
 });
 
+watch(taskStatusList, (newList) => {
+    newList.forEach((status, index) => {
+        status.serialNo = index + 1;
+    })
+})
+
 const loading = ref(false);
 const handleCreateProject = async () => {
     loading.value = true;
-    if (projectNameInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null) {
+    if (projectNameInput.value === null || taskStatusList.value.length <= 0 || !selectedCloseStatus.value) {
         errorHandler.value = true;
         loading.value = false;
     } else {
@@ -131,17 +153,20 @@ const handleCreateProject = async () => {
                 {
                     taskStatusName: 'Open',
                     taskStatusColor: `#6466f1`,
-                    is_closed_status: 0
+                    is_closed_status: 0,
+                    serialNo: 1
                 },
                 {
                     taskStatusName: 'Doing',
                     taskStatusColor: `#ff0084`,
-                    is_closed_status: 0
+                    is_closed_status: 0,
+                    serialNo: 2
                 },
                 {
                     taskStatusName: 'Dev Done',
                     taskStatusColor: `#12955d`,
-                    is_closed_status: 0
+                    is_closed_status: 0,
+                    serialNo: 3
                 }
             ];
             loading.value = false;
@@ -160,20 +185,24 @@ const handleClose = () => {
         {
             taskStatusName: 'Open',
             taskStatusColor: `#6466f1`,
-            is_closed_status: 0
+            is_closed_status: 0,
+            serialNo: 1
         },
         {
             taskStatusName: 'Doing',
             taskStatusColor: `#ff0084`,
-            is_closed_status: 0
+            is_closed_status: 0,
+            serialNo: 2
         },
         {
             taskStatusName: 'Dev Done',
             taskStatusColor: `#12955d`,
-            is_closed_status: 0
+            is_closed_status: 0,
+            serialNo: 3
         }
     ];
     selectedCloseStatus.value = null;
+    taskStatusName.value = '';
 
 };
 
@@ -209,10 +238,10 @@ const handleClose = () => {
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
-                            <ColorPicker class="color-pick" style="width: 1.5rem;" v-model="colorHEX" inputId="cp-hex"
+                            <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem;" v-model="colorHEX" inputId="cp-hex"
                                 format="hex" />
                         </InputGroupAddon>
-                        <InputText class="form-control" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
+                        <InputText class="form-control" v-tooltip.top="{ value: 'Type Status Name' }" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
                         <InputGroupAddon @click="addTaskStatus" class="btn btn-outline-secondary cursor-pointer">
                             <p class="pi pi-plus cursor-pointer"></p>
                         </InputGroupAddon>
@@ -225,7 +254,7 @@ const handleClose = () => {
                                 class="list-group" ghost-class="ghost" :move="checkMove" @start="dragging = true"
                                 @end="dragging = false">
                                 <template v-slot:item="{ element, index }">
-                                    <div class="flex delete-task justify-content-between" :style="taskCardStyle">
+                                    <div class="flex delete-task justify-content-between" :style="hoveredItemIndex === index ? taskCardHoverStyle : taskCardStyle" @mouseenter="hoveredItemIndex = index" @mouseleave="hoveredItemIndex = null" :key="element.id">
                                         <svg style="margin-right: -4px;" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
                                             <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                                               <circle cx="5" cy="5" r="1"/>
@@ -238,14 +267,14 @@ const handleClose = () => {
                                             </g>
                                           </svg>
                                         <div class="flex align-items-center" style="width: 89%">
-                                            <ColorPicker class="color-pick mr-2 status-colors border-none"
+                                            <ColorPicker v-tooltip.left="{ value: 'Change Color' }" class="color-pick mr-2 status-colors border-none"
                                                 v-model="element.taskStatusColor" inputId="cp-hex" format="hex" />
         
                                             <!-- <div class="status-colors" :style="{ backgroundColor: task.taskStatusColor }"></div> -->
                                             <!-- <p class="text-uppercase text-muteds">
                                                 {{ task.taskStatusName }}
                                             </p> -->
-                                            <InputText class="text-uppercase text-muteds w-full" id="name"
+                                            <InputText v-tooltip.left="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full" id="name"
                                                 v-model="element.taskStatusName" required="true" />
         
                                         </div>
@@ -254,7 +283,6 @@ const handleClose = () => {
                                         </div>
                                     </div>
                                 </template>
-
                             </draggable>
                         </div>
                     </div>
@@ -287,6 +315,7 @@ const handleClose = () => {
                 </p>
                 <div class="container">
                     <div class="field">
+                        {{ selectedCloseStatus }}
                         <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName"
                             placeholder="Select Status" class="w-full" />
                     </div>

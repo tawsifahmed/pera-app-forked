@@ -158,7 +158,7 @@ const notifiData = ref(false);
 const fetchNotifyData = async () => {
     const token = useCookie('token');
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=10&page=1`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=5&page=1`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
