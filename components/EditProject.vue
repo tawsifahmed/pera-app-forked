@@ -49,7 +49,7 @@ const taskCardHoverStyle = computed(() => ({
 
 const taskStatusName = ref('');
 
-const taskStatusList = ref(refProjectId?.statuses.map((item, index) => ({ ...item, serialNo: index + 1 })));
+const taskStatusList = ref(refProjectId?.statuses.map((item, index) => ({ ...item, serial_no: index + 1 })));
 
 const dummyStatusList = ref([]);
 dummyStatusList.value = JSON.parse(JSON.stringify(taskStatusList.value));
@@ -73,7 +73,7 @@ const addTaskStatus = () => {
       name: taskStatusName.value,
       color_code: `#${colorHEX.value}`,
       is_closed_status: 0,
-      serialNo: dummyStatusList.value.length + 1,
+      serial_no: dummyStatusList.value.length + 1,
     }
     dummyStatusList.value.push(newTaskStatusList);
     taskStatusName.value = '';
@@ -111,7 +111,7 @@ watch(selectedCloseStatus, (newStatus) => {
 
 watch(dummyStatusList, (newList) => {
   newList.forEach((status, index) => {
-    status.serialNo = index + 1;
+    status.serial_no = index + 1;
   });
 },
 //  { deep: true }
@@ -122,7 +122,7 @@ const transformKeys = (list) => {
     taskStatusName: status.name,
     taskStatusColor: status.color_code.startsWith('#') ? status.color_code : `#${status.color_code}`,
     is_closed_status: status.is_closed_status,
-    serialNo: status.serialNo
+    serial_no: status.serial_no
   }));
 }
 
@@ -136,7 +136,7 @@ const handleCreateProject = async () => {
     errorHandler.value = false
 
     dummyStatusList.value.forEach(status => {
-      const allowedKeys = ['color_code', 'name', 'is_closed_status', 'serialNo'];
+      const allowedKeys = ['color_code', 'name', 'is_closed_status', 'serial_no'];
       Object.keys(status).forEach(key => {
         if (!allowedKeys.includes(key)) {
           delete status[key];
