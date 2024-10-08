@@ -45,19 +45,19 @@ const taskStatusList = ref([
         taskStatusName: 'Open',
         taskStatusColor: `#6466f1`,
         is_closed_status: 0,
-        serialNo: 1
+        serial_no: 1
     },
     {
         taskStatusName: 'Doing',
         taskStatusColor: `#ff0084`,
         is_closed_status: 0,
-        serialNo: 2
+        serial_no: 2
     },
     {
         taskStatusName: 'Dev Done',
         taskStatusColor: `#12955d`,
         is_closed_status: 0,
-        serialNo: 3
+        serial_no: 3
     }
 ]);
 
@@ -81,7 +81,7 @@ const addTaskStatus = () => {
             taskStatusName: taskStatusName.value,
             taskStatusColor: `#${colorHEX.value}`,
             is_closed_status: 0,
-            serialNo: taskStatusList.value.length + 1
+            serial_no: taskStatusList.value.length + 1
         };
         taskStatusList.value.push(newTaskStatusList);
         taskStatusName.value = '';
@@ -117,7 +117,7 @@ watch(selectedCloseStatus, (newStatus) => {
 
 watch(taskStatusList, (newList) => {
     newList.forEach((status, index) => {
-        status.serialNo = index + 1;
+        status.serial_no = index + 1;
     })
 })
 
@@ -154,19 +154,19 @@ const handleCreateProject = async () => {
                     taskStatusName: 'Open',
                     taskStatusColor: `#6466f1`,
                     is_closed_status: 0,
-                    serialNo: 1
+                    serial_no: 1
                 },
                 {
                     taskStatusName: 'Doing',
                     taskStatusColor: `#ff0084`,
                     is_closed_status: 0,
-                    serialNo: 2
+                    serial_no: 2
                 },
                 {
                     taskStatusName: 'Dev Done',
                     taskStatusColor: `#12955d`,
                     is_closed_status: 0,
-                    serialNo: 3
+                    serial_no: 3
                 }
             ];
             loading.value = false;
@@ -186,19 +186,19 @@ const handleClose = () => {
             taskStatusName: 'Open',
             taskStatusColor: `#6466f1`,
             is_closed_status: 0,
-            serialNo: 1
+            serial_no: 1
         },
         {
             taskStatusName: 'Doing',
             taskStatusColor: `#ff0084`,
             is_closed_status: 0,
-            serialNo: 2
+            serial_no: 2
         },
         {
             taskStatusName: 'Dev Done',
             taskStatusColor: `#12955d`,
             is_closed_status: 0,
-            serialNo: 3
+            serial_no: 3
         }
     ];
     selectedCloseStatus.value = null;
