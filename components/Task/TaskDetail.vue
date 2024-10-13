@@ -240,16 +240,6 @@ const checkAttachmentType = (file) => {
     }
 };
 
-const commentAttachment = ref(false);
-
-const handleCommentAttachment = () => {
-    commentAttachment.value = true;
-};
-
-const closeCommentAttachment = () => {
-    commentAttachment.value = false;
-};
-
 onMounted(async () => {
     await getTaskDetails(taskDetails.value?.id);
     const obg = {
@@ -1142,6 +1132,7 @@ a {
 .sub-create .pi-plus {
     font-size: 12px !important;
 }
+
 .no-scrollbar::-webkit-scrollbar {
     display: none !important;
 }
