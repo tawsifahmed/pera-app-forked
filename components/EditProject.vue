@@ -54,7 +54,6 @@ const taskStatusList = ref(refProjectId?.statuses.map((item, index) => ({ ...ite
 const dummyStatusList = ref([]);
 dummyStatusList.value = JSON.parse(JSON.stringify(taskStatusList.value));
 
-
 const colorHEX = ref('6466f1');
 
 const taskStatusNullCheck = ref(null);
@@ -232,7 +231,7 @@ onMounted(() => {
                                     v-model="element.color_code" inputId="cp-hex" format="hex" />
 
                                
-                                <InputText v-tooltip.left="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full" id="name"
+                                <InputText v-tooltip.right="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full"
                                     v-model="element.name" required="true" />
                             </div>
                             <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1 flex justify-content-center align-items-center">
