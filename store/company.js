@@ -323,7 +323,7 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
-            this.statuslist = data.value?.taskStatus;
+            this.statuslist = data.value?.data?.statuses;
 
             const updatedData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
