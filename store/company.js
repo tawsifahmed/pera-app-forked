@@ -227,7 +227,7 @@ export const useCompanyStore = defineStore('workStation', {
             this.singleSpace = data.value?.data;
             this.singleSpaceProjects = this.singleSpace?.projects.map((item, index) => ({ ...item, index: index + 1 }));
         },
-        async createSpace({ name, description, company_id, color }) {
+        async createSpace({ name, description, company_id, color, users }) {
             
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
@@ -239,7 +239,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     company_id: company_id,
-                    color: color
+                    color: color,
+                    users
                 }
             });
 
@@ -248,7 +249,7 @@ export const useCompanyStore = defineStore('workStation', {
                 // await this.getCompanyList();
             }
         },
-        async editSpace({ id, name, description, company_id, color }) {
+        async editSpace({ id, name, description, company_id, color, users }) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/update/${id}`, {
                 method: 'POST',
@@ -260,7 +261,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     company_id: company_id,
-                    color: color
+                    color: color,
+                    users
                 }
             });
 
