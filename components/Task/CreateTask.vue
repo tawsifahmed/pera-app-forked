@@ -90,10 +90,10 @@ const handleCreateTask = async () => {
             project_id: projects,
             parent_task_id: taskId
         };
-        if(dueDate.value){
-            const postSubDate = new Date(dueDate.value)
+        if(sendDate){
+            const postSubDate = new Date(sendDate)
             postSubDate.setDate(postSubDate.getDate() - 1);
-            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '') : null;
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
         }
         
         await createTask(createTaskData);
