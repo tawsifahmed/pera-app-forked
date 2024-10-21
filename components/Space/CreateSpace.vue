@@ -65,7 +65,7 @@ const handleCreateSpace = async () => {
             color: spaceAvatarPreview.value,
             users: selectedMembers.value.map((item) => item.id)
         };
-        // return
+        
         await space.createSpace(createSpaceData);
 
         if (save.value == true) {
@@ -215,15 +215,19 @@ const handleClose = () => {
 #lightseagreen {
     background-color: #009688;
 }
+
 #brown {
     background-color: #795548;
 }
+
 #cyan {
     background-color: #00bcd4;
 }
+
 #amber {
     background-color: #ffc107;
 }
+
 #indigo {
     background-color: #3f51b5;
 }
@@ -234,9 +238,6 @@ const handleClose = () => {
 
 .prog-bar {
     top: 24px;
-}
-
-.modal-container {
 }
 
 .company-name {
