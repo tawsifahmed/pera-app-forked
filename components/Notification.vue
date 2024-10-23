@@ -20,7 +20,7 @@ const handleClick = async (element) => {
             }
         });
         const companyId = localStorage.getItem('userCompany');
-        console.log('Notification_element =>', element);
+        // console.log('Notification_element =>', element);
         // console.log('Task click: ', task);
         if (element.payload?.type === "task_details"){
             await navigateTo({ path: `/companies/${companyId}/spaces/${element?.space_id}/projects/${element?.project_id}`, query: { task_key: element?.task_id } });
@@ -52,7 +52,7 @@ const fetchData = async () => {
         });
 
         if (data.value) {
-            console.log('notification data =>', data.value);
+            // console.log('notification data =>', data.value);
             notificationData.value = data.value.data;
             totalPage.value = Math.ceil(data.value.total / 5);
         }
@@ -80,7 +80,7 @@ const handleReadAll = async () => {
 
         if (data.value) {
 
-            console.log('real all data =>', data.value);
+            // console.log('real all data =>', data.value);
             await fetchData();
             toast.add({ severity: 'success', summary: 'Successful', detail: 'All notifications marked as read', group: 'br', life: 3000 });
 
