@@ -5,6 +5,7 @@ const notificationData = ref([]);
 const page = ref(1);
 const totalPage = ref(1);
 const emit = defineEmits(['closeNotification']);
+const toast = useToast();
 
 
 const handleClick = async (element) => {
@@ -66,6 +67,34 @@ const init = async () => {
 
 init();
 
+const loadingRead = ref(false);
+const handleReadAll = async () => {
+    loadingRead.value = true;
+    try {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/read-all`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+
+            console.log('real all data =>', data.value);
+            await fetchData();
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'All notifications marked as read', group: 'br', life: 3000 });
+
+            loadingRead.value = false;
+            
+
+        }
+    } catch (e) {
+        console.log(e);
+        loadingRead.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Something went wrong!', group: 'br', life: 3000 });
+    }
+}
+
 const handleNavigate = async (type) => {
     if (type === 'prev' && page.value > 1) {
         page.value -= 1;
@@ -81,10 +110,13 @@ const handleNavigate = async (type) => {
         <div v-for="notify in notificationData" :key="notify" class="">
             <div @click="handleClick(notify)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
         </div>
-        
-        <div class="flex gap-2 justify-content-center">
-            <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
-            <Button @click="handleNavigate('')" :disabled="totalPage === page ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
+        <div class="flex justify-content-between align-items-center mt-1">
+            <Button class="invisible" label="Read All" />
+            <div class="flex gap-2 justify-content-center">
+                <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
+                <Button @click="handleNavigate('')" :disabled="totalPage === page ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
+            </div>
+            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600"label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
     <div class="bg-white card2 text-center text-lg" v-else>
@@ -118,7 +150,13 @@ const handleNavigate = async (type) => {
     cursor: pointer;
     text-wrap: wrap;
 }
+
 .unread {
     background-color: #60f7c949;
 }
+
+.invisible {
+    visibility: hidden;
+}
+
 </style>
