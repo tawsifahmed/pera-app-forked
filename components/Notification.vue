@@ -105,23 +105,24 @@ const handleNavigate = async (type) => {
 };
 </script>
 <template>
-    <div v-if="notificationData.length > 0" class="bg-white card1">
+    <div  class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
-        <div v-for="notify in notificationData" :key="notify" class="">
+        <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
             <div @click="handleClick(notify)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
+        </div>
+        <div class="bg-white text-center text-lg" v-else>
+            No notifications!
         </div>
         <div class="flex justify-content-between align-items-center mt-1">
             <Button class="invisible" label="Read All" />
             <div class="flex gap-2 justify-content-center">
                 <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
-                <Button @click="handleNavigate('')" :disabled="totalPage === page ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
+                <Button @click="handleNavigate('')" :disabled="totalPage === page || !notificationData.length > 0 ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
             </div>
             <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600"label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
-    <div class="bg-white card2 text-center text-lg" v-else>
-        No notifications!
-    </div>
+    
 </template>
 
 <style lang="scss" scoped>
