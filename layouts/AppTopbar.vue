@@ -185,6 +185,8 @@ const fetchNotifyData = async () => {
 
 fetchNotifyData();
 
+
+
 const handleNotificationComp = () => {
     showNotify.value = !showNotify.value;
     if(notifiData.value) {
@@ -194,7 +196,59 @@ const handleNotificationComp = () => {
 const showTimer = ref(false);
 
 const timerTaskId = ref();
-timerTaskId.value = localStorage.getItem('storeTaskID');
+const storedTaskID = localStorage.getItem('storeTaskID');
+
+
+console.log('timerTaskId', timerTaskId.value);
+const fetchedTimerData = ref();
+
+const fetchActiveTimer = async () => {
+    const token = useCookie('token');
+    try {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/timer-history`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+            console.log('active timer data =>', data.value);
+            // return;
+            fetchedTimerData.value = data.value.data.is_timer_start;
+            if(data.value.data.is_timer_start === "true"){
+                timerTaskId.value = data.value.data.task_id;
+            }
+            console.log('fetchedTimerData', data.value.data);
+            console.log('timerTaskId', timerTaskId.value);
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+fetchActiveTimer();
+
+const piniaTID = ref();
+if(timerData.value) {
+    console.log('from Pinia');
+    piniaTID.value = timerData.value?.task_id;
+}
+console.log('timerDatPPPa', timerData.value?.task_id);
+
+if (storedTaskID) {
+    console.log('from Store');
+    timerTaskId.value = storedTaskID;
+}
+
+
+
+watch(timerData, (oldValue, newValue) => {
+    console.log('timerDataWW', newValue);
+    if (newValue) {
+        timerTaskId.value = newValue.task_id;
+    }
+});
 
 
 
@@ -235,7 +289,7 @@ const timeTrack = ref('00:00:00');
 
 <template>
     <div class="layout-topbar">
-        <!-- <pre>{{notifiData}}</pre> -->
+        
         <Toast position="bottom-right" group="br" />
         <router-link to="/" class="layout-topbar-logo">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
@@ -266,8 +320,11 @@ const timeTrack = ref('00:00:00');
                 <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
+            <!-- <pre>timerPinia{{timerData}}</pre> -->
+            <br>
+            
 
-            <div v-if="showTimer"
+            <NuxtLink :to="{ path: `/companies/${storeTaskCompanyID}/spaces/${timerData ? timerData?.space_id : storeTaskSpaceID}/projects/${timerData ? timerData?.project_id : storeTaskProjectID}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  v-if="showTimer"
                 class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2">
                 <div class="clock-wrapper relative ml-2">
                     <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
@@ -277,7 +334,7 @@ const timeTrack = ref('00:00:00');
                         {{ timeTrack }}
                     </div>
                 </div>
-            </div>
+            </NuxtLink>
 
             <button @click="openProfile" class="p-link layout-topbar-button">
                 <div v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image"
@@ -292,6 +349,7 @@ const timeTrack = ref('00:00:00');
                     style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
+            <pre>valueID{{timerTaskId}}</pre>
 
             <div class="relative">
                 <div v-if="notifiData" class="ping-container">
@@ -308,10 +366,12 @@ const timeTrack = ref('00:00:00');
                     <Notification @closeNotification="closeNotification($event)" />
                 </div>
             </div>
+            <pre>{{fetchedTimerData}}</pre>
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
             </button>
+            <pre>{{piniaTID}}</pre>
         </div>
 
         <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }"

@@ -66,7 +66,7 @@ const handleClickClock = async () => {
         await getTaskDetails(taskDetails.value?.id);
         startTimer();
         localStorage.setItem('storeTaskID', JSON.stringify(taskDetails.value?.id));
-        localStorage.setItem('storeTaskProjectID', JSON.stringify(projID));
+        localStorage.setItem('storeTaskProjectID', JSON.stringify(Number(projID)));
         localStorage.setItem('storeTaskSpaceID', JSON.stringify(taskDetails.value?.project.space_id));
         localStorage.setItem('storeTaskCompanyID', JSON.stringify(taskDetails.value?.project.company_id));
         let storeTimerObj = {

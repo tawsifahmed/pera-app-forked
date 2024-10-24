@@ -70,6 +70,7 @@ export const useClockStore = defineStore('clock', () => {
                 company_id: company_id
             }
             isTImerStopped.value = false
+            console.log('timerDataPinia', timerData)
             console.log('isTImerStopped', isTImerStopped.value)
             await getStoreTimer();
         }
