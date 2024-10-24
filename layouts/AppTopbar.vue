@@ -366,7 +366,7 @@ const timeTrack = ref('00:00:00');
                     <Notification @closeNotification="closeNotification($event)" />
                 </div>
             </div>
-            <pre>{{fetchedTimerData}}</pre>
+            <!-- <pre>{{fetchedTimerData}}</pre> -->
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
