@@ -172,8 +172,8 @@ const handleTaskDetailSubmit = async () => {
     };
 
 
-    if (dueDate.value) {
-        const postSubDate = new Date(dueDate.value);
+    if (sendEditDate) {
+        const postSubDate = new Date(sendEditDate);
         postSubDate.setDate(postSubDate.getDate() - 1);
         dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
     }
@@ -714,7 +714,7 @@ const handleShareTaskId = () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p class="m-0 ml-1">
+                                <p class="m-0 ml-1" style="font-size: 0.9rem;">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>

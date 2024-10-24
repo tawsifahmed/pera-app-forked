@@ -20,8 +20,8 @@
                 placeholder="Select Tags" :maxSelectedLabels="5" class="w-full" />
         </div>
         <div class="field">
-            <label>Due Date <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hourFormat="12" />
+            <label>Due Date <span v-tooltip.right="{ value: 'Set your task due date' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
         </div>
         <div class="field">
             <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
@@ -57,6 +57,7 @@ const dueDate = ref(null);
 const assignees = ref(null);
 const tags = ref(null);
 const priority = ref(null);
+const userHasModifiedTime = ref(false);
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -66,7 +67,24 @@ const priorities = ref([
 ]);
 
 const emit = defineEmits(['closeCreateModal']);
-console.log('duedate id', dueDate.value);
+
+const handleDateChange = (newDate) => {
+    console.log('test druve')
+    if (!userHasModifiedTime.value) {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);  
+        dueDate.value = selectedDate;  
+    }else {
+        dueDate.value = newDate;  
+    }
+};
+
+watch(dueDate, (newVal, oldVal) => {
+    if (newVal && oldVal && newVal !== oldVal) {
+        userHasModifiedTime.value = true;
+    }
+});
+
 
 const handleCreateTask = async () => {
     btnLoading.value = true;
@@ -90,10 +108,10 @@ const handleCreateTask = async () => {
             project_id: projects,
             parent_task_id: taskId
         };
-        if(dueDate.value){
-            const postSubDate = new Date(dueDate.value)
+        if(sendDate){
+            const postSubDate = new Date(sendDate)
             postSubDate.setDate(postSubDate.getDate() - 1);
-            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '') : null;
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
         }
         
         await createTask(createTaskData);

@@ -94,8 +94,8 @@ const handleUpdateTask = async () => {
             project_id: projects
         };
         
-        if(dueDate.value){
-            const postSubDate = new Date(dueDate.value)
+        if(sendEditDate){
+            const postSubDate = new Date(sendEditDate)
             postSubDate.setDate(postSubDate.getDate() - 1);
             dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
         }
