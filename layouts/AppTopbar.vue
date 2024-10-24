@@ -100,7 +100,8 @@ const handleOutsideClick = () => {
 
 const closeNotification = (evn) => {
     showNotify.value = evn;
-    fetchNotifyData();
+    // fetchNotifyData();
+    // notifiData.value = false;
 
 };
 
@@ -160,7 +161,7 @@ const notifiData = ref(false);
 const fetchNotifyData = async () => {
     const token = useCookie('token');
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=10&page=1`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/list?limit=5&page=1`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -183,6 +184,13 @@ const fetchNotifyData = async () => {
 };
 
 fetchNotifyData();
+
+const handleNotificationComp = () => {
+    showNotify.value = !showNotify.value;
+    if(notifiData.value) {
+        notifiData.value = false;
+    }
+};
 const showTimer = ref(false);
 
 const timerTaskId = ref();
@@ -290,6 +298,7 @@ const timeTrack = ref('00:00:00');
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
                 </div>
+                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn">
                 <button @click="() => {
                     showNotify = !showNotify;
                 }

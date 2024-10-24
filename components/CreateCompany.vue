@@ -176,7 +176,7 @@ const handleCreateWorkspace = async () => {
             <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" placeholder="Select Type" class="w-full" />
         </div>
         <div class="field">
-            <pre>{{showValidEmail}}</pre>
+            <!-- <pre>{{showValidEmail}}</pre> -->
             <label for="email">Email Address<i class="text-red-400 text-italic">*</i> <span  v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Email" v-model="invite" @Input="handleEmail" />
             <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>

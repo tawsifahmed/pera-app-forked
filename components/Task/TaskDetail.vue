@@ -195,8 +195,8 @@ const handleTaskDetailSubmit = async () => {
     };
 
 
-    if (dueDate.value) {
-        const postSubDate = new Date(dueDate.value);
+    if (sendEditDate) {
+        const postSubDate = new Date(sendEditDate);
         postSubDate.setDate(postSubDate.getDate() - 1);
         dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
     }
@@ -245,7 +245,7 @@ const checkAttachmentType = (file) => {
     const imageExtensions = ['jpg', 'JPG', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif', 'heic', 'heif'];
     const videoExtensions = ['mp4', 'avi', 'flv', 'wmv', 'mov', '3gp', 'mkv'];
     const pdfExtensions = ['pdf', 'PDF', 'ppt', 'pptx'];
-    const wordExtensions = ['doc', 'docx'];
+    const wordExtensions = ['doc', 'docx', 'rtf'];
     const excelExtensions = ['xls', 'xlsx', 'csv'];
 
     if (imageExtensions.some((ext) => file.endsWith('.' + ext))) {
@@ -261,16 +261,6 @@ const checkAttachmentType = (file) => {
     } else {
         return 'file';
     }
-};
-
-const commentAttachment = ref(false);
-
-const handleCommentAttachment = () => {
-    commentAttachment.value = true;
-};
-
-const closeCommentAttachment = () => {
-    commentAttachment.value = false;
 };
 
 onMounted(async () => {
@@ -426,8 +416,6 @@ const handleShare = async () => {
         toast.add({ severity: 'success', summary: 'Share successful', detail: 'Shared link copied', group: 'br', life: 3000 });
         return;
     }
-    console.log(data.value.shared_token);
-    console.log('error', error.value);
 };
 
 const handleShareTaskId = () => {
@@ -462,7 +450,7 @@ const handleShareTaskId = () => {
             </h5>
             <div class="flex gap-1">
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
-                <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span>
+                <!-- <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span> -->
                 <h5 class="m-0 ml-2">Activity</h5>
                 <!-- <pre>isTagsEdited {{isTagsEdited}}</pre> -->
             </div>
@@ -648,7 +636,7 @@ const handleShareTaskId = () => {
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
                                             :href="item?.file"
                                         >
-                                            <div class="pi pi-file-excel text-6xl text-primary attach-icon"></div>
+                                            <div class="pi pi-file-excel text-6xl attach-icon" style="color: #04aa6d;"></div>
                                             <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
@@ -749,7 +737,7 @@ const handleShareTaskId = () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p class="m-0 ml-1">
+                                <p class="m-0 ml-1" style="font-size: 0.9rem;">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>
@@ -1167,6 +1155,7 @@ a {
 .sub-create .pi-plus {
     font-size: 12px !important;
 }
+
 .no-scrollbar::-webkit-scrollbar {
     display: none !important;
 }

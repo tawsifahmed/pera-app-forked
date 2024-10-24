@@ -27,7 +27,7 @@ const sectionCreateLoading = ref(false);
 const subSectionCreateLoading = ref(false);
 const sectionEditLoading = ref(false);
 const subSectionEditLoading = ref(false);
-
+const loading = ref(false);
 const init = async () => {
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section`, {
@@ -60,14 +60,17 @@ const sectionStatuses = ref([
     { name: 'Active', label: 1 },
     { name: 'Inactive', label: 0 }
 ]);
-
+const markType = ref([
+    { name: 'Percentage (%)', label: 1 },
+    { name: 'Number (01)', label: 0 }
+]);
 const handleSectionCreation = async () => {
     sectionCreateLoading.value = true;
     console.log(Object.keys(sectionCreate.value));
     const formData = new FormData();
     formData.append('name', sectionCreate.value.name);
     formData.append('status', sectionCreate.value.status?.label); // optional chaining to avoid undefined errors
-
+    formData.append('section_weightage', sectionCreate.value.section_weightage);
     // Check if name or status is empty or undefined
     if (!sectionCreate.value.name || !sectionCreate.value.status) {
         sectionCreateLoading.value = false;
@@ -75,7 +78,7 @@ const handleSectionCreation = async () => {
     }
 
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-create`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-create`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -83,7 +86,7 @@ const handleSectionCreation = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         init();
         sectionModal.value = false;
         sectionCreate.value = {};
@@ -102,6 +105,8 @@ const handleSubSectionCreation = async () => {
     formData.append('section_id', subSectionCreate.value.section?.id);
     formData.append('title', subSectionCreate.value.name);
     formData.append('target_mark', subSectionCreate.value.targetMark);
+    formData.append('mark_type', subSectionCreate.value.mark_type.label);
+    formData.append('weightage', subSectionCreate.value.weightage);
     formData.append('comment', subSectionCreate.value.comment || '');
     formData.append('status', subSectionCreate.value.status?.label); // optional chaining to avoid undefined errors
 
@@ -120,7 +125,7 @@ const handleSubSectionCreation = async () => {
         body: formData
     });
 
-    if (data) {
+    if (data.value) {
         initSub();
         subModal.value = false;
         subSectionCreate.value = {};
@@ -145,8 +150,6 @@ const editSection = async (data) => {
 
 const structuredSectionList = ref();
 const editSubSection = async (data) => {
-    console.log('data', data);
-
     visibleEditSubModal.value = true;
     structuredSectionList.value = sectionList.value.map((item) => ({ name: item.name, id: item.id }));
     subSectionEdit.value = {
@@ -154,10 +157,11 @@ const editSubSection = async (data) => {
         section_id: structuredSectionList.value.find((item) => item.id === data.section_id),
         title: data.title,
         target_mark: data.target_mark,
+        mark_type: markType.value.find((item) => item.label === data.mark_type),
+        weightage: data.weightage,
         comment: data.comment,
         status: sectionStatuses.value.find((item) => item.label === data.status)
     };
-    console.log('Edit Data:', subSectionEdit.value);
 };
 
 const handleEditSection = async () => {
@@ -170,7 +174,7 @@ const handleEditSection = async () => {
     const formData = new FormData();
     formData.append('name', sectionEdit.value.name);
     formData.append('status', sectionEdit.value.status?.label); // optional chaining to avoid undefined errors
-
+    formData.append('section_weightage', sectionEdit.value.section_weightage);
     const token = useCookie('token');
     const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-update/${sectionEdit.value.id}`, {
         method: 'POST',
@@ -198,11 +202,13 @@ const handleEditSubSection = async () => {
         subSectionEditLoading.value = false;
         return toast.add({ severity: 'error', summary: 'Failed', detail: 'Please fill all required fields', group: 'br', life: 3000 });
     }
-
+    console.log(subSectionEdit);
     const formData = new FormData();
     formData.append('section_id', subSectionEdit.value.section_id?.id);
     formData.append('title', subSectionEdit.value.title);
+    formData.append('weightage', subSectionEdit.value.weightage);
     formData.append('target_mark', subSectionEdit.value.target_mark);
+    formData.append('mark_type', subSectionEdit.value.mark_type.label);
     formData.append('comment', subSectionEdit.value.comment);
     formData.append('status', subSectionEdit.value.status?.label); // optional chaining to avoid undefined errors
 
@@ -223,13 +229,13 @@ const handleEditSubSection = async () => {
         toast.add({ severity: 'success', summary: 'Updated', detail: 'Sub Section Updated Successfully', group: 'br', life: 3000 });
     } else {
         subSectionEditLoading.value = false;
-        toast.add({ severity: 'error', summary: error.value.data.app_message, detail: error.value.data.user_message, group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: error.value.data.app_message || 'Error', detail: error.value.data.user_message || 'Failed To Update', group: 'br', life: 3000 });
     }
 };
 
 const deleteSection = async (id) => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/section-delete/${id}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -240,13 +246,13 @@ const deleteSection = async (id) => {
         init();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Failed', detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
 const deleteSubSection = async (id) => {
     const token = useCookie('token');
-    const { data, pending } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-delete/${id}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/kpi/sub-section-delete/${id}`, {
         method: 'DELETE',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -257,7 +263,7 @@ const deleteSubSection = async (id) => {
         initSub();
         toast.add({ severity: 'success', summary: 'Deleted', detail: 'Sub Section Deleted Successfully', group: 'br', life: 3000 });
     } else {
-        toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to delete sub section!', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Failed', detail: error.value.data.user_message, group: 'br', life: 3000 });
     }
 };
 
@@ -278,12 +284,12 @@ onMounted(() => {
                         <Button v-if="createSection" @click="() => (sectionModal = true)" label="Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
-                        <DataTable v-model:filters="filters" class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+                        <DataTable class="table-stR" :value="sectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
                             <template #empty> <p class="text-center">No Data found...</p> </template>
                             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="name" header="Section Name"></Column>
-                            <Column style="text-wrap: nowrap" field="status" header="Status"></Column>
+                            <Column style="text-wrap: nowrap" field="section_weightage" header="Weightage"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
                                 <template #body="slotProps">
                                     <div style="display: flex; flex-wrap: wrap; gap: 5px">
@@ -320,6 +326,12 @@ onMounted(() => {
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="sectionCreate.section_weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Status:</label>
                                     <Dropdown v-model="sectionCreate.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
@@ -345,6 +357,12 @@ onMounted(() => {
                             </div>
                             <div class="col-12">
                                 <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="sectionEdit.section_weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Section Status:</label>
                                     <Dropdown v-model="sectionEdit.status" :options="sectionStatuses" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
@@ -366,12 +384,13 @@ onMounted(() => {
                         <Button v-if="createSubSection" @click="() => (subModal = true)" label="Sub Section" icon="pi pi-plus" class="" />
                     </div>
                     <div class="card">
-                        <DataTable v-model:filters="filters" class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+                        <DataTable class="table-stR" :value="subSectionList" paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
                             <template #empty> <p class="text-center">No Data found...</p> </template>
                             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
                             <Column field="index" header="Serial" sortable></Column>
                             <Column style="text-wrap: nowrap" field="title" header="Sub Section Name"></Column>
                             <Column style="text-wrap: nowrap" field="target_mark" header="Target Mark"></Column>
+                            <Column style="text-wrap: nowrap" field="weightage" header="Weightage"></Column>
                             <Column style="text-wrap: nowrap" field="section_name" header="Section"></Column>
                             <Column style="text-wrap: nowrap" field="comment" header="Comment"></Column>
                             <!-- <Column field="sub_section" header="Sub Sections">
@@ -409,6 +428,18 @@ onMounted(() => {
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
                                     <InputText type="text" v-model="subSectionCreate.name" placeholder="Title" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="subSectionCreate.weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
+                                    <Dropdown v-model="subSectionCreate.mark_type" :options="markType" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -452,6 +483,18 @@ onMounted(() => {
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Sub Section Title:</label>
                                     <InputText type="text" v-model="subSectionEdit.title" placeholder="Title" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
+                                    <InputText type="text" v-model="subSectionEdit.weightage" placeholder="Weightage" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Mark Type:</label>
+                                    <Dropdown v-model="subSectionEdit.mark_type" :options="markType" optionLabel="name" placeholder="Select Status" checkmark :highlightOnSelect="false" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">

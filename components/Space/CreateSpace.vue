@@ -1,11 +1,13 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useToast } from 'primevue/usetoast';
+import { onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 import { useWorkSpaceStore } from '~/store/workSpace';
 const toast = useToast();
 const companies = useActiveCompanyStore();
+const usersListStore = useCompanyStore();
 companies.getCompany();
 const { company_id } = storeToRefs(useActiveCompanyStore());
 const { companyId } = storeToRefs(useCompanyStore());
@@ -15,11 +17,21 @@ const { spacePage } = defineProps(['spacePage']);
 
 const spaceFormInputs = ref(false);
 const spaceNameError = ref(false);
+const userError = ref(false);
 const spaceDescriptionError = ref(false);
 const spaceNameInput = ref(null);
 const spaceDescripInput = ref('');
 const spaceAvatarPreview = ref('#8080805c');
 const spaceColorPreview = ref(null);
+const usersLists = ref([]);
+
+
+onMounted(async() => {
+    await usersListStore.getTaskAssignModalData();
+    usersLists.value = usersListStore.users; 
+});
+
+const selectedMembers = ref([]);
 
 const changeColor = (color) => {
     spaceAvatarPreview.value = color;
@@ -27,9 +39,16 @@ const changeColor = (color) => {
 
 const loading = ref(false);
 const handleCreateSpace = async () => {
+    spaceNameError.value = false;
+    userError.value = false;
     loading.value = true;
-    if (spaceNameInput.value === null) {
+    if (spaceNameInput.value === null || spaceNameInput.value === '') {
         spaceNameError.value = true;
+        loading.value = false;
+        return;
+    }
+    if (selectedMembers.value.length === 0) {
+        userError.value = true;
         loading.value = false;
         return;
     }
@@ -43,9 +62,10 @@ const handleCreateSpace = async () => {
             name: spaceNameInput.value,
             description: spaceDescripInput.value,
             company_id: company_id,
-            color: spaceAvatarPreview.value
+            color: spaceAvatarPreview.value,
+            users: selectedMembers.value.map((item) => item.id)
         };
-        // return
+        
         await space.createSpace(createSpaceData);
 
         if (save.value == true) {
@@ -54,6 +74,7 @@ const handleCreateSpace = async () => {
             spaceDescripInput.value = null;
             spaceAvatarPreview.value = '#8080805c';
             spaceColorPreview.value = null;
+            selectedMembers.value = [];
             loading.value = false;
             toast.add({ severity: 'success', summary: 'Space creation', detail: 'Space created successfully!', group: 'br', life: 3000 });
         } else {
@@ -69,13 +90,36 @@ const showDialog = () => {
 };
 const hideDialog = () => {
     spaceFormInputs.value = false;
+    if(spaceNameInput.value){
+        spaceNameInput.value = null;
+    }
+    if(spaceDescripInput.value){
+        spaceDescripInput.value = null;
+    }
+    if(selectedMembers.value){
+        selectedMembers.value = [];
+    }
+    spaceAvatarPreview.value = '#8080805c';
 };
+
+const handleClose = () => {
+    if(spaceNameInput.value){
+        spaceNameInput.value = null;
+    }
+    if(spaceDescripInput.value){
+        spaceDescripInput.value = null;
+    }
+    if(selectedMembers.value){
+        selectedMembers.value = [];
+    }
+    spaceAvatarPreview.value = '#8080805c';
+}
 </script>
 
 <template>
     <div>
         <Button :icon="spacePage ? '' : 'pi pi-plus'" :class="spacePage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'" :label="spacePage ? 'Create +' : ''" @click="showDialog" :severity="spacePage ? 'primary' : 'secondary'" aria-label="Bookmark" :text="!spacePage" />
-        <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid"  @update:visible="handleClose">
             <div class="field">
                 <!-- <pre>{{spacePage}}</pre> -->
                 <label for="name">Space Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
@@ -108,6 +152,10 @@ const hideDialog = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="field">
+                <label>Space Members<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <MultiSelect display="chip" v-model="selectedMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Space Members" class="w-full" :invalid="userError"/>
             </div>
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
@@ -167,15 +215,19 @@ const hideDialog = () => {
 #lightseagreen {
     background-color: #009688;
 }
+
 #brown {
     background-color: #795548;
 }
+
 #cyan {
     background-color: #00bcd4;
 }
+
 #amber {
     background-color: #ffc107;
 }
+
 #indigo {
     background-color: #3f51b5;
 }
@@ -186,9 +238,6 @@ const hideDialog = () => {
 
 .prog-bar {
     top: 24px;
-}
-
-.modal-container {
 }
 
 .company-name {

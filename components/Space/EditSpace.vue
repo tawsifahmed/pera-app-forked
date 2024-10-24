@@ -1,15 +1,16 @@
-
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 const { editSpace } = useCompanyStore(); // use authenticateUser action from  auth store
-const { isSpaceEdited } = storeToRefs(useCompanyStore()); 
+const { isSpaceEdited } = storeToRefs(useCompanyStore());
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
-
-const {refSpaceId, singleCompany} = defineProps(['refSpaceId', 'singleCompany']);
+const usersListStore = useCompanyStore();
+const { refSpaceId, singleCompany } = defineProps(['refSpaceId', 'singleCompany']);
 const spaceFormInputs = ref(true);
 const errorHandler = ref(false);
+const spaceNameError = ref(false);
+const userError = ref(false);
 const toast = useToast();
 
 
@@ -18,13 +19,21 @@ const spaceAvatarPreview = ref(refSpaceId?.color);
 const spaceNameInput = ref(refSpaceId?.name);
 
 const spaceDescripInput = ref(refSpaceId?.description);
+const usersLists = ref([]);
+
+const editMembers = ref(refSpaceId?.users.map((item) => ({ id: item.id, name: item.name })))
+
+onMounted(async () => {
+  await usersListStore.getTaskAssignModalData();
+  usersLists.value = usersListStore.users;
+});
 
 const spaceColorPreview = ref(null);
 
 console.log('spaceAvatarPreview', spaceAvatarPreview.value)
 
 const changeColor = (color) => {
-    spaceAvatarPreview.value = color;
+  spaceAvatarPreview.value = color;
 };
 
 const emit = defineEmits(['closeEditSpace']);
@@ -32,115 +41,132 @@ const emit = defineEmits(['closeEditSpace']);
 const loading = ref(false);
 
 const handleEditSpace = async () => {
-        loading.value = true
-        if(spaceNameInput.value === null || spaceAvatarPreview.value === null){
-            errorHandler.value = true
-            loading.value = false
-            return
-        }else{
-            const editSpaceData = {
-              'id': refSpaceId.id,
-              'name': spaceNameInput.value,
-              'description': spaceDescripInput.value,
-              'company_id': singleCompany.id,
-              'color': spaceAvatarPreview.value,
-              // 'shared_status': selectedShareSpace.value,
-              // 'task_statuses': taskStatusList.value,
-              // 'features': selectedFeatures.value,
-              // 'views': checkedViews,
-          }
-    
-          await editSpace(editSpaceData);
-          if(isSpaceEdited.value === true){
-              spaceFormInputs.value = false
-              loading.value = false
-              emit('closeEditSpace', false);
-              toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Updated Successfully', group: 'br', life: 3000 });   
-
-              console.log('space created')
-          }else{
-              loading.value = false
-              toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update space', group: 'br', life: 3000 });
-              console.log('space not created')
-              
-          }
-        }
+  spaceNameError.value = false;
+  userError.value = false;
+  loading.value = true
+  if (spaceNameInput.value === null || spaceNameInput.value === '') {
+    spaceNameError.value = true;
+    loading.value = false;
+    return;
+  }
+  if (editMembers.value.length === 0) {
+    userError.value = true;
+    loading.value = false;
+    return;
+  }
+  else {
+    const editSpaceData = {
+      'id': refSpaceId.id,
+      'name': spaceNameInput.value,
+      'description': spaceDescripInput.value,
+      'company_id': singleCompany.id,
+      'color': spaceAvatarPreview.value,
+      'users': editMembers.value.map((item) => item.id)
+      // 'shared_status': selectedShareSpace.value,
+      // 'task_statuses': taskStatusList.value,
+      // 'features': selectedFeatures.value,
+      // 'views': checkedViews,
     }
 
-  const hideDialog = () => {
+    await editSpace(editSpaceData);
+    if (isSpaceEdited.value === true) {
+      spaceFormInputs.value = false
+      loading.value = false
+      emit('closeEditSpace', false);
+      toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Updated Successfully', group: 'br', life: 3000 });
+
+      console.log('space created')
+    } else {
+      loading.value = false
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update space', group: 'br', life: 3000 });
+      console.log('space not created')
+
+    }
+  }
+}
+
+const hideDialog = () => {
   emit('closeEditSpace', false);
 }
 
 </script>
 
 <template>
-    <div class="">
-      <div v-if="spaceFormInputs">  
-        <!-- <pre>{{refSpaceId}}</pre> -->
-              <!-- <div class="company-name flex justify-center text-center mb-5">
+  <div class="">
+    <div v-if="spaceFormInputs">
+      <!-- <pre>{{refSpaceId?.users.map((item) => ({ id: item.id, name: item.name }))}}</pre> -->
+      <!-- <div class="company-name flex justify-center text-center mb-5">
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div> -->
-          <div class="field flex flex-column">
-              <label for="name">Space Name<i class="text-red-400 text-italic">*</i> </label>
-              <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
-          </div>
-          <div class="field flex flex-column">
-              <label for="name">Space Description</label>
-              <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
-          </div>
-          
-          <div class="field">
-            <label for="name">Space Color<i class="text-red-400 text-italic">*</i> </label>
-            <div class="m-0 d-flex colorpicker-wrapper">
-                <div class="flex justify-center align-items-center">
-                    <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S'}}</div>
-                    <div class="ml-2">
-                        <div class="flex">
-                            <div id="white" class="color" @click="changeColor('#e5ded4')"></div>
-                            <div id="gray" class="color" @click="changeColor('#9e9e9e')"></div>
-                            <div id="orange" class="color" @click="changeColor('#ff9800')"></div>
-                            <div id="purple" class="color" @click="changeColor('#9c27b0')"></div>
-                            <div id="cadetblue" class="color" @click="changeColor('#e91e63')"></div>
-                            <div id="burlywood" class="color" @click="changeColor('#4caf50')"></div>
-                            <div id="pink" class="color" @click="changeColor('#f44336')"></div>
-                            <div id="lightseagreen" class="color" @click="changeColor('#009688')"></div>
-                            <div id="brown" class="color" @click="changeColor('#795548')"></div>
-                            <div id="cyan" class="color" @click="changeColor('#00bcd4')"></div>
-                            <div id="amber" class="color" @click="changeColor('#ffc107')"></div>
-                            <div id="indigo" class="color" @click="changeColor('#3f51b5')"></div>
-                        </div>
-                    </div>
-                </div>
+      <div class="field flex flex-column">
+        <label for="name">Space Name<i class="text-red-400 text-italic">*</i> </label>
+        <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
+      </div>
+      <div class="field flex flex-column">
+        <label for="name">Space Description</label>
+        <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20"
+          :invalid="spaceDescriptionError" />
+      </div>
+
+      <div class="field">
+        <label for="name">Space Color<i class="text-red-400 text-italic">*</i> </label>
+        <div class="m-0 d-flex colorpicker-wrapper">
+          <div class="flex justify-center align-items-center">
+            <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`"
+              class="d-flex align-items-center justify-content-center text-3xl text-white">{{ spaceNameInput ?
+                spaceNameInput.charAt(0).toUpperCase() : 'S'}}</div>
+            <div class="ml-2">
+              <div class="flex">
+                <div id="white" class="color" @click="changeColor('#e5ded4')"></div>
+                <div id="gray" class="color" @click="changeColor('#9e9e9e')"></div>
+                <div id="orange" class="color" @click="changeColor('#ff9800')"></div>
+                <div id="purple" class="color" @click="changeColor('#9c27b0')"></div>
+                <div id="cadetblue" class="color" @click="changeColor('#e91e63')"></div>
+                <div id="burlywood" class="color" @click="changeColor('#4caf50')"></div>
+                <div id="pink" class="color" @click="changeColor('#f44336')"></div>
+                <div id="lightseagreen" class="color" @click="changeColor('#009688')"></div>
+                <div id="brown" class="color" @click="changeColor('#795548')"></div>
+                <div id="cyan" class="color" @click="changeColor('#00bcd4')"></div>
+                <div id="amber" class="color" @click="changeColor('#ffc107')"></div>
+                <div id="indigo" class="color" @click="changeColor('#3f51b5')"></div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+      <div class="field">
+        <!-- <pre>{{usersLists}}</pre> -->
+        <label>Space Members<i class="text-red-400 text-italic">*</i> </label>
+        <MultiSelect display="chip" v-model="editMembers" :options="usersLists" filter optionLabel="name"
+          placeholder="Select Space Members" class="w-full" :invalid="userError" />
+      </div>
 
-          <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
+      <p v-if="errorHandler" style="color: red;"> Please fill/check up all the fields</p>
 
-          <!-- <div class="create-btn-wrapper">
+      <!-- <div class="create-btn-wrapper">
             <Button @click="handleEditSpace" class="text-white py-2 px-6 tracking-wide" label="Update Space" :loading="loading"/>
           </div> -->
-      </div>
-      <br>
-      <div class="flex justify-content-end mt-2">
-        <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
-        <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleEditSpace" />
-      </div>
-
-     
-
     </div>
+    <br>
+    <div class="flex justify-content-end mt-2">
+      <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
+      <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleEditSpace" />
+    </div>
+
+
+
+  </div>
 </template>
 
 <style scoped>
-
-#dynamic-div{
+#dynamic-div {
   height: 55px;
   width: 55px;
   border-radius: 10px;
   display: flex;
 }
 
-.color{
+.color {
   margin-left: 6px;
   height: 24px;
   width: 23px;
@@ -180,46 +206,47 @@ const handleEditSpace = async () => {
 #lightseagreen {
   background-color: #009688;
 }
+
 #brown {
   background-color: #795548;
 }
+
 #cyan {
   background-color: #00bcd4;
 }
+
 #amber {
   background-color: #ffc107;
 }
+
 #indigo {
   background-color: #3f51b5;
 }
 
 
-.tskk{
-    color: transparent
+.tskk {
+  color: transparent
 }
 
 .prog-bar {
   top: 24px;
 }
 
-.modal-container{
-  
-}
+.modal-container {}
 
-.company-name{
+.company-name {
   border-radius: 5px;
   display: flex;
   justify-content: center;
 }
 
 
-.colorpicker-wrapper{
+.colorpicker-wrapper {
   display: flex;
 }
 
-.create-btn-wrapper{
+.create-btn-wrapper {
   display: flex;
   justify-content: center;
 }
-  
 </style>
