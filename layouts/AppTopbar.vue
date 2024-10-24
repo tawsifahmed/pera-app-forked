@@ -299,14 +299,11 @@ const timeTrack = ref('00:00:00');
                     <span class="ping-inner"></span>
                 </div>
                 <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn">
-                <button @click="() => {
-                    showNotify = !showNotify;
-                }
-                    " class="p-link layout-topbar-button notify-btn">
 
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
+
                 <div v-if="showNotify" class="notification">
                     <Notification @closeNotification="closeNotification($event)" />
                 </div>
