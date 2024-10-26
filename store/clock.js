@@ -51,14 +51,13 @@ export const useClockStore = defineStore('clock', () => {
         console.log('timerData11', timerData)
     }
 
-    async function storeTaskTimer({task_id, project_id, space_id, company_id}) {
+    async function storeTaskTimer({task_id, project_id, space_id, company_id, timerStartTime}) {
         if(task_id === null || project_id === null || space_id === null || company_id === null) {
             timerData.value = null
             await getStoreTimer();
             isTImerStopped.value = true
             return
         }else{
-
             console.log('task_id', task_id)
             console.log('project_id', project_id)
             console.log('space_id', space_id)
@@ -67,7 +66,8 @@ export const useClockStore = defineStore('clock', () => {
                 task_id: task_id,
                 project_id: project_id,
                 space_id: space_id,
-                company_id: company_id
+                company_id: company_id,
+                timerStartTime: timerStartTime
             }
             isTImerStopped.value = false
             console.log('timerDataPinia', timerData)

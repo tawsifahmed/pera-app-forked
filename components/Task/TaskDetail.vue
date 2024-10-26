@@ -69,11 +69,13 @@ const handleClickClock = async () => {
         localStorage.setItem('storeTaskProjectID', JSON.stringify(Number(projID)));
         localStorage.setItem('storeTaskSpaceID', JSON.stringify(taskDetails.value?.project.space_id));
         localStorage.setItem('storeTaskCompanyID', JSON.stringify(taskDetails.value?.project.company_id));
+        localStorage.setItem('storeTaskTimerStartTime', JSON.stringify(taskDetails.value.taskTimer.start_time));
         let storeTimerObj = {
             task_id: taskDetails.value.id,
             project_id: projID,
             space_id: taskDetails.value.project.space_id,
-            company_id: taskDetails.value.project.company_id
+            company_id: taskDetails.value.project.company_id,
+            timerStartTime: taskDetails.value.taskTimer.start_time
         }
         await storeTaskTimer(storeTimerObj)
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
@@ -86,6 +88,7 @@ const handleClickClock = async () => {
         localStorage.removeItem('storeTaskProjectID');
         localStorage.removeItem('storeTaskSpaceID');
         localStorage.removeItem('storeTaskCompanyID');
+        localStorage.removeItem('storeTaskTimerStartTime');
 
         let storeTimerObj = {
             task_id: null,
@@ -101,6 +104,7 @@ const handleClickClock = async () => {
 
 const startTimer = () => {
     const taskId = taskDetails.value.id;
+    console.log('taskDetails.value.taskTimer.start_time', taskDetails.value.taskTimer.start_time);
     const startTime = new Date(taskDetails.value.taskTimer.start_time).getTime();
 
     interval = setInterval(() => {

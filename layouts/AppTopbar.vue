@@ -202,6 +202,21 @@ const storedTaskID = localStorage.getItem('storeTaskID');
 console.log('timerTaskId', timerTaskId.value);
 const fetchedTimerData = ref();
 
+const timerStartTime = ref();
+// const storeTaskTimerStartTime = localStorage.getItem('storeTaskTimerStartTime');
+// if(storeTaskTimerStartTime) {
+//     timerStartTime.value = storeTaskTimerStartTime || new Date().toISOString();
+// }
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const storeTaskTimerStartTime = localStorage.getItem('storeTaskTimerStartTime');
+
+//     if (storeTaskTimerStartTime) {
+//         timerStartTime.value = storeTaskTimerStartTime;
+//     } 
+// });
+
+
 const fetchActiveTimer = async () => {
     const token = useCookie('token');
     try {
@@ -218,6 +233,7 @@ const fetchActiveTimer = async () => {
             fetchedTimerData.value = data.value.data.is_timer_start;
             if(data.value.data.is_timer_start === "true"){
                 timerTaskId.value = data.value.data.task_id;
+                timerStartTime.value = data.value.data.start_time;
             }
             console.log('fetchedTimerData', data.value.data);
             console.log('timerTaskId', timerTaskId.value);
@@ -252,7 +268,42 @@ watch(timerData, (oldValue, newValue) => {
 
 
 
+let interv = null;
 
+const timeTracker = ref("00:00:00");
+
+function startTimer(timerStartTime) {
+    // Convert the timerStartTime string to a Date object
+    const startTime = new Date(timerStartTime);
+
+    // Function to update the timer every second
+    function updateTimer() {
+        const currentTime = new Date();
+        const elapsedTime = currentTime - startTime; // Difference in milliseconds
+
+        // Calculate hours, minutes, and seconds from elapsed time
+        const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+        const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+
+        // Format the time as HH:MM:SS
+        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        // Return the formatted time
+        return formattedTime;
+    }
+
+    // Update the timer value every second
+    setInterval(() => {
+        const timerElement = document.querySelector('.text-sm');
+        if (timerElement) {
+            timerElement.textContent = updateTimer();
+        }
+    }, 1000);
+
+    // Initialize with the current time value
+    return updateTimer();
+}
 // watch(isTImerStopped, (oldValue, newValue) => {
 //     if (newValue === true) {
 //         timerTaskId.value = null;
@@ -267,6 +318,7 @@ getStoreTimer();
 watchEffect(async () => {
     if (isTImerStopped.value === true) {
         timerTaskId.value = null;
+        startTimer = () => {};
         console.log('timerTaskIdFOLO', timerTaskId.value);
     }
     if (timerData.value || timerTaskId.value) {
@@ -277,13 +329,19 @@ watchEffect(async () => {
 
 });
 
+// watch(timerData?.task_id, (oldValue, newValue) => {
+//     console.log('timerData.task_id', newValue);
+//     if (newValue !== oldValue) {
+//         startTimer = () => "00:00:00";
+//     }
+// });
+
 
 // Watch for changes in timerTaskId or localStorage changes
 
 // Detect localStorage changes and update timerTaskId
 
 
-const timeTrack = ref('00:00:00');
 
 </script>
 
@@ -321,6 +379,7 @@ const timeTrack = ref('00:00:00');
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
+             <pre>{{typeof timerStartTime}}</pre>
             <br>
             
 
@@ -330,8 +389,10 @@ const timeTrack = ref('00:00:00');
                     <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
                         <i :class="`pi-stop stop`"></i>
                     </div>
-                    <div class="text-sm absolute">
-                        {{ timeTrack }}
+                    <div class="text-sm absolute text-black">
+                        {{ timerData?.timerStartTime 
+                            ? startTimer(timerData?.timerStartTime) 
+                            : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
                     </div>
                 </div>
             </NuxtLink>
