@@ -10,7 +10,7 @@ const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData } = useClockStore();
+const { getTaskTimerData, storeTaskTimer } = useClockStore();
 const { trackedTime } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
@@ -46,6 +46,30 @@ watch(tags, (newValue) => {
 
 const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
 
+const userHasModifiedTime = ref(false);
+
+// const dateVal = ref(taskDetails.value?.due_date ? 1 : 0);
+
+const handleDateChange = (newDate) => {
+        console.log('test druve')
+        if (!userHasModifiedTime.value) {
+            const selectedDate = new Date(newDate);
+            selectedDate.setHours(23, 59, 0, 0);  
+            dueDate.value = selectedDate;  
+        }else {
+            dueDate.value = newDate;  
+        }
+};
+
+
+watch(dueDate, (newVal, oldVal) => {
+    if (newVal && oldVal && newVal !== oldVal) {
+        userHasModifiedTime.value = true;
+    }
+});
+
+
+
 const checkDate = ref(dueDate.value);
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
@@ -60,17 +84,43 @@ let interval = null;
 
 const handleClickClock = async () => {
     const taskId = taskDetails.value.id;
-
+    console.log('taskDetails', taskDetails.value);
     if (taskDetails.value?.is_timer_start === 'false') {
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
         await getTaskDetails(taskDetails.value?.id);
         startTimer();
+        localStorage.setItem('storeTaskID', JSON.stringify(taskDetails.value?.id));
+        localStorage.setItem('storeTaskProjectID', JSON.stringify(Number(projID)));
+        localStorage.setItem('storeTaskSpaceID', JSON.stringify(taskDetails.value?.project.space_id));
+        localStorage.setItem('storeTaskCompanyID', JSON.stringify(taskDetails.value?.project.company_id));
+        localStorage.setItem('storeTaskTimerStartTime', JSON.stringify(taskDetails.value.taskTimer.start_time));
+        let storeTimerObj = {
+            task_id: taskDetails.value.id,
+            project_id: projID,
+            space_id: taskDetails.value.project.space_id,
+            company_id: taskDetails.value.project.company_id,
+            timerStartTime: taskDetails.value.taskTimer.start_time
+        }
+        await storeTaskTimer(storeTimerObj)
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Started', group: 'br', life: 3000 });
         await getSingleProject(projID);
     } else {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(taskDetails.value?.id);
         stopTimer();
+        localStorage.removeItem('storeTaskID');
+        localStorage.removeItem('storeTaskProjectID');
+        localStorage.removeItem('storeTaskSpaceID');
+        localStorage.removeItem('storeTaskCompanyID');
+        localStorage.removeItem('storeTaskTimerStartTime');
+
+        let storeTimerObj = {
+            task_id: null,
+            project_id: null,
+            space_id: null,
+            company_id: null
+        }
+        await storeTaskTimer(storeTimerObj);
         toast.add({ severity: 'success', summary: 'Task Timer', detail: 'Timer Stopped', group: 'br', life: 3000 });
         await getSingleProject(projID);
     }
@@ -78,6 +128,7 @@ const handleClickClock = async () => {
 
 const startTimer = () => {
     const taskId = taskDetails.value.id;
+    console.log('taskDetails.value.taskTimer.start_time', taskDetails.value.taskTimer.start_time);
     const startTime = new Date(taskDetails.value.taskTimer.start_time).getTime();
 
     interval = setInterval(() => {
@@ -157,7 +208,7 @@ const handleTaskDetailSubmit = async () => {
     }
 
     console.log('checkDate', checkDate.value);
-    const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+    const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
     console.log('formattedDueDate', formattedDueDate);
     const taskDetailData = {
         id: taskDetails.value?.id,
@@ -213,6 +264,9 @@ const uploadFile = async () => {
     if (isFileUpload.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', group: 'br', life: 3000 });
         getTaskDetails(taskDetails.value?.id);
+        document.getElementById('attachInput').value = null;
+        file.value = null;
+
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', group: 'br', life: 3000 });
     }
@@ -459,7 +513,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12"/>
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -625,8 +679,8 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                                 <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
-                                    <input @change="onFileChange" class="float-right file-up-btn" type="file" placeholder="+" />
-                                    <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
+                                    <input @change="onFileChange" id="attachInput" class="float-right file-up-btn" type="file" placeholder="+" />
+                                    <Button type="button" :loading="isLoading" @click="uploadFile" label="Uploads" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
