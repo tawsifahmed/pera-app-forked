@@ -222,7 +222,7 @@ loading.value = false;
                         </div>
                         <div class="field md:w-28rem mb-4">
                             <label for="password2" class="block text-900 font-medium text-xl mb-2">Confirm Password</label>
-                            <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"> </Password>
+                            <Password id="password2" v-model="createUser.confirmPass" placeholder="Confirm Password":feedback="false"  :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"> </Password>
                             <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassError"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password required! </small>
                             <small id="password-help" class="error-report red-text" v-if="errorData.confirmPassMismatch"> <InputIcon class="pi pi-exclamation-triangle"></InputIcon> Confirm Password did not match! </small>
                         </div>
