@@ -20,7 +20,7 @@
             <div class="field">
                 <!-- <pre>date{{dueDate}}</pre> -->
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hourFormat="12"/>
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
             </div>
             <div class="field">
                 <label>Priority</label>
@@ -50,6 +50,7 @@ const taskEditDescriptionInput = ref(null);
 
 const taskNameEditInput = ref(singleTask?.data?.name);
 const dueDate = ref(singleTask?.data?.dueDate ? new Date(singleTask.data.dueDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
+const userHasModifiedTime = ref(false);
 
 const assignees = ref(null);
 assignees.value = singleTask?.data?.assigneeObj ? singleTask?.data?.assigneeObj.map((obj) => ({ id: obj.id, name: obj.name  })) : '';
@@ -69,6 +70,23 @@ const priorities = ref([
 const EditErrorHandler = ref(false);
 
 const emit = defineEmits(['closeEditModal']);
+
+const handleDateChange = (newDate) => {
+    console.log('test druve')
+    if (!userHasModifiedTime.value) {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);  
+        dueDate.value = selectedDate;  
+    }else {
+        dueDate.value = newDate;  
+    }
+};
+
+watch(dueDate, (newVal, oldVal) => {
+    if (newVal && oldVal && newVal !== oldVal) {
+        userHasModifiedTime.value = true;
+    }
+});
 
 const handleUpdateTask = async () => {
     btnLoading.value = true;

@@ -46,6 +46,30 @@ watch(tags, (newValue) => {
 
 const dueDate = ref(taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
 
+const userHasModifiedTime = ref(false);
+
+// const dateVal = ref(taskDetails.value?.due_date ? 1 : 0);
+
+const handleDateChange = (newDate) => {
+        console.log('test druve')
+        if (!userHasModifiedTime.value) {
+            const selectedDate = new Date(newDate);
+            selectedDate.setHours(23, 59, 0, 0);  
+            dueDate.value = selectedDate;  
+        }else {
+            dueDate.value = newDate;  
+        }
+};
+
+
+watch(dueDate, (newVal, oldVal) => {
+    if (newVal && oldVal && newVal !== oldVal) {
+        userHasModifiedTime.value = true;
+    }
+});
+
+
+
 const checkDate = ref(dueDate.value);
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
@@ -240,6 +264,9 @@ const uploadFile = async () => {
     if (isFileUpload.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'File Upload successfully!', group: 'br', life: 3000 });
         getTaskDetails(taskDetails.value?.id);
+        document.getElementById('attachInput').value = null;
+        file.value = null;
+
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upload file!', group: 'br', life: 3000 });
     }
@@ -486,7 +513,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12"/>
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -652,8 +679,8 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                                 <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
-                                    <input @change="onFileChange" class="float-right file-up-btn" type="file" placeholder="+" />
-                                    <Button type="button" :loading="isLoading" @click="uploadFile" label="Upload" />
+                                    <input @change="onFileChange" id="attachInput" class="float-right file-up-btn" type="file" placeholder="+" />
+                                    <Button type="button" :loading="isLoading" @click="uploadFile" label="Uploads" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
