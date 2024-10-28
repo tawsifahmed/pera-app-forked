@@ -119,7 +119,7 @@ const handleNavigate = async (type) => {
                 <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
                 <Button @click="handleNavigate('')" :disabled="totalPage === page || !notificationData.length > 0 ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
             </div>
-            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600"label="Read All" @click="handleReadAll" :loading="loadingRead"/>
+            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
     
