@@ -195,7 +195,14 @@ const handleNotificationComp = () => {
 };
 const showTimer = ref(false);
 
+const timerCompanyID = ref();
+const timerSpaceId = ref();
+const timerProjectId = ref();
 const timerTaskId = ref();
+
+const storeTaskCompanyID = localStorage.getItem('storeTaskCompanyID');
+const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
+const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
 const storedTaskID = localStorage.getItem('storeTaskID');
 
 
@@ -203,19 +210,6 @@ console.log('timerTaskId', timerTaskId.value);
 const fetchedTimerData = ref();
 
 const timerStartTime = ref();
-// const storeTaskTimerStartTime = localStorage.getItem('storeTaskTimerStartTime');
-// if(storeTaskTimerStartTime) {
-//     timerStartTime.value = storeTaskTimerStartTime || new Date().toISOString();
-// }
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const storeTaskTimerStartTime = localStorage.getItem('storeTaskTimerStartTime');
-
-//     if (storeTaskTimerStartTime) {
-//         timerStartTime.value = storeTaskTimerStartTime;
-//     } 
-// });
-
 
 const fetchActiveTimer = async () => {
     const token = useCookie('token');
@@ -232,6 +226,9 @@ const fetchActiveTimer = async () => {
             // return;
             fetchedTimerData.value = data.value.data.is_timer_start;
             if(data.value.data.is_timer_start === "true"){
+                timerCompanyID.value = data.value.data.company_id;
+                timerSpaceId.value = data.value.data.space_id;
+                timerProjectId.value = data.value.data.project_id;
                 timerTaskId.value = data.value.data.task_id;
                 timerStartTime.value = data.value.data.start_time;
             }
@@ -257,7 +254,17 @@ if (storedTaskID) {
     timerTaskId.value = storedTaskID;
 }
 
+if(storeTaskCompanyID) {
+    timerCompanyID.value = storeTaskCompanyID;
+}
 
+if(storeTaskSpaceID) {
+    timerSpaceId.value = storeTaskSpaceID;
+}
+
+if(storeTaskProjectID) {
+    timerProjectId.value = storeTaskProjectID;
+}
 
 watch(timerData, (oldValue, newValue) => {
     console.log('timerDataWW', newValue);
@@ -266,59 +273,48 @@ watch(timerData, (oldValue, newValue) => {
     }
 });
 
+let timerInterval = null;
 
-
-let interv = null;
-
-const timeTracker = ref("00:00:00");
-
-function startTimer(timerStartTime) {
-    // Convert the timerStartTime string to a Date object
-    const startTime = new Date(timerStartTime);
-
-    // Function to update the timer every second
-    function updateTimer() {
-        const currentTime = new Date();
-        const elapsedTime = currentTime - startTime; // Difference in milliseconds
-
-        // Calculate hours, minutes, and seconds from elapsed time
-        const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-        const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-
-        // Format the time as HH:MM:SS
-        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-        // Return the formatted time
-        return formattedTime;
-    }
-
-    // Update the timer value every second
-    setInterval(() => {
-        const timerElement = document.querySelector('.text-sm');
-        if (timerElement) {
-            timerElement.textContent = updateTimer();
+function startTimer(timerSTime) {
+    if (timerSTime === 'stop') {
+        console.log('timerSTime', timerSTime);
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
         }
-    }, 1000);
+        return;
+    } else {
 
-    // Initialize with the current time value
-    return updateTimer();
+        const startTime = new Date(timerSTime);
+
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsedTime = currentTime - startTime; 
+            const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+            const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+            const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            return formattedTime;
+        }
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+        }
+        timerInterval = setInterval(() => {
+            const timerElement = document.querySelector('.text-sm');
+            if (timerElement) {
+                timerElement.textContent = updateTimer();
+            }
+        }, 1000);
+        return updateTimer();
+    }
 }
-// watch(isTImerStopped, (oldValue, newValue) => {
-//     if (newValue === true) {
-//         timerTaskId.value = null;
-//     }
-// });
-const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
-const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
-const storeTaskCompanyID = localStorage.getItem('storeTaskCompanyID');
-
 
 getStoreTimer();
 watchEffect(async () => {
     if (isTImerStopped.value === true) {
         timerTaskId.value = null;
-        startTimer = () => {};
+        startTimer('stop')
         console.log('timerTaskIdFOLO', timerTaskId.value);
     }
     if (timerData.value || timerTaskId.value) {
@@ -328,21 +324,6 @@ watchEffect(async () => {
     }
 
 });
-
-// watch(timerData?.task_id, (oldValue, newValue) => {
-//     console.log('timerData.task_id', newValue);
-//     if (newValue !== oldValue) {
-//         startTimer = () => "00:00:00";
-//     }
-// });
-
-
-// Watch for changes in timerTaskId or localStorage changes
-
-// Detect localStorage changes and update timerTaskId
-
-
-
 </script>
 
 <template>
@@ -379,17 +360,17 @@ watchEffect(async () => {
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
-             <pre>{{typeof timerStartTime}}</pre>
+             <!-- <pre>{{typeof timerStartTime}}</pre> -->
             <br>
             
 
-            <NuxtLink :to="{ path: `/companies/${storeTaskCompanyID}/spaces/${timerData ? timerData?.space_id : storeTaskSpaceID}/projects/${timerData ? timerData?.project_id : storeTaskProjectID}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  v-if="showTimer"
-                class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2">
+            <NuxtLink :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  v-if="showTimer"
+                class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2 time-int">
                 <div class="clock-wrapper relative ml-2">
                     <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
                         <i :class="`pi-stop stop`"></i>
                     </div>
-                    <div class="text-sm absolute text-black">
+                    <div class="text-sm absolute text-black time-int">
                         {{ timerData?.timerStartTime 
                             ? startTimer(timerData?.timerStartTime) 
                             : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
@@ -410,7 +391,7 @@ watchEffect(async () => {
                     style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
-            <pre>valueID{{timerTaskId}}</pre>
+            <!-- <pre>valueID{{timerTaskId}}</pre> -->
 
             <div class="relative">
                 <div v-if="notifiData" class="ping-container">
@@ -432,7 +413,7 @@ watchEffect(async () => {
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
             </button>
-            <pre>{{piniaTID}}</pre>
+            <!-- <pre>{{piniaTID}}</pre> -->
         </div>
 
         <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }"
@@ -602,6 +583,9 @@ watchEffect(async () => {
     color: white;
     background-color: white;
     font-size: 7px;
+}
 
+.time-int{
+    color: black !important;
 }
 </style>
