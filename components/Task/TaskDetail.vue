@@ -531,7 +531,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <div class="clock-wrapper relative">
-                                            <div :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
+                                            <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }" :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
                                                 <i :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
                                             <div class="text-sm absolute">
