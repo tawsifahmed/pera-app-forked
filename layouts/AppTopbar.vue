@@ -392,12 +392,12 @@ watchEffect(async () => {
             </button>
             <!-- <pre>valueID{{timerTaskId}}</pre> -->
 
-            <div @click="handleNotificationComp" class="relative">
+            <div  class="relative">
                 <div v-if="notifiData" class="ping-container">
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
                 </div>
-                <button class="p-link layout-topbar-button notify-btn">
+                <button class="p-link layout-topbar-button notify-btn" @click="handleNotificationComp">
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
