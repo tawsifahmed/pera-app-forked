@@ -684,7 +684,7 @@ const handleShareTaskId = () => {
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <Button v-if="createTaskP" icon="pi pi-plus" label="Create" v-tooltip.left="{ value: `Create Sub Task` }" @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')" class="mr-2 sub-create" severity="secondary" />
+                                <Button v-if="createTaskP" icon="pi pi-plus" label="Create" v-tooltip.right="{ value: `Create Sub Task` }" @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')" class="mr-2 sub-create" severity="secondary" />
                                 <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>

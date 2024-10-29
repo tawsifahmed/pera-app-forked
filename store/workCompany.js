@@ -93,7 +93,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
           },
         }),
       )
-      console.log('process.env.API_URL=>', data.value)
+      console.log('SideBar List', data.value)
       this.availableCompanies = data.value?.data;
       let storedCompanyId = Number(localStorage.getItem('userCompany'));
       if (this.availableCompanies) {

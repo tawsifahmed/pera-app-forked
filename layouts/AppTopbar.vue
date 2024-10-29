@@ -28,7 +28,7 @@ const userImage = ref(null);
 const { logUserOut } = useAuthStore();
 const { authenticated } = storeToRefs(useAuthStore());
 const visibleProfile = ref(false);
-
+const showTimer = ref(false);
 const showNotify = ref(false);
 const logout = () => {
     logUserOut();
@@ -188,12 +188,40 @@ fetchNotifyData();
 
 
 const handleNotificationComp = () => {
+   
     showNotify.value = !showNotify.value;
     if(notifiData.value) {
         notifiData.value = false;
     }
 };
-const showTimer = ref(false);
+
+const setter = ref(false)
+
+// watch(showNotify, (newValue, oldValue) => {
+//     // console.log('old', oldValue);
+//     console.log('new', newValue);
+//     // if(newValue === true){
+//     //     showNotify.value = false;
+//     // }
+//     if(newValue === false){
+//         showNotify.value = true;
+//         setter.value = true
+//     }
+
+//     // if(setter.value){
+//     //     showNotify.value = false;
+//     //     setter.value = false
+//     // }
+// });
+
+// watch(setter, (newValue, oldValue) => {
+//     console.log('setter', newValue);
+//     if(newValue === true){
+//         showNotify.value = false;
+//         setter.value = false
+//     }
+// });
+
 
 const timerCompanyID = ref();
 const timerSpaceId = ref();
@@ -319,10 +347,10 @@ watchEffect(async () => {
     }
     if (timerData.value || timerTaskId.value) {
         showTimer.value = true;
+        console.log('timerData');
     } else {
         showTimer.value = false;
     }
-
 });
 </script>
 
@@ -360,26 +388,13 @@ watchEffect(async () => {
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
-             <!-- <pre>{{typeof timerStartTime}}</pre> -->
-            <br>
+             <!-- <pre>{{ showNotify}}</pre> -->
+            
             
 
-            <NuxtLink :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  v-if="showTimer"
-                class="flex justify-content-between gap-2 align-items-center task-detail-wrapper mr-2 time-int">
-                <div class="clock-wrapper relative ml-2">
-                    <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
-                        <i :class="`pi-stop stop`"></i>
-                    </div>
-                    <div class="text-sm absolute text-black time-int">
-                        {{ timerData?.timerStartTime 
-                            ? startTimer(timerData?.timerStartTime) 
-                            : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
-                    </div>
-                </div>
-            </NuxtLink>
 
             <button @click="openProfile" class="p-link layout-topbar-button">
-                <div v-tooltip.left="{ value: 'Profile' }" v-if="userProfile?.data?.image"
+                <div v-tooltip.bottom="{ value: 'Profile' }" v-if="userProfile?.data?.image"
                     class="flex align-items-center gap-2">
                     <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
                     <div class="userImage">
@@ -387,7 +402,7 @@ watchEffect(async () => {
                             style="height: 100%; width: 100%; object-fit: cover" />
                     </div>
                 </div>
-                <img v-tooltip.left="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt=""
+                <img v-tooltip.bottom="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt=""
                     style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
@@ -408,6 +423,21 @@ watchEffect(async () => {
                     <Notification @closeNotification="closeNotification($event)" />
                 </div>
             </div>
+
+            <NuxtLink v-tooltip.left="{ value: 'Active Task' }" :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  
+            v-if="showTimer" class="flex absolute  gap-2 align-items-center task-timer-wrapper mr-2 time-int">
+               <div class="clock-wrapper relative ml-2">
+                   <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
+                       <i :class="`pi-stop stop`"></i>
+                   </div>
+                   <div class="text-sm absolute text-black">
+                       {{ timerData?.timerStartTime 
+                           ? startTimer(timerData?.timerStartTime) 
+                           : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
+                   </div>
+               </div>
+           </NuxtLink>
+
             <!-- <pre>{{fetchedTimerData}}</pre> -->
             <button @click="logout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
@@ -528,8 +558,11 @@ watchEffect(async () => {
     }
 }
 
-.task-detail-wrapper {
-    width: 100%;
+.task-timer-wrapper {
+    height: 40px;
+    width: 120px;
+    right: 197px;
+    top: 15px;
     border: 2px solid #9596e4;
     /* Project theme color */
     padding: 0 40px;
@@ -563,6 +596,7 @@ watchEffect(async () => {
     display: flex;
     align-items: center;
     gap: 7px;
+    
 }
 
 .clock-btn {
