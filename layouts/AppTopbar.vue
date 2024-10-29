@@ -296,6 +296,7 @@ watch(timerData, (oldValue, newValue) => {
 let timerInterval = null;
 
 function startTimer(timerSTime) {
+    const timerElement = document.getElementById('timer-interval');
     if (timerSTime === 'stop') {
         console.log('timerSTime', timerSTime);
         if (timerInterval) {
@@ -316,11 +317,23 @@ function startTimer(timerSTime) {
             return formattedTime;
         }
 
+                // Hide the timer element for the first 2 seconds
+                if (timerElement) {
+            timerElement.style.visibility = 'hidden';
+        }
+
+        // Show timer element after 2 seconds
+        setTimeout(() => {
+            if (timerElement) {
+                timerElement.style.visibility = 'visible';
+            }
+        }, 1000);
+
         if (timerInterval) {
             clearInterval(timerInterval);
         }
         timerInterval = setInterval(() => {
-            const timerElement = document.getElementById('timer-interval');
+            
             if (timerElement) {
                 timerElement.textContent = updateTimer();
             }
@@ -418,7 +431,7 @@ watchEffect(async () => {
                         <i :class="`pi pi-stop text-white`" style="font-size: 11px; font-weight: 700"></i>
                     </div>
                     <div class="text-sm absolute text-black time-int" id="timer-interval">
-                        {{ timerData?.timerStartTime ? startTimer(timerData?.timerStartTime) : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
+                        {{ timerData?.timerStartTime ? startTimer(timerData?.timerStartTime) : timerStartTime ? startTimer(timerStartTime) : ' ' }}
                     </div>
                 </div>
             </NuxtLink>
@@ -604,13 +617,6 @@ watchEffect(async () => {
 
 .time-int {
     color: crimson !important;
-    animation: blink-animation 1s steps(5, start) infinite;
     font-weight: 400;
-}
-
-@keyframes blink-animation {
-    to {
-        visibility: hidden;
-    }
 }
 </style>

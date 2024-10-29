@@ -5,6 +5,9 @@ import { useCompanyStore } from '~/store/company';
 import { useFileUploaderStore } from '~/store/fileUpload';
 import accessPermission from '~/composables/usePermission';
 import Editor from 'primevue/editor';
+import Calendar from 'primevue/calendar';
+import { onMounted } from 'vue';
+
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -32,7 +35,7 @@ const createTaskP = ref(accessPermission('create_task'));
 
 const assignees = ref(null);
 assignees.value = taskDetails.value?.assignee?.map((obj) => ({ id: obj.id, name: obj.name }));
-const isAsigneeEdited = ref(false); 
+const isAsigneeEdited = ref(false);
 watch(assignees, (newValue) => {
     isAsigneeEdited.value = true;
 });
@@ -51,14 +54,14 @@ const userHasModifiedTime = ref(false);
 // const dateVal = ref(taskDetails.value?.due_date ? 1 : 0);
 
 const handleDateChange = (newDate) => {
-        console.log('test druve')
-        if (!userHasModifiedTime.value) {
-            const selectedDate = new Date(newDate);
-            selectedDate.setHours(23, 59, 0, 0);  
-            dueDate.value = selectedDate;  
-        }else {
-            dueDate.value = newDate;  
-        }
+    console.log('test druve')
+    if (!userHasModifiedTime.value) {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);
+        dueDate.value = selectedDate;
+    } else {
+        dueDate.value = newDate;
+    }
 };
 
 
@@ -79,6 +82,42 @@ watch(dueDate, (newValue, oldValue) => {
 
 
 const status = ref();
+
+const confirm = useConfirm();
+
+// Refs to store hours and minutes values
+const hours = ref(0);
+const minutes = ref(0);
+
+// Function to handle adding the duration
+const addDuration = () => {
+    toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${hours.value} hours and ${minutes.value} minutes`, group: 'br', life: 3000 });
+   
+};
+
+// Function to trigger the confirmation popup
+const requireConfirmation = (event) => {
+    console.log(event.detail)
+    if(event.detail === 3 && taskDetails.value?.is_timer_start === 'false') {
+        confirm.require({
+            target: event.currentTarget,
+            group: 'headless',
+            message: 'Set task duration:',
+            accept: () => {
+                toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+            },
+            reject: () => {
+                // toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+            }
+        });
+    }
+};
+
+
+const manualTimeHr = ref();
+const manualTimeMin = ref();
+
+
 const timeTrack = ref('00:00:00');
 let interval = null;
 
@@ -233,15 +272,15 @@ const handleTaskDetailSubmit = async () => {
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
-        if(isDescriptionEdited.value === true) {
+        if (isDescriptionEdited.value === true) {
             isDescriptionEdited.value = false;
             console.log('isDescriptionEdited Flagged');
         }
-        if(isAsigneeEdited.value === true) {
+        if (isAsigneeEdited.value === true) {
             isAsigneeEdited.value = false;
             console.log('isAsigneeEdited Flagged');
         }
-        if(isTagsEdited.value === true) {
+        if (isTagsEdited.value === true) {
             isTagsEdited.value = false;
             console.log('isTagsEdited Flagged');
         }
@@ -468,19 +507,17 @@ const handleShareTaskId = () => {
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
-            <h5
-                v-tooltip.top="{
-                    value: `${taskDetails.name}`,
-                    pt: {
-                        width: '200px'
-                    }
-                }"
-                class="m-0 detail-task-name cursor-pointer"
-            >
+            <h5 v-tooltip.top="{
+                value: `${taskDetails.name}`,
+                pt: {
+                    width: '200px'
+                }
+            }" class="m-0 detail-task-name cursor-pointer">
                 {{ taskDetails.name }}
             </h5>
             <div class="flex gap-1">
-                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
+                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }"
+                    class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
                 <!-- <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span> -->
                 <h5 class="m-0 ml-2">Activity</h5>
                 <!-- <pre>isTagsEdited {{isTagsEdited}}</pre> -->
@@ -498,44 +535,105 @@ const handleShareTaskId = () => {
                         <form @submit.prevent="handleTaskDetailSubmit" class="mt-2 task-detail ml-2">
                             <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
                                 <div class="w-full lg:w-fit">
-                                    <div class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
-                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
+                                    <div
+                                        class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-user"></span>
                                             <p>Assignee:</p>
                                         </div>
                                         <FloatLabel style="width: 164.94px" class="input-fields">
-                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists" optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2" class="w-full" />
+                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists"
+                                                optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2"
+                                                class="w-full" />
                                         </FloatLabel>
                                     </div>
-                                    <div class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                    <div
+                                        class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-calendar"></span>
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
+                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate"
+                                                placeholder="Set Due Date" showTime hourFormat="12"
+                                                @date-select="handleDateChange($event)" />
                                         </FloatLabel>
                                     </div>
                                 </div>
                                 <div class="w-full lg:w-fit">
-                                    <div class="flex justify-content-between gap-2 align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
+                                    <div
+                                        class="flex justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-flag"></span>
                                             <p>Status:</p>
                                         </div>
-                                        <Dropdown @change="changeStatusData(status)" v-model="status" :options="taskStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        <Dropdown @change="changeStatusData(status)" v-model="status"
+                                            :options="taskStatus" optionLabel="name" placeholder="Select Status"
+                                            style="width: 146.41px" />
                                     </div>
-                                    <div class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
+                                    <div
+                                        class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        <div
+                                            class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <div class="clock-wrapper relative">
-                                            <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }" :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`" @click="handleClickClock">
-                                                <i :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
+                                            <ConfirmPopup group="headless">
+                                                <template #container="{ message, acceptCallback, rejectCallback }">
+                                                    <div class="border-round px-3 py-3">
+                                                        <span class="text-dm">{{ message.message }}</span>
+                
+                                                        <div class="flex justify-content-center align-items-center gap-3 mt-3 manual-wrapper">
+                                                            <div>
+                                                                <label for="hours" class="block mb-2 text-xs">Hours</label>
+                                                                <InputNumber v-model="hours" showButtons buttonLayout="vertical"
+                                                                    style="width: 3rem" :min="0" :max="23" id="hours">
+                                                                    <template #incrementbuttonicon class="p-1">
+                                                                        <span class="pi pi-chevron-up manual-time-changer" />
+                                                                    </template>
+                                                                    <template #decrementbuttonicon>
+                                                                        <span class="pi pi-chevron-down manual-time-changer" />
+                                                                    </template>
+                                                                </InputNumber>
+                                                            </div>
+                
+                                                            <div>
+                                                                <label for="minutes" class="block mb-2 text-xs">Minutes</label>
+                                                                <InputNumber v-model="minutes" showButtons buttonLayout="vertical"
+                                                                    style="width: 3rem" :min="0" :max="59" id="minutes">
+                                                                    <template #incrementbuttonicon>
+                                                                        <span class="pi pi-chevron-up manual-time-changer" />
+                                                                    </template>
+                                                                    <template #decrementbuttonicon>
+                                                                        <span class="pi pi-chevron-down manual-time-changer" />
+                                                                    </template>
+                                                                </InputNumber>
+                                                            </div>
+                                                        </div>
+                
+                                                        <!-- Flex container for buttons -->
+                                                        <div class="flex justify-content-center align-items-center gap-2 mt-3">
+                                                            <Button icon="pi pi-check px-2 py-0 manual-time-changer" label="" class="border-none" @click="addDuration" size="small"></Button>
+                                                            <Button icon="pi pi-times px-2 py-0 text-white bg-red-400 manual-time-changer" class="bg-red-400 border-none" label="" outlined @click="rejectCallback" severity="secondary"
+                                                                size="small" text></Button>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </ConfirmPopup>
+                                            <!-- <Button icon="pi pi-pencil " class="absolute manual-time-btn bg-gray-500 border-none" @click="requireConfirmation($event)" label=""></Button> -->
+                                            <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
+                                                :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`"
+                                                @click="handleClickClock">
+                                                <i
+                                                    :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
                                             </div>
-                                            <div class="text-sm absolute">
-                                                {{ taskDetails?.is_timer_start == 'true' ? timeTrack : secondsToHHMMSS(taskDetails?.total_duration) }}
+                                            <div class="text-sm absolute" @click="requireConfirmation($event)">
+                                                {{ taskDetails?.is_timer_start == 'true' ? timeTrack :
+                                                secondsToHHMMSS(taskDetails?.total_duration) }}
                                             </div>
                                         </div>
 
@@ -545,17 +643,24 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3" style="width: 100%">
-                                <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property" style="width: 10%">
+                            <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3"
+                                style="width: 100%">
+                                <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property"
+                                    style="width: 10%">
                                     <span class="pi pi-tags"></span>
                                     <p>Tags:</p>
                                 </div>
                                 <FloatLabel style="width: 90%" class="input-fields">
-                                    <MultiSelect display="chip" v-model="tags" filter :options="tagsLists" optionLabel="name" placeholder="Select Tags" class="w-full" />
+                                    <MultiSelect display="chip" v-model="tags" filter :options="tagsLists"
+                                        optionLabel="name" placeholder="Select Tags" class="w-full" />
                                 </FloatLabel>
                             </div>
+                            
+
+                            <!-- {{manualTime}} -->
                             <div class="field mt-3 flex flex-column">
-                                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                <div
+                                    class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
                                     <span class="pi pi-sliders-h"></span>
                                     <p>Description:</p>
                                 </div>
@@ -568,8 +673,10 @@ const handleShareTaskId = () => {
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
                                             <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
                                             <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
-                                            <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
-                                            <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                                            <button class="ql-list" type="button" data-pc-section="list"
+                                                value="ordered"></button>
+                                            <button class="ql-list" type="button" data-pc-section="list"
+                                                value="bullet"></button>
                                             <button class="ql-link" type="button" data-pc-section="link"></button>
                                         </span>
                                     </template>
@@ -584,128 +691,139 @@ const handleShareTaskId = () => {
                         <!-- tab for details, sub task  -->
                         <TabView class="mt-3">
                             <TabPanel class="file-upload" header="Detail">
-                                <p class="m-0">Attachments: {{ taskDetails?.attachments && taskDetails?.attachments?.length > 0 ? taskDetails?.attachments?.length : 0 }}</p>
-                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
-                                    <div
-                                        v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
+                                <p class="m-0">Attachments: {{ taskDetails?.attachments &&
+                                    taskDetails?.attachments?.length > 0 ?
+                                    taskDetails?.attachments?.length : 0 }}</p>
+                                <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2"
+                                    style="overflow-x: scroll">
+                                    <div v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-5 attch-w"
-                                        style="background-color: #f7fafc"
-                                    >
+                                        style="background-color: #f7fafc">
                                         <div class="pi pi-file text-6xl attach-icon"></div>
-                                        <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                        <div
+                                            class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                             <div class="text-xs">asdasd....asdme.extng</div>
                                             <div class="text-xs">9 MAy, 2024</div>
                                         </div>
                                     </div>
-                                    <div
-                                        v-for="item in taskDetails?.attachments"
-                                        :key="item"
-                                        target="_blank"
+                                    <div v-for="item in taskDetails?.attachments" :key="item" target="_blank"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
-                                        style="background-color: #f7fafc"
-                                    >
+                                        style="background-color: #f7fafc">
                                         <!-- <pre v-if="checkAttachmentType(item?.file == 'image')">{{checkAttachmentType(item?.file)}}</pre> -->
-                                        <a
-                                            v-if="checkAttachmentType(item?.file) === 'file'"
-                                            target="_blank"
+                                        <a v-if="checkAttachmentType(item?.file) === 'file'" target="_blank"
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
-                                            :href="item?.file"
-                                        >
+                                            :href="item?.file">
                                             <div class="pi pi-file text-6xl attach-icon"></div>
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <a v-if="checkAttachmentType(item?.file) === 'image'" target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 relative" :href="item?.file">
-                                            <img :src="item?.file" alt="" style="width: 90%; height: 80px; border-radius: 10px; border-top-left-radius: 10px; object-fit: cover" />
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                        <a v-if="checkAttachmentType(item?.file) === 'image'" target="_blank"
+                                            class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 relative"
+                                            :href="item?.file">
+                                            <img :src="item?.file" alt=""
+                                                style="width: 90%; height: 80px; border-radius: 10px; border-top-left-radius: 10px; object-fit: cover" />
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <a
-                                            v-if="checkAttachmentType(item?.file) === 'video'"
-                                            target="_blank"
+                                        <a v-if="checkAttachmentType(item?.file) === 'video'" target="_blank"
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
-                                            :href="item?.file"
-                                        >
+                                            :href="item?.file">
                                             <div class="pi pi-video text-6xl attach-icon"></div>
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <a
-                                            v-if="checkAttachmentType(item?.file) === 'pdf'"
-                                            target="_blank"
+                                        <a v-if="checkAttachmentType(item?.file) === 'pdf'" target="_blank"
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
-                                            :href="item?.file"
-                                        >
+                                            :href="item?.file">
                                             <div class="pi pi-file-pdf text-6xl text-danger attach-icon"></div>
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <a
-                                            v-if="checkAttachmentType(item?.file) === 'word'"
-                                            target="_blank"
+                                        <a v-if="checkAttachmentType(item?.file) === 'word'" target="_blank"
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
-                                            :href="item?.file"
-                                        >
+                                            :href="item?.file">
                                             <div class="pi pi-file-word text-6xl text-blue attach-icon"></div>
 
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <a
-                                            v-if="checkAttachmentType(item?.file) === 'excel'"
-                                            target="_blank"
+                                        <a v-if="checkAttachmentType(item?.file) === 'excel'" target="_blank"
                                             class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-2 my-6 relative"
-                                            :href="item?.file"
-                                        >
-                                            <div class="pi pi-file-excel text-6xl attach-icon" style="color: #04aa6d;"></div>
-                                            <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
+                                            :href="item?.file">
+                                            <div class="pi pi-file-excel text-6xl attach-icon" style="color: #04aa6d;">
+                                            </div>
+                                            <div
+                                                class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                 <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
                                                 <div class="text-xs">{{ setDateFormat(item?.created_at) }}</div>
                                             </div>
                                         </a>
-                                        <div @click="deleteFile(item?.id)" class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
+                                        <div @click="deleteFile(item?.id)"
+                                            class="absolute bg-red-500 text-white p-2 flex align-items-center justify-content-center close-btn">
                                             <i class="pi pi-times text-xs text-white"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div v-if="updateTaskP" class="flex gap-2 w-full justify-content-center">
-                                    <input @change="onFileChange" id="attachInput" class="float-right file-up-btn" type="file" placeholder="+" />
+                                    <input @change="onFileChange" id="attachInput" class="float-right file-up-btn"
+                                        type="file" placeholder="+" />
                                     <Button type="button" :loading="isLoading" @click="uploadFile" label="Uploads" />
                                 </div>
                             </TabPanel>
                             <TabPanel :header="`Sub Tasks ${subTasks?.length ? subTasks.length : 0}`">
-                                <Button v-if="createTaskP" icon="pi pi-plus" label="Create" v-tooltip.right="{ value: `Create Sub Task` }" @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')" class="mr-2 sub-create" severity="secondary" />
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true" :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
+                                <Button v-if="createTaskP" icon="pi pi-plus" label="Create"
+                                    v-tooltip.right="{ value: `Create Sub Task` }"
+                                    @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')"
+                                    class="mr-2 sub-create" severity="secondary" />
+                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
+                                    :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer tone" field="name" header="Name" expander :style="{ width: '45%' }">
+                                    <Column class="cursor-pointer tone" field="name" header="Name" expander
+                                        :style="{ width: '45%' }">
                                         <template #body="slotProps">
-                                            <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{ slotProps.node.data.name }} </span>
+                                            <span class="taskTitle"
+                                                @click="emit('handleTaskDetailView', slotProps.node)"
+                                                v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
+                                                slotProps.node.data.name }} </span>
                                         </template>
                                     </Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
-                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '11.5%' }" style="text-wrap: nowrap;"></Column>
+                                    <Column field="dueDateValue" header="Due Date" :style="{ width: '11.5%' }"
+                                        style="text-wrap: nowrap;">
+                                    </Column>
                                     <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown-det">
-                                                <Button style="width: 30px; height: 30px; border-radius: 50%" icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
+                                                <Button style="width: 30px; height: 30px; border-radius: 50%"
+                                                    icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
                                                 <div class="action-dropdown-content-det">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success" @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')" rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success" @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info" @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                                                        rounded />
+                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
+                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -715,19 +833,15 @@ const handleShareTaskId = () => {
                             <TabPanel :header="`Bounce ${vModelBncStatus?.is_bounce === 'Yes' ? '1' : ''}`">
                                 <div class="card">
                                     <div class="flex justify-content-start align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
+                                        <div
+                                            class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
                                             <span class="pi pi-flag"></span>
                                             <p class="text-nowrap">Bounce Status:</p>
                                         </div>
-                                        <Dropdown
-                                            @change="changeBounceStatusData(vModelBncStatus)"
-                                            :disabled="!editBounceP"
-                                            v-model="vModelBncStatus"
-                                            :options="bounceStatus"
-                                            optionLabel="is_bounce"
-                                            placeholder="Select Status"
-                                            style="width: 146.41px"
-                                        />
+                                        <Dropdown @change="changeBounceStatusData(vModelBncStatus)"
+                                            :disabled="!editBounceP" v-model="vModelBncStatus" :options="bounceStatus"
+                                            optionLabel="is_bounce" placeholder="Select Status"
+                                            style="width: 146.41px" />
                                     </div>
                                 </div>
                             </TabPanel>
@@ -741,29 +855,37 @@ const handleShareTaskId = () => {
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">
                         <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn"
+                                class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
                                 <li v-html="act.title" style="font-size: smaller !important"></li>
                             </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                                <Button @click="hideActivity" label="↑ Hide"
+                                    class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
-                                    <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
-                                    <Avatar v-else :label="val.commentator_name.charAt()" class="mr-2 capitalize" size="small" style="background-color: gray; color: #ededed; border-radius: 50%" />
+                                    <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt=""
+                                        style="width: 28px; height: 28px; border-radius: 50%" />
+                                    <Avatar v-else :label="val.commentator_name.charAt()" class="mr-2 capitalize"
+                                        size="small"
+                                        style="background-color: gray; color: #ededed; border-radius: 50%" />
                                     <p class="text-lg">{{ val.commentator_name }}</p>
                                 </div>
                             </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
-                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                    <a :href="val?.file" target="_blank"
+                                        class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
+                                        style="background-color: #f7fafc">
                                         <div class="pi pi-file"></div>
-                                        <div class="attach-detail flex flex-column justify-content-center align-items-center">
+                                        <div
+                                            class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
                                         </div>
                                     </a>
@@ -771,12 +893,14 @@ const handleShareTaskId = () => {
                                 <p class="m-0 ml-1" style="font-size: 0.9rem;">
                                     {{ val?.comment ? val?.comment : '' }}
                                 </p>
-                                <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time) }}</i>
+                                <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time)
+                                    }}</i>
                             </template>
                         </Card>
                     </div>
                     <form @submit.prevent="handleTaskComment" class="comment-add">
-                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative" v-if="commentFile">
+                        <div class="text-sm font-semibold tracking-wide leading-3 bg-gray-300 px-3 py-2 flex align-itens-center mb-1 relative"
+                            v-if="commentFile">
                             <div>
                                 <span class="pi pi-file-import mr-2"></span> <span>{{ commenFileName }}</span>
                             </div>
@@ -785,7 +909,8 @@ const handleShareTaskId = () => {
                             </div>
                         </div>
                         <div>
-                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15" class="border-gray-300 mb-1 comment-text" required />
+                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15"
+                                class="border-gray-300 mb-1 comment-text" required />
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
 
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
@@ -1191,7 +1316,19 @@ a {
     display: none !important;
 }
 
-.ql-toolbar.ql-snow{
+.ql-toolbar.ql-snow {
     padding: 4px !important;
 }
+
+.manual-wrapper{
+    .p-inputnumber-button{
+        padding: 3px 0 !important;
+    }
+}
+
+.manual-time-changer{
+    font-size: .65rem !important;
+}
+
+
 </style>
