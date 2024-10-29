@@ -40,6 +40,36 @@ export const useClockStore = defineStore('clock', () => {
         }
     }
 
+    async function setManualTime(taskId, duration) {
+
+        const token = useCookie('token')
+
+        try {
+            const response = await fetch(`https://pbe.singularitybd.net/api/v1/set-manual-time`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`,
+                },
+                body: {
+                    task_id: taskId,
+                    duration: duration
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+
+            const data = await response.json()
+            return data;
+
+        } catch (error) {
+            console.error('Error uploading file:', error)
+        }
+    }
+
+    
+
     async function getStoreTimer() {
 
         // timerData.value = {
@@ -77,5 +107,5 @@ export const useClockStore = defineStore('clock', () => {
         
     }
 
-    return { getTaskTimerData, storeTaskTimer, getStoreTimer, timerData, trackedTime, isTImerStopped }
+    return { getTaskTimerData, storeTaskTimer, getStoreTimer, setManualTime, timerData, trackedTime, isTImerStopped }
 })

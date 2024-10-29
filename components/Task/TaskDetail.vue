@@ -13,7 +13,7 @@ const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData, storeTaskTimer } = useClockStore();
+const { getTaskTimerData, setManualTime, storeTaskTimer } = useClockStore();
 const { trackedTime } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
@@ -86,13 +86,21 @@ const status = ref();
 const confirm = useConfirm();
 
 // Refs to store hours and minutes values
-const hours = ref(0);
-const minutes = ref(0);
+const manualTimeHr = ref(0);
+const manualTimeMin = ref(0);
 
 // Function to handle adding the duration
-const addDuration = () => {
-    toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${hours.value} hours and ${minutes.value} minutes`, group: 'br', life: 3000 });
-   
+const addDuration = async () => {
+    let totalSeconds;
+    if(manualTimeHr.value > 0 || manualTimeMin.value > 0){
+        totalSeconds = (manualTimeHr.value * 3600) + (manualTimeMin.value * 60);
+        console.log('totalSeconds', totalSeconds);
+        // return
+        const responseData = await setManualTime(taskDetails.value?.id, totalSeconds);
+        console.log('responseData', responseData);
+        toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value} hours and ${manualTimeMin.value} minutes`, group: 'br', life: 3000 });
+    }
+    totalSeconds = null
 };
 
 // Function to trigger the confirmation popup
@@ -114,8 +122,6 @@ const requireConfirmation = (event) => {
 };
 
 
-const manualTimeHr = ref();
-const manualTimeMin = ref();
 
 
 const timeTrack = ref('00:00:00');
@@ -590,7 +596,7 @@ const handleShareTaskId = () => {
                                                         <div class="flex justify-content-center align-items-center gap-3 mt-3 manual-wrapper">
                                                             <div>
                                                                 <label for="hours" class="block mb-2 text-xs">Hours</label>
-                                                                <InputNumber v-model="hours" showButtons buttonLayout="vertical"
+                                                                <InputNumber v-model="manualTimeHr" showButtons buttonLayout="vertical"
                                                                     style="width: 3rem" :min="0" :max="23" id="hours">
                                                                     <template #incrementbuttonicon class="p-1">
                                                                         <span class="pi pi-chevron-up manual-time-changer" />
@@ -603,7 +609,7 @@ const handleShareTaskId = () => {
                 
                                                             <div>
                                                                 <label for="minutes" class="block mb-2 text-xs">Minutes</label>
-                                                                <InputNumber v-model="minutes" showButtons buttonLayout="vertical"
+                                                                <InputNumber v-model="manualTimeMin" showButtons buttonLayout="vertical"
                                                                     style="width: 3rem" :min="0" :max="59" id="minutes">
                                                                     <template #incrementbuttonicon>
                                                                         <span class="pi pi-chevron-up manual-time-changer" />
