@@ -41,7 +41,9 @@ export const useClockStore = defineStore('clock', () => {
     }
 
     async function setManualTime(taskId, duration) {
-
+        const formdata = new FormData();
+        formdata.append("task_id", taskId);
+        formdata.append("duration", duration); 
         const token = useCookie('token')
 
         try {
@@ -50,10 +52,7 @@ export const useClockStore = defineStore('clock', () => {
                 headers: {
                     Authorization: `Bearer ${token.value}`,
                 },
-                body: {
-                    task_id: taskId,
-                    duration: duration
-                }
+                body: formdata
             })
 
             if (!response.ok) {

@@ -616,7 +616,21 @@ watchEffect(async () => {
 }
 
 .time-int {
-    color: crimson !important;
+    color: crimson;
+    animation: blink-animation 1s steps(5, start) infinite;
     font-weight: 400;
+}
+
+@keyframes blink-animation {
+    0% {
+        
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 </style>

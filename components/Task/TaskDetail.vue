@@ -97,8 +97,18 @@ const addDuration = async () => {
         console.log('totalSeconds', totalSeconds);
         // return
         const responseData = await setManualTime(taskDetails.value?.id, totalSeconds);
+        if(responseData?.code === 200){
+            await getTaskDetails(taskDetails.value?.id);
+            toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value} hours and ${manualTimeMin.value} minutes`, group: 'br', life: 3000 });
+            manualTimeHr.value = 0;
+            manualTimeMin.value = 0;
+            
+        }else{
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add duration', group: 'br', life: 3000 });
+        }
         console.log('responseData', responseData);
-        toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value} hours and ${manualTimeMin.value} minutes`, group: 'br', life: 3000 });
+    }else{
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Please add duration', group: 'br', life: 3000 });
     }
     totalSeconds = null
 };
@@ -590,10 +600,10 @@ const handleShareTaskId = () => {
                                         <div class="clock-wrapper relative">
                                             <ConfirmPopup group="headless">
                                                 <template #container="{ message, acceptCallback, rejectCallback }">
-                                                    <div class="border-round px-3 py-3">
-                                                        <span class="text-dm">{{ message.message }}</span>
+                                                    <div class="border-round px-2 pt-3 pb-2">
+                                                        <!-- <span class="text-dm">{{ message.message }}</span> -->
                 
-                                                        <div class="flex justify-content-center align-items-center gap-3 mt-3 manual-wrapper">
+                                                        <div class="flex justify-content-center align-items-center gap-3 manual-wrapper -mt-1">
                                                             <div>
                                                                 <label for="hours" class="block mb-2 text-xs">Hours</label>
                                                                 <InputNumber v-model="manualTimeHr" showButtons buttonLayout="vertical"
@@ -622,15 +632,14 @@ const handleShareTaskId = () => {
                                                         </div>
                 
                                                         <!-- Flex container for buttons -->
-                                                        <div class="flex justify-content-center align-items-center gap-2 mt-3">
-                                                            <Button icon="pi pi-check px-2 py-0 manual-time-changer" label="" class="border-none" @click="addDuration" size="small"></Button>
-                                                            <Button icon="pi pi-times px-2 py-0 text-white bg-red-400 manual-time-changer" class="bg-red-400 border-none" label="" outlined @click="rejectCallback" severity="secondary"
-                                                                size="small" text></Button>
+                                                        <div class="flex justify-content-center align-items-center" style="margin-top: 0.49rem !important">
+                                                            <Button icon="pi pi-check px-2 py-0 text-sm" label="" class="border-none w-full mx-4" @click="addDuration" size="small"></Button>
+                                                            <!-- <Button icon="pi pi-times px-2 py-0 text-white bg-red-400 manual-time-changer" class="bg-red-400 border-none" label="" outlined @click="rejectCallback" severity="secondary"
+                                                                size="small" text></Button> -->
                                                         </div>
                                                     </div>
                                                 </template>
                                             </ConfirmPopup>
-                                            <!-- <Button icon="pi pi-pencil " class="absolute manual-time-btn bg-gray-500 border-none" @click="requireConfirmation($event)" label=""></Button> -->
                                             <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
                                                 :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`"
                                                 @click="handleClickClock">
