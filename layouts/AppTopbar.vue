@@ -320,7 +320,7 @@ function startTimer(timerSTime) {
             clearInterval(timerInterval);
         }
         timerInterval = setInterval(() => {
-            const timerElement = document.querySelector('.text-sm');
+            const timerElement = document.getElementById('timer-interval');
             if (timerElement) {
                 timerElement.textContent = updateTimer();
             }
@@ -417,7 +417,7 @@ watchEffect(async () => {
                     <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
                         <i :class="`pi pi-stop text-white`" style="font-size: 11px; font-weight: 700"></i>
                     </div>
-                    <div class="text-sm absolute text-black time-int">
+                    <div class="text-sm absolute text-black time-int" id="timer-interval">
                         {{ timerData?.timerStartTime ? startTimer(timerData?.timerStartTime) : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
                     </div>
                 </div>
@@ -603,7 +603,7 @@ watchEffect(async () => {
 }
 
 .time-int {
-    color: black !important;
+    color: crimson !important;
     animation: blink-animation 1s steps(5, start) infinite;
     font-weight: 400;
 }
