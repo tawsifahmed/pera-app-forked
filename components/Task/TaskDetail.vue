@@ -86,14 +86,15 @@ const status = ref();
 const confirm = useConfirm();
 
 // Refs to store hours and minutes values
-const manualTimeHr = ref(0);
-const manualTimeMin = ref(0);
+const manualTimeHr = ref(null);
+const manualTimeMin = ref(null);
 
 // Function to handle adding the duration
 const hideManualTimer = ref(false)
 
+const mLoading = ref(false);
 const addDuration = async (rejectCallback) => {
-    
+    mLoading.value = true;
     let totalSeconds;
     if(manualTimeHr.value > 0 || manualTimeMin.value > 0){
         totalSeconds = (manualTimeHr.value * 3600) + (manualTimeMin.value * 60);
@@ -102,18 +103,21 @@ const addDuration = async (rejectCallback) => {
         const responseData = await setManualTime(taskDetails.value?.id, totalSeconds);
         if(responseData?.code === 200){
             await getTaskDetails(taskDetails.value?.id);
-            toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value} hours and ${manualTimeMin.value} minutes`, group: 'br', life: 3000 });
-            manualTimeHr.value = 0;
-            manualTimeMin.value = 0;
+            mLoading.value = false;
+            toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value ? manualTimeHr.value : 0} hours and ${manualTimeMin.value ? manualTimeMin.value : 0} minutes`, group: 'br', life: 3000 });
+            manualTimeHr.value = null;
+            manualTimeMin.value = null;
             rejectCallback()
             
 
             
         }else{
+            mLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add duration', group: 'br', life: 3000 });
         }
         console.log('responseData', responseData);
     }else{
+        mLoading.value = false;
         toast.add({ severity: 'error', summary: 'Error', detail: 'Please add duration', group: 'br', life: 3000 });
     }
     totalSeconds = null
@@ -612,9 +616,9 @@ const handleShareTaskId = () => {
                                                         <div class="flex justify-content-center align-items-center gap-3 manual-wrapper -mt-1">
                                                             <div>
                                                                 <label for="hours" class="block mb-2 text-xs">Hours</label>
-                                                                <InputNumber v-model="manualTimeHr" showButtons buttonLayout="vertical"
+                                                                <InputNumber v-model="manualTimeHr" placeholder="00" showButtons buttonLayout="vertical"
                                                                     style="width: 3rem" :min="0" :max="23" id="hours">
-                                                                    <template #incrementbuttonicon class="p-1">
+                                                                    <template #incrementbuttonicon>
                                                                         <span class="pi pi-chevron-up manual-time-changer" />
                                                                     </template>
                                                                     <template #decrementbuttonicon>
@@ -625,7 +629,7 @@ const handleShareTaskId = () => {
                 
                                                             <div>
                                                                 <label for="minutes" class="block mb-2 text-xs">Minutes</label>
-                                                                <InputNumber v-model="manualTimeMin" showButtons buttonLayout="vertical"
+                                                                <InputNumber v-model="manualTimeMin" placeholder="00" showButtons buttonLayout="vertical"
                                                                     style="width: 3rem" :min="0" :max="59" id="minutes">
                                                                     <template #incrementbuttonicon>
                                                                         <span class="pi pi-chevron-up manual-time-changer" />
@@ -639,7 +643,7 @@ const handleShareTaskId = () => {
                 
                                                         <!-- Flex container for buttons -->
                                                         <div class="flex justify-content-center align-items-center" style="margin-top: 0.49rem !important">
-                                                            <Button icon="pi pi-check px-2 py-0 text-sm" label="" class="border-none w-full mx-4" @click="addDuration(rejectCallback)" size="small"></Button>
+                                                            <Button icon="pi pi-check px-2 py-0 text-sm" label="" class="border-none w-full mx-3" :loading="mLoading" @click="addDuration(rejectCallback)" size="small"></Button>
                                                             <!-- <Button icon="pi pi-times px-2 py-0 text-white bg-red-400 manual-time-changer" class="bg-red-400 border-none" label="" outlined @click="rejectCallback" severity="secondary"
                                                                 size="small" text></Button> -->
                                                         </div>
