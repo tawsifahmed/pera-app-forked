@@ -90,7 +90,10 @@ const manualTimeHr = ref(0);
 const manualTimeMin = ref(0);
 
 // Function to handle adding the duration
-const addDuration = async () => {
+const hideManualTimer = ref(false)
+
+const addDuration = async (rejectCallback) => {
+    
     let totalSeconds;
     if(manualTimeHr.value > 0 || manualTimeMin.value > 0){
         totalSeconds = (manualTimeHr.value * 3600) + (manualTimeMin.value * 60);
@@ -102,6 +105,9 @@ const addDuration = async () => {
             toast.add({ severity: 'success', summary: 'Duration Added', detail: `Duration: ${manualTimeHr.value} hours and ${manualTimeMin.value} minutes`, group: 'br', life: 3000 });
             manualTimeHr.value = 0;
             manualTimeMin.value = 0;
+            rejectCallback()
+            
+
             
         }else{
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to add duration', group: 'br', life: 3000 });
@@ -598,7 +604,7 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Track Time:</p>
                                         </div>
                                         <div class="clock-wrapper relative">
-                                            <ConfirmPopup group="headless">
+                                            <ConfirmPopup :close="hideManualTimer" group="headless">
                                                 <template #container="{ message, acceptCallback, rejectCallback }">
                                                     <div class="border-round px-2 pt-3 pb-2">
                                                         <!-- <span class="text-dm">{{ message.message }}</span> -->
@@ -633,7 +639,7 @@ const handleShareTaskId = () => {
                 
                                                         <!-- Flex container for buttons -->
                                                         <div class="flex justify-content-center align-items-center" style="margin-top: 0.49rem !important">
-                                                            <Button icon="pi pi-check px-2 py-0 text-sm" label="" class="border-none w-full mx-4" @click="addDuration" size="small"></Button>
+                                                            <Button icon="pi pi-check px-2 py-0 text-sm" label="" class="border-none w-full mx-4" @click="addDuration(rejectCallback)" size="small"></Button>
                                                             <!-- <Button icon="pi pi-times px-2 py-0 text-white bg-red-400 manual-time-changer" class="bg-red-400 border-none" label="" outlined @click="rejectCallback" severity="secondary"
                                                                 size="small" text></Button> -->
                                                         </div>
