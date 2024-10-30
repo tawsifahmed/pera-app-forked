@@ -70,7 +70,6 @@ const getActionItems = (node) => {
         {
             label: 'Edit Task',
             icon: 'pi pi-pencil text-white',
-            class: 'bg-red-300',
             command: () => {
                 // Emit the event for editing the task
                 emit('handleTaskEdit', node);
@@ -1136,16 +1135,16 @@ textarea {
 .p-speeddial-list {
     
     li:nth-child(1) a {
-        background-color: #f97316;
+        background-color: #22c55e;
     }
     li:nth-child(2) a {
-        background-color: #0ea5e9;
+        background-color: #a855f7;
     }
     li:nth-child(3) a {
-        background-color: #25df69;
+        background-color: #0ea5e9;
     }
     li:nth-child(4) a {
-        background-color: #22c55e;
+        background-color: #ef4444;
     }
 }
 

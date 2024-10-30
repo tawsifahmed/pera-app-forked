@@ -205,13 +205,13 @@ onMounted(() => {
                             <Calendar v-model="data[field]" view="year" dateFormat="yy" fluid :manualInputs="false" />
                         </template>
                     </Column>
-                    <Column v-if="deleteQuarter" header="" style="width: 1%; min-width: 1rem; padding: 0;" bodyStyle="text-align:start">
+                    <Column v-if="updateQuarter" header=" " :rowEditor="true" style="width: 1%; margin-right: -200px; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:end" class=""></Column>
+                    <Column v-if="!updateQuarter" header=" " style="width: 1%; min-width: 6rem; margin-right: -200px; padding: 0 auto" bodyStyle="text-align:end" class=""></Column>
+                    <Column v-if="deleteQuarter" header="Action" style="width: 1%; min-width: 1rem; padding: 0" bodyStyle="text-align:end">
                         <template #body="{ data }">
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="onDelete(data)" />
                         </template>
                     </Column>
-                    <Column v-if="updateQuarter" header="Action" :rowEditor="true" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
-                    <Column v-if="!updateQuarter" header="Action" style="width: 1%; min-width: 6rem; padding: 0 auto" bodyStyle="text-align:start"></Column>
                 </DataTable>
             </div>
         </div>
@@ -254,4 +254,15 @@ onMounted(() => {
         </form>
     </Dialog>
 </template>
-<style scoped></style>
+<style scoped>
+.editButtonPosition {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+}
+.headerPosition {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+}
+</style>

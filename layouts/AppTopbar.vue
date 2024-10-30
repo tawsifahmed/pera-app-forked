@@ -304,6 +304,7 @@ watch(timerData, (oldValue, newValue) => {
 let timerInterval = null;
 
 function startTimer(timerSTime) {
+    const timerElement = document.getElementById('timer-interval');
     if (timerSTime === 'stop') {
         console.log('timerSTime', timerSTime);
         if (timerInterval) {
@@ -325,11 +326,23 @@ function startTimer(timerSTime) {
             return formattedTime;
         }
 
+                // Hide the timer element for the first 2 seconds
+                if (timerElement) {
+            timerElement.style.visibility = 'hidden';
+        }
+
+        // Show timer element after 2 seconds
+        setTimeout(() => {
+            if (timerElement) {
+                timerElement.style.visibility = 'visible';
+            }
+        }, 1000);
+
         if (timerInterval) {
             clearInterval(timerInterval);
         }
         timerInterval = setInterval(() => {
-            const timerElement = document.querySelector('.text-sm');
+            
             if (timerElement) {
                 timerElement.textContent = updateTimer();
             }
@@ -424,19 +437,21 @@ watchEffect(async () => {
                 </div>
             </div>
 
-            <NuxtLink v-tooltip.left="{ value: 'Active Task' }" :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"  
-            v-if="showTimer" class="flex absolute  gap-2 align-items-center task-timer-wrapper mr-2 time-int">
-               <div class="clock-wrapper relative ml-2">
-                   <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
-                       <i :class="`pi-stop stop`"></i>
-                   </div>
-                   <div class="text-sm absolute text-black">
-                       {{ timerData?.timerStartTime 
-                           ? startTimer(timerData?.timerStartTime) 
-                           : timerStartTime ? startTimer(timerStartTime) : '00:00:00' }}
-                   </div>
-               </div>
-           </NuxtLink>
+            <NuxtLink
+                v-if="showTimer"
+                v-tooltip.left="{ value: 'Active Task' }"
+                :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"
+                class="flex absolute gap-2 align-items-center task-timer-wrapper mr-2"
+            >
+                <div class="clock-wrapper relative ml-2">
+                    <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
+                        <i :class="`pi pi-stop text-white`" style="font-size: 11px; font-weight: 700"></i>
+                    </div>
+                    <div class="text-sm absolute text-black time-int" id="timer-interval">
+                        {{ timerData?.timerStartTime ? startTimer(timerData?.timerStartTime) : timerStartTime ? startTimer(timerStartTime) : ' ' }}
+                    </div>
+                </div>
+            </NuxtLink>
 
             <!-- <pre>{{fetchedTimerData}}</pre> -->
             <button @click="logout" class="p-link layout-topbar-button">
@@ -619,7 +634,22 @@ watchEffect(async () => {
     font-size: 7px;
 }
 
-.time-int{
-    color: black !important;
+.time-int {
+    color: crimson;
+    animation: blink-animation 1s steps(5, start) infinite;
+    font-weight: 400;
+}
+
+@keyframes blink-animation {
+    0% {
+        
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 </style>
