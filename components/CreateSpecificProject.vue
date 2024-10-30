@@ -95,10 +95,10 @@ const addTaskStatus = () => {
 };
 
 const handleDeleteTask = (index) => {
-    if(selectedCloseStatus.value.is_closed_status === taskStatusList.value[index].is_closed_status) {
+    taskStatusList.value.splice(index, 1);
+    if(selectedCloseStatus.value?.is_closed_status === taskStatusList.value[index]?.is_closed_status) {
         selectedCloseStatus.value = null;
     }
-    taskStatusList.value.splice(index, 1);
     if (taskStatusList.value.length == 0) {
         taskStatusNullCheck.value = false;
     }
