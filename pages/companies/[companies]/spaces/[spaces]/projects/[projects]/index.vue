@@ -58,12 +58,25 @@ const openCreateSpace = async (key, type) => {
 
 const handleTaskEdit = async (task) => {
     singleTask.value = task;
+    document.documentElement.style.cursor = 'wait';
+    document.documentElement.style.position = 'relative';
+    const overlayD = document.createElement('div');
+    overlayD.style.position = 'absolute';
+    overlayD.style.top = '0';
+    overlayD.style.left = '0';
+    overlayD.style.width = '100%';
+    overlayD.style.height = '100%';
+    overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    overlayD.style.zIndex = '1000000';
+    document.documentElement.appendChild(overlayD);
 
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
     visibleEdit.value = true;
+    document.documentElement.style.cursor = 'auto';
+    document.documentElement.removeChild(overlayD);
 };
 
 const confirmDeleteTask = (taskId) => {
