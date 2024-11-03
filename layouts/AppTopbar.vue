@@ -277,22 +277,22 @@ if(timerData.value) {
 }
 console.log('timerDatPPPa', timerData.value?.task_id);
 
-if (storedTaskID) {
-    console.log('from Store');
-    timerTaskId.value = storedTaskID;
-}
+// if (storedTaskID) {
+//     console.log('from Store');
+//     timerTaskId.value = storedTaskID;
+// }
 
 if(storeTaskCompanyID) {
     timerCompanyID.value = storeTaskCompanyID;
 }
 
-if(storeTaskSpaceID) {
-    timerSpaceId.value = storeTaskSpaceID;
-}
+// if(storeTaskSpaceID) {
+//     timerSpaceId.value = storeTaskSpaceID;
+// }
 
-if(storeTaskProjectID) {
-    timerProjectId.value = storeTaskProjectID;
-}
+// if(storeTaskProjectID) {
+//     timerProjectId.value = storeTaskProjectID;
+// }
 
 watch(timerData, (oldValue, newValue) => {
     console.log('timerDataWW', newValue);
@@ -336,7 +336,7 @@ function startTimer(timerSTime) {
             if (timerElement) {
                 timerElement.style.visibility = 'visible';
             }
-        }, 1000);
+        }, 500);
 
         if (timerInterval) {
             clearInterval(timerInterval);

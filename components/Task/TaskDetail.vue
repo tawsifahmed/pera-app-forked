@@ -601,7 +601,7 @@ const handleShareTaskId = () => {
                                             style="width: 146.41px" />
                                     </div>
                                     <div
-                                        class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
+                                        class="flex mt-2 justify-content-start gap-6 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
