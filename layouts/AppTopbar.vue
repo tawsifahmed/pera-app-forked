@@ -88,6 +88,8 @@ const isOutsideClicked = (event) => {
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
 
+
+
 const handleOutsideClick = () => {
     if (showNotify.value) {
         // fetchNotifyData();
@@ -100,6 +102,7 @@ const closeNotification = (evn) => {
     showNotify.value = evn;
     // fetchNotifyData();
     // notifiData.value = false;
+
 };
 
 // Register directive
@@ -168,9 +171,9 @@ const fetchNotifyData = async () => {
         if (data.value) {
             console.log('notification data =>', data.value);
             if (data.value.data.find((item) => item.is_read === 0)) {
-                notifiData.value = true;
+                notifiData.value = true
             } else {
-                notifiData.value = false;
+                notifiData.value = false
             }
             console.log('notification data =>', notifiData.value);
             // totalPage.value = Math.ceil(data.value.total / 5);
@@ -182,14 +185,17 @@ const fetchNotifyData = async () => {
 
 fetchNotifyData();
 
+
+
 const handleNotificationComp = () => {
+   
     showNotify.value = !showNotify.value;
-    if (notifiData.value) {
+    if(notifiData.value) {
         notifiData.value = false;
     }
 };
 
-const setter = ref(false);
+const setter = ref(false)
 
 // watch(showNotify, (newValue, oldValue) => {
 //     // console.log('old', oldValue);
@@ -216,6 +222,7 @@ const setter = ref(false);
 //     }
 // });
 
+
 const timerCompanyID = ref();
 const timerSpaceId = ref();
 const timerProjectId = ref();
@@ -225,6 +232,7 @@ const storeTaskCompanyID = localStorage.getItem('storeTaskCompanyID');
 const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
 const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
 const storedTaskID = localStorage.getItem('storeTaskID');
+
 
 console.log('timerTaskId', timerTaskId.value);
 const fetchedTimerData = ref();
@@ -245,7 +253,7 @@ const fetchActiveTimer = async () => {
             console.log('active timer data =>', data.value);
             // return;
             fetchedTimerData.value = data.value.data.is_timer_start;
-            if (data.value.data.is_timer_start === 'true') {
+            if(data.value.data.is_timer_start === "true"){
                 timerCompanyID.value = data.value.data.company_id;
                 timerSpaceId.value = data.value.data.space_id;
                 timerProjectId.value = data.value.data.project_id;
@@ -258,12 +266,12 @@ const fetchActiveTimer = async () => {
     } catch (e) {
         console.log(e);
     }
-};
+}
 
 fetchActiveTimer();
 
 const piniaTID = ref();
-if (timerData.value) {
+if(timerData.value) {
     console.log('from Pinia');
     piniaTID.value = timerData.value?.task_id;
 }
@@ -274,15 +282,15 @@ if (storedTaskID) {
     timerTaskId.value = storedTaskID;
 }
 
-if (storeTaskCompanyID) {
+if(storeTaskCompanyID) {
     timerCompanyID.value = storeTaskCompanyID;
 }
 
-if (storeTaskSpaceID) {
+if(storeTaskSpaceID) {
     timerSpaceId.value = storeTaskSpaceID;
 }
 
-if (storeTaskProjectID) {
+if(storeTaskProjectID) {
     timerProjectId.value = storeTaskProjectID;
 }
 
@@ -305,11 +313,12 @@ function startTimer(timerSTime) {
         }
         return;
     } else {
+
         const startTime = new Date(timerSTime);
 
         function updateTimer() {
             const currentTime = new Date();
-            const elapsedTime = currentTime - startTime;
+            const elapsedTime = currentTime - startTime; 
             const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
             const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
@@ -346,7 +355,7 @@ getStoreTimer();
 watchEffect(async () => {
     if (isTImerStopped.value === true) {
         timerTaskId.value = null;
-        startTimer('stop');
+        startTimer('stop')
         console.log('timerTaskIdFOLO', timerTaskId.value);
     }
     if (timerData.value || timerTaskId.value) {
@@ -360,6 +369,7 @@ watchEffect(async () => {
 
 <template>
     <div class="layout-topbar">
+        
         <Toast position="bottom-right" group="br" />
         <router-link to="/" class="layout-topbar-logo">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
@@ -391,26 +401,33 @@ watchEffect(async () => {
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
-            <!-- <pre>{{ showNotify}}</pre> -->
+             <!-- <pre>{{ showNotify}}</pre> -->
+            
+            
+
 
             <button @click="openProfile" class="p-link layout-topbar-button">
-                <div v-tooltip.bottom="{ value: 'Profile' }" v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
+                <div v-tooltip.bottom="{ value: 'Profile' }" v-if="userProfile?.data?.image"
+                    class="flex align-items-center gap-2">
                     <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
                     <div class="userImage">
-                        <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
+                        <img :src="`${userProfile?.data?.image}`" class=""
+                            style="height: 100%; width: 100%; object-fit: cover" />
                     </div>
                 </div>
-                <img v-tooltip.bottom="{ value: 'Profile' }" v-else src="../assets/dummy_profile.png" alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover" />
+                <img v-tooltip.bottom="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt=""
+                    style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
                 <span class="ml-4">Profile</span>
             </button>
             <!-- <pre>valueID{{timerTaskId}}</pre> -->
 
-            <div  class="relative">
+            <div class="relative">
                 <div v-if="notifiData" class="ping-container">
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
                 </div>
-                <button class="p-link layout-topbar-button notify-btn" @click="handleNotificationComp">
+                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn">
+
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
@@ -444,7 +461,8 @@ watchEffect(async () => {
             <!-- <pre>{{piniaTID}}</pre> -->
         </div>
 
-        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }"
+            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
     </div>
@@ -547,6 +565,7 @@ watchEffect(async () => {
 }
 
 @keyframes ping {
+
     75%,
     100% {
         transform: scale(2);
@@ -568,7 +587,6 @@ watchEffect(async () => {
 
     &:hover {
         box-shadow: 0 -1px 0 rgba(99, 102, 241, 0.04), 0 2px 4px rgba(99, 102, 241, 0.25);
-        border: 2px solid #28295c;
     }
 
     &:active {
@@ -593,6 +611,7 @@ watchEffect(async () => {
     display: flex;
     align-items: center;
     gap: 7px;
+    
 }
 
 .clock-btn {
