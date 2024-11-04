@@ -56,15 +56,21 @@ const handleGenerate = async () => {
     const formattedEndDate = dateFormatter(endDate.value);
     const formData = new FormData();
     const userIds = employee.value?.map(item => item.id);
-    console.log('User ID', userIds);
-    formData.append('user_id[]', userIds);
+        console.log('User ID', userIds);
+
+    userIds.forEach((id) => {
+        formData.append('user_id[]', id)
+    })    
+    // formData.append('user_id[]', userIds);
 
     // Only append project IDs if there are valid projects selected
     if (selectedProject.value && selectedProject.value.length > 0) {
         const projectIds = selectedProject.value?.map(item => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            formData.append('project_id[]', projectIds);
+            projectIds.forEach((id) =>{
+                formData.append('project_id[]', id)
+            })
         }
     }
 
@@ -109,15 +115,19 @@ const handleReportDownload = async () => {
     const formattedEndDate = dateFormatter(endDate.value);
     const formData = new FormData();
     const userIds = employee.value?.map(item => item.id);
-    console.log('User ID', userIds);
-    // return
-    formData.append('user_id[]', userIds);
-    console.log('User ID', formData)
+        console.log('User ID', userIds);
+
+    userIds.forEach((id) => {
+        formData.append('user_id[]', id)
+    })    
+
     if (selectedProject.value && selectedProject.value.length > 0) {
         const projectIds = selectedProject.value?.map(item => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            formData.append('project_id[]', projectIds);
+            projectIds.forEach((id) =>{
+                formData.append('project_id[]', id)
+            })
         }
     }
 
