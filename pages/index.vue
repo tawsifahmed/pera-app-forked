@@ -528,7 +528,7 @@ watch(
                     <!-- Filter -->
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
-                            optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                            filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
                         <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses"
                             :disabled="!selectedProject" optionLabel="name" placeholder="Select Status"
                             class="w-full md:w-12rem mb-2" />

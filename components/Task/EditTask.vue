@@ -9,12 +9,12 @@
             </div>
             <div class="field">
                 <label>Assignees</label>
-                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter optionLabel="name"
+                <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter resetFilterOnHide optionLabel="name"
                     placeholder="Select Assignees" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">
                 <label>Tags</label>
-                <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter optionLabel="name"
+                <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter resetFilterOnHide optionLabel="name"
                     placeholder="Select Tags" :maxSelectedLabels="3" class="w-full" />
             </div>
             <div class="field">

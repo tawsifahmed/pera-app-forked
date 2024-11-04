@@ -210,14 +210,14 @@ onMounted(() => {
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">User:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="employee" :options="employees" filter
+                            <MultiSelect display="chip" v-model="employee" :options="employees" filter resetFilterOnHide
                                 optionLabel="name" placeholder="Select User" class="w-full" />
                         </div>
                     </div>
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">Project:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter
+                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide
                                 optionLabel="name" placeholder="Select Project" class="w-full" />
                         </div>
                     </div>
@@ -261,12 +261,18 @@ onMounted(() => {
                 </template>
                 <Column field="task_name" header="Task"></Column>
                 <Column field="project_name" header="Project"></Column>
-                <Column field="assignee_name" header="Assignee"></Column>
+                <Column field="assignee_name" header="Assignee">
+                  <template #body="slotProps">
+                    <div v-for="(assignee, index) in slotProps.data.assignee_name">
+                      {{ assignee.name }}<span class="font-bold" v-if="index < slotProps.data.assignee_name.length - 1">, </span>
+                    </div>
+                  </template>
+                </Column>
                 <Column field="task_status" header="Status"></Column>
                 <Column field="task_due_date" header="Due Date"></Column>
                 <Column field="task_date_done" header="Completed Date"></Column>
                 <Column field="formatted_time_tracked" header="Time Track"></Column>
-                <Column field="overdue" header="Over Due"></Column>
+                <Column field="overdue" header="Over Due" ></Column>
                 <Column field="bounce" header="Bounce"></Column>
             </DataTable>
         </div>
@@ -274,6 +280,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+
 .user-selection {
     display: flex;
     flex-direction: column;

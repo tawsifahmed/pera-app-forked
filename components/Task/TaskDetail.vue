@@ -296,7 +296,7 @@ const handleTaskDetailSubmit = async () => {
 
     await editTask(taskDetailData);
     if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successfull', detail: 'Task detail updated', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
         if (isDescriptionEdited.value === true) {
             isDescriptionEdited.value = false;
@@ -569,7 +569,7 @@ const handleShareTaskId = () => {
                                             <p>Assignee:</p>
                                         </div>
                                         <FloatLabel style="width: 164.94px" class="input-fields">
-                                            <MultiSelect display="chip" v-model="assignees" filter :options="usersLists"
+                                            <MultiSelect display="chip" v-model="assignees" filter resetFilterOnHide :options="usersLists"
                                                 optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2"
                                                 class="w-full" />
                                         </FloatLabel>
@@ -676,7 +676,7 @@ const handleShareTaskId = () => {
                                     <p>Tags:</p>
                                 </div>
                                 <FloatLabel style="width: 90%" class="input-fields">
-                                    <MultiSelect display="chip" v-model="tags" filter :options="tagsLists"
+                                    <MultiSelect display="chip" v-model="tags" filter resetFilterOnHide :options="tagsLists"
                                         optionLabel="name" placeholder="Select Tags" class="w-full" />
                                 </FloatLabel>
                             </div>

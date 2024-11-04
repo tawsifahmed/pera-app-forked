@@ -25,7 +25,7 @@
         <!-- <pre>{{user_type}}</pre> -->
         <div class="field flex flex-column">
             <label>Role<i class="text-red-500">*</i></label>
-            <Dropdown v-model="user_type" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+            <Dropdown v-model="user_type" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
         <div class="create-btn-wrappe">
