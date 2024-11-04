@@ -1,12 +1,29 @@
 <script setup>
+import { storeToRefs } from 'pinia';
+import { useActiveCompanyStore } from '~/store/workCompany';
+import RadioButton from 'primevue/radiobutton';
+
+const { totalProjects } = storeToRefs(useActiveCompanyStore());
+
 const url = useRuntimeConfig();
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
 });
 const startDate = ref('');
+
+const selectedDateCategory = ref('Create');
+const selectedDateCategory2 = ref('Create');
+console.log('Selected Date Category', selectedDateCategory.value);
+const dateCategories = ref([
+    { name: 'Create', key: 'A' },
+    { name: 'Due Date', key: 'B' },
+
+]);
+
 const endDate = ref('');
 const employee = ref('');
+const selectedProject = ref();
 const employees = ref([]);
 const previewData = ref(null);
 const loading = ref(false);
@@ -128,15 +145,39 @@ onMounted(() => {
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">User:</label>
                         <div class="flex justify-content-center">
-                            <Dropdown v-model="employee" :options="employees" optionLabel="name" placeholder="Select/Search User" class="w-full md:w-14rem" />
-                        </div>
+                            <MultiSelect display="chip" v-model="employee" :options="employees" filter optionLabel="name"
+                placeholder="Select User" class="w-full" />
+                            </div>
+                    </div>
+                    <div class="user-selection w-full md:w-14rem w-full">
+                        <label class="font-bold block mb-2">Project:</label>
+                        <div class="flex justify-content-center">
+                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter optionLabel="name"
+                placeholder="Select Project" class="w-full" />
+                            </div>
                     </div>
                     <div class="flex-auto">
-                        <label for="icondisplay" class="font-bold block mb-2">From: </label>
+                        <div class="flex gap-3 align-items-center">
+                            <label for="icondisplay" class="font-bold block mb-2">From: </label>
+                            <div class="flex flex-wrap gap-2 mb-2 text-sm">
+                                <div v-for="category in dateCategories" :key="category.key" class="flex align-items-center">
+                                    <RadioButton v-model="selectedDateCategory" :inputId="category.key" name="dynamic" :value="category.name" />
+                                    <label :for="category.key" class="ml-2">{{ category.name }}</label>
+                                </div>
+                            </div>
+                        </div>
                         <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
-                        <label for="icondisplay" class="font-bold block mb-2"> To: </label>
+                        <div class="flex gap-3 align-items-center">
+                            <label for="icondisplay" class="font-bold block mb-2">To: </label>
+                            <div class="flex flex-wrap gap-2 mb-2 text-sm">
+                                <div v-for="category in dateCategories" :key="category.key" class="flex align-items-center">
+                                    <RadioButton v-model="selectedDateCategory2" :inputId="category.key" name="dynamic" :value="category.name" />
+                                    <label :for="category.key" class="ml-2">{{ category.name }}</label>
+                                </div>
+                            </div>
+                        </div>
                         <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>

@@ -35,25 +35,21 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
-const isSpeedDialVisible = ref({}); // Object to track visibility for each item
+const isSpeedDialVisible = ref({});
 
-// Show the SpeedDial options for the hovered item
-// Show the SpeedDial options for the specific row
 const showSpeedDial = (key) => {
     isSpeedDialVisible.value = {
-        ...isSpeedDialVisible.value, // Keep the previous state
-        [key]: true, // Show the SpeedDial for the hovered row
+        ...isSpeedDialVisible.value,
+        [key]: true, 
     };
 };
 
-// Hide the SpeedDial options for the specific row
 const hideSpeedDial = (key) => {
     isSpeedDialVisible.value = {
-        ...isSpeedDialVisible.value, // Keep the previous state
-        [key]: false, // Hide the SpeedDial for the row
+        ...isSpeedDialVisible.value, 
+        [key]: false, 
     };
 };
-
 
 const getActionItems = (node) => {
     return [
@@ -61,27 +57,24 @@ const getActionItems = (node) => {
             label: 'Add Sub Task',
             icon: 'pi pi-plus text-white',
             command: () => {
-                // Emit the event for creating a sub-task
                 emit('openCreateSpace', node.key, 'sub-task');
                 // toast.add({ severity: 'info', summary: 'Add Sub Task', detail: `Sub Task Added to ${node.data.name}`, life: 3000 });
             },
-            disabled: !createTaskP, // Disable if the user cannot create a task
+            disabled: !createTaskP,
         },
         {
             label: 'Edit Task',
             icon: 'pi pi-pencil text-white',
             command: () => {
-                // Emit the event for editing the task
                 emit('handleTaskEdit', node);
                 // toast.add({ severity: 'success', summary: 'Edit Task', detail: `Editing ${node.data.name}`, life: 3000 });
             },
-            disabled: !updateTaskP, // Disable if the user cannot update the task
+            disabled: !updateTaskP, 
         },
         {
             label: 'Task Detail',
             icon: 'pi pi-window-maximize text-white',
             command: () => {
-                // Emit the event for task details
                 emit('handleTaskDetailView', node);
                 // toast.add({ severity: 'info', summary: 'Task Details', detail: `Viewing details of ${node.data.name}`, life: 3000 });
             }
@@ -90,14 +83,11 @@ const getActionItems = (node) => {
             label: 'Delete Task',
             icon: 'pi pi-trash text-white',
             command: () => {
-                // Emit the event for deleting the task
                 emit('confirmDeleteTask', node.key);
                 // toast.add({ severity: 'error', summary: 'Delete Task', detail: `Deleted ${node.data.name}`, life: 3000 });
             },
-            disabled: !deleteTaskP, // Disable if the user cannot delete the task
+            disabled: !deleteTaskP,
         },
-
-
     ];
 };
 
@@ -128,7 +118,6 @@ const handleFilterReset = () => {
     } else {
         return;
     }
-
 };
 
 const changeAttribute = async () => {
@@ -174,10 +163,8 @@ const handleDateDelete2 = () => {
 const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
-    // return
     loading.value = true;
     console.log('lod', taskLists);
-    // return
     if (taskLists.length > 0) {
         const csvContent =
             'data:text/csv;charset=utf-8,' +
