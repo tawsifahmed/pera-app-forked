@@ -120,7 +120,7 @@ const handleReportDownload = async () => {
             formData.append('project_id[]', projectIds);
         }
     }
-    
+
     if (startDate.value && endDate.value) {
         if (selectedDateCategory.value == 'Create') {
             formData.append('start_date', formattedStartDate);
@@ -189,10 +189,10 @@ onMounted(() => {
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
             <h5 class="mb-1">User Reports</h5>
-            <pre>
+            <!-- <pre>
                 sp =>{{  selectedProject?.length }}
             
-            </pre>
+            </pre> -->
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
