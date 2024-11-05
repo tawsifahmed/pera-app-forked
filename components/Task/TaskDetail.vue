@@ -698,6 +698,12 @@ const handleShareTaskId = () => {
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
                                             <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
                                             <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                                            <button v-tooltip.bottom="'Strikethrough'" class="ql-strike"></button>
+                                            <span class="ql-formats">
+                                                <select class="ql-color"></select>
+                                                <select class="ql-background"></select>
+                                              </span>
+
                                             <button class="ql-list" type="button" data-pc-section="list"
                                                 value="ordered"></button>
                                             <button class="ql-list" type="button" data-pc-section="list"
