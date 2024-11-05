@@ -327,7 +327,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
-                                    <InputText type="text" v-model="sectionCreate.section_weightage" placeholder="Weightage" min="0" class="w-full" />
+                                    <InputNumber v-model="sectionCreate.section_weightage" placeholder="Weightage" inputId="Weightage" :min="0" :max="60" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">
@@ -358,7 +358,7 @@ onMounted(() => {
                             <div class="col-12">
                                 <div class="user-selection w-full">
                                     <label for="icondisplay" class="font-bold block mb-2">Weightage:</label>
-                                    <InputText type="text" v-model="sectionEdit.section_weightage" placeholder="Weightage" min="0" class="w-full" />
+                                    <InputNumber v-model="sectionEdit.section_weightage" placeholder="Weightage" inputId="Weightage" :min="0" :max="60" class="w-full" />
                                 </div>
                             </div>
                             <div class="col-12">

@@ -7,7 +7,7 @@
 
         <div class="field flex flex-column">
             <label>Role<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+            <Dropdown v-model="selectedRoles" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>

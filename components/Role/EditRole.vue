@@ -8,7 +8,7 @@
         <div class="field permission_selection">
             <label>Permissions<i class="text-red-400 text-italic">*</i> </label>
             <!-- <pre>{{selectedPermissions}}</pre> -->
-            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>

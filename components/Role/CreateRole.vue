@@ -7,7 +7,7 @@
 
         <div class="field permission_selection">
             <label>Permissions<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter role name</p>

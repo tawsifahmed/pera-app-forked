@@ -107,7 +107,7 @@ const handleTaskDetailView = async (task) => {
     overlayD.style.width = '100%';
     overlayD.style.height = '100%';
     overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
-    overlayD.style.zIndex = '1000000';
+    overlayD.style.zIndex = '100000010';
     document.documentElement.appendChild(overlayD);
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;

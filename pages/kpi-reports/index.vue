@@ -41,6 +41,13 @@ const loading = ref(false);
 const subModal = ref(false);
 const toast = useToast();
 
+const handleSubSectionModal = (modal, section) => {
+    console.log('check selected section', section);
+
+    subModal.value = modal;
+    subSectionCreate.value.section = section;
+    console.log('check subsection create', subSectionCreate.value.section);
+};
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('getMembers22', () =>
@@ -50,10 +57,10 @@ const init = async () => {
             }
         })
     );
-    console.log('memmbess',data.value?.team_members);
-    if(data.value?.team_members){
+    console.log('memmbess', data.value?.team_members);
+    if (data.value?.team_members) {
         employees.value = data.value?.team_members.map((member) => ({ id: member.id, name: member.name }));
-        console.log('employee',employee.value);
+        console.log('employee', employee.value);
     }
 };
 
@@ -285,7 +292,17 @@ quaterYear.value = date.getFullYear();
                                                         class="w-full"
                                                         style="max-width: 17rem"
                                                     />
-                                                    <Button @click="() => (subModal = true)" icon="pi pi-plus" severity="success" aria-label="Add New" class="" />
+                                                    <Button
+                                                        @click="
+                                                            () => {
+                                                                handleSubSectionModal(true, dynamicSection[index].section_id);
+                                                            }
+                                                        "
+                                                        icon="pi pi-plus"
+                                                        severity="success"
+                                                        aria-label="Add New"
+                                                        class=""
+                                                    />
                                                 </div>
                                             </div>
                                             <div class="col-12 md:col-6">

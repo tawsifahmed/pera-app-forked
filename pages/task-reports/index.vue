@@ -55,7 +55,7 @@ const handleGenerate = async () => {
         return (loading.value = false);
     } else {
         loading.value = false;
-        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to download', group: 'br', life: 3000 });
+        return toast.add({ severity: 'error', summary: 'Failed', detail: 'Failed to generate!', group: 'br', life: 3000 });
     }
 };
 const handleReportDownload = async () => {
