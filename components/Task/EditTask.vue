@@ -46,7 +46,7 @@ const { singleTask, usersLists, tagsLists, projects } = defineProps(['singleTask
 const toast = useToast();
 const btnLoading = ref(false);
 
-const taskEditDescriptionInput = ref(null);
+// const taskEditDescriptionInput = ref(null);
 
 const taskNameEditInput = ref(singleTask?.data?.name);
 const dueDate = ref(singleTask?.data?.dueDate ? new Date(singleTask.data.dueDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
@@ -104,7 +104,7 @@ const handleUpdateTask = async () => {
         const editTaskData = {
             id: singleTask.key,
             name: taskNameEditInput.value,
-            description: taskEditDescriptionInput.value,
+            // description: taskEditDescriptionInput.value,
             priority: priority.value.name,
             dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             assignees: assignees.value.map((obj) => obj.id),
