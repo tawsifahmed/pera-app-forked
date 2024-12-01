@@ -124,7 +124,7 @@ watch(taskStatusList, (newList) => {
 const loading = ref(false);
 const handleCreateProject = async () => {
     loading.value = true;
-    if (projectNameInput.value === null || taskStatusList.value.length <= 0 || !selectedCloseStatus.value) {
+    if (projectNameInput.value === null || taskStatusList.value.length <= 0 || selectedCloseStatus.value === null) {
         errorHandler.value = true;
         loading.value = false;
     } else {
@@ -169,6 +169,7 @@ const handleCreateProject = async () => {
                     serial_no: 3
                 }
             ];
+            selectedCloseStatus.value = null;
             loading.value = false;
         } else {
             toast.add({ severity: 'error', summary: 'Failed', detail: 'Project creation Failed!', group: 'br', life: 3000 });

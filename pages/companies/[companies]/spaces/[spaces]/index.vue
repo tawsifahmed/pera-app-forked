@@ -42,8 +42,9 @@ const confirmDeleteProject = (spaceId) => {
 };
 
 const deleteProjectDialog = ref(false);
-
+const deleteLoader = ref(false);
 const deletingProject = async () => {
+    deleteLoader.value = true;
     console.log('refCompanyIdFin', refProjectId.value);
 
     // return
@@ -53,9 +54,11 @@ const deletingProject = async () => {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteProjectDialog.value = false;
         console.log('space deleted');
+        deleteLoader.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
         console.log('space not deleted');
+        deleteLoader.value = false;
     }
 };
 
@@ -143,7 +146,7 @@ const isPage = ref(true);
         <Dialog v-model:visible="deleteProjectDialog" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingProject" />
+            <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingProject" />
         </Dialog>
 
         <Dialog v-model:visible="visibleEditProject" modal header="Edit Project" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

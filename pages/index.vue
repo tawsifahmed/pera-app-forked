@@ -8,7 +8,7 @@ import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
 // companies.getCompany();
-const { companyList, totalProjects } = storeToRefs(useActiveCompanyStore());
+const { totalCompanies, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
 const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
@@ -285,8 +285,8 @@ watch(
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <!-- <pre>{{companyList.length}}</pre> -->
-                        <div class="text-900 font-medium text-xl">{{ companyList ? companyList.length : '0' }}</div>
+                        <!-- <pre>{{totalCompanies}}</pre> -->
+                        <div class="text-900 font-medium text-xl">{{ totalCompanies ? totalCompanies : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                         style="width: 2.5rem; height: 2.5rem">

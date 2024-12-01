@@ -11,7 +11,7 @@
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="number" class="w-full" placeholder="Enter Phone No."/>
+            <InputText v-model="phone" type="tel" class="w-full" placeholder="Enter Phone No."/>
         </div>
         <div class="field">
             <label for="company">Address</label>

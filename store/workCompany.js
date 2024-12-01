@@ -63,6 +63,13 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
         return [];
       }
     },
+    totalCompanies(state) {
+      if (state.availableCompanies) {
+        return state.availableCompanies.length;
+      } else {
+        return 0;
+      }
+    },
     selectedCompany(state) {
       return state.compInLoclStrg
     },
