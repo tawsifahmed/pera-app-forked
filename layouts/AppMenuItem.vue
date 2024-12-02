@@ -147,15 +147,15 @@ const toggle = (event) => {
             </div>
         </a>
         <router-link
-            class="flex align-items-center justify-content-between"
+            class="flex align-items-center justify-content-between" style="margin-left: 1px !important; padding-left: 7px !important;"
             v-if="item.to && !item.items && item.visible !== false"
             @click="itemClick($event, item, index)"
             :class="[item.class, { 'active-route': checkActiveRoute(item) }]"
             tabindex="0"
             :to="item.to"
         >
-            <div class="flex flex-row">
-                <i :class="item.icon" class="layout-menuitem-icon"></i>
+            <div class="flex flex-row align-items-center">
+                <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important;"></i>
                 <span v-tooltip.right="{ value: `${item.label.length > 20 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
             </div>
             <span

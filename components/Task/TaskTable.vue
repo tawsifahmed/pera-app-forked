@@ -536,7 +536,7 @@ const handleChange = (event, name) => {
                             optionLabel="name" placeholder="Set Priority">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div v-if="slotProps.value.name" :style="{ fontWeight: 500 }" class="pt-1">{{
+                                    <div v-if="slotProps.value.name" :style="{ color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '', fontWeight: 500 }" class="pt-1">{{
                                         slotProps.value.name }}
                                     </div>
                                     <div v-else class="pt-1">Set </div>
@@ -548,7 +548,6 @@ const handleChange = (event, name) => {
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
                                     <div>{{ slotProps.option.name }}</div>
-                                    
                                 </div>
                             </template>
                         </Dropdown>
@@ -1233,8 +1232,8 @@ textarea {
 .custom-speed-dial:hover{
     .p-speeddial-list {
         background: transparent !important;
-        backdrop-filter: blur(100px);
-        -webkit-backdrop-filter: blur(100px);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
         padding: 0px 0px 0 100px !important;
     }     
 }

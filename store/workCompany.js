@@ -25,7 +25,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
               const proObj = {
                 'label': ele?.name,
                 'id': ele?.id,
-                'icon': 'pi pi-list',
+                'icon': 'pi pi-bars',
                 'color': ele?.color,
                 'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
               }

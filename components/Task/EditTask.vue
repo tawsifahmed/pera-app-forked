@@ -58,7 +58,7 @@ assignees.value = singleTask?.data?.assigneeObj ? singleTask?.data?.assigneeObj.
 const tags = ref(singleTask?.data?.tagsObj);
 
 const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+priority.value = singleTask.data.priority ? { name: singleTask.data.priority.name, code: singleTask.data.priority.code } : '';
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
