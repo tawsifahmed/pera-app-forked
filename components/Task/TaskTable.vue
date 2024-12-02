@@ -209,8 +209,10 @@ const downloadTaskSheet = (taskLists) => {
     }
 };
 
+const tableLoader = ref(true);
 onMounted(async () => {
     await getSingleProject(id);
+    tableLoader.value = false;
     getUserlist();
 });
 
@@ -286,6 +288,8 @@ function countTasks(tasks) {
 
     return count;
 }
+
+
 // Kanban
 const editable = ref(true);
 const dragOptions = computed(() => ({
@@ -368,7 +372,7 @@ const handleChange = (event, name) => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true"
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :loading="tableLoader"
         :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty>
             <p class="text-center">No Data found...</p>
@@ -1112,7 +1116,7 @@ textarea {
 
 .custom-speed-dial:hover{
     .p-speeddial-list {
-        background: rgba(255, 255, 255, 0.23);
+        background: transparent !important;
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
         padding: 0px 0px 0 100px !important;
@@ -1138,4 +1142,11 @@ textarea {
 .p-speeddial-opened .p-speeddial-rotate {
     transform: rotate(90deg);
   }
+
+
+ .p-treetable-loading-overlay{
+    background: transparent !important;
+    z-index: 1000 !important;
+    backdrop-filter: blur(100px) !important;
+ } 
 </style>
