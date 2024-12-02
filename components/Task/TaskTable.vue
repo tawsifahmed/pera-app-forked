@@ -7,8 +7,8 @@ import Column from 'primevue/column';
 
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
-const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
-const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
+const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
+const { modStatusList, singleProject, statuslist, isTaskEdited } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -34,6 +34,13 @@ const priorities = ref([
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
 ]);
+
+const onChangePriorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+])
 
 const isSpeedDialVisible = ref({});
 
@@ -242,6 +249,50 @@ async function handleTaskStatus(status, task_id) {
     }
 }
 
+const handleTaskChanges = async (taskValue, task_id) => {
+    
+
+        // let sendEditDate;
+        // if (dueDate.value) {
+        //     const selectedDate = new Date(dueDate.value);
+        //     selectedDate.setDate(selectedDate.getDate() + 1);
+        //     sendEditDate = selectedDate.toISOString();
+        // }
+        const editTaskData = {
+            id: task_id,
+            // name: taskNameEditInput.value,
+            // description: taskEditDescriptionInput.value,
+            priority: taskValue.name,
+            // dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
+            // assignees: assignees.value.map((obj) => obj.id),
+            // tags: tags.value.map((obj) => obj.id),
+            project_id: id
+        };
+        
+        // if(sendEditDate){
+        //     const postSubDate = new Date(sendEditDate)
+        //     postSubDate.setDate(postSubDate.getDate() - 1);
+        //     dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
+        // }
+        
+        await editTask(editTaskData);
+        // if (detectDuplicateTask.value === true) {
+        //     btnLoading.value = false;
+        //     toast.add({ severity: 'error', summary: 'Error', detail: 'Cannnot edit, edited task name already exists!', group: 'br', life: 3000 });
+        // }
+         if (isTaskEdited.value === true) {
+            // btnLoading.value = false;
+            // emit('closeEditModal', false);
+
+            // emit('visibleEdit', 'visibleEdit');
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Priority updated ', group: 'br', life: 3000 });
+        } else {
+            // btnLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
+        }
+   
+};
+
 function getRandomDeepColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -263,6 +314,13 @@ function avatarStyle(index) {
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
+};
+
+const formatPriority = (priority) => {
+    return {
+        name: priority,
+        code: priority
+    };
 };
 
 const load = () => {
@@ -467,7 +525,39 @@ const handleChange = (event, name) => {
                     slotProps.node.data.dueDateValue }}</div>
             </template>
         </Column>
-        <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
+        <Column field="priority" header="Priority" :style="{ width: '10%' }">
+            <template #body="slotProps">
+                <div class="inline-block">
+                    <div class="task-status-2">
+                        <!-- <pre>{{slotProps.node.data}}</pre> -->
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                            @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
+                            v-model="slotProps.node.data.priority" :options="onChangePriorities" :disabled="!updateTaskP"
+                            optionLabel="name" placeholder="Set Priority">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center">
+                                    <div v-if="slotProps.value.name" :style="{ fontWeight: 500 }" class="pt-1">{{
+                                        slotProps.value.name }}
+                                    </div>
+                                    <div v-else class="pt-1">Set </div>
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                    
+                                </div>
+                            </template>
+                        </Dropdown>
+                        
+                    </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
+                </div>
+            </template>    
+        </Column>
         <Column field="action" header="Action" :style="{ width: '10%', position: 'relative' }">
             <template #body="slotProps">
                 <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
@@ -1143,8 +1233,8 @@ textarea {
 .custom-speed-dial:hover{
     .p-speeddial-list {
         background: transparent !important;
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(100px);
+        -webkit-backdrop-filter: blur(100px);
         padding: 0px 0px 0 100px !important;
     }     
 }
@@ -1174,5 +1264,6 @@ textarea {
     background: transparent !important;
     z-index: 1000 !important;
     backdrop-filter: blur(100px) !important;
+    -webkit-backdrop-filter: blur(100px) !important;
  } 
 </style>
