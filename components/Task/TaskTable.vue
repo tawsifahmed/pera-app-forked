@@ -375,7 +375,7 @@ const handleChange = (event, name) => {
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :loading="tableLoader"
         :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty>
-            <p class="text-center">No Data found...</p>
+            <p class="text-center">No data found...</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
         <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '40%' }">
@@ -470,8 +470,15 @@ const handleChange = (event, name) => {
         <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
         <Column field="action" header="Action" :style="{ width: '10%', position: 'relative' }">
             <template #body="slotProps">
-                <div class="flex justify-content-start align-items-center" style="width: fit-content;"
+                <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
                     @mouseover="showSpeedDial(slotProps.node.key)" 
+                    @mouseleave="hideSpeedDial(slotProps.node.key)"     
+                    >
+                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
+                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
+                </div>
+                <div class=" justify-content-start align-items-center tabView-action" style="width: fit-content;"
+                    @click="showSpeedDial(slotProps.node.key)" 
                     @mouseleave="hideSpeedDial(slotProps.node.key)"     
                     >
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
@@ -1072,6 +1079,25 @@ textarea {
 .board-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+}
+
+.webView-action{
+    display: flex;
+}
+
+.tabView-action{
+    display: none;
+}
+
+
+@media (max-width: 1024px) {
+    .webView-action {
+        display: none;
+    }
+
+    .tabView-action {
+        display: flex;
+    }
 }
 
 .p-treetable .p-treetable-tbody>tr>td .p-treetable-toggler {
