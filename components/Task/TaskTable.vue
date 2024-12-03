@@ -70,21 +70,26 @@ const handleInlineNameEdit = (node) => {
 
 const inputChanged = ref(false);
 watch(inlineTaskNameInput, (newVal, oldVal) => {
-    if (newVal !== oldVal) {
+    console.log('newVal', newVal);
+    console.log('oldVal', oldVal);
+    if (oldVal !== null) {
         inputChanged.value = true;
+        console.log('inputChanged', inputChanged.value);
     }
 });
 
 const updateTaskName = async (taskId) => {
-    if(inputChanged.value === true) {
+    if(inputChanged.value !== true) {
+        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
+    } else{
         await handleTaskChanges( inlineTaskNameInput.value, taskId);
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [taskId]: false
         };
+        inlineTaskNameInput.value = null;
         editClikedRowKey.value = null;
-    } else{
-        toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+        inputChanged.value = false;
     }
 }
 
@@ -535,18 +540,17 @@ const handleChange = (event, name) => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true" :loading="tableLoader"
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
         :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty>
             <p class="text-center">No data found...</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" tone" expander :style="{ width: '40%' }"
+        <Column field="name" header="Name" class=" tone" expander :style="{ width: '600px' }"
             :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full tasktitle-hover" @mouseenter="handleMouseEnter(slotProps.node.key)"
                     >
-
                     <div class="inline-block w-full relative">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
@@ -584,7 +588,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" class="cursor-pointer" :style="{ width: '5%' }">
+        <Column field="" header="" class="cursor-pointer" :style="{ width: '75px' }">
             <template #body="slotProps" >
                 <div class="flex gap-1" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <Button @click="handleInlineNameEdit(slotProps.node)"
@@ -597,13 +601,13 @@ const handleChange = (event, name) => {
                         style="font-size: 0.2rem" />
                     <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                         v-tooltip.top="{ value: `Edit Name` }" v-if="checkMarkInput[slotProps.node.key]"
-                        severity="secondary" icon="pi pi-check" class="w-fit h-fit p-1 "
+                        severity="secondary" icon="pi pi-check" class=" p-1 "
                         style="font-size: 0.2rem" />
                 </div>
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee">
+        <Column field="assignee" header="Assignee" :style="{ width: '295px' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -621,7 +625,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '15%' }">
+        <Column field="status" header="Status" :style="{ width: '148px' }">
             <template #body="slotProps">
                 <div class="inline-block" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="task-status-2">
@@ -652,7 +656,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '148px' }">
             <template #body="slotProps">
                 <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
                     {{slotProps.node.data.dueDateValue }}
@@ -664,7 +668,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="priority" header="Priority" :style="{ width: '10%' }">
+        <Column field="priority" header="Priority" :style="{ width: '140px' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -698,7 +702,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="action" header="Action" :style="{ width: '10%', position: 'relative' }">
+        <Column field="action" header="Action" :style="{ width: '73px', position: 'relative' }">
             <template #body="slotProps">
                 <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
                     @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
@@ -931,7 +935,7 @@ const handleChange = (event, name) => {
 
 .tone {
     overflow: hidden !important;
-    /*text-overflow: ellipsis !important;*/
+    text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
 
@@ -1473,7 +1477,7 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 93.5%;
+    width: 98%;
     position: absolute;
     left: 23px;
     top: -5px;
