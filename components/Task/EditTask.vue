@@ -20,7 +20,7 @@
             <div class="field">
                 <!-- <pre>date{{dueDate}}</pre> -->
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)"/>
             </div>
             <div class="field">
                 <label>Priority</label>

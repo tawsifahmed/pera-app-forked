@@ -293,6 +293,58 @@ const handleTaskChanges = async (taskValue, task_id) => {
    
 };
 
+const hideTrigger = ref()
+const handleInlineDate = () => {
+    hideTrigger.value = true;
+    // visibleDateTrigger.value = false;
+    // userHasModifiedTime.value = false;
+    // console.log('inlineDueDate', inlineDueDate.value);
+    // handleDateChange(inlineDueDate.value, slotKey);
+};
+
+const inlineDueDate = ref(); 
+const userHasModifiedTime = ref(false);
+
+const visibleDateTrigger = ref({});
+const handleDateChange = (newDate, slotKey) => {
+    console.log('newDate', newDate);
+    let oldDate = slotKey.node.data.dueDateValue;
+    if (!userHasModifiedTime.value) {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);  
+        inlineDueDate.value = selectedDate;
+        console.log('inlineDueDate', inlineDueDate.value);
+        let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });  
+        console.log('placeHolderValue', placeHolderValue);
+        slotKey.node.data.dueDateValue = placeHolderValue;
+    }else {
+        inlineDueDate.value = newDate;  
+        let placeHolderValue = new Date(newDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        slotKey.node.data.dueDateValue = placeHolderValue;
+    }
+    visibleDateTrigger.value = {
+        ...visibleDateTrigger.value,
+        [slotKey.node.key]: true, 
+    };  
+};
+
+const handleCalendarHide = (key) => {
+    visibleDateTrigger.value = {
+        ...visibleDateTrigger.value,
+        [key]: false, // Set the visible trigger to false when calendar is hidden
+    };
+};
+
+watch(inlineDueDate, (newVal, oldVal) => {
+    if (newVal && oldVal && newVal !== oldVal) {
+        userHasModifiedTime.value = true;
+    }
+});
+
+
+
+
+
 function getRandomDeepColor() {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -521,8 +573,17 @@ const handleChange = (event, name) => {
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap' }">
             <template #body="slotProps">
-                <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{
-                    slotProps.node.data.dueDateValue }}</div>
+                <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
+                    {{slotProps.node.data.dueDateValue }}
+                </div> -->
+                <div class="relative">
+                    <Calendar @date-select="handleDateChange($event, slotProps)" @hide="handleCalendarHide(slotProps.node.key)"
+                    class="inline-calendar cursor-pointer" manualInput="false" 
+                    :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''" 
+                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" 
+                    showTime hourFormat="12" />
+                    <Button v-if="visibleDateTrigger[slotProps.node.key]" @click="handleInlineDate()" class="ml-2" icon="pi pi-check" style="width: 1.8rem; height: 1.8rem;" rounded outlined aria-label="Filter" />
+                </div>
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '10%' }">
@@ -1264,5 +1325,29 @@ textarea {
     z-index: 1000 !important;
     backdrop-filter: blur(100px) !important;
     -webkit-backdrop-filter: blur(100px) !important;
- } 
+ }
+
+
+ .green-calendar > input::-webkit-input-placeholder{
+    color:    #087641;
+    font-weight: 600;
+    
+ }
+
+ .red-calendar > input::-webkit-input-placeholder{ 
+    color: #b13a41;
+    font-weight: 600;
+    
+ }
+
+ .inline-calendar{
+    max-width: 59% !important;
+    cursor: pointer !important;
+    .p-inputtext{
+        padding: 0.25rem 0.5rem !important;
+        cursor: pointer !important;
+        text-align: center !important;
+    }
+ }
+
 </style>

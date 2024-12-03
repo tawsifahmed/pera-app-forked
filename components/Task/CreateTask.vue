@@ -21,7 +21,7 @@
         </div>
         <div class="field">
             <label>Due Date <span v-tooltip.right="{ value: 'Set your task due date' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
+            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)"/>
         </div>
         <div class="field">
             <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
