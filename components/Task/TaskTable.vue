@@ -78,6 +78,39 @@ watch(inlineTaskNameInput, (newVal, oldVal) => {
     }
 });
 
+
+// Timer reference for managing click delay
+let clickTimer = ref(null);
+
+// Single click handler
+const handleClick = (node) => {
+  // Clear the timer if already set to prevent single click on double click
+  if (clickTimer.value) {
+    clearTimeout(clickTimer.value);
+    clickTimer.value = null;
+  }
+
+  // Set timer to trigger the single-click action
+  clickTimer.value = setTimeout(() => {
+    emit('handleTaskDetailView', node);
+    clickTimer.value = null; // Reset the timer after the function runs
+  }, 250); // Delay for single click detection (250ms)
+};
+
+
+// Double click handler
+const handleDblClick = (node) => {
+  // Clear the single click timer to avoid running both functions
+  if (clickTimer.value) {
+    clearTimeout(clickTimer.value);
+    clickTimer.value = null;
+  }
+
+  // Call the double-click function
+  handleInlineNameEdit(node);
+};
+
+
 const updateTaskName = async (taskId) => {
     if(inputChanged.value !== true) {
         return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
@@ -368,9 +401,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
 };
 
 
-
 const inlineDueDate = ref();
-
 
 const handleDateChange = async (newDate, slotKey) => {
     console.log('newDate', newDate);
@@ -385,22 +416,6 @@ const handleDateChange = async (newDate, slotKey) => {
     slotKey.node.data.dueDateValue = placeHolderValue;
     await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
-
-const handleCalendarHide = async (key) => {
-    // visibleDateTrigger.value = {
-    //     ...visibleDateTrigger.value,
-    //     [key]: false, // Set the visible trigger to false when calendar is hidden
-    // };
-};
-
-
-
-
-
-
-
-
-
 
 function getRandomDeepColor() {
     const letters = '0123456789ABCDEF';
@@ -423,13 +438,6 @@ function avatarStyle(index) {
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
-};
-
-const formatPriority = (priority) => {
-    return {
-        name: priority,
-        code: priority
-    };
 };
 
 const load = () => {
@@ -546,12 +554,12 @@ const handleChange = (event, name) => {
             <p class="text-center">No data found...</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" tone" expander :style="{ width: '600px' }"
+        <Column field="name" header="Name" class=" tone" expander :style="{ width: '590px' }"
             :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block w-full tasktitle-hover" @mouseenter="handleMouseEnter(slotProps.node.key)"
+                <div class="inline-block w-full tasktitle-hover cursor-pointer" @mouseenter="handleMouseEnter(slotProps.node.key)"
                     >
-                    <div class="inline-block w-full relative">
+                    <div @click="handleClick(slotProps.node)" @dblclick="handleDblClick(slotProps.node)" class="inline-block w-full relative">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -577,7 +585,7 @@ const handleChange = (event, name) => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <span  @click="emit('handleTaskDetailView', slotProps.node)" class="taskTitle cursor-pointer" v-tooltip.left="{
+                        <span class="taskTitle cursor-pointer" v-tooltip.left="{
                             value: `${slotProps.node.data.name}`
                         }">{{ slotProps.node.data.name }}
                         </span>
@@ -588,26 +596,29 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" class="cursor-pointer" :style="{ width: '75px' }">
+        <Column field="" header="" :style="{ width: '75px',padding: '0.75rem .9rem' }">
             <template #body="slotProps" >
-                <div class="flex gap-1" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <Button @click="handleInlineNameEdit(slotProps.node)"
-                        v-tooltip.top="{ value: `Edit Task` }" v-if="hoveredRowKey === slotProps.node.key && !checkMarkInput[slotProps.node.key]"
-                        severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
-                        style="font-size: 0.8rem !important;" />
-                    <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                        v-tooltip.top="{ value: `Create Sub Task` }" v-if="hoveredRowKey === slotProps.node.key && !checkMarkInput[slotProps.node.key]"
-                        severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1 ml-auto"
-                        style="font-size: 0.2rem" />
-                    <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
-                        v-tooltip.top="{ value: `Edit Name` }" v-if="checkMarkInput[slotProps.node.key]"
-                        severity="secondary" icon="pi pi-check" class=" p-1 "
-                        style="font-size: 0.2rem" />
+                <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
+
+                    <div class="flex gap-1 w-full" v-if="hoveredRowKey === slotProps.node.key" >
+                        <Button @click="handleInlineNameEdit(slotProps.node)"
+                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
+                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
+                            style="font-size: 0.8rem !important;" />
+                        <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
+                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1 ml-auto"
+                            style="font-size: 0.2rem" />
+                        <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
+                            v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
+                            severity="primary" icon="pi pi-check" class=" p-1 w-full"
+                            style="font-size: 0.2rem" />
+                    </div>
                 </div>
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee" :style="{ width: '295px' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '270px' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -627,7 +638,7 @@ const handleChange = (event, name) => {
         </Column>
         <Column field="status" header="Status" :style="{ width: '148px' }">
             <template #body="slotProps">
-                <div class="inline-block" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                <div class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
                         <Dropdown class="mr-1 flex justify-content-center align-items-center"
@@ -1477,9 +1488,9 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 98%;
+    width: 97.9%;
     position: absolute;
     left: 23px;
-    top: -5px;
+    top: -5.5px;
 }
 </style>
