@@ -47,14 +47,14 @@ const isSpeedDialVisible = ref({});
 const showSpeedDial = (key) => {
     isSpeedDialVisible.value = {
         ...isSpeedDialVisible.value,
-        [key]: true, 
+        [key]: true,
     };
 };
 
 const hideSpeedDial = (key) => {
     isSpeedDialVisible.value = {
-        ...isSpeedDialVisible.value, 
-        [key]: false, 
+        ...isSpeedDialVisible.value,
+        [key]: false,
     };
 };
 
@@ -76,7 +76,7 @@ const getActionItems = (node) => {
                 emit('handleTaskEdit', node);
                 // toast.add({ severity: 'success', summary: 'Edit Task', detail: `Editing ${node.data.name}`, life: 3000 });
             },
-            disabled: !updateTaskP, 
+            disabled: !updateTaskP,
         },
         {
             label: 'Task Detail',
@@ -249,97 +249,91 @@ async function handleTaskStatus(status, task_id) {
     }
 }
 
-const handleTaskChanges = async (taskValue, task_id) => {
-    
+const cLoading = ref(false);
 
-        // let sendEditDate;
-        // if (dueDate.value) {
-        //     const selectedDate = new Date(dueDate.value);
-        //     selectedDate.setDate(selectedDate.getDate() + 1);
-        //     sendEditDate = selectedDate.toISOString();
-        // }
+
+const handleTaskChanges = async (taskValue, task_id) => {
+
+
+
+    if (taskValue instanceof Date) {
+        cLoading.value = true;
+        let sendEditDate;
+        if (taskValue) {
+            const selectedDate = new Date(taskValue);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            sendEditDate = selectedDate.toISOString();
+        }
         const editTaskData = {
             id: task_id,
             // name: taskNameEditInput.value,
             // description: taskEditDescriptionInput.value,
-            priority: taskValue.name,
-            // dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
+            // priority: taskValue.name,
+            dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             // assignees: assignees.value.map((obj) => obj.id),
             // tags: tags.value.map((obj) => obj.id),
             project_id: id
         };
-        
-        // if(sendEditDate){
-        //     const postSubDate = new Date(sendEditDate)
-        //     postSubDate.setDate(postSubDate.getDate() - 1);
-        //     dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
-        // }
-        
-        await editTask(editTaskData);
-        // if (detectDuplicateTask.value === true) {
-        //     btnLoading.value = false;
-        //     toast.add({ severity: 'error', summary: 'Error', detail: 'Cannnot edit, edited task name already exists!', group: 'br', life: 3000 });
-        // }
-         if (isTaskEdited.value === true) {
-            // btnLoading.value = false;
-            // emit('closeEditModal', false);
 
-            // emit('visibleEdit', 'visibleEdit');
+        await editTask(editTaskData);
+
+        if (isTaskEdited.value === true) {
+            cLoading.value = false;
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 3000 });
+
+        } else {
+            cLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update due date!', group: 'br', life: 3000 });
+        }
+    } else {
+        const editTaskData = {
+            id: task_id,
+
+            priority: taskValue.name,
+
+            project_id: id
+        };
+
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Priority updated ', group: 'br', life: 3000 });
         } else {
-            // btnLoading.value = false;
+
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
         }
-   
+    }
 };
 
-const hideTrigger = ref()
-const handleInlineDate = () => {
-    hideTrigger.value = true;
-    // visibleDateTrigger.value = false;
-    // userHasModifiedTime.value = false;
-    // console.log('inlineDueDate', inlineDueDate.value);
-    // handleDateChange(inlineDueDate.value, slotKey);
-};
 
-const inlineDueDate = ref(); 
-const userHasModifiedTime = ref(false);
 
-const visibleDateTrigger = ref({});
-const handleDateChange = (newDate, slotKey) => {
+const inlineDueDate = ref();
+
+
+const handleDateChange = async (newDate, slotKey) => {
     console.log('newDate', newDate);
     let oldDate = slotKey.node.data.dueDateValue;
-    if (!userHasModifiedTime.value) {
+    
         const selectedDate = new Date(newDate);
-        selectedDate.setHours(23, 59, 0, 0);  
+        selectedDate.setHours(23, 59, 0, 0);
         inlineDueDate.value = selectedDate;
         console.log('inlineDueDate', inlineDueDate.value);
-        let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });  
+        let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
         console.log('placeHolderValue', placeHolderValue);
         slotKey.node.data.dueDateValue = placeHolderValue;
-    }else {
-        inlineDueDate.value = newDate;  
-        let placeHolderValue = new Date(newDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        slotKey.node.data.dueDateValue = placeHolderValue;
-    }
-    visibleDateTrigger.value = {
-        ...visibleDateTrigger.value,
-        [slotKey.node.key]: true, 
-    };  
+        await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
 
-const handleCalendarHide = (key) => {
-    visibleDateTrigger.value = {
-        ...visibleDateTrigger.value,
-        [key]: false, // Set the visible trigger to false when calendar is hidden
-    };
+const handleCalendarHide = async (key) => {
+        // visibleDateTrigger.value = {
+        //     ...visibleDateTrigger.value,
+        //     [key]: false, // Set the visible trigger to false when calendar is hidden
+        // };
 };
 
-watch(inlineDueDate, (newVal, oldVal) => {
-    if (newVal && oldVal && newVal !== oldVal) {
-        userHasModifiedTime.value = true;
-    }
-});
+
+
+
+
 
 
 
@@ -428,8 +422,9 @@ const handleChange = (event, name) => {
 <template>
     <div class="filter-wrapper pb-2 mb-1">
         <!-- <pre>{{modStatusList}}</pre> -->
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter resetFilterOnHide
-            optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
+            resetFilterOnHide optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3"
+            class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
             placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
@@ -577,12 +572,11 @@ const handleChange = (event, name) => {
                     {{slotProps.node.data.dueDateValue }}
                 </div> -->
                 <div class="relative">
-                    <Calendar @date-select="handleDateChange($event, slotProps)" @hide="handleCalendarHide(slotProps.node.key)"
-                    class="inline-calendar cursor-pointer" manualInput="false" 
-                    :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''" 
-                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" 
-                    showTime hourFormat="12" />
-                    <Button v-if="visibleDateTrigger[slotProps.node.key]" @click="handleInlineDate()" class="ml-2" icon="pi pi-check" style="width: 1.8rem; height: 1.8rem;" rounded outlined aria-label="Filter" />
+                    <Calendar @date-select="handleDateChange($event, slotProps)"
+                         class="inline-calendar cursor-pointer"
+                        :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
+                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'"
+                         />
                 </div>
             </template>
         </Column>
@@ -593,12 +587,14 @@ const handleChange = (event, name) => {
                         <!-- <pre>{{slotProps.node.data}}</pre> -->
                         <Dropdown class="mr-1 flex justify-content-center align-items-center"
                             @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
-                            v-model="slotProps.node.data.priority" :options="onChangePriorities" :disabled="!updateTaskP"
-                            optionLabel="name" placeholder="Set Priority">
+                            v-model="slotProps.node.data.priority" :options="onChangePriorities"
+                            :disabled="!updateTaskP" optionLabel="name" placeholder="Set Priority">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div v-if="slotProps.value.name" :style="{ color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '', fontWeight: 500 }" class="pt-1">{{
-                                        slotProps.value.name }}
+                                    <div v-if="slotProps.value.name"
+                                        :style="{ color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '', fontWeight: 500 }"
+                                        class="pt-1">{{
+                                            slotProps.value.name }}
                                     </div>
                                     <div v-else class="pt-1">Set </div>
                                 </div>
@@ -612,27 +608,25 @@ const handleChange = (event, name) => {
                                 </div>
                             </template>
                         </Dropdown>
-                        
+
                     </div>
                     <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
-            </template>    
+            </template>
         </Column>
         <Column field="action" header="Action" :style="{ width: '10%', position: 'relative' }">
             <template #body="slotProps">
                 <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
-                    @mouseover="showSpeedDial(slotProps.node.key)" 
-                    @mouseleave="hideSpeedDial(slotProps.node.key)"     
-                    >
+                    @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
-                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
+                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
+                        :tooltipOptions="{ position: 'top' }" />
                 </div>
                 <div class=" justify-content-start align-items-center tabView-action" style="width: fit-content;"
-                    @click="showSpeedDial(slotProps.node.key)" 
-                    @mouseleave="hideSpeedDial(slotProps.node.key)"     
-                    >
+                    @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
-                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
+                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
+                        :tooltipOptions="{ position: 'top' }" />
                 </div>
                 <!-- PrimeVue SpeedDial -->
             </template>
@@ -661,7 +655,7 @@ const handleChange = (event, name) => {
                                             <div class="">
                                                 <p class="font-semibold truncate text-sm title"
                                                     v-tooltip.top="{ value: `${element.data.name}` }">{{
-                                                    element.data.name }}</p>
+                                                        element.data.name }}</p>
                                                 <!-- <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon"
@@ -700,13 +694,13 @@ const handleChange = (event, name) => {
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
                                                     style="border-radius: 5px" @click="(event) => {
-                                                            event.stopPropagation();
-                                                            if (activeSubTask == element.unique_id) {
-                                                                activeSubTask = null;
-                                                            } else {
-                                                                activeSubTask = element.unique_id;
-                                                            }
+                                                        event.stopPropagation();
+                                                        if (activeSubTask == element.unique_id) {
+                                                            activeSubTask = null;
+                                                        } else {
+                                                            activeSubTask = element.unique_id;
                                                         }
+                                                    }
                                                         ">
                                                     <p class="mb-1">Subtask</p>
                                                     <i
@@ -1231,11 +1225,11 @@ textarea {
     border-bottom-left-radius: 0px;
 }
 
-.webView-action{
+.webView-action {
     display: flex;
 }
 
-.tabView-action{
+.tabView-action {
     display: none;
 }
 
@@ -1260,17 +1254,23 @@ textarea {
     width: 30px !important;
     height: 30px !important;
 }
+
 .p-speeddial-button.p-button.p-button-icon-only svg {
-    display: none; /* Hide original icon */
+    display: none;
+    /* Hide original icon */
 }
 
 .p-speeddial-button.p-button.p-button-icon-only::before {
-    content: ''; /* Required for pseudo-elements */
-    background-image: url('../../assets/icons/three-dots.svg'); /* Use the path to your new icon */
+    content: '';
+    /* Required for pseudo-elements */
+    background-image: url('../../assets/icons/three-dots.svg');
+    /* Use the path to your new icon */
     background-size: contain;
     background-repeat: no-repeat;
-    display: block; /* Make it visible */
-    width: 140%; /* Adjust width and height as needed */
+    display: block;
+    /* Make it visible */
+    width: 140%;
+    /* Adjust width and height as needed */
     height: 140%;
     margin-left: 4px;
 }
@@ -1279,37 +1279,42 @@ textarea {
     position: absolute;
     right: 30px;
     top: 1.2px;
-        li {
-            a {
-                width: 27.5px !important;
-                height: 27.5px !important;
-                span{
-                    font-size: 13px;
-                }
+
+    li {
+        a {
+            width: 27.5px !important;
+            height: 27.5px !important;
+
+            span {
+                font-size: 13px;
             }
         }
+    }
 }
 
-.custom-speed-dial:hover{
+.custom-speed-dial:hover {
     .p-speeddial-list {
         background: transparent !important;
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
         padding: 0px 0px 0 100px !important;
-    }     
+    }
 }
 
 .p-speeddial-list {
-    
+
     li:nth-child(1) a {
         background-color: #22c55e;
     }
+
     li:nth-child(2) a {
         background-color: #a855f7;
     }
+
     li:nth-child(3) a {
         background-color: #0ea5e9;
     }
+
     li:nth-child(4) a {
         background-color: #ef4444;
     }
@@ -1317,37 +1322,67 @@ textarea {
 
 .p-speeddial-opened .p-speeddial-rotate {
     transform: rotate(90deg);
-  }
+}
 
 
- .p-treetable-loading-overlay{
+.p-treetable-loading-overlay {
     background: transparent !important;
     z-index: 1000 !important;
     backdrop-filter: blur(100px) !important;
     -webkit-backdrop-filter: blur(100px) !important;
- }
+}
 
 
- .green-calendar > input::-webkit-input-placeholder{
-    color:    #087641;
+.green-calendar>input::-webkit-input-placeholder {
+    color: #087641;
     font-weight: 600;
-    
- }
+}
 
- .red-calendar > input::-webkit-input-placeholder{ 
+.green-calendar>input:-moz-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.green-calendar>input::-moz-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.green-calendar>input:-ms-input-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.red-calendar>input::-webkit-input-placeholder {
     color: #b13a41;
     font-weight: 600;
-    
- }
+}
 
- .inline-calendar{
+.red-calendar>input:-moz-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.red-calendar>input::-moz-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.red-calendar>input:-ms-input-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.inline-calendar {
     max-width: 59% !important;
     cursor: pointer !important;
-    .p-inputtext{
+
+    .p-inputtext {
         padding: 0.25rem 0.5rem !important;
         cursor: pointer !important;
         text-align: center !important;
-    }
- }
+        caret-color: transparent !important;
 
+    }
+}
 </style>
