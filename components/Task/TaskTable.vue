@@ -44,6 +44,51 @@ const onChangePriorities = ref([
 
 const isSpeedDialVisible = ref({});
 
+const hoveredRowKey = ref(null);
+
+const handleMouseEnter = (key) => {
+    hoveredRowKey.value = key;
+};
+
+const editClikedRowKey = ref(null);
+
+const checkMarkInput = ref({});
+const inlineTaskNameInput = ref(null);
+const inputLoading = ref(false);
+const handleInlineNameEdit = (node) => {
+    inlineTaskNameInput.value = node.data.name;
+    editClikedRowKey.value = node.key;
+    checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+    }, {});
+    checkMarkInput.value = {
+        ...checkMarkInput.value,
+        [node.key]: true
+    };
+};
+
+const inputChanged = ref(false);
+watch(inlineTaskNameInput, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        inputChanged.value = true;
+    }
+});
+
+const updateTaskName = async (taskId) => {
+    if(inputChanged.value === true) {
+        await handleTaskChanges( inlineTaskNameInput.value, taskId);
+        checkMarkInput.value = {
+            ...checkMarkInput.value,
+            [taskId]: false
+        };
+        editClikedRowKey.value = null;
+    } else{
+        toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+    }
+}
+
+
 const showSpeedDial = (key) => {
     isSpeedDialVisible.value = {
         ...isSpeedDialVisible.value,
@@ -253,9 +298,6 @@ const cLoading = ref(false);
 
 
 const handleTaskChanges = async (taskValue, task_id) => {
-
-
-
     if (taskValue instanceof Date) {
         cLoading.value = true;
         let sendEditDate;
@@ -285,7 +327,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
             cLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update due date!', group: 'br', life: 3000 });
         }
-    } else {
+    } else if (taskValue?.name) {
         const editTaskData = {
             id: task_id,
 
@@ -301,6 +343,22 @@ const handleTaskChanges = async (taskValue, task_id) => {
 
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
         }
+    } else{
+        inputLoading.value = true;
+        const editTaskData = {
+            id: task_id,
+            name: taskValue,
+            project_id: id
+        };
+
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task name updated ', group: 'br', life: 3000 });
+            inputLoading.value = false;
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task name!', group: 'br', life: 3000 });
+            inputLoading.value = false;
+        }
     }
 };
 
@@ -312,22 +370,22 @@ const inlineDueDate = ref();
 const handleDateChange = async (newDate, slotKey) => {
     console.log('newDate', newDate);
     let oldDate = slotKey.node.data.dueDateValue;
-    
-        const selectedDate = new Date(newDate);
-        selectedDate.setHours(23, 59, 0, 0);
-        inlineDueDate.value = selectedDate;
-        console.log('inlineDueDate', inlineDueDate.value);
-        let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-        console.log('placeHolderValue', placeHolderValue);
-        slotKey.node.data.dueDateValue = placeHolderValue;
-        await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
+
+    const selectedDate = new Date(newDate);
+    selectedDate.setHours(23, 59, 0, 0);
+    inlineDueDate.value = selectedDate;
+    console.log('inlineDueDate', inlineDueDate.value);
+    let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+    console.log('placeHolderValue', placeHolderValue);
+    slotKey.node.data.dueDateValue = placeHolderValue;
+    await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
 
 const handleCalendarHide = async (key) => {
-        // visibleDateTrigger.value = {
-        //     ...visibleDateTrigger.value,
-        //     [key]: false, // Set the visible trigger to false when calendar is hidden
-        // };
+    // visibleDateTrigger.value = {
+    //     ...visibleDateTrigger.value,
+    //     [key]: false, // Set the visible trigger to false when calendar is hidden
+    // };
 };
 
 
@@ -483,40 +541,68 @@ const handleChange = (event, name) => {
             <p class="text-center">No data found...</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '40%' }">
+        <Column field="name" header="Name" class=" tone" expander :style="{ width: '40%' }"
+            :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block">
-                    <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
-                            @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
-                            v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
-                            optionLabel="name">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value" class="flex align-items-center"
-                                    :style="{ backgroundColor: slotProps.value.color_code }">
-                                    <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg">
+                <div class="inline-block w-full tasktitle-hover" @mouseenter="handleMouseEnter(slotProps.node.key)"
+                    >
+
+                    <div class="inline-block w-full relative">
+                        <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
+                            <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                                @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
+                                v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
+                                optionLabel="name">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value" class="flex align-items-center"
+                                        :style="{ backgroundColor: slotProps.value.color_code }">
+                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg">
+                                        </div>
                                     </div>
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
-                            <template #option="slotProps">
-                                <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }"
-                                        style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
-                                    <div>{{ slotProps.option.name }}</div>
-                                </div>
-                            </template>
-                        </Dropdown>
+                                    <span v-else>
+                                        {{ slotProps.placeholder }}
+                                    </span>
+                                </template>
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center">
+                                        <div :style="{ backgroundColor: slotProps.option.color_code }"
+                                            style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi">
+                                        </div>
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                        </div>
+                        <span  @click="emit('handleTaskDetailView', slotProps.node)" class="taskTitle cursor-pointer" v-tooltip.left="{
+                            value: `${slotProps.node.data.name}`
+                        }">{{ slotProps.node.data.name }}
+                        </span>
+                        <span>
+                            <InputText v-if="editClikedRowKey === slotProps.node.key" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                        </span>
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
-                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{
-                        value: `${slotProps.node.data.name}`
-                    }">{{ slotProps.node.data.name }}</span>
                 </div>
             </template>
         </Column>
+        <Column field="" header="" class="cursor-pointer" :style="{ width: '5%' }">
+            <template #body="slotProps" >
+                <div class="flex gap-1" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <Button @click="handleInlineNameEdit(slotProps.node)"
+                        v-tooltip.top="{ value: `Edit Task` }" v-if="hoveredRowKey === slotProps.node.key && !checkMarkInput[slotProps.node.key]"
+                        severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
+                        style="font-size: 0.8rem !important;" />
+                    <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                        v-tooltip.top="{ value: `Create Sub Task` }" v-if="hoveredRowKey === slotProps.node.key && !checkMarkInput[slotProps.node.key]"
+                        severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1 ml-auto"
+                        style="font-size: 0.2rem" />
+                    <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
+                        v-tooltip.top="{ value: `Edit Name` }" v-if="checkMarkInput[slotProps.node.key]"
+                        severity="secondary" icon="pi pi-check" class="w-fit h-fit p-1 "
+                        style="font-size: 0.2rem" />
+                </div>
+            </template>
+        </Column>
+
         <Column field="assignee" header="Assignee">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
@@ -535,9 +621,9 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '20%' }">
+        <Column field="status" header="Status" :style="{ width: '15%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div class="inline-block" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
                         <Dropdown class="mr-1 flex justify-content-center align-items-center"
@@ -572,11 +658,9 @@ const handleChange = (event, name) => {
                     {{slotProps.node.data.dueDateValue }}
                 </div> -->
                 <div class="relative">
-                    <Calendar @date-select="handleDateChange($event, slotProps)"
-                         class="inline-calendar cursor-pointer"
+                    <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
                         :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
-                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'"
-                         />
+                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
                 </div>
             </template>
         </Column>
@@ -880,7 +964,7 @@ const handleChange = (event, name) => {
     margin-top: -4px;
 }
 
-.taskTitle:hover {
+.tasktitle-hover:hover {
     color: #00c8ff;
     font-weight: 500;
 }
@@ -1384,5 +1468,14 @@ textarea {
         caret-color: transparent !important;
 
     }
+}
+
+
+.inline-task-input{
+    padding: 0.35rem 0.75rem !important;
+    width: 93.5%;
+    position: absolute;
+    left: 23px;
+    top: -5px;
 }
 </style>
