@@ -1,1 +1,0 @@
-import{s as r}from"./basecomponent.esm.e27d4a57.js";import"./entry.47cc6144.js";var s={name:"Row",extends:r,inject:["$rows"],mounted:function(){var t;(t=this.$rows)===null||t===void 0||t.add(this.$)},unmounted:function(){var t;(t=this.$rows)===null||t===void 0||t.delete(this.$)},render:function(){return null}};export{s as default};
