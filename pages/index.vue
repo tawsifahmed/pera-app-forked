@@ -180,6 +180,8 @@ const statuses = ref();
 const filterStatus = ref();
 const filterDueDate = ref();
 const isCalendarSelected = ref(false);
+const taskLoading = ref(false); // Add loading state
+
 
 watch(selectedProject, (newVal) => {
     statuses.value = [{ name: 'All', id: '' }, ...(selectedProject.value?.statuses?.map((status) => ({ name: status.name, id: status.id })) || [])];
@@ -205,7 +207,7 @@ const filterTasks = async () => {
     currentPage.value = 1; 
   }
   crrPage.value = currentPage.value;
-
+  totalPages.value = 0;
   fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
   isLoadMoreClicked = false; 
 };
@@ -268,7 +270,7 @@ const loadMoreTasks = async () => {
 
 const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
   const limit = 15; 
-
+  taskLoading.value = true;
   console.log('status', status);
 
   
@@ -295,6 +297,8 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
   } catch (e) {
     console.log(e);
     loadMoreLoading.value = false; // Reset loading flag after fetch
+  } finally {
+    taskLoading.value = false; // Reset loading flag after fetch
   }
 };
 
@@ -568,54 +572,47 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
-                <pre>statuses =>{{ statuses }}</pre>
-                <pre>userI =>{{ projectId }}</pre>
-                <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
                 <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px;">
-                    <h5 class="mb-2">Tasks</h5>
-                    <!-- Filter -->
-                    <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
-                            filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses"
-                            :disabled="!selectedProject" optionLabel="name" placeholder="Select Status"
-                            class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative w-full md:w-12rem">
-                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate"
-                                placeholder="Select Date" class="w-full md:w-12rem" />
-                            <p v-if="isCalendarSelected" @click="handleDateDelete"
-                                class="pi pi-times end-cross absolute cursor-pointer"></p>
-                        </div>
-                        <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
+                  <h5 class="mb-2">Tasks</h5>
+                  <div class="flex gap-2 flex-wrap justify-content-end filter-container">
+                    <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                    <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
+                    <div class="mb-2 relative w-full md:w-12rem">
+                      <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                      <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                     </div>
+                    <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
+                  </div>
                 </div>
+          
                 <div class="task-container">
-                    <div v-if="taskList.length > 0" class="">
-                        <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)"
-                            class="task-card">
-                            <!-- <pre>{{ task }}</pre> -->
-                            <div class="title-group">
-                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
-                                <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
-                                <div class=""
-                                    style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px">
-                                </div>
-                                <p>{{ task?.project_name }}</p>
-                            </div>
-                            <div class="">
-                                <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
-                            </div>
-                        </div>
+                  <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 22rem;">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
+                  </div>
+          
+                  <div v-else-if="taskList.length > 0"> <!-- Show task list when not loading and tasks are available -->
+                    <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card">
+                      <div class="title-group">
+                        <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                        <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
+                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                        <p>{{ task?.project_name }}</p>
+                      </div>
+                      <div>
+                        <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                      </div>
                     </div>
-                    <div v-else>
-                      <p class="text-black text-lg text-center">No Tasks found!</p>
-                    </div>
-                    <div class="w-full flex justify-content-center" >
-                        <Button v-if="currentPage < totalPages" @click="loadMoreTasks" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                    </div>
+                  </div>
+          
+                  <div v-else> <!-- Show No Tasks Found when task list is empty -->
+                    <p class="text-black text-lg text-center">No Tasks found!</p>
+                  </div>
+          
+                  <div class="w-full flex justify-content-center">
+                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                  </div>
                 </div>
-            </div>
+              </div>
         </div>
         <div class="col-12 xl:col-6">
             <div class="card">
