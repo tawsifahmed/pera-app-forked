@@ -570,7 +570,7 @@ const handleChange = (event, name) => {
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
      filterDisplay="menu" style="overflow: auto">
         <template #empty>
-            <p class="text-center">No data found...</p>
+            <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
         <Column field="name" header="Name" class=" tone" expander :style="{ width: '610px' }"
@@ -949,6 +949,13 @@ const handleChange = (event, name) => {
     width: 100% !important;
 }
 
+.table-st .p-treetable-emptymessage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
 
 
 
@@ -1003,6 +1010,7 @@ const handleChange = (event, name) => {
 
 .taskTitle{
     max-width: 532px;
+    min-width: 532px;
 }
 
 .assignee-wrapper {
