@@ -573,7 +573,7 @@ const handleChange = (event, name) => {
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" tone" expander :style="{ width: '610px' }"
+        <Column field="name" header="Name" class=" " expander :style="{ width: '610px' }"
             :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full tasktitle-hover cursor-pointer" @mouseenter="handleMouseEnter(slotProps.node.key)"
@@ -606,7 +606,7 @@ const handleChange = (event, name) => {
                         </div>
                         <span @click="handleClick(slotProps.node)" class="taskTitle cursor-pointer" v-tooltip.left="{
                             value: `${slotProps.node.data.name}`
-                        }">{{ slotProps.node.data.name }}
+                        }">{{ slotProps.node.data.name }} 
                         </span>
                         <span>
                             <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
@@ -1010,7 +1010,10 @@ const handleChange = (event, name) => {
 
 .taskTitle{
     max-width: 532px;
-    min-width: 532px;
+    white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
 }
 
 .assignee-wrapper {
