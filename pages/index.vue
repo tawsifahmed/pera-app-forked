@@ -261,16 +261,22 @@ const dateFormatter = (data) => {
 
 const totalPages = ref(0); 
 
+const hideLoading = ref(false);
 const loadMoreLoading = ref(false);
-const loadMoreTasks = async () => {
+const loadMoreTasks = async (vl) => {
+    if(vl === 'hide-loader'){
+        hideLoading.value = true;
+    }
   loadMoreLoading.value = true;   
   currentPage.value++;
   await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
 };
 
 const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
-  const limit = 15; 
-  taskLoading.value = true;
+  const limit = 15;
+  if(!hideLoading.value){
+      taskLoading.value = true;
+  } 
   console.log('status', status);
 
   
@@ -609,7 +615,7 @@ watch(
                   </div>
           
                   <div class="w-full flex justify-content-center">
-                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
                   </div>
                 </div>
               </div>
