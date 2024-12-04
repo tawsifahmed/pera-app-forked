@@ -839,22 +839,32 @@ const handleShareTaskId = () => {
                                     <Column field="dueDateValue" header="Due Date" :style="{ width: '11.5%' }"
                                         style="text-wrap: nowrap;">
                                     </Column>
-                                    <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
+                                    <Column field="priority" header="Priority" :style="{ width: '10%' }">
+                                        <template #body="slotProps">
+                                            <span class="text-xs"
+                                                :class="slotProps.node.data.priority?.name === 'High' ? 'text-danger' : slotProps.node.data.priority?.name === 'Medium' ? 'text-warning' : 'text-success'">
+                                                {{ slotProps.node.data.priority?.name }}
+                                            </span>
+                                        </template>    
+                                    </Column>
                                     <Column field="action" header="Action">
                                         <template #body="slotProps">
                                             <div class="action-dropdown-det">
                                                 <Button style="width: 30px; height: 30px; border-radius: 50%"
                                                     icon="pi pi-ellipsis-v" class="action-dropdown-det-toggle" />
                                                 <div class="action-dropdown-content-det">
-                                                    <Button icon="pi pi-plus" class="mr-2 ac-btn" severity="success"
+                                                    
+                                                   
+                                                    
+                                                        <Button icon="pi pi-trash" class="mr-1 ac-btn dlt-action" severity="warning" rounded
+                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
+                                                        <Button icon="pi pi-cog" class="mr-1 ac-btn view-action" severity="info"
+                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
+                                                        <Button icon="pi pi-pencil" class="mr-1 ac-btn edit-action" severity="success"
+                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
+                                                        <Button icon="pi pi-plus" class="ac-btn sub-action" severity="success"
                                                         @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
                                                         rounded />
-                                                    <Button icon="pi pi-pencil" class="mr-2 ac-btn" severity="success"
-                                                        @click="emit('handleTaskEdit', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-cog" class="mr-2 ac-btn" severity="info"
-                                                        @click="emit('handleTaskDetailView', slotProps.node)" rounded />
-                                                    <Button icon="pi pi-trash" class="ac-btn" severity="warning" rounded
-                                                        @click="emit('confirmDeleteTask', slotProps.node.key)" />
                                                 </div>
                                             </div>
                                         </template>
@@ -1155,7 +1165,7 @@ const handleShareTaskId = () => {
     gap: 3px;
     padding: 10px 5px;
     top: -10px;
-    left: -154px;
+    left: -147px;
     /*left: -158px;*/
     border-radius: 5px;
 }
@@ -1361,5 +1371,20 @@ a {
     font-size: .65rem !important;
 }
 
+.sub-action {
+    background-color: #22c55e;
+}
+
+.edit-action {
+    background-color: #a855f7;
+}
+
+.view-action {
+    background-color: #0ea5e9;
+}
+
+.dlt-action {
+    background-color: #ef4444;
+}
 
 </style>
