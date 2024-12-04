@@ -48,6 +48,13 @@ const hoveredRowKey = ref(null);
 
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
+    if(editClikedRowKey.value !== key) {
+        checkMarkInput.value = {
+            ...checkMarkInput.value,
+            [key]: false
+        };
+        editClikedRowKey.value = null;
+    }
 };
 
 const editClikedRowKey = ref(null);
@@ -55,17 +62,29 @@ const editClikedRowKey = ref(null);
 const checkMarkInput = ref({});
 const inlineTaskNameInput = ref(null);
 const inputLoading = ref(false);
+
+
 const handleInlineNameEdit = (node) => {
     inlineTaskNameInput.value = node.data.name;
+    const inputT = document.getElementById(`inputTaskName${node.key}`);
+    console.log('inputTFunc', inputT);
+    
     editClikedRowKey.value = node.key;
     checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
         acc[key] = false;
         return acc;
     }, {});
+    nextTick(() => {
+        if (inputT) {
+            inputT.focus();
+        }
+    });
+    
     checkMarkInput.value = {
         ...checkMarkInput.value,
         [node.key]: true
     };
+    
 };
 
 const inputChanged = ref(false);
@@ -549,7 +568,7 @@ const handleChange = (event, name) => {
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-        :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
+         filterDisplay="menu" style="overflow: auto">
         <template #empty>
             <p class="text-center">No data found...</p>
         </template>
@@ -559,7 +578,7 @@ const handleChange = (event, name) => {
             <template #body="slotProps">
                 <div class="inline-block w-full tasktitle-hover cursor-pointer" @mouseenter="handleMouseEnter(slotProps.node.key)"
                     >
-                    <div @click="handleClick(slotProps.node)" @dblclick="handleDblClick(slotProps.node)" class="inline-block w-full relative">
+                    <div  @dblclick="handleDblClick(slotProps.node)" class="inline-block w-full relative">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -585,12 +604,12 @@ const handleChange = (event, name) => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <span class="taskTitle cursor-pointer" v-tooltip.left="{
+                        <span @click="handleClick(slotProps.node)" class="taskTitle cursor-pointer" v-tooltip.left="{
                             value: `${slotProps.node.data.name}`
                         }">{{ slotProps.node.data.name }}
                         </span>
                         <span>
-                            <InputText v-if="editClikedRowKey === slotProps.node.key" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                            <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
                         </span>
                     </div>
                 </div>
@@ -599,8 +618,7 @@ const handleChange = (event, name) => {
         <Column field="" header="" :style="{ width: '75px',padding: '0.75rem .9rem' }">
             <template #body="slotProps" >
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
-
-                    <div class="flex gap-1 w-full" v-if="hoveredRowKey === slotProps.node.key" >
+                    <div class="flex gap-1 w-full h-full align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
                         <Button @click="handleInlineNameEdit(slotProps.node)"
                             v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
                             severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
@@ -931,9 +949,8 @@ const handleChange = (event, name) => {
     width: 100% !important;
 }
 
-.table-st thead tr {
-    background: #ededed;
-}
+
+
 
 .filter-wrapper {
     display: flex;
@@ -1493,4 +1510,6 @@ textarea {
     left: 23px;
     top: -5.5px;
 }
+
+
 </style>
