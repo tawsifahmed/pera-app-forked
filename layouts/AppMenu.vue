@@ -157,7 +157,7 @@ const handleCreateCompanyModal = () => {
 <template>
     <div class="relative">
         <!-- <pre>{{menu}}</pre> -->
-        <div class="mt-3" v-if="company">
+        <div class="mt-3" v-if="!company">
             <!-- <pre>cList => {{companyList.length}}</pre> -->
             <!-- <pre>pre2: {{selectedComp}}</pre> -->
             <!-- <pre>selC{{selectedCompany}}</pre> -->
@@ -220,7 +220,7 @@ const handleCreateCompanyModal = () => {
     align-items: center;
     backdrop-filter: blur(100px);
     background-color: white; /* Semi-transparent background */
-    z-index: 99999999999999999999999 !important; /* Ensure it's on top of all other elements */
+    z-index: 10999 !important; /* Ensure it's on top of all other elements */
 }
 
 .waved-logo{
