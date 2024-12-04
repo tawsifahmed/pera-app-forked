@@ -1447,7 +1447,7 @@ textarea {
 
 .p-treetable-loading-overlay {
     background: transparent !important;
-    z-index: 1000 !important;
+    z-index: 100;
     backdrop-filter: blur(100px) !important;
     -webkit-backdrop-filter: blur(100px) !important;
 }
