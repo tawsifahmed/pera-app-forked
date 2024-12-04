@@ -157,7 +157,7 @@ const handleCreateCompanyModal = () => {
 <template>
     <div class="relative">
         <!-- <pre>{{menu}}</pre> -->
-        <div class="mt-3" v-if="!company">
+        <div class="mt-3" v-if="company">
             <!-- <pre>cList => {{companyList.length}}</pre> -->
             <!-- <pre>pre2: {{selectedComp}}</pre> -->
             <!-- <pre>selC{{selectedCompany}}</pre> -->
