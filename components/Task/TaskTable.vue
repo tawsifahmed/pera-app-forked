@@ -568,7 +568,7 @@ const handleChange = (event, name) => {
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-    :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
+     filterDisplay="menu" style="overflow: auto">
         <template #empty>
             <p class="text-center">No data found...</p>
         </template>

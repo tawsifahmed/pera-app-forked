@@ -190,13 +190,24 @@ const selectedStatus = ref();
 const projectId = ref();
 const sta = ref();
 const enD = ref();
+const crrPage = ref(1);
+let currentPage = ref(1); // New variable for current page
+
 
 const filterTasks = async () => {
-    projectId.value = selectedProject.value ? selectedProject.value.id : '';
-    sta.value = selectedStatus.value ? selectedStatus.value.id : '';
-    enD.value = filterDueDate.value;
-    console.log('sta', sta.value);
-    fetchTasks(projectId.value, sta.value, enD.value);
+  projectId.value = selectedProject.value ? selectedProject.value.id : '';
+  sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+  enD.value = filterDueDate.value;
+
+  if (isLoadMoreClicked) { 
+    currentPage.value++; 
+  } else {
+    currentPage.value = 1; 
+  }
+  crrPage.value = currentPage.value;
+
+  fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
+  isLoadMoreClicked = false; 
 };
 
 const selectFilterDate = (newDate) => {
@@ -214,7 +225,7 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if(selectedProject.value || filterStatus.value || filterDueDate.value) {
+    if(selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
         filterDueDate.value = '';
@@ -233,6 +244,7 @@ const handleTaskClick = async (task) => {
     console.log('Task click: ', task);
     await navigateTo({ path: `/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`, query: { task_key: task.id } });
 };
+
 // Date Formatter
 const dateFormatter = (data) => {
     const dateStr = data;
@@ -245,23 +257,60 @@ const dateFormatter = (data) => {
     return `${day}-${month}-${year}`;
 };
 
-const fetchTasks = async (projectId = '', status = '', dueDate = '') => {
-    console.log('status', status);
-    // return
-    try {
-        const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        });
-        taskList.value = data.value.data;
-        console.log('Task list: ', data.value.data);
-    } catch (e) {
-        console.log(e);
-    }
+const totalPages = ref(0); 
+
+const loadMoreLoading = ref(false);
+const loadMoreTasks = async () => {
+  loadMoreLoading.value = true;   
+  currentPage.value++;
+  await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
 };
+
+const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
+  const limit = 15; 
+
+  console.log('status', status);
+
+  
+  try {
+    const token = useCookie('token');
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    });
+
+    // Update taskList only if data is valid and total pages are available
+    if (data.value && data.value.data && data.value.counts?.total_tasks) {
+    totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
+      taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
+      loadMoreLoading.value = false; // Reset loading flag after fetch
+    } else {
+      taskList.value = []; // Clear taskList if no data or pagination info
+      loadMoreLoading.value = false; // Reset loading flag after fetch
+    }
+
+    console.log('Task list: ', taskList.value);
+  } catch (e) {
+    console.log(e);
+    loadMoreLoading.value = false; // Reset loading flag after fetch
+  }
+};
+
+let isLoadMoreClicked = false; // Flag to track 'see more' button click
+
+window.addEventListener('scroll', () => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  // Check if near the bottom of the page and there are more pages
+  if (scrollTop + clientHeight >= scrollHeight - 50 && currentPage.value < totalPages) {
+    isLoadMoreClicked = true; // Set flag for next fetchTasks call
+    filterTasks(); // Trigger fetch with incremented page
+  }
+});
+
+
 fetchTasks();
 
 watch(
@@ -560,7 +609,10 @@ watch(
                         </div>
                     </div>
                     <div v-else>
-                        <p class="text-black text-lg text-center">No Tasks found!</p>
+                      <p class="text-black text-lg text-center">No Tasks found!</p>
+                    </div>
+                    <div class="w-full flex justify-content-center" >
+                        <Button v-if="currentPage < totalPages" @click="loadMoreTasks" :loading="loadMoreLoading" label="Load More" severity="secondary" />
                     </div>
                 </div>
             </div>
