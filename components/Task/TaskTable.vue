@@ -568,17 +568,17 @@ const handleChange = (event, name) => {
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-         filterDisplay="menu" style="overflow: auto">
+    :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
         <template #empty>
             <p class="text-center">No data found...</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" tone" expander :style="{ width: '590px' }"
+        <Column field="name" header="Name" class=" tone" expander :style="{ width: '610px' }"
             :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full tasktitle-hover cursor-pointer" @mouseenter="handleMouseEnter(slotProps.node.key)"
                     >
-                    <div  @dblclick="handleDblClick(slotProps.node)" class="inline-block w-full relative">
+                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full relative">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -636,7 +636,7 @@ const handleChange = (event, name) => {
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee" :style="{ width: '270px' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '250px' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -963,7 +963,7 @@ const handleChange = (event, name) => {
 
 .tone {
     overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    /*text-overflow: ellipsis !important;*/
     white-space: nowrap !important;
 }
 
@@ -999,6 +999,10 @@ const handleChange = (event, name) => {
 .tasktitle-hover:hover {
     color: #00c8ff;
     font-weight: 500;
+}
+
+.taskTitle{
+    max-width: 532px;
 }
 
 .assignee-wrapper {
@@ -1505,7 +1509,7 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 97.9%;
+    width: 98.4%;
     position: absolute;
     left: 23px;
     top: -5.5px;
