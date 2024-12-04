@@ -147,13 +147,15 @@ const requireConfirmation = (event) => {
 const timeTrack = ref('00:00:00');
 let interval = null;
 
+const timeLoading = ref(false);
 const handleClickClock = async () => {
     const taskId = taskDetails.value.id;
-    console.log('taskDetails', taskDetails.value);
+    timeLoading.value = true;
     if (taskDetails.value?.is_timer_start === 'false') {
         const responseData = await getTaskTimerData('start', taskDetails.value?.id);
         await getTaskDetails(taskDetails.value?.id);
         startTimer();
+        timeLoading.value = false;
         localStorage.setItem('storeTaskID', JSON.stringify(taskDetails.value?.id));
         localStorage.setItem('storeTaskProjectID', JSON.stringify(Number(projID)));
         localStorage.setItem('storeTaskSpaceID', JSON.stringify(taskDetails.value?.project.space_id));
@@ -173,6 +175,7 @@ const handleClickClock = async () => {
         const responseData = await getTaskTimerData('stop', taskDetails.value?.id, taskDetails.value?.taskTimer?.id);
         await getTaskDetails(taskDetails.value?.id);
         stopTimer();
+        timeLoading.value = false;
         localStorage.removeItem('storeTaskID');
         localStorage.removeItem('storeTaskProjectID');
         localStorage.removeItem('storeTaskSpaceID');
@@ -650,12 +653,14 @@ const handleShareTaskId = () => {
                                                     </div>
                                                 </template>
                                             </ConfirmPopup>
-                                            <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
+                                            <Button :loading="timeLoading" class="clock-btn" v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"  @click="handleClickClock" :icon="taskDetails?.is_timer_start == 'true' ? 'pi pi-stop' : 'pi pi-play'" :severity="taskDetails?.is_timer_start == 'true' ? ' stop-color' : ''" rounded aria-label="Filter" />
+
+                                            <!-- <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
                                                 :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`"
                                                 @click="handleClickClock">
                                                 <i
                                                     :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
-                                            </div>
+                                            </div> -->
                                             <div class="text-sm absolute" @click="requireConfirmation($event)">
                                                 {{ taskDetails?.is_timer_start == 'true' ? timeTrack :
                                                 secondsToHHMMSS(taskDetails?.total_duration) }}
@@ -1283,30 +1288,32 @@ input[type='file']::file-selector-button:hover {
 .clock-btn {
     width: 20px;
     height: 20px;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    cursor: pointer;
-    transition: all 0.1s ease-in-out;
     position: absolute;
     right: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .clock-btn:hover {
     box-shadow: none;
 }
 
-.stop {
-    color: white;
-    font-size: 8px;
+.pi-stop {
+    font-size: 0.7rem;
+    margin-top: 0.1rem;
+   
 }
 
-.start {
-    color: white;
-    font-size: 10px;
-    margin-left: 1px;
+.stop-color{
+    background: #f38ec0;
+    border: 1px solid #f38ec0;
+}
+
+.pi-play {
+    font-size: 0.8rem;
+    margin-left: 2px;
+    margin-top: 1px;
 }
 
 .attch-w {
