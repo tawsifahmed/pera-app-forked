@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
 import { useToast } from 'primevue/usetoast';
-import { onMounted } from 'vue';
+import { nextTick, onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 import { useWorkSpaceStore } from '~/store/workSpace';
@@ -24,12 +24,6 @@ const spaceDescripInput = ref('');
 const spaceAvatarPreview = ref('#8080805c');
 const spaceColorPreview = ref(null);
 const usersLists = ref([]);
-
-
-onMounted(async() => {
-    await usersListStore.getTaskAssignModalData();
-    usersLists.value = usersListStore.users; 
-});
 
 const selectedMembers = ref([]);
 
@@ -85,8 +79,18 @@ const handleCreateSpace = async () => {
     }
 };
 
-const showDialog = () => {
+const showDialog = async () => {
     spaceFormInputs.value = true;
+    if(spaceFormInputs.value){
+        await usersListStore.getTaskAssignModalData();
+        usersLists.value = usersListStore.users; 
+        const createSpaceName = document.getElementById('createSpaceName');
+        nextTick(() => {
+            if (createSpaceName) {
+                createSpaceName.focus();
+            }
+        });
+    }
 };
 const hideDialog = () => {
     spaceFormInputs.value = false;
@@ -122,8 +126,8 @@ const handleClose = () => {
         <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid"  @update:visible="handleClose">
             <div class="field">
                 <!-- <pre>{{spacePage}}</pre> -->
-                <label for="name">Space Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-                <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
+                <label for="createSpaceName">Space Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <InputText id="createSpaceName" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
             </div>
             <div class="field">
                 <label for="name">Space Description <span v-tooltip.right="{ value: 'After setting space name, you can provide description.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>

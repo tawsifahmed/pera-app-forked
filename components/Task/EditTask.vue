@@ -4,7 +4,7 @@
             <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name<i class="text-red-400 text-italic">*</i></label>
-                <Textarea id="description" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
+                <Textarea id="editTaskName" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
                     :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
@@ -135,6 +135,16 @@ const handleUpdateTask = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const editTaskName = document.getElementById('editTaskName');
+
+    nextTick(() => {
+        if (editTaskName) {
+            editTaskName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>
