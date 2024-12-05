@@ -576,9 +576,9 @@ const handleChange = (event, name) => {
         <Column field="name" header="Name" class=" " expander :style="{ width: '610px' }"
             :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block w-full tasktitle-hover cursor-pointer" @mouseenter="handleMouseEnter(slotProps.node.key)"
+                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
                     >
-                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full relative">
+                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -604,7 +604,7 @@ const handleChange = (event, name) => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <span @click="handleClick(slotProps.node)" class="taskTitle cursor-pointer" v-tooltip.left="{
+                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" v-tooltip.left="{
                             value: `${slotProps.node.data.name}`
                         }">{{ slotProps.node.data.name }} 
                         </span>
@@ -1009,10 +1009,13 @@ const handleChange = (event, name) => {
 }
 
 .taskTitle{
-    max-width: 532px;
+    width: 100%;
+    position: absolute;
     white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    left: 23px;
+    bottom: 0px;
 
 }
 
@@ -1377,6 +1380,8 @@ textarea {
 
 .p-treetable .p-treetable-tbody>tr>td .p-treetable-toggler {
     margin-right: 0.2rem !important;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
 }
 
 /* Wrapper to ensure the speed dial only takes the space of the button */
@@ -1520,10 +1525,10 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 98.4%;
+    width: 98.5%;
     position: absolute;
     left: 23px;
-    top: -5.5px;
+    top: -6px;
 }
 
 
