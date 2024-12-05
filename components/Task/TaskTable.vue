@@ -1009,7 +1009,7 @@ const handleChange = (event, name) => {
 }
 
 .taskTitle{
-    width: 100%;
+    max-width: 100%;
     position: absolute;
     white-space: nowrap;
     overflow: hidden;
@@ -1433,7 +1433,7 @@ textarea {
         background: transparent !important;
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
-        padding: 0px 0px 0 100px !important;
+        padding: 0px 0px 0 10px !important;
     }
 }
 
@@ -1525,7 +1525,7 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 98.5%;
+    width: 99.2%;
     position: absolute;
     left: 23px;
     top: -6px;

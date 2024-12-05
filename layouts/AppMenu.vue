@@ -237,7 +237,7 @@ const handleCreateCompanyModal = () => {
 
 .loader-wrapper{
     top: -84px;
-    left: -74px;
+    left: -74.5px;
     width: 240px;
     height: 240px;
 }
