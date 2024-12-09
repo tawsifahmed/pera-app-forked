@@ -174,6 +174,12 @@ const hideDialog = () => {
 
 onMounted(() => {
   taskStatusList.value = refProjectId?.statuses;
+  const editProjectName = document.getElementById('editProjectName');
+  nextTick(() => {
+    if(editProjectName){
+      editProjectName.focus();
+    }
+  });
 });
 
 </script>
@@ -185,8 +191,8 @@ onMounted(() => {
         <label for="name">Project: <strong>{{ refProjectId?.name }}</strong></label>
       </div>
       <div class="field flex flex-column">
-        <label for="name">Project Name<i class="text-red-400 text-italic">*</i> </label>
-        <InputText id="name" v-model="projectNameInput" required="true" />
+        <label for="editProjectName">Project Name<i class="text-red-400 text-italic">*</i> </label>
+        <InputText id="editProjectName" v-model="projectNameInput" required="true" />
       </div>
       <div class="field flex flex-column">
         <label for="name">Project Description</label>

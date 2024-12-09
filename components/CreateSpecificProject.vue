@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pini
 import ColorPicker from 'primevue/colorpicker';
 import { useWorkProjectStore } from '../store/workProjects';
 import { useToast } from 'primevue/usetoast';
+import { onMounted } from 'vue';
 const toast = useToast();
 const project = useWorkProjectStore();
 const { save } = storeToRefs(useWorkProjectStore());
@@ -68,12 +69,6 @@ const closeStatusError = ref(false);
 const projectNameInput = ref(null);
 const projectDescriptionInput = ref('');
 
-const showDialog = () => {
-    companyFormInputs.value = true;
-};
-const hideDialog = () => {
-    companyFormInputs.value = false;
-};
 const addTaskStatus = () => {
     taskStatusName.value ? (addTaskSTatusError.value = false) : (addTaskSTatusError.value = true);
     if (taskStatusName?.value?.length > 0) {
@@ -146,7 +141,6 @@ const handleCreateProject = async () => {
         await project.createProjects(createProjectData);
         if (save.value === true) {
             companyFormInputs.value = false;
-            toast.add({ severity: 'success', summary: 'Success!', detail: 'Project created successfully!', group: 'br', life: 3000 });
             projectNameInput.value = null;
             projectDescriptionInput.value = null;
             taskStatusList.value = [
@@ -171,17 +165,38 @@ const handleCreateProject = async () => {
             ];
             selectedCloseStatus.value = null;
             loading.value = false;
+            toast.add({ severity: 'success', summary: 'Success!', detail: 'Project created successfully!', group: 'br', life: 3000 });
+
         } else {
             toast.add({ severity: 'error', summary: 'Failed', detail: 'Project creation Failed!', group: 'br', life: 3000 });
             loading.value = false;
+            companyFormInputs.value = true;
         }
     }
 };
 
 
-const handleClose = () => {
-    projectNameInput.value = null;
-    projectDescriptionInput.value = null;
+const showDialog = async () => {
+    companyFormInputs.value = true;
+    if (companyFormInputs.value) {
+        console.log('isOpen');
+        await nextTick();
+        let createProjectName = document.getElementById('createProjectName');
+        if (createProjectName) {
+            createProjectName.focus();
+        }
+    }
+};
+
+const hideDialog = () => {
+    companyFormInputs.value = false;
+    if(projectNameInput.value){
+        projectNameInput.value = null;
+    }
+
+    if(projectDescriptionInput.value){
+        projectDescriptionInput.value = null;
+    }
     taskStatusList.value = [
         {
             taskStatusName: 'Open',
@@ -202,7 +217,45 @@ const handleClose = () => {
             serial_no: 3
         }
     ];
-    selectedCloseStatus.value = null;
+    
+    if(selectedCloseStatus.value){
+        selectedCloseStatus.value = null;
+    }
+    taskStatusName.value = '';
+};
+
+const handleClose = () => {
+    if(projectNameInput.value){
+        projectNameInput.value = null;
+    }
+
+    if(projectDescriptionInput.value){
+        projectDescriptionInput.value = null;
+    }
+    taskStatusList.value = [
+        {
+            taskStatusName: 'Open',
+            taskStatusColor: `#6466f1`,
+            is_closed_status: 0,
+            serial_no: 1
+        },
+        {
+            taskStatusName: 'Doing',
+            taskStatusColor: `#ff0084`,
+            is_closed_status: 0,
+            serial_no: 2
+        },
+        {
+            taskStatusName: 'Dev Done',
+            taskStatusColor: `#12955d`,
+            is_closed_status: 0,
+            serial_no: 3
+        }
+    ];
+    
+    if(selectedCloseStatus.value){
+        selectedCloseStatus.value = null;
+    }
     taskStatusName.value = '';
 
 };
@@ -224,7 +277,7 @@ const handleClose = () => {
                 <label for="name">Project Name<i class="text-red-400 text-italic">*</i><span
                         v-tooltip.right="{ value: 'Demo Text Text' }"
                         class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-                <InputText id="name" v-model="projectNameInput" required="true" />
+                <InputText id="createProjectName" v-model="projectNameInput" required="true" />
             </div>
             <div class="field">
                 <label for="name">Project Description <span v-tooltip.right="{ value: 'Demo Text Text' }"

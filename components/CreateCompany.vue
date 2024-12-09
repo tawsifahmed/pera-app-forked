@@ -171,7 +171,7 @@ const handleCreateWorkspace = async () => {
 
 <template>
     <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Company" :modal="true" class="p-fluid">
-        <pre>nE=>{{typeof numEmployees}}</pre>
+        <!-- <pre>nE=>{{typeof numEmployees}}</pre> -->
         <div class="field">
             <label for="company">Company Size<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
             <Dropdown v-model="numEmployees" inputId="company" :options="companyLargeAmount" optionLabel="label" placeholder="Select Size" class="w-full" />

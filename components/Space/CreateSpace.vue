@@ -85,6 +85,7 @@ const showDialog = async () => {
         await usersListStore.getTaskAssignModalData();
         usersLists.value = usersListStore.users; 
         const createSpaceName = document.getElementById('createSpaceName');
+        console.log('createSpaceName', createSpaceName);
         nextTick(() => {
             if (createSpaceName) {
                 createSpaceName.focus();
