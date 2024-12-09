@@ -4,7 +4,7 @@
             <label for="company"
                 >Tag Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
             ></label>
-            <InputText v-model="name" class="w-full" placeholder="Enter tag name" />
+            <InputText id="createTagName" v-model="name" class="w-full" placeholder="Enter tag name" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -54,6 +54,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createTagName = document.getElementById('createTagName');
+    nextTick(() => {
+        if (createTagName){
+            createTagName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

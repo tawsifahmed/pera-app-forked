@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Name<i class="text-red-500">*</i></label>
-            <InputText v-model="name" class="w-full" placeholder="Enter Name"/>
+            <InputText id="editEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
         <div class="field">
@@ -110,6 +110,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const editEmployeeName = document.getElementById('editEmployeeName');
+    nextTick(() => {
+        if (editEmployeeName){
+            editEmployeeName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

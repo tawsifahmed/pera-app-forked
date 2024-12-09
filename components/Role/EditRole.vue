@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText v-model="editName" class="w-full" placeholder="Edit role name" />
+            <InputText id="editTeamName" v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
 
         <div class="field permission_selection">
@@ -70,6 +70,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(async() => {
+    const editTeamName = document.getElementById('editTeamName');
+    nextTick(() => {
+        if (editTeamName){
+            editTeamName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

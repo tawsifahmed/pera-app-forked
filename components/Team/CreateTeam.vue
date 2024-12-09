@@ -74,12 +74,21 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createTeamName = document.getElementById('createTeamName');
+    nextTick(() => {
+        if (createTeamName){
+            createTeamName.focus();
+        }
+    });
+});
 </script>
 <template>
     <div>
         <div class="field">
             <label for="company">Name<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText v-model="name" class="w-full" />
+            <InputText id="createTeamName" v-model="name" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
