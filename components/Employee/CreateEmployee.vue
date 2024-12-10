@@ -1,4 +1,6 @@
 <script setup>
+import { nextTick, onMounted } from 'vue';
+
 const url = useRuntimeConfig();
 const props = defineProps({
     param: {
@@ -89,6 +91,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createEmployeeName = document.getElementById('createEmployeeName');
+    nextTick(() => {
+        if (createEmployeeName){
+            createEmployeeName.focus();
+        }
+    });
+});
 </script>
 <template>
     <div>
@@ -97,7 +108,7 @@ const handleSubmitData = async () => {
                 >Name<i class="text-red-400 text-italic">*</i>
                 <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
             ></label>
-            <InputText v-model="name" class="w-full" placeholder="Enter Name"/>
+            <InputText id="createEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
         <div class="field">

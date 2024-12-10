@@ -80,6 +80,12 @@ const handleSubmitData = async () => {
 onMounted(async() => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
+    const editTeamName = document.getElementById('editTeamName');
+    nextTick(() => {
+        if (editTeamName){
+            editTeamName.focus();
+        }
+    });
 });
 </script>
 
@@ -87,7 +93,7 @@ onMounted(async() => {
     <div>
         <div class="field">
             <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText v-model="editName" class="w-full" />
+            <InputText id="editTeamName" v-model="editName" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
