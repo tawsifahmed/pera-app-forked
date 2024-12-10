@@ -371,11 +371,11 @@ watchEffect(async () => {
     <div class="layout-topbar">
         
         <Toast position="bottom-right" group="br" />
-        <router-link to="/" class="layout-topbar-logo">
+        <router-link to="/" class="layout-topbar-logo absolute" style="left: 73px;">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+        <button class="p-link layout-menu-button layout-topbar-button" style="margin-left: 0 !important;" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
         <div class="p-link layout-topbar-menu-button layout-topbar-button">
