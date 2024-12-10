@@ -573,7 +573,7 @@ const handleChange = (event, name) => {
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '40%' }"
+        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }"
             :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
@@ -615,7 +615,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" :style="{ width: '8%', padding: '0.75rem .9rem' }">
+        <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
             <template #body="slotProps" >
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
@@ -636,7 +636,7 @@ const handleChange = (event, name) => {
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee" :style="{ width: '18%' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -1532,7 +1532,7 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 99.2%;
+    width: 96.6%;
     position: absolute;
     left: 23px;
     top: -6px;
