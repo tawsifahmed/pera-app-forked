@@ -807,7 +807,7 @@ const handleChange = (event, name) => {
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
                                                     style="border-radius: 5px" @click="(event) => {
@@ -953,7 +953,12 @@ const handleChange = (event, name) => {
     display: flex;
     justify-content: center;
     align-items: center;
+}
 
+.table-st thead th:hover{
+    border: 2px solid #e2e8f0;
+    border-top: none;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 
@@ -1016,7 +1021,6 @@ const handleChange = (event, name) => {
     text-overflow: ellipsis;
     left: 23px;
     bottom: 0px;
-
 }
 
 .assignee-wrapper {
