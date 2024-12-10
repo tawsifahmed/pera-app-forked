@@ -568,12 +568,12 @@ const handleChange = (event, name) => {
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
     <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-     filterDisplay="menu" style="overflow: auto">
+     filterDisplay="menu" style="overflow: auto;" :tableProps="{ style: { minWidth: '1024px' } }">
         <template #empty>
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '610px' }"
+        <Column field="name" header="Name" class=" " expander :style="{ width: '40%' }"
             :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
@@ -615,17 +615,17 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" :style="{ width: '75px',padding: '0.75rem .9rem' }">
+        <Column field="" header="" :style="{ width: '8%', padding: '0.75rem .9rem' }">
             <template #body="slotProps" >
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <div class="flex gap-1 w-full h-full align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
+                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
                         <Button @click="handleInlineNameEdit(slotProps.node)"
                             v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
+                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1"
                             style="font-size: 0.8rem !important;" />
                         <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
                             v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1 ml-auto"
+                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1"
                             style="font-size: 0.2rem" />
                         <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                             v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
@@ -636,7 +636,7 @@ const handleChange = (event, name) => {
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee" :style="{ width: '250px' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '18%' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -654,7 +654,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '148px' }">
+        <Column field="status" header="Status" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -685,19 +685,19 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '148px' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
             <template #body="slotProps">
                 <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
                     {{slotProps.node.data.dueDateValue }}
                 </div> -->
-                <div class="relative">
+               
                     <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
                         :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
                         :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
-                </div>
+             
             </template>
         </Column>
-        <Column field="priority" header="Priority" :style="{ width: '140px' }">
+        <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -731,7 +731,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="action" header="Action" :style="{ width: '73px', position: 'relative' }">
+        <Column field="action" header="Action" :style="{ width: '6%', position: 'relative' }">
             <template #body="slotProps">
                 <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
                     @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
@@ -961,6 +961,9 @@ const handleChange = (event, name) => {
     border-bottom: 1px solid #e2e8f0;
 }
 
+.table-st table {
+    width: 100% !important;
+}
 
 
 
@@ -1514,7 +1517,7 @@ textarea {
 }
 
 .inline-calendar {
-    max-width: 59% !important;
+    max-width: 4.2vw !important;
     cursor: pointer !important;
 
     .p-inputtext {
