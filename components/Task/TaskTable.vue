@@ -7,8 +7,8 @@ import Column from 'primevue/column';
 
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
-const { getSingleProject, getTaskAssignModalData } = useCompanyStore();
-const { modStatusList, singleProject, statuslist } = storeToRefs(useCompanyStore());
+const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
+const { modStatusList, singleProject, statuslist, isTaskEdited } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -35,19 +35,128 @@ const priorities = ref([
     { name: 'Low', code: 'Low' }
 ]);
 
+const onChangePriorities = ref([
+    { name: 'Urgent', code: 'Urgent' },
+    { name: 'High', code: 'High' },
+    { name: 'Normal', code: 'Normal' },
+    { name: 'Low', code: 'Low' }
+])
+
 const isSpeedDialVisible = ref({});
+
+const hoveredRowKey = ref(null);
+
+const handleMouseEnter = (key) => {
+    hoveredRowKey.value = key;
+    if(editClikedRowKey.value !== key) {
+        checkMarkInput.value = {
+            ...checkMarkInput.value,
+            [key]: false
+        };
+        editClikedRowKey.value = null;
+    }
+};
+
+const editClikedRowKey = ref(null);
+
+const checkMarkInput = ref({});
+const inlineTaskNameInput = ref(null);
+const inputLoading = ref(false);
+
+
+const handleInlineNameEdit = (node) => {
+    inlineTaskNameInput.value = node.data.name;
+    const inputT = document.getElementById(`inputTaskName${node.key}`);
+    console.log('inputTFunc', inputT);
+    
+    editClikedRowKey.value = node.key;
+    checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+    }, {});
+    nextTick(() => {
+        if (inputT) {
+            inputT.focus();
+        }
+    });
+    
+    checkMarkInput.value = {
+        ...checkMarkInput.value,
+        [node.key]: true
+    };
+    
+};
+
+const inputChanged = ref(false);
+watch(inlineTaskNameInput, (newVal, oldVal) => {
+    console.log('newVal', newVal);
+    console.log('oldVal', oldVal);
+    if (oldVal !== null) {
+        inputChanged.value = true;
+        console.log('inputChanged', inputChanged.value);
+    }
+});
+
+
+// Timer reference for managing click delay
+let clickTimer = ref(null);
+
+// Single click handler
+const handleClick = (node) => {
+  // Clear the timer if already set to prevent single click on double click
+  if (clickTimer.value) {
+    clearTimeout(clickTimer.value);
+    clickTimer.value = null;
+  }
+
+  // Set timer to trigger the single-click action
+  clickTimer.value = setTimeout(() => {
+    emit('handleTaskDetailView', node);
+    clickTimer.value = null; // Reset the timer after the function runs
+  }, 250); // Delay for single click detection (250ms)
+};
+
+
+// Double click handler
+const handleDblClick = (node) => {
+  // Clear the single click timer to avoid running both functions
+  if (clickTimer.value) {
+    clearTimeout(clickTimer.value);
+    clickTimer.value = null;
+  }
+
+  // Call the double-click function
+  handleInlineNameEdit(node);
+};
+
+
+const updateTaskName = async (taskId) => {
+    if(inputChanged.value !== true) {
+        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
+    } else{
+        await handleTaskChanges( inlineTaskNameInput.value, taskId);
+        checkMarkInput.value = {
+            ...checkMarkInput.value,
+            [taskId]: false
+        };
+        inlineTaskNameInput.value = null;
+        editClikedRowKey.value = null;
+        inputChanged.value = false;
+    }
+}
+
 
 const showSpeedDial = (key) => {
     isSpeedDialVisible.value = {
         ...isSpeedDialVisible.value,
-        [key]: true, 
+        [key]: true,
     };
 };
 
 const hideSpeedDial = (key) => {
     isSpeedDialVisible.value = {
-        ...isSpeedDialVisible.value, 
-        [key]: false, 
+        ...isSpeedDialVisible.value,
+        [key]: false,
     };
 };
 
@@ -69,7 +178,7 @@ const getActionItems = (node) => {
                 emit('handleTaskEdit', node);
                 // toast.add({ severity: 'success', summary: 'Edit Task', detail: `Editing ${node.data.name}`, life: 3000 });
             },
-            disabled: !updateTaskP, 
+            disabled: !updateTaskP,
         },
         {
             label: 'Task Detail',
@@ -209,8 +318,10 @@ const downloadTaskSheet = (taskLists) => {
     }
 };
 
+const tableLoader = ref(true);
 onMounted(async () => {
     await getSingleProject(id);
+    tableLoader.value = false;
     getUserlist();
 });
 
@@ -239,6 +350,91 @@ async function handleTaskStatus(status, task_id) {
         console.error('Error fetching data:', error);
     }
 }
+
+const cLoading = ref(false);
+
+
+const handleTaskChanges = async (taskValue, task_id) => {
+    if (taskValue instanceof Date) {
+        cLoading.value = true;
+        let sendEditDate;
+        if (taskValue) {
+            const selectedDate = new Date(taskValue);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            sendEditDate = selectedDate.toISOString();
+        }
+        const editTaskData = {
+            id: task_id,
+            // name: taskNameEditInput.value,
+            // description: taskEditDescriptionInput.value,
+            // priority: taskValue.name,
+            dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
+            // assignees: assignees.value.map((obj) => obj.id),
+            // tags: tags.value.map((obj) => obj.id),
+            project_id: id
+        };
+
+        await editTask(editTaskData);
+
+        if (isTaskEdited.value === true) {
+            cLoading.value = false;
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 3000 });
+
+        } else {
+            cLoading.value = false;
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update due date!', group: 'br', life: 3000 });
+        }
+    } else if (taskValue?.name) {
+        const editTaskData = {
+            id: task_id,
+
+            priority: taskValue.name,
+
+            project_id: id
+        };
+
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Priority updated ', group: 'br', life: 3000 });
+        } else {
+
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
+        }
+    } else{
+        inputLoading.value = true;
+        const editTaskData = {
+            id: task_id,
+            name: taskValue,
+            project_id: id
+        };
+
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task name updated ', group: 'br', life: 3000 });
+            inputLoading.value = false;
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task name!', group: 'br', life: 3000 });
+            inputLoading.value = false;
+        }
+    }
+};
+
+
+const inlineDueDate = ref();
+
+const handleDateChange = async (newDate, slotKey) => {
+    console.log('newDate', newDate);
+    let oldDate = slotKey.node.data.dueDateValue;
+
+    const selectedDate = new Date(newDate);
+    selectedDate.setHours(23, 59, 0, 0);
+    inlineDueDate.value = selectedDate;
+    console.log('inlineDueDate', inlineDueDate.value);
+    let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+    console.log('placeHolderValue', placeHolderValue);
+    slotKey.node.data.dueDateValue = placeHolderValue;
+    await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
+};
 
 function getRandomDeepColor() {
     const letters = '0123456789ABCDEF';
@@ -286,6 +482,8 @@ function countTasks(tasks) {
 
     return count;
 }
+
+
 // Kanban
 const editable = ref(true);
 const dragOptions = computed(() => ({
@@ -314,8 +512,9 @@ const handleChange = (event, name) => {
 <template>
     <div class="filter-wrapper pb-2 mb-1">
         <!-- <pre>{{modStatusList}}</pre> -->
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter resetFilterOnHide
-            optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
+            resetFilterOnHide optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3"
+            class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
             placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
@@ -368,47 +567,76 @@ const handleChange = (event, name) => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" :lazy="true"
-        :tableProps="{ style: { minWidth: '650px', width: '100%' } }" filterDisplay="menu" style="overflow: auto">
+    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
+     filterDisplay="menu" style="overflow: auto">
         <template #empty>
-            <p class="text-center">No Data found...</p>
+            <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="cursor-pointer tone" expander :style="{ width: '40%' }">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '610px' }"
+            :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block">
-                    <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
-                            @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
-                            v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
-                            optionLabel="name">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value" class="flex align-items-center"
-                                    :style="{ backgroundColor: slotProps.value.color_code }">
-                                    <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg">
+                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
+                    >
+                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
+                        <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
+                            <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                                @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
+                                v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
+                                optionLabel="name">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value" class="flex align-items-center"
+                                        :style="{ backgroundColor: slotProps.value.color_code }">
+                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg">
+                                        </div>
                                     </div>
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
-                            <template #option="slotProps">
-                                <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }"
-                                        style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
-                                    <div>{{ slotProps.option.name }}</div>
-                                </div>
-                            </template>
-                        </Dropdown>
+                                    <span v-else>
+                                        {{ slotProps.placeholder }}
+                                    </span>
+                                </template>
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center">
+                                        <div :style="{ backgroundColor: slotProps.option.color_code }"
+                                            style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi">
+                                        </div>
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                        </div>
+                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" v-tooltip.left="{
+                            value: `${slotProps.node.data.name}`
+                        }">{{ slotProps.node.data.name }} 
+                        </span>
+                        <span>
+                            <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                        </span>
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
-                    <span class="taskTitle" @click="emit('handleTaskDetailView', slotProps.node)" v-tooltip.left="{
-                        value: `${slotProps.node.data.name}`
-                    }">{{ slotProps.node.data.name }}</span>
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee">
+        <Column field="" header="" :style="{ width: '75px',padding: '0.75rem .9rem' }">
+            <template #body="slotProps" >
+                <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <div class="flex gap-1 w-full h-full align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
+                        <Button @click="handleInlineNameEdit(slotProps.node)"
+                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
+                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1 ml-auto"
+                            style="font-size: 0.8rem !important;" />
+                        <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
+                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1 ml-auto"
+                            style="font-size: 0.2rem" />
+                        <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
+                            v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
+                            severity="primary" icon="pi pi-check" class=" p-1 w-full"
+                            style="font-size: 0.2rem" />
+                    </div>
+                </div>
+            </template>
+        </Column>
+
+        <Column field="assignee" header="Assignee" :style="{ width: '250px' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -426,7 +654,7 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '20%' }">
+        <Column field="status" header="Status" :style="{ width: '148px' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -457,21 +685,65 @@ const handleChange = (event, name) => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '148px' }">
             <template #body="slotProps">
-                <div :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">{{
-                    slotProps.node.data.dueDateValue }}</div>
+                <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
+                    {{slotProps.node.data.dueDateValue }}
+                </div> -->
+                <div class="relative">
+                    <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
+                        :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
+                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
+                </div>
             </template>
         </Column>
-        <Column field="priority" header="Priority" :style="{ width: '10%' }"></Column>
-        <Column field="action" header="Action" :style="{ width: '10%', position: 'relative' }">
+        <Column field="priority" header="Priority" :style="{ width: '140px' }">
             <template #body="slotProps">
-                <div class="flex justify-content-start align-items-center" style="width: fit-content;"
-                    @mouseover="showSpeedDial(slotProps.node.key)" 
-                    @mouseleave="hideSpeedDial(slotProps.node.key)"     
-                    >
+                <div class="inline-block">
+                    <div class="task-status-2">
+                        <!-- <pre>{{slotProps.node.data}}</pre> -->
+                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                            @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
+                            v-model="slotProps.node.data.priority" :options="onChangePriorities"
+                            :disabled="!updateTaskP" optionLabel="name" placeholder="Set Priority">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center">
+                                    <div v-if="slotProps.value.name"
+                                        :style="{ color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '', fontWeight: 500 }"
+                                        class="pt-1">{{
+                                            slotProps.value.name }}
+                                    </div>
+                                    <div v-else class="pt-1">Set </div>
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+
+                    </div>
+                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
+                </div>
+            </template>
+        </Column>
+        <Column field="action" header="Action" :style="{ width: '73px', position: 'relative' }">
+            <template #body="slotProps">
+                <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
+                    @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
-                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
+                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
+                        :tooltipOptions="{ position: 'top' }" />
+                </div>
+                <div class=" justify-content-start align-items-center tabView-action" style="width: fit-content;"
+                    @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
+                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
+                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
+                        :tooltipOptions="{ position: 'top' }" />
                 </div>
                 <!-- PrimeVue SpeedDial -->
             </template>
@@ -500,7 +772,7 @@ const handleChange = (event, name) => {
                                             <div class="">
                                                 <p class="font-semibold truncate text-sm title"
                                                     v-tooltip.top="{ value: `${element.data.name}` }">{{
-                                                    element.data.name }}</p>
+                                                        element.data.name }}</p>
                                                 <!-- <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon"
@@ -539,13 +811,13 @@ const handleChange = (event, name) => {
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
                                                     style="border-radius: 5px" @click="(event) => {
-                                                            event.stopPropagation();
-                                                            if (activeSubTask == element.unique_id) {
-                                                                activeSubTask = null;
-                                                            } else {
-                                                                activeSubTask = element.unique_id;
-                                                            }
+                                                        event.stopPropagation();
+                                                        if (activeSubTask == element.unique_id) {
+                                                            activeSubTask = null;
+                                                        } else {
+                                                            activeSubTask = element.unique_id;
                                                         }
+                                                    }
                                                         ">
                                                     <p class="mb-1">Subtask</p>
                                                     <i
@@ -677,9 +949,15 @@ const handleChange = (event, name) => {
     width: 100% !important;
 }
 
-.table-st thead tr {
-    background: #ededed;
+.table-st .p-treetable-emptymessage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
+
+
+
 
 .filter-wrapper {
     display: flex;
@@ -725,9 +1003,20 @@ const handleChange = (event, name) => {
     margin-top: -4px;
 }
 
-.taskTitle:hover {
+.tasktitle-hover:hover {
     color: #00c8ff;
     font-weight: 500;
+}
+
+.taskTitle{
+    max-width: 100%;
+    position: absolute;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    left: 23px;
+    bottom: 0px;
+
 }
 
 .assignee-wrapper {
@@ -1070,8 +1359,29 @@ textarea {
     border-bottom-left-radius: 0px;
 }
 
+.webView-action {
+    display: flex;
+}
+
+.tabView-action {
+    display: none;
+}
+
+
+@media (max-width: 1024px) {
+    .webView-action {
+        display: none;
+    }
+
+    .tabView-action {
+        display: flex;
+    }
+}
+
 .p-treetable .p-treetable-tbody>tr>td .p-treetable-toggler {
     margin-right: 0.2rem !important;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
 }
 
 /* Wrapper to ensure the speed dial only takes the space of the button */
@@ -1080,17 +1390,23 @@ textarea {
     width: 30px !important;
     height: 30px !important;
 }
+
 .p-speeddial-button.p-button.p-button-icon-only svg {
-    display: none; /* Hide original icon */
+    display: none;
+    /* Hide original icon */
 }
 
 .p-speeddial-button.p-button.p-button-icon-only::before {
-    content: ''; /* Required for pseudo-elements */
-    background-image: url('../../assets/icons/three-dots.svg'); /* Use the path to your new icon */
+    content: '';
+    /* Required for pseudo-elements */
+    background-image: url('../../assets/icons/three-dots.svg');
+    /* Use the path to your new icon */
     background-size: contain;
     background-repeat: no-repeat;
-    display: block; /* Make it visible */
-    width: 140%; /* Adjust width and height as needed */
+    display: block;
+    /* Make it visible */
+    width: 140%;
+    /* Adjust width and height as needed */
     height: 140%;
     margin-left: 4px;
 }
@@ -1099,37 +1415,42 @@ textarea {
     position: absolute;
     right: 30px;
     top: 1.2px;
-        li {
-            a {
-                width: 27.5px !important;
-                height: 27.5px !important;
-                span{
-                    font-size: 13px;
-                }
+
+    li {
+        a {
+            width: 27.5px !important;
+            height: 27.5px !important;
+
+            span {
+                font-size: 13px;
             }
         }
+    }
 }
 
-.custom-speed-dial:hover{
+.custom-speed-dial:hover {
     .p-speeddial-list {
-        background: rgba(255, 255, 255, 0.23);
+        background: transparent !important;
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px);
-        padding: 0px 0px 0 100px !important;
-    }     
+        padding: 0px 0px 0 10px !important;
+    }
 }
 
 .p-speeddial-list {
-    
+
     li:nth-child(1) a {
         background-color: #22c55e;
     }
+
     li:nth-child(2) a {
         background-color: #a855f7;
     }
+
     li:nth-child(3) a {
         background-color: #0ea5e9;
     }
+
     li:nth-child(4) a {
         background-color: #ef4444;
     }
@@ -1137,5 +1458,78 @@ textarea {
 
 .p-speeddial-opened .p-speeddial-rotate {
     transform: rotate(90deg);
-  }
+}
+
+
+.p-treetable-loading-overlay {
+    background: transparent !important;
+    z-index: 100;
+    backdrop-filter: blur(100px) !important;
+    -webkit-backdrop-filter: blur(100px) !important;
+}
+
+
+.green-calendar>input::-webkit-input-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.green-calendar>input:-moz-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.green-calendar>input::-moz-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.green-calendar>input:-ms-input-placeholder {
+    color: #087641;
+    font-weight: 600;
+}
+
+.red-calendar>input::-webkit-input-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.red-calendar>input:-moz-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.red-calendar>input::-moz-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.red-calendar>input:-ms-input-placeholder {
+    color: #b13a41;
+    font-weight: 600;
+}
+
+.inline-calendar {
+    max-width: 59% !important;
+    cursor: pointer !important;
+
+    .p-inputtext {
+        padding: 0.25rem 0.5rem !important;
+        cursor: pointer !important;
+        text-align: center !important;
+        caret-color: transparent !important;
+
+    }
+}
+
+
+.inline-task-input{
+    padding: 0.35rem 0.75rem !important;
+    width: 99.2%;
+    position: absolute;
+    left: 23px;
+    top: -6px;
+}
+
+
 </style>

@@ -5,6 +5,7 @@ const { editSpace } = useCompanyStore(); // use authenticateUser action from  au
 const { isSpaceEdited } = storeToRefs(useCompanyStore());
 import ColorPicker from 'primevue/colorpicker';
 import InputSwitch from 'primevue/inputswitch';
+import { nextTick } from 'vue';
 const usersListStore = useCompanyStore();
 const { refSpaceId, singleCompany } = defineProps(['refSpaceId', 'singleCompany']);
 const spaceFormInputs = ref(true);
@@ -26,6 +27,12 @@ const editMembers = ref(refSpaceId?.users.map((item) => ({ id: item.id, name: it
 onMounted(async () => {
   await usersListStore.getTaskAssignModalData();
   usersLists.value = usersListStore.users;
+  const editSpaceName = document.getElementById('editSpaceName');
+  nextTick(() => {
+    if(editSpaceName){
+      editSpaceName.focus();
+    }
+  });
 });
 
 const spaceColorPreview = ref(null);
@@ -99,8 +106,8 @@ const hideDialog = () => {
                 <p class="bg-indigo-500 text-white rounded company-name px-3 py-1">Company: {{singleCompany?.name}}</p>
             </div> -->
       <div class="field flex flex-column">
-        <label for="name">Space Name<i class="text-red-400 text-italic">*</i> </label>
-        <InputText id="name" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
+        <label for="editSpaceName">Space Name<i class="text-red-400 text-italic">*</i> </label>
+        <InputText id="editSpaceName" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
       </div>
       <div class="field flex flex-column">
         <label for="name">Space Description</label>

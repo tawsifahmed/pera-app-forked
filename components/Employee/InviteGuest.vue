@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="email">Email address<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText type="email" v-model="email" class="w-full" />
+            <InputText id="inviteEmail" type="email" v-model="email" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
@@ -73,6 +73,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const inviteEmail = document.getElementById('inviteEmail');
+    nextTick(() => {
+        if (inviteEmail){
+            inviteEmail.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

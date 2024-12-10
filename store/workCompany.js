@@ -25,7 +25,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
               const proObj = {
                 'label': ele?.name,
                 'id': ele?.id,
-                'icon': 'pi pi-list',
+                'icon': 'pi pi-bars',
                 'color': ele?.color,
                 'to': `/companies/${element?.company_id}/spaces/${element?.id}/projects/${ele.id}`,
               }
@@ -61,6 +61,13 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
         }));
       } else {
         return [];
+      }
+    },
+    totalCompanies(state) {
+      if (state.availableCompanies) {
+        return state.availableCompanies.length;
+      } else {
+        return 0;
       }
     },
     selectedCompany(state) {

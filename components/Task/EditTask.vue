@@ -4,7 +4,7 @@
             <!-- <pre>{{singleTask}}</pre> -->
             <div class="field flex flex-column">
                 <label for="name">Edit Task Name<i class="text-red-400 text-italic">*</i></label>
-                <Textarea id="description" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
+                <Textarea id="editTaskName" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15"
                     :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
@@ -20,7 +20,7 @@
             <div class="field">
                 <!-- <pre>date{{dueDate}}</pre> -->
                 <label>Due Date</label>
-                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
+                <Calendar v-model="dueDate" class="w-full" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)"/>
             </div>
             <div class="field">
                 <label>Priority</label>
@@ -46,7 +46,7 @@ const { singleTask, usersLists, tagsLists, projects } = defineProps(['singleTask
 const toast = useToast();
 const btnLoading = ref(false);
 
-const taskEditDescriptionInput = ref(null);
+// const taskEditDescriptionInput = ref(null);
 
 const taskNameEditInput = ref(singleTask?.data?.name);
 const dueDate = ref(singleTask?.data?.dueDate ? new Date(singleTask.data.dueDate).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null);
@@ -58,7 +58,7 @@ assignees.value = singleTask?.data?.assigneeObj ? singleTask?.data?.assigneeObj.
 const tags = ref(singleTask?.data?.tagsObj);
 
 const priority = ref(null);
-priority.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
+priority.value = singleTask.data.priority ? { name: singleTask.data.priority.name, code: singleTask.data.priority.code } : '';
 
 const priorities = ref([
     { name: 'Urgent', code: 'Urgent' },
@@ -104,7 +104,7 @@ const handleUpdateTask = async () => {
         const editTaskData = {
             id: singleTask.key,
             name: taskNameEditInput.value,
-            description: taskEditDescriptionInput.value,
+            // description: taskEditDescriptionInput.value,
             priority: priority.value.name,
             dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             assignees: assignees.value.map((obj) => obj.id),
@@ -135,6 +135,16 @@ const handleUpdateTask = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const editTaskName = document.getElementById('editTaskName');
+
+    nextTick(() => {
+        if (editTaskName) {
+            editTaskName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

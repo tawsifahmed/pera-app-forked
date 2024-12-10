@@ -3,7 +3,7 @@
         <InputText type="hidden" v-model="tskId" />
         <div class="field flex flex-column">
             <label for="name">Set Task Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Textarea id="description" class="border-gray-300" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
+            <Textarea id="createTaskName" class="border-gray-300" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div>
         <!-- <div class="field">
             <label for="company">Set Task Name</label>
@@ -21,7 +21,7 @@
         </div>
         <div class="field">
             <label>Due Date <span v-tooltip.right="{ value: 'Set your task due date' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)"/>
+            <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)"/>
         </div>
         <div class="field">
             <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
@@ -38,6 +38,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
+import { nextTick, onBeforeMount, onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
 const { createTask } = useCompanyStore();
 const { isTaskCreated, detectDuplicateTask } = storeToRefs(useCompanyStore());
@@ -132,6 +133,20 @@ const handleCreateTask = async () => {
         }
     }
 };
+
+
+
+
+
+onMounted(() => {
+    const createTaskName = document.getElementById('createTaskName');
+
+    nextTick(() => {
+        if (createTaskName) {
+            createTaskName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

@@ -45,7 +45,9 @@ const confirmDeleteSpace = (spaceId) => {
 
 const deleteSpaceDialog = ref(false);
 
+const deleteLoader = ref(false);
 const deletingSpace = async () => {
+    deleteLoader.value = true;
     console.log('refCompanyIdFin', refSpaceId.value);
 
     // return
@@ -55,9 +57,11 @@ const deletingSpace = async () => {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteSpaceDialog.value = false;
         console.log('space deleted');
+        deleteLoader.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
         console.log('space not deleted');
+        deleteLoader.value = false;
     }
 };
 
@@ -155,18 +159,9 @@ const spacePage = ref(true);
         </DataTable>
 
         <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
-
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
-        </Dialog>
-
-
-
-        <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
+            <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingSpace" />
         </Dialog>
         <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

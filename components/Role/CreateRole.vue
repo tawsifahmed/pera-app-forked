@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Role Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText v-model="name" class="w-full" placeholder="Enter role name" />
+            <InputText id="createRoleName" v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
         <div class="field permission_selection">
@@ -69,6 +69,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createRoleName = document.getElementById('createRoleName');
+    nextTick(() => {
+        if (createRoleName){
+            createRoleName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss">

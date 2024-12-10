@@ -155,7 +155,7 @@ const handleCreateCompanyModal = () => {
 </script>
 
 <template>
-    <div>
+    <div class="relative">
         <!-- <pre>{{menu}}</pre> -->
         <div class="mt-3" v-if="company">
             <!-- <pre>cList => {{companyList.length}}</pre> -->
@@ -170,10 +170,11 @@ const handleCreateCompanyModal = () => {
                 <Menu ref="menu1" id="overlay_menu" @click="clickCompanyMenu(cItems)" :model="cItems" :popup="true" />
            </div>
         </div>
-        <!-- <div class="flex justify-content-center" v-else>
-            <Button @click="handleCreateCompanyModal" class="cursor-pointer w-full text-white px-5 py-2 mt-2" label="Create Company +" />
-            <CreateCompany v-model:visible="visibleCreateCompany"  />
-        </div> -->
+        <div v-else class="fullscreen-loader flex justify-content-center align-items-center">
+                <div class="waved-logo relative">
+                    <img class="loader-wrapper absolute" src="/demo/wave.gif" alt="">
+                </div>     
+        </div>
         <hr />
         <ul class="layout-menu">
             <template v-for="(item, i) in model" :key="item.id">
@@ -206,6 +207,54 @@ const handleCreateCompanyModal = () => {
 .company-first-letter{
     min-width: 2.8rem;
     height: 2.7rem;
+}
+
+.fullscreen-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(100px);
+    background-color: white; /* Semi-transparent background */
+    z-index: 10999 !important; /* Ensure it's on top of all other elements */
+}
+
+.waved-logo{
+    background-image: url('/demo/images/login/avatar.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    animation: waveIconPulse 1.83s .4s infinite;
+
+    
+}
+
+.loader-wrapper{
+    top: -84px;
+    left: -74.5px;
+    width: 240px;
+    height: 240px;
+}
+
+@keyframes waveIconPulse{
+    0%{
+        transform: scaleZ(1);
+    }
+    30%{
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    60%{
+        transform: scale3d(1.1, 1.1, 1.1);
+    }
+    100%{
+        transform: scaleZ(1);
+    }
 }
 
 </style>

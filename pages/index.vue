@@ -8,7 +8,7 @@ import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const companies = useActiveCompanyStore();
 // companies.getCompany();
-const { companyList, totalProjects } = storeToRefs(useActiveCompanyStore());
+const { totalCompanies, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
 const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
@@ -180,6 +180,8 @@ const statuses = ref();
 const filterStatus = ref();
 const filterDueDate = ref();
 const isCalendarSelected = ref(false);
+const taskLoading = ref(false); // Add loading state
+
 
 watch(selectedProject, (newVal) => {
     statuses.value = [{ name: 'All', id: '' }, ...(selectedProject.value?.statuses?.map((status) => ({ name: status.name, id: status.id })) || [])];
@@ -190,13 +192,24 @@ const selectedStatus = ref();
 const projectId = ref();
 const sta = ref();
 const enD = ref();
+const crrPage = ref(1);
+let currentPage = ref(1); // New variable for current page
+
 
 const filterTasks = async () => {
-    projectId.value = selectedProject.value ? selectedProject.value.id : '';
-    sta.value = selectedStatus.value ? selectedStatus.value.id : '';
-    enD.value = filterDueDate.value;
-    console.log('sta', sta.value);
-    fetchTasks(projectId.value, sta.value, enD.value);
+  projectId.value = selectedProject.value ? selectedProject.value.id : '';
+  sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+  enD.value = filterDueDate.value;
+
+  if (isLoadMoreClicked) { 
+    currentPage.value++; 
+  } else {
+    currentPage.value = 1; 
+  }
+  crrPage.value = currentPage.value;
+  totalPages.value = 0;
+  fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
+  isLoadMoreClicked = false; 
 };
 
 const selectFilterDate = (newDate) => {
@@ -214,7 +227,7 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if(selectedProject.value || filterStatus.value || filterDueDate.value) {
+    if(selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
         filterDueDate.value = '';
@@ -233,6 +246,7 @@ const handleTaskClick = async (task) => {
     console.log('Task click: ', task);
     await navigateTo({ path: `/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`, query: { task_key: task.id } });
 };
+
 // Date Formatter
 const dateFormatter = (data) => {
     const dateStr = data;
@@ -245,23 +259,68 @@ const dateFormatter = (data) => {
     return `${day}-${month}-${year}`;
 };
 
-const fetchTasks = async (projectId = '', status = '', dueDate = '') => {
-    console.log('status', status);
-    // return
-    try {
-        const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        });
-        taskList.value = data.value.data;
-        console.log('Task list: ', data.value.data);
-    } catch (e) {
-        console.log(e);
+const totalPages = ref(0); 
+
+const hideLoading = ref(false);
+const loadMoreLoading = ref(false);
+const loadMoreTasks = async (vl) => {
+    if(vl === 'hide-loader'){
+        hideLoading.value = true;
     }
+  loadMoreLoading.value = true;   
+  currentPage.value++;
+  await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
 };
+
+const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
+  const limit = 15;
+  if(!hideLoading.value){
+      taskLoading.value = true;
+  } 
+  console.log('status', status);
+
+  
+  try {
+    const token = useCookie('token');
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    });
+
+    // Update taskList only if data is valid and total pages are available
+    if (data.value && data.value.data && data.value.counts?.total_tasks) {
+    totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
+      taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
+      loadMoreLoading.value = false; // Reset loading flag after fetch
+    } else {
+      taskList.value = []; // Clear taskList if no data or pagination info
+      loadMoreLoading.value = false; // Reset loading flag after fetch
+    }
+
+    console.log('Task list: ', taskList.value);
+  } catch (e) {
+    console.log(e);
+    loadMoreLoading.value = false; // Reset loading flag after fetch
+  } finally {
+    taskLoading.value = false; // Reset loading flag after fetch
+  }
+};
+
+let isLoadMoreClicked = false; // Flag to track 'see more' button click
+
+window.addEventListener('scroll', () => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  // Check if near the bottom of the page and there are more pages
+  if (scrollTop + clientHeight >= scrollHeight - 50 && currentPage.value < totalPages) {
+    isLoadMoreClicked = true; // Set flag for next fetchTasks call
+    filterTasks(); // Trigger fetch with incremented page
+  }
+});
+
+
 fetchTasks();
 
 watch(
@@ -285,8 +344,8 @@ watch(
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <!-- <pre>{{companyList.length}}</pre> -->
-                        <div class="text-900 font-medium text-xl">{{ companyList ? companyList.length : '0' }}</div>
+                        <!-- <pre>{{totalCompanies}}</pre> -->
+                        <div class="text-900 font-medium text-xl">{{ totalCompanies ? totalCompanies : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
                         style="width: 2.5rem; height: 2.5rem">
@@ -519,51 +578,47 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <!-- <pre>selectedProject =>{{ selectedProject }}</pre>
-                <pre>statuses =>{{ statuses }}</pre>
-                <pre>userI =>{{ projectId }}</pre>
-                <pre>selectedStatus =>{{ selectedStatus }}</pre> -->
                 <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px;">
-                    <h5 class="mb-2">Tasks</h5>
-                    <!-- Filter -->
-                    <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
-                            filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses"
-                            :disabled="!selectedProject" optionLabel="name" placeholder="Select Status"
-                            class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative w-full md:w-12rem">
-                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate"
-                                placeholder="Select Date" class="w-full md:w-12rem" />
-                            <p v-if="isCalendarSelected" @click="handleDateDelete"
-                                class="pi pi-times end-cross absolute cursor-pointer"></p>
-                        </div>
-                        <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
+                  <h5 class="mb-2">Tasks</h5>
+                  <div class="flex gap-2 flex-wrap justify-content-end filter-container">
+                    <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                    <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
+                    <div class="mb-2 relative w-full md:w-12rem">
+                      <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                      <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                     </div>
+                    <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
+                  </div>
                 </div>
+          
                 <div class="task-container">
-                    <div v-if="taskList.length > 0" class="">
-                        <div v-for="task in taskList" :key="task" @click="() => handleTaskClick(task)"
-                            class="task-card">
-                            <!-- <pre>{{ task }}</pre> -->
-                            <div class="title-group">
-                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
-                                <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
-                                <div class=""
-                                    style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px">
-                                </div>
-                                <p>{{ task?.project_name }}</p>
-                            </div>
-                            <div class="">
-                                <p class="" style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
-                            </div>
-                        </div>
+                  <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 22rem;">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
+                  </div>
+          
+                  <div v-else-if="taskList.length > 0"> <!-- Show task list when not loading and tasks are available -->
+                    <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card">
+                      <div class="title-group">
+                        <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                        <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
+                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                        <p>{{ task?.project_name }}</p>
+                      </div>
+                      <div>
+                        <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                      </div>
                     </div>
-                    <div v-else>
-                        <p class="text-black text-lg text-center">No Tasks found!</p>
-                    </div>
+                  </div>
+          
+                  <div v-else> <!-- Show No Tasks Found when task list is empty -->
+                    <p class="text-black text-lg text-center">No Tasks found!</p>
+                  </div>
+          
+                  <div class="w-full flex justify-content-center">
+                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                  </div>
                 </div>
-            </div>
+              </div>
         </div>
         <div class="col-12 xl:col-6">
             <div class="card">
