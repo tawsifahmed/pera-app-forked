@@ -630,7 +630,7 @@ const handleChange = (event, name) => {
                         <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                             v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
                             severity="primary" icon="pi pi-check" class=" p-1 w-full"
-                            style="font-size: 0.2rem" />
+                            style="font-size: 0.2rem; margin: 0 0.65rem;" />
                     </div>
                 </div>
             </template>
@@ -1517,7 +1517,9 @@ textarea {
 }
 
 .inline-calendar {
-    max-width: 4.2vw !important;
+    @media (min-width: 1440px) {
+        max-width: 4.2vw !important;
+    }
     cursor: pointer !important;
 
     .p-inputtext {
@@ -1532,7 +1534,7 @@ textarea {
 
 .inline-task-input{
     padding: 0.35rem 0.75rem !important;
-    width: 96.6%;
+    width: 98.6%;
     position: absolute;
     left: 23px;
     top: -6px;
