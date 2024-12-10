@@ -831,13 +831,14 @@ const handleShareTaskId = () => {
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer tone" field="name" header="Name" expander
+                                    <Column class="cursor-pointer " field="name" header="Name" expander
                                         :style="{ width: '45%' }">
                                         <template #body="slotProps">
-                                            <span class="taskTitle"
+                                            <span class="subtaskTitle"
                                                 @click="emit('handleTaskDetailView', slotProps.node)"
                                                 v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
-                                                slotProps.node.data.name }} </span>
+                                                slotProps.node.data.name }} 
+                                            </span>
                                         </template>
                                     </Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
@@ -1393,5 +1394,13 @@ a {
 .dlt-action {
     background-color: #ef4444;
 }
+
+.subtaskTitle{
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+
 
 </style>
