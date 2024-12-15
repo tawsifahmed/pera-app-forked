@@ -16,7 +16,7 @@ export const useWorkSpaceStore = defineStore('workSpace', {
         }
     },
     actions: {
-        async createSpace({ name, description, company_id, color }) {
+        async createSpace({ name, description, company_id, color, users }) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
                 method: 'POST',
@@ -28,10 +28,10 @@ export const useWorkSpaceStore = defineStore('workSpace', {
                     'description': description,
                     'company_id': company_id,
                     'color': color,
+                    'users': users,
                 },
             });
             if (data.value?.app_message === 'success') {
-                console.log('company_id', company_id)
                 this.isSpaceCreated = true;
                 await companies.getCompany()
                 await single.getSingleCompany(this.comID)

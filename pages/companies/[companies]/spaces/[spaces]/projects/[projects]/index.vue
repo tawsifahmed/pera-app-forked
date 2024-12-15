@@ -23,7 +23,8 @@ const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
 const singleTask = ref(null);
-
+const task_key = useRoute().query.task_key;
+console.log(task_key);
 const { projects } = useRoute().params;
 const visible = ref(false);
 
@@ -57,12 +58,25 @@ const openCreateSpace = async (key, type) => {
 
 const handleTaskEdit = async (task) => {
     singleTask.value = task;
+    document.documentElement.style.cursor = 'wait';
+    document.documentElement.style.position = 'relative';
+    const overlayD = document.createElement('div');
+    overlayD.style.position = 'absolute';
+    overlayD.style.top = '0';
+    overlayD.style.left = '0';
+    overlayD.style.width = '100%';
+    overlayD.style.height = '100%';
+    overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    overlayD.style.zIndex = '1000000';
+    document.documentElement.appendChild(overlayD);
 
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
     visibleEdit.value = true;
+    document.documentElement.style.cursor = 'auto';
+    document.documentElement.removeChild(overlayD);
 };
 
 const confirmDeleteTask = (taskId) => {
@@ -84,6 +98,17 @@ const deletingTask = async () => {
 };
 
 const handleTaskDetailView = async (task) => {
+    document.documentElement.style.cursor = 'wait';
+    document.documentElement.style.position = 'relative';
+    const overlayD = document.createElement('div');
+    overlayD.style.position = 'absolute';
+    overlayD.style.top = '0';
+    overlayD.style.left = '0';
+    overlayD.style.width = '100%';
+    overlayD.style.height = '100%';
+    overlayD.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+    overlayD.style.zIndex = '100000010';
+    document.documentElement.appendChild(overlayD);
     if (visibleTaskDetailView.value) {
         visibleTaskDetailView.value = false;
     }
@@ -93,7 +118,18 @@ const handleTaskDetailView = async (task) => {
     await getTagsAssignModalData();
     tagsLists.value = tagsListStore.tags;
     visibleTaskDetailView.value = true;
+    document.documentElement.style.cursor = 'auto';
+    document.documentElement.removeChild(overlayD);
 };
+
+console.log('visibleTaskDetailView', visibleTaskDetailView.value);
+watch(visibleTaskDetailView, (value) => {
+    if(value === true) {
+        return 0;
+    }else{
+        localStorage.removeItem('taskDetailID')
+    }
+});
 
 const initFilters = () => {
     filters.value = {
@@ -116,6 +152,17 @@ const updateTaskTable = () => {
 
 getSingleProject(projects);
 
+
+watch(() => useRoute().query.task_key, (newTaskKey) => {
+    if (newTaskKey) {
+        handleTaskDetailView({ key: newTaskKey });
+    }
+});
+
+if (task_key) {
+    handleTaskDetailView({ key: task_key });
+}
+
 watchEffect(() => {
     loading.value = false;
 });
@@ -127,6 +174,8 @@ watchEffect(() => {
         <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
+                <p class="pi pi-angle-right font-bold"></p>
+                <NuxtLink to="/companies" class="text">Companies</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>
                 <NuxtLink :to="`/companies/${singleProject?.company_id}`" class="text">Company - {{ singleProject?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right font-bold"></p>

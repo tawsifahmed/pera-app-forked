@@ -21,6 +21,7 @@ const deleteTagsP = ref(accessPermission('delete_tags'));
 const filters = ref();
 
 const loading = ref(true);
+const loading1 = ref(false);
 
 const toast = useToast();
 
@@ -72,6 +73,7 @@ const deleteTag = (key) => {
 };
 
 const confirmDeleteTag = async () => {
+    loading1.value = true;
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/tag/delete/${id.value}`, {
         method: 'DELETE',
@@ -83,10 +85,12 @@ const confirmDeleteTag = async () => {
     if (data.value.code === 200) {
         visibleDeleteTag.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Tag Deleted successfully!', group: 'br', life: 3000 });
+        loading1.value = false;
+        init();
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Tag Deleted Failed!', group: 'br', life: 3000 });
+        loading1.value = false;
     }
-    init();
 };
 
 const init = async () => {
@@ -123,7 +127,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createTagsP" icon="pi pi-plus" label="Create Tag" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
+                <Button v-if="createTagsP" icon="pi pi-plus" label="Create" @click="handleCreateTagModal" class="mr-2" severity="secondary" />
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" />
                 <Button icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" /> -->
@@ -144,7 +148,7 @@ initFilters();
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
 
-            <Column field="name" sortable header="Tag Name"></Column>
+            <Column field="name" header="Tag Name"></Column>
             <!-- <Column field="email" sortable header="Email Address"></Column> -->
             <!-- <Column field="phone" sortable header="Phone Number"></Column> -->
             <Column field="action" header="Action">
@@ -171,7 +175,7 @@ initFilters();
         <Dialog v-model:visible="visibleDeleteTag" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />
         </Dialog>
 
         <!-- Invite User -->

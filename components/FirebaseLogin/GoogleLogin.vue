@@ -16,7 +16,7 @@ const signInWithGoogle = async () => {
         })
         .catch((error) => {
             // Handle sign in error
-            toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
+            // toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
             console.error('Error signing in with Google:', error.message);
         });
 
@@ -27,29 +27,33 @@ const signInWithGoogle = async () => {
                 token: authToken
             }
         });
-        console.log(data.value);
-        const userCompany = data?.value?.company?.id;
-        if (userCompany) {
-            localStorage.setItem('userCompany', JSON.stringify(userCompany));
+        console.log('loginData',data.value);
+        if(data.value){
+            // console.log('login.value', data.value)
+            const userCompany = data?.value?.company?.id;
+            if (userCompany) {
+                localStorage.setItem('userCompany', JSON.stringify(userCompany));
+            }
+            toast.add({ severity: 'success', summary: 'Authorized', detail: 'Login Successful', group: 'br', life: 3000 });
+            const token = useCookie('token');
+            token.value = data.value.token;
+    
+            setTimeout(() => {
+                router.push('/');
+            }, 300);
+            const rolePermission = useCookie('rolePermission');
+            rolePermission.value = data?.value?.permissions;
         }
-        toast.add({ severity: 'success', summary: 'Login Successful', detail: '', life: 3000 });
-        const token = useCookie('token');
-        token.value = data.value.token;
 
-        setTimeout(() => {
-            router.push('/');
-        }, 300);
-
-        const rolePermission = useCookie('rolePermission');
-        rolePermission.value = data?.value?.permissions;
     } catch (error) {
-        toast.add({ severity: 'error', summary: 'Login Failed', detail: 'Something went wrong.', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Authorization Failed', detail: 'Something went wrong.', group: 'br', life: 3000 });
         console.log(error);
     }
 };
 </script>
 <template>
     <button class="login-with-google-btn" @click="signInWithGoogle">
+        <Toast position="bottom-right" group="br"/>
         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 48 48">
             <path
                 fill="#FFC107"
@@ -64,7 +68,6 @@ const signInWithGoogle = async () => {
 </template>
 
 <style scoped>
-/* Customize styles as needed */
 .login-with-google-btn {
     cursor: pointer;
     display: flex;
@@ -73,14 +76,12 @@ const signInWithGoogle = async () => {
     align-items: center;
     transition: background-color 0.3s, box-shadow 0.3s;
     width: 100%;
-    padding: 12px 16px;
+    padding: 8px 16px;
     border-radius: 5px;
-    /* box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25); */
-    border: 1px solid #ededed;
+    border: 1px solid #d9d9d9;
     color: #757575;
     font-weight: 500;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    /* background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=); */
     background-color: white;
     background-repeat: no-repeat;
     background-position: 12px 11px;

@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Role Name</label>
-            <InputText v-model="editName" class="w-full" placeholder="Edit role name" />
+            <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
+            <InputText id="editTeamName" v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
 
         <div class="field permission_selection">
-            <label>Permissions</label>
+            <label>Permissions<i class="text-red-400 text-italic">*</i> </label>
             <!-- <pre>{{selectedPermissions}}</pre> -->
-            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -70,6 +70,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(async() => {
+    const editTeamName = document.getElementById('editTeamName');
+    nextTick(() => {
+        if (editTeamName){
+            editTeamName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

@@ -38,11 +38,11 @@ const itemKey = ref(null);
 
 const items = ref([
     {
-        label: 'Settings',
+        label: 'Space Settings',
         items: [
             {
                 label: 'Manage Space',
-                icon: 'pi pi-th-large'
+                icon: 'pi pi-table'
             }
             // {
             //     label: 'Show all Space',
@@ -92,6 +92,14 @@ const itemClick = (event, item) => {
     setActiveMenuItem(foundItemKey);
 };
 
+const itemClickSubMenu = (event, item, index) => {
+    console.log('clicked itemPPP', index);
+    const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
+    console.log(foundItemKey);
+    setActiveMenuItem(foundItemKey);
+    isActiveMenu.value = true;
+};
+
 const clickSpaceMenu = (event) => {
     if (event[0].items[0].label == 'Manage Space') {
         console.log('company_id', company_id.value);
@@ -111,13 +119,14 @@ const toggle = (event) => {
 </script>
 
 <template>
+    <!-- <pre>activeMenu=>{{isActiveMenu}}</pre> -->
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
         <div v-if="root && item.visible !== false" class="layout-menuitem-root-text flex justify-content-between align-items-center">
             {{ item.label }}
 
             <div v-if="item.option == 'space_option'">
                 <div class="flex align-items-center">
-                    <Button type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
+                    <Button v-tooltip.top="{ value: 'Manage Space' }" type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" @click="clickSpaceMenu(items)" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
                     <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
@@ -127,25 +136,27 @@ const toggle = (event) => {
         <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
-                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text">{{ item.label }} </NuxtLink>
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{ value: `${item.label}` }">
+                    {{ item.label.length > 16 ? item.label.slice(0, 16) + '...' : item.label }}
+                </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
-                <i @click="itemClick($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
+                <i @click="itemClickSubMenu($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject v-if="createProjectP" v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
                 <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             </div>
         </a>
         <router-link
-            class="flex align-items-center justify-content-between"
+            class="flex align-items-center justify-content-between" style="margin-left: 1px !important; padding-left: 7px !important;"
             v-if="item.to && !item.items && item.visible !== false"
             @click="itemClick($event, item, index)"
             :class="[item.class, { 'active-route': checkActiveRoute(item) }]"
             tabindex="0"
             :to="item.to"
         >
-            <div class="flex flex-row">
-                <i :class="item.icon" class="layout-menuitem-icon"></i>
-                <span class="layout-menuitem-text">{{ item.label }}</span>
+            <div class="flex flex-row align-items-center">
+                <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important;"></i>
+                <span v-tooltip.right="{ value: `${item.label.length > 20 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
             </div>
             <span
                 v-if="item.label == 'Employees'"
@@ -153,6 +164,7 @@ const toggle = (event) => {
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
+            <span v-if="item.label == 'Teams'" style="left: 7px; position: relative" v-tooltip.right="{ value: 'Demo Text Text For Teams.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             <span
                 v-if="item.label == 'Roles'"
                 style="left: 7px; position: relative"
@@ -166,13 +178,19 @@ const toggle = (event) => {
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
             <span
-                v-if="item.label == 'Task Wise Reports'"
+                v-if="item.label == 'Task Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
             ></span>
             <span
-                v-if="item.label == 'User Wise Reports'"
+                v-if="item.label == 'User Reports'"
+                style="left: 7px; position: relative"
+                v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
+                class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
+            ></span>
+            <span
+                v-if="item.label == 'KPI Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
@@ -197,5 +215,9 @@ const toggle = (event) => {
 .layout-menu ul a {
     padding: 0.65rem 0.75rem;
     border-radius: 6px;
+}
+
+.space-items {
+    text-wrap: nowrap;
 }
 </style>

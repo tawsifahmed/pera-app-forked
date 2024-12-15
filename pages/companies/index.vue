@@ -8,7 +8,8 @@ import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Toast from 'primevue/toast';
-import accessPermission from "~/composables/usePermission";
+import accessPermission from '~/composables/usePermission';
+const createCompanyP = ref(accessPermission('create_company'));
 const updateCompanyP = ref(accessPermission('update_company'));
 const deleteCompanyP = ref(accessPermission('delete_company'));
 
@@ -21,8 +22,13 @@ const visibleEditCompany = ref(false);
 
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
-const { getCompanyList, deleteCompany } = useCompanyStore();
-const { companyList, isCompanyDeleted } = storeToRefs(useCompanyStore());
+const { getCompanyList, deleteCompany, switchCompany } = useCompanyStore();
+const { compList, isCompanyDeleted, companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());
+
+import { useActiveCompanyStore } from '~/store/workCompany';
+const companies = useActiveCompanyStore();
+companies.getCompany();
+const { companyList } = storeToRefs(useActiveCompanyStore());
 
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
@@ -57,15 +63,26 @@ const confirmdeleteCompany = (companyId) => {
 
 const deletingCompany = async () => {
     console.log('refCompanyIdFin', refCompanyId.value);
-
-    // return
     await deleteCompany(refCompanyId.value);
 
     if (isCompanyDeleted.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Company Deleted Successfully', group: 'br', life: 3000 });
         deleteCompanyDialog.value = false;
-        console.log('company deleted');
-        router.push('/')
+        if (companyList.value.length >= 1) {
+            if (refCompanyId.value === Number(localStorage.getItem('userCompany'))) {
+                await switchCompanyHandler(companyList.value[0].id);
+                localStorage.setItem('userCompany', JSON.stringify(companyList.value[0].id));
+                await companies.getCompany();
+                await getCompanyList();
+                // location.reload();
+            } else {
+                return;
+            }
+        } else {
+            localStorage.removeItem('userCompany');
+            // location.reload();
+            window.location.href = '/';
+        }
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete company', group: 'br', life: 3000 });
         console.log('company not deleted');
@@ -84,23 +101,37 @@ const initFilters = () => {
 };
 
 initFilters();
+
+const switchCompanyHandler = async (switchCompId) => {
+    if (switchCompId === Number(localStorage.getItem('userCompany'))) {
+        return;
+    } else {
+        await switchCompany(switchCompId);
+        if (isCompanySwitched.value === true) {
+            localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+            toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
+        }
+    }
+};
 </script>
 
 <template>
     <div class="card">
-        <div class="d-flex create-btn-wrapper mr-2">
+        <!-- <pre>c lenght => {{companyList.length}}</pre> -->
+        <div class="d-flex create-btn-wrapper mb-3">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
                 <p class="text">Companies</p>
             </div>
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
-            <!-- <Button @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create Company +" />
-            <Dialog v-model:visible="visibleCreateCompany" modal header=" " :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                <CreateCompany />
-            </Dialog> -->
+            <Button v-if="createCompanyP" @click="handleCreateCompanyModal" class="cursor-pointer text-white px-5 py-2" label="Create +" />
+
+            <CreateCompany v-model:visible="visibleCreateCompany" />
         </div>
-      
+
         <div class="flex mb-2 justify-content-end">
             <IconField iconPosition="right">
                 <InputIcon>
@@ -109,27 +140,25 @@ initFilters();
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-st" :value="companyList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
-           
+        <DataTable v-model:filters="filters" class="table-st" :value="compList" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> Loading data. Please wait. </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column field="name" header="Company Name" sortable>
-              <template #body="slotProps" >
-                <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
-                  <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps?.data?.name }}</p>
-                </NuxtLink>
-              </template>
+            <Column field="name" header="Company Name">
+                <template #body="slotProps">
+                    <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
+                        <p class="cursor-pointer com-name hover:text-primary font-semibold" @click="switchCompanyHandler(slotProps?.data?.id)">{{ slotProps?.data?.name }}</p>
+                    </NuxtLink>
+                </template>
             </Column>
-            <Column field="number_of_employees" sortable header="Number of Employees"></Column>
-            <Column field="company_type" sortable header="Type"></Column>
+            <Column field="number_of_employees" header="Number of Employees"></Column>
+            <Column field="company_type" header="Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
-                   
                     <Button v-if="updateCompanyP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
-                    <Button v-if="!updateCompanyP" style="visibility: hidden;" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
+                    <Button v-if="!updateCompanyP" style="visibility: hidden" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editCompany(slotProps.data)" />
                     <Button v-if="deleteCompanyP" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
-                    <Button v-if="!deleteCompanyP" style="visibility: hidden;" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
+                    <Button v-if="!deleteCompanyP" style="visibility: hidden" icon="pi pi-trash" text class="mt-2" severity="warning" rounded @click="confirmdeleteCompany(slotProps.data.id)" />
                 </template>
             </Column>
         </DataTable>
@@ -141,7 +170,7 @@ initFilters();
         </Dialog>
 
         <Dialog v-model:visible="visibleEditCompany" modal header="Edit Company" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditCompany :refCompanyId="refCompanyId"  @closeEditModal="closeEditModal($event)"/>
+            <EditCompany :refCompanyId="refCompanyId" @closeEditModal="closeEditModal($event)" />
         </Dialog>
     </div>
 </template>
@@ -188,22 +217,21 @@ initFilters();
     }
 }
 
-.table-st{
+.table-st {
     border: 1px solid #ededed;
     border-radius: 10px;
     overflow: hidden;
     td {
-  
-      padding: 0.15rem 1rem !important;
+        padding: 0.15rem 1rem !important;
     }
-  }
-  .table-st thead tr{
-   background:#ededed;
-  }
+}
+.table-st thead tr {
+    background: #ededed;
+}
 
-    .com-name{
-        color: #3c3c3c !important;
-    }
+.com-name {
+    color: #3c3c3c !important;
+}
 
 //.breadc{
 // margin-top: 0 !important;

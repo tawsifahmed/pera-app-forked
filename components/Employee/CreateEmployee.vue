@@ -1,4 +1,6 @@
 <script setup>
+import { nextTick, onMounted } from 'vue';
+
 const url = useRuntimeConfig();
 const props = defineProps({
     param: {
@@ -17,7 +19,6 @@ const name = ref('');
 const email = ref('');
 
 const phone = ref('');
-
 const address = ref('');
 
 const password = ref('');
@@ -33,6 +34,14 @@ const emit = defineEmits(['closeCreateModal']);
 const loading = ref(false);
 const handleSubmitData = async () => {
     loading.value = true;
+    // if (phone.value != '') {
+    //     const phoneRegex = /^(?:\+?88)?01[3-9]\d{8}$/;
+    //     if (!phoneRegex.test(phone.value)) {
+    //         toast.add({ severity: 'error', summary: 'Error', detail: 'Invalid phone number!', group: 'br', life: 3000 });
+    //         loading.value = false;
+    //         return;
+    //     }
+    // }
     if (name.value === '' || email.value === '' || password.value === '' || selectedRoles.value.length === 0) {
         errorHandler.value = true;
         loading.value = false;
@@ -82,38 +91,59 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createEmployeeName = document.getElementById('createEmployeeName');
+    nextTick(() => {
+        if (createEmployeeName){
+            createEmployeeName.focus();
+        }
+    });
+});
 </script>
 <template>
     <div>
         <div class="field">
-            <label for="company">Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText v-model="name" class="w-full" />
+            <label for="company"
+                >Name<i class="text-red-400 text-italic">*</i>
+                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+            ></label>
+            <InputText id="createEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
         <div class="field">
-            <label for="email">Email address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText type="email" v-model="email" class="w-full" />
+            <label for="email"
+                >Email address<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+            ></label>
+            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
         </div>
         <div class="field">
             <label for="phoneNo">Phone <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText v-model="phone" inputId="worktype" type="number" class="w-full" />
+            <InputText v-model="phone" inputId="worktype" type="tel" class="w-full" maxlength="14" placeholder="Enter Phone No."/>
         </div>
         <div class="field">
             <label for="company">Address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Textarea v-model="address" rows="3" cols="20" class="w-full" />
+            <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Enter Address"/>
         </div>
         <div class="field">
-            <label for="company">Password <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText type="password" v-model="password" class="w-full" />
+            <label for="company"
+                >Password<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+            ></label>
+            <Password v-model="password" placeholder="Enter password" :feedback="false" :invalid="confirmPassError" toggleMask class="w-full" inputClass="w-full"></Password>
+
+            <!-- <InputText type="password" v-model="password" class="w-full" /> -->
         </div>
 
         <div class="field flex flex-column">
-            <label>Role</label>
-            <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+            <!-- <pre>rol {{rolesLists}}</pre> -->
+            <label
+                >Role<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+            ></label>
+            <Dropdown v-model="selectedRoles" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
-        <div class="create-btn-wrapper">
+        <div class="create-btn-wrapper mb-0">
             <Button :loading="loading" label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>

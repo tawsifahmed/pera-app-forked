@@ -9,11 +9,13 @@ export const useCompanyStore = defineStore('workStation', {
         isCompanyCreated: false,
         isCompanyDeleted: false,
         isCompanyEdited: false,
-        companyList: null,
+        compList: null,
         companyId: null,
         singleCompany: null,
         singleCompanySpaces: null,
         singleCompanyName: null,
+        isCompanySwitched: false,
+        companySwitchToast: null,
 
         // space api
         spaceList: null,
@@ -60,20 +62,20 @@ export const useCompanyStore = defineStore('workStation', {
         chartProjectInfo: null,
         chartTaskInfo: null,
         chartClosedTaskInfo: null,
-        rolesLists: null
+        rolesLists: null,
     }),
 
     actions: {
         async getCompanyList() {
             const token = useCookie('token');
-            const { data, pending, error } = await useAsyncData('companyList', () =>
+            const { data, pending, error } = await useAsyncData('compList', () =>
                 $fetch('https://pbe.singularitybd.net/api/v1/company/list', {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
                 })
             );
-            this.companyList = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+            this.compList = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
             this.singleCompanyName = data.value?.data[0]?.name;
         },
         async getSingleCompany(company) {
@@ -140,6 +142,31 @@ export const useCompanyStore = defineStore('workStation', {
                 await companies.getCompany();
             }
         },
+        async switchCompany(switchCompId) {
+            const token = useCookie('token');
+            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/switch-company`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token.value}`
+                },
+                body: {
+                    company_id: switchCompId
+                }
+            });
+            if (data.value?.code === 200) {
+                // console.log('data', data);
+                const userType = useCookie('userType');
+                userType.value = data?.value?.user_type;
+                const rolePermission = useCookie('rolePermission');
+                rolePermission.value = data?.value?.permissions;
+                this.isCompanySwitched = true;
+                this.companySwitchToast = data.value.message;
+                location.reload();
+            }else{
+                this.isCompanySwitched = false;
+                this.companySwitchToast = 'Unable to switch company';
+            }
+        },
         async deleteCompany(id) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/delete/${id}`, {
@@ -153,7 +180,6 @@ export const useCompanyStore = defineStore('workStation', {
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyDeleted = true;
-                localStorage.removeItem('userCompany');
                 await companies.getCompany();
                 this.getCompanyList();
                 // this.getSingleCompany(id);
@@ -201,7 +227,8 @@ export const useCompanyStore = defineStore('workStation', {
             this.singleSpace = data.value?.data;
             this.singleSpaceProjects = this.singleSpace?.projects.map((item, index) => ({ ...item, index: index + 1 }));
         },
-        async createSpace({ name, description, company_id, color }) {
+        async createSpace({ name, description, company_id, color, users }) {
+            
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
                 method: 'POST',
@@ -212,16 +239,17 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     company_id: company_id,
-                    color: color
+                    color: color,
+                    users
                 }
             });
 
             if (data.value?.app_message === 'success') {
                 this.isSpaceCreated = true;
-                await this.getCompanyList();
+                // await this.getCompanyList();
             }
         },
-        async editSpace({ id, name, description, company_id, color }) {
+        async editSpace({ id, name, description, company_id, color, users }) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/update/${id}`, {
                 method: 'POST',
@@ -233,7 +261,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     company_id: company_id,
-                    color: color
+                    color: color,
+                    users
                 }
             });
 
@@ -296,7 +325,7 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
-            this.statuslist = data.value?.taskStatus;
+            this.statuslist = data.value?.data?.statuses;
 
             const updatedData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
@@ -330,6 +359,7 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async editProject({ id, name, description, space_id, statuses }) {
+            console.log('statuses Pinia', statuses);
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
@@ -369,7 +399,36 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getSingleSpace(spaceId);
             }
         },
+        async getTaskDetails(id) {
+            const token = useCookie('token');
+            const { data, pending, error } = await useAsyncData('taskDetails', () =>
+                $fetch(`https://pbe.singularitybd.net/api/v1/tasks/show/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token.value}`
+                    }
+                })
+            );
+
+            this.taskDetails = data.value?.data;
+            this.taskActivity = data.value?.taskActivity;
+            this.singleTaskComments = data.value?.data.comments;
+            this.subTasks = data.value?.subTasks;
+            this.taskStatus = [];
+            let status = data.value?.taskStatus;
+
+            if (status && status.length > 0) {
+                status.forEach((element) => {
+                    let obj = {
+                        name: element.name,
+                        code: element.id
+                    };
+                    this.taskStatus.push(obj);
+                });
+            }
+        },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
+            console.log('dueDate formatted', dueDate);
+            // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
                 method: 'POST',
@@ -399,10 +458,15 @@ export const useCompanyStore = defineStore('workStation', {
                     this.isTaskCreated = true;
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
+                    let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                    if(taskIdInLclStrg){
+                        this.getTaskDetails(taskIdInLclStrg);
+                    }
                 }
             }
         },
         async editTask({ id, name, description, project_id, dueDate, priority, assignees, tags }) {
+            
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${id}`, {
                 method: 'POST',
@@ -414,6 +478,7 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     due_date: dueDate,
+                    // due_date: dueDate,
                     priority: priority,
                     assignees: assignees,
                     tags: tags,
@@ -421,6 +486,7 @@ export const useCompanyStore = defineStore('workStation', {
                     // 'attachments' : attachments,
                 }
             });
+            console.log('data', data);
 
             if (error.value) {
                 if (error.value.data.code === 400) {
@@ -433,6 +499,10 @@ export const useCompanyStore = defineStore('workStation', {
                     this.isTaskEdited = true;
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
+                    let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                    if(taskIdInLclStrg){
+                        this.getTaskDetails(taskIdInLclStrg);
+                    }
                 }
             }
         },
@@ -451,9 +521,12 @@ export const useCompanyStore = defineStore('workStation', {
                 this.isTaskDeleted = true;
                 // this.getSpaceList();
                 this.getSingleProject(projectId);
+                let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
+                if(taskIdInLclStrg){
+                this.getTaskDetails(taskIdInLclStrg);
+                }
             }
         },
-
         async getTaskAssignModalData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
@@ -493,33 +566,6 @@ export const useCompanyStore = defineStore('workStation', {
                         name: element.name
                     };
                     this.tags.push(obj);
-                });
-            }
-        },
-        async getTaskDetails(id) {
-            const token = useCookie('token');
-            const { data, pending, error } = await useAsyncData('taskDetails', () =>
-                $fetch(`https://pbe.singularitybd.net/api/v1/tasks/show/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token.value}`
-                    }
-                })
-            );
-
-            this.taskDetails = data.value?.data;
-            this.taskActivity = data.value?.taskActivity;
-            this.singleTaskComments = data.value?.data.comments;
-            this.subTasks = data.value?.subTasks;
-            this.taskStatus = [];
-            let status = data.value?.taskStatus;
-
-            if (status && status.length > 0) {
-                status.forEach((element) => {
-                    let obj = {
-                        name: element.name,
-                        code: element.id
-                    };
-                    this.taskStatus.push(obj);
                 });
             }
         },

@@ -27,6 +27,7 @@ const deleteUserP = ref(accessPermission('delete_user'));
 const filters = ref();
 
 const loading = ref(true);
+const loading1 = ref(false);
 
 const toast = useToast();
 
@@ -66,9 +67,8 @@ const closeEditModal = (evn) => {
     init();
 };
 
-const handleCreateCompanyModal = () => {
+const handleCreateCompanyModal = () => { 
     visibleCreateEmployee.value = true;
-    init();
 };
 
 const handleInviteUserModal = () => {
@@ -77,6 +77,7 @@ const handleInviteUserModal = () => {
 
 const closeInviteModal = (evn) => {
     visibleInviteUser.value = false;
+    init();
 };
 
 const selectedRole = ref([]);
@@ -102,6 +103,7 @@ const deleteEmployee = (key) => {
 };
 
 const confirmDeleteEmployee = async () => {
+    loading1.value = true;
     const token = useCookie('token');
     const { data, pending } = await useFetch(`${url.public.apiUrl}/users/delete/${id.value}`, {
         method: 'DELETE',
@@ -113,16 +115,19 @@ const confirmDeleteEmployee = async () => {
     if (data.value.code === 200) {
         visibleDeleteEmployee.value = false;
         toast.add({ severity: 'success', summary: 'Success', detail: 'Employee Deleted successfully!', group: 'br', life: 3000 });
+        loading1.value = false;
+        init();
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Employee Deleted Failed!', group: 'br', life: 3000 });
+        loading1.value = false;
     }
-    init();
+
 };
 
 const init = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch('${url.public.apiUrl}/users/list', {
+        $fetch(`${url.public.apiUrl}/users/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -136,16 +141,16 @@ const init = async () => {
 const getRoleList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('roleLiist', () =>
-        $fetch('${url.public.apiUrl}/roles/list', {
+        $fetch(`${url.public.apiUrl}/roles/list`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         })
     );
     if (data.value?.data?.length > 0) {
-        console.log('data', data.value?.data);
+        // console.log('data', data.value?.data);
         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        console.log('rolesLists', rolesLists.value);
+        // console.log('rolesLists', rolesLists.value);
     }
 };
 
@@ -176,7 +181,7 @@ initFilters();
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
-                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary" />
+                <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary"/>
                 <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
@@ -196,10 +201,10 @@ initFilters();
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
-            <Column field="name" sortable header="Employee Name"></Column>
-            <Column field="email" sortable header="Email Address"></Column>
-            <Column field="phone" sortable header="Phone"></Column>
-            <Column field="user_type" sortable header="User Type"></Column>
+            <Column field="name" header="Employee Name"></Column>
+            <Column field="email" header="Email Address"></Column>
+            <Column field="phone" header="Phone"></Column>
+            <Column field="user_type" header="User Type"></Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <Button v-if="updateUserP" icon="pi pi-pencil" text class="mr-2" severity="success" rounded @click="editEmployee(slotProps.data)" />
@@ -224,7 +229,7 @@ initFilters();
         <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteEmployee = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" />
+            <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" :loading="loading1"/>
         </Dialog>
 
         <!-- Invite User -->

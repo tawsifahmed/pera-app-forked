@@ -13,6 +13,8 @@ export const useAuthStore = defineStore('auth', {
     userCompany: null,
     resendOtpMsg: null,
     detectDuplicateEmail: false,
+    resetState: null,
+    resetToken: ''
   }),
 
   actions: {
@@ -44,6 +46,7 @@ export const useAuthStore = defineStore('auth', {
 
       if (data.value) {
         if (data.value.code === 200) {
+          console.log('login.value', data.value)
           this.userCompany = data?.value?.company?.id;
           if (this.userCompany) {
             localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
@@ -52,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
           token.value = data?.value?.access_token;
           const rolePermission = useCookie('rolePermission');
           rolePermission.value = data?.value?.permissions;
-          this.authenticated = true; //  authenticated state value to true
+          this.authenticated = true;
         } else {
           this.authenticated = false;
           token.value = '';
@@ -204,15 +207,68 @@ export const useAuthStore = defineStore('auth', {
       console.log('resendOtpResponse', this.resendOtpResponse)
 
     },
-
+    async forgotPassword(email) {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          email
+        },
+      });
+      if (data.value) {
+        return { code: 200, message: 'otp' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
+    async forgotPasswordOtp(email, otp) {
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          email,
+          otp
+        },
+      });
+      if (data.value) {
+        this.resetToken = data.value.token;
+        return { code: 200, message: 'new-password' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
+    async passwordReset(email, password) {
+      const token = useCookie('token');
+      const authToken = token.value ? token.value : this.resetToken;
+      console.log('token', token.value)
+      console.log('this.resetToken', this.resetToken)
+      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: {
+          email,
+          password: password.value.password,
+          password_confirmation: password.value.confirm_password
+        },
+      });
+      if (data.value) {
+        this.resetToken = '';
+        return { code: 200, message: 'Password Changed' }
+      } else {
+        return { code: error.value.status, message: error.value.data.message };
+      }
+    },
     logUserOut() {
       const token = useCookie('token');
       const rolePermission = useCookie('rolePermission');
       localStorage.removeItem('userCompany')
+      localStorage.removeItem('taskDetailID');
       this.authenticated = false;
       token.value = null;
       rolePermission.value = null;
     },
-
   },
 });

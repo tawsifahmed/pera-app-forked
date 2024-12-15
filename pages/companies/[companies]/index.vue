@@ -45,7 +45,9 @@ const confirmDeleteSpace = (spaceId) => {
 
 const deleteSpaceDialog = ref(false);
 
+const deleteLoader = ref(false);
 const deletingSpace = async () => {
+    deleteLoader.value = true;
     console.log('refCompanyIdFin', refSpaceId.value);
 
     // return
@@ -55,9 +57,11 @@ const deletingSpace = async () => {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteSpaceDialog.value = false;
         console.log('space deleted');
+        deleteLoader.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
         console.log('space not deleted');
+        deleteLoader.value = false;
     }
 };
 
@@ -85,21 +89,25 @@ watchEffect(() => {
 const closeEditSpace = (evn) => {
     visibleEditSpace.value = evn;
 };
+
+const spacePage = ref(true);
 </script>
 
 <template>
     <!-- <pre class="">{{ singleCompany.name }}</pre> -->
     <div class="card">
         <Toast position="bottom-right" group="br" />
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+        <div class="d-flex create-space-btn-wrapper mb-3">
             <!-- <Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" /> -->
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home"></NuxtLink>
                 <p class="pi pi-angle-right"></p>
+                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
+                <p class="pi pi-angle-right"></p>
                 <p class="text">Company - {{ singleCompany?.name }}</p>
             </div>
             <div class="create-btn-wrapper ">
-                <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }" />
+                <SpaceCreateSpace v-if="createSpaceP" v-tooltip.left="{ value: 'Create Space' }" :spacePage="spacePage" />
             </div>
         </div>
 
@@ -127,7 +135,12 @@ const closeEditSpace = (evn) => {
                 </template>
             </Column>
             <Column field="description" header="Description"></Column>
-            <Column field="color" header="Space Color"></Column>
+            <Column field="color" header="Space Color">
+               <template #body="slotProps">
+                <div id="dynamic-div" :style="`background-color: ${slotProps.data.color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-2 px-2 w-fit text-white">{{slotProps.data.name ? slotProps.data.name.charAt(0).toUpperCase() : 'S'}}</div>
+
+               </template>
+            </Column>
             <Column field="action" header="Action">
                 <template #body="slotProps">
                     <!-- <NuxtLink :to="`/companies/${singleCompany.id}/spaces/${slotProps.data.id}`">
@@ -146,18 +159,9 @@ const closeEditSpace = (evn) => {
         </DataTable>
 
         <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
-
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
-        </Dialog>
-
-
-
-        <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
-            <p>Are you sure you want to delete?</p>
-            <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingSpace" />
+            <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingSpace" />
         </Dialog>
         <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

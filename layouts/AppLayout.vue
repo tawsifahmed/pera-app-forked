@@ -7,6 +7,7 @@ import AppConfig from './AppConfig.vue';
 import { useLayout } from './composables/layout';
 import { provideTracker } from '../composables/timeTracker';
 
+
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
 
 const outsideClickListener = ref(null);

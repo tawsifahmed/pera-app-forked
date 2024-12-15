@@ -6856,7 +6856,7 @@
     border-bottom: 0 none;
     background: #ffffff;
     color: #334155;
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     border-top-right-radius: 6px;
     border-top-left-radius: 6px;
   }
@@ -7227,7 +7227,7 @@
     position: absolute;
     display: none;
     padding: 0.25em 0.5rem;
-    max-width: 12.5rem;
+    max-width: 25.5rem;
   }
 
   .p-tooltip.p-tooltip-right,

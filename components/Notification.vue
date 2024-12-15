@@ -4,10 +4,13 @@ const token = useCookie('token');
 const notificationData = ref([]);
 const page = ref(1);
 const totalPage = ref(1);
+const emit = defineEmits(['closeNotification']);
+const toast = useToast();
 
-const handleClick = async (id) => {
+
+const handleClick = async (element) => {
     try {
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${id}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/update/${element.id}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -16,6 +19,23 @@ const handleClick = async (id) => {
                 is_read: 1
             }
         });
+        const companyId = localStorage.getItem('userCompany');
+        // console.log('Notification_element =>', element);
+        // console.log('Task click: ', task);
+        if (element.payload?.type === "task_details"){
+            await navigateTo({ path: `/companies/${companyId}/spaces/${element?.space_id}/projects/${element?.project_id}`, query: { task_key: element?.task_id } });
+            emit('closeNotification', false);
+        } 
+        // else if (element.payload?.type === "project_details") {
+        //     await navigateTo({ path: `/companies/${companyId}/spaces/${element.payload.space_id}/projects/${element.payload.project_id}` });
+        // } 
+        // else if (element.payload?.type === "space_details") {
+        //     await navigateTo({ path: `/companies/${companyId}/spaces/${element.payload.space_id}` });
+        // } 
+        // else if (element.payload?.type === "company_details") {
+        //     await navigateTo({ path: `/companies/${companyId}` });
+        // }
+        // await navigateTo({ path: `/companies/${companyId}/spaces/${task?.space_id}/projects/${task?.project_id}`, query: { task_key: task.id } });
         await fetchData();
     } catch (e) {
         console.log(e);
@@ -32,6 +52,7 @@ const fetchData = async () => {
         });
 
         if (data.value) {
+            // console.log('notification data =>', data.value);
             notificationData.value = data.value.data;
             totalPage.value = Math.ceil(data.value.total / 5);
         }
@@ -46,6 +67,34 @@ const init = async () => {
 
 init();
 
+const loadingRead = ref(false);
+const handleReadAll = async () => {
+    loadingRead.value = true;
+    try {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/notification/read-all`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+
+            // console.log('real all data =>', data.value);
+            await fetchData();
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'All notifications marked as read', group: 'br', life: 3000 });
+
+            loadingRead.value = false;
+            
+
+        }
+    } catch (e) {
+        console.log(e);
+        loadingRead.value = false;
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Something went wrong!', group: 'br', life: 3000 });
+    }
+}
+
 const handleNavigate = async (type) => {
     if (type === 'prev' && page.value > 1) {
         page.value -= 1;
@@ -56,16 +105,24 @@ const handleNavigate = async (type) => {
 };
 </script>
 <template>
-    <div class="bg-white card1">
+    <div  class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
-        <div v-for="notify in notificationData" :key="notify" class="">
-            <div @click="handleClick(notify.id)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
+        <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
+            <div @click="handleClick(notify)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
         </div>
-        <div class="flex gap-2 justify-content-center">
-            <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
-            <Button @click="handleNavigate('')" :disabled="totalPage === page ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
+        <div class="bg-white text-center text-lg" v-else>
+            No notifications!
+        </div>
+        <div class="flex justify-content-between align-items-center mt-1">
+            <Button class="invisible" label="Read All" />
+            <div class="flex gap-2 justify-content-center">
+                <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
+                <Button @click="handleNavigate('')" :disabled="totalPage === page || !notificationData.length > 0 ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
+            </div>
+            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
+    
 </template>
 
 <style lang="scss" scoped>
@@ -76,6 +133,15 @@ const handleNavigate = async (type) => {
     width: 30rem;
     padding: 10px;
 }
+.card2 {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 30rem;
+    padding: 10px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
 
 .title {
     padding: 10px;
@@ -85,7 +151,13 @@ const handleNavigate = async (type) => {
     cursor: pointer;
     text-wrap: wrap;
 }
+
 .unread {
     background-color: #60f7c949;
 }
+
+.invisible {
+    visibility: hidden;
+}
+
 </style>

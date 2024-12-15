@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Name</label>
-            <InputText v-model="name" class="w-full" placeholder="Edit tag name" />
+            <label for="company">Name<i class="text-red-400 text-italic">*</i> </label>
+            <InputText id="editTagName" v-model="name" class="w-full" placeholder="Edit tag name" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter tag name</p>
@@ -59,6 +59,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const editTagName = document.getElementById('editTagName');
+    nextTick(() => {
+        if (editTagName){
+            editTagName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

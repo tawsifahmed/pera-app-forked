@@ -42,8 +42,9 @@ const confirmDeleteProject = (spaceId) => {
 };
 
 const deleteProjectDialog = ref(false);
-
+const deleteLoader = ref(false);
 const deletingProject = async () => {
+    deleteLoader.value = true;
     console.log('refCompanyIdFin', refProjectId.value);
 
     // return
@@ -53,9 +54,11 @@ const deletingProject = async () => {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
         deleteProjectDialog.value = false;
         console.log('space deleted');
+        deleteLoader.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
         console.log('space not deleted');
+        deleteLoader.value = false;
     }
 };
 
@@ -81,22 +84,26 @@ const edittProject = (id) => {
 const closeEditProject = (evn) => {
     visibleEditProject.value = evn;
 };
+
+const isPage = ref(true);
 </script>
 
 <template>
     <div class="card">
         <Toast position="bottom-right" group="br" />
         <!-- <h5>Dashboard > {{ singleSpace?.company_name }} > {{ singleSpace?.name }}</h5> -->
-        <div class="d-flex create-space-btn-wrapper mb-3 mr-2">
+        <div class="d-flex create-space-btn-wrapper mb-3">
             <div class="breadCrumWrap">
                 <NuxtLink to="/" class="text pi pi-home responsive-text"></NuxtLink>
+                <p class="pi pi-angle-right"></p>
+                <NuxtLink to="/companies" class="text ">Companies</NuxtLink>
                 <p class="pi pi-angle-right responsive-text"></p>
                 <NuxtLink class="text responsive-text" :to="`/companies/${singleSpace?.company_id}`"> Company - {{ singleSpace?.company_name }}</NuxtLink>
                 <p class="pi pi-angle-right responsive-text"></p>
                 <p class="text cursor-pointer responsive-text">Space - {{ singleSpace?.name }}</p>
             </div>
             <div class="create-btn-wrapper">
-                <CreateSpecificProject v-if="createProjectP" v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" />
+                <CreateSpecificProject v-if="createProjectP" v-tooltip.left="{ value: 'Create Project' }" :singleSpace="singleSpace" :spaces="spaces" :isPage="isPage" />
             </div>
         </div>
         <div class="flex justify-content-end mb-2">
@@ -128,7 +135,7 @@ const closeEditProject = (evn) => {
                     <!-- <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink> -->
-                    <Button v-if="updateProjectP" icon="pi pi-pencil" text class="w-fit" severity="success" rounded @click="edittProject(slotProps.data)" />
+                    <Button v-if="updateProjectP" icon="pi pi-pencil" text class="" severity="success" rounded @click="edittProject(slotProps.data)" />
                     <Button v-if="deleteProjectP" icon="pi pi-trash" text class="" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
                     <Button v-if="!updateProjectP" icon="pi pi-pencil" text class="" severity="success" style="visibility: hidden" />
                     <Button v-if="!deleteProjectP" icon="pi pi-trash" text class="" severity="warning" style="visibility: hidden" />
@@ -139,7 +146,7 @@ const closeEditProject = (evn) => {
         <Dialog v-model:visible="deleteProjectDialog" header=" " :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
-            <Button label="Yes" icon="pi pi-check" text @click="deletingProject" />
+            <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingProject" />
         </Dialog>
 
         <Dialog v-model:visible="visibleEditProject" modal header="Edit Project" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

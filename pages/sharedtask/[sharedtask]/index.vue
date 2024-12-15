@@ -2,6 +2,7 @@
 const url = useRuntimeConfig();
 import Column from 'primevue/column';
 
+
 const isLogged = ref(false);
 
 const token = useCookie('token');
@@ -115,7 +116,19 @@ const formattedTime = (time) => {
                                         <span class="pi pi-sliders-h"></span>
                                         <p class="text-nowrap font-bold">Description:</p>
                                     </div>
-                                    <p class="">{{ taskData?.description }}</p>
+                                    <!-- <Editor v-model="description" editorStyle="height: 150px" >
+                                        <template v-slot:toolbar>
+                                            <span class="ql-formats flex justify-content-end">
+                                                <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                                                <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                                                <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                                                <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
+                                                <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                                                <button class="ql-link" type="button" data-pc-section="link"></button>
+                                            </span>
+                                        </template>
+                                    </Editor> -->
+                                    <p v-html="taskData?.description" class="description-section"></p>
                                 </div>
                             </div>
 
@@ -183,9 +196,9 @@ const formattedTime = (time) => {
                                     </div>
                                 </template>
                                 <template #content>
-                                    <div v-if="setFileUrl(comment?.file)" class="flex justify-content-end">
+                                    <div v-if="setFileUrl(comment?.file)" class="flex justify-content-start my-2">
                                         <a
-                                            :href="`http://188.166.212.40/pera/public/storage/${comment?.file}`"
+                                            :href="`https://pbe.singularitybd.net/public/storage/${comment?.file}`"
                                             target="_blank"
                                             class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
                                             style="background-color: #f7fafc"
@@ -196,8 +209,11 @@ const formattedTime = (time) => {
                                             </div>
                                         </a>
                                     </div>
-                                    <p class="m-0 ml-1">
-                                        {{ comment?.comment ? comment?.comment : '' }}
+                                    <p v-if="comment?.comment" class="m-0 ml-1">
+                                        {{ comment?.comment }}
+                                    </p>
+                                    <p v-else class="m-0 ml-1" style="visibility: hidden;"> 
+                                        .
                                     </p>
                                     <i style="line-height: 0" class="pb-1 float-right">{{ formattedTime(comment.created_at) }}</i>
                                 </template>
@@ -509,5 +525,13 @@ input[type='file']::file-selector-button:hover {
     align-items: end;
     justify-content: center;
     gap: 0px;
+}
+
+.description-section {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    max-height: 130px;
+    overflow-y: scroll;
 }
 </style>

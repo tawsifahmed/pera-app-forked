@@ -40,10 +40,6 @@ const companyLargeAmount = ref([
     {
         id: '501-2000',
         label: '501-2000'
-    },
-    {
-        id:'2000+',
-        label: '2000+'
     }
 ]);
 
@@ -70,8 +66,8 @@ const solutions = ref([
         label: 'Support'
     },
     {
-        id: 'Seles & CRM',
-        label: 'Seles & CRM'
+        id: 'Sales & CRM',
+        label: 'Sales & CRM'
     },
     {
         id: 'Personal Use',
@@ -112,6 +108,7 @@ const validateEmail = (mail) => {
 
 const showValidEmail = ref(null);
 const validEmailStatus = ref(null);
+showValidEmail.value = refCompanyId?.email;
 
 const handleEmail = () => {
     validEmailStatus.value = false;
@@ -132,7 +129,7 @@ const errorHandler = ref(false);
 const btnLoading = ref(false);
 const handleEditCompany = async () => {
     btnLoading.value = true;
-    if (numEmployees.value === null || sSolution.value === null || invite.value === null || workSpaceName.value === null || workSpaceName.value === '') {
+    if (numEmployees.value === null || sSolution.value === null || showValidEmail.value === null || workSpaceName.value === null || workSpaceName.value === '') {
         errorHandler.value = true;
         btnLoading.value = false;
         return;
@@ -145,7 +142,7 @@ const handleEditCompany = async () => {
         const workspaceData = {
             id: refCompanyId.id,
             name: workSpaceName.value,
-            email: invite.value,
+            email: showValidEmail.value,
             address: null,
             contact_number: null,
             number_of_employees: nE,
@@ -177,25 +174,24 @@ const handleEditCompany = async () => {
         <!-- <p>refCompanyId {{refCompanyId}}</p> -->
        
             <div class="field">
-                <label for="company">Company Size</label>
-                <Dropdown v-model="numEmployees" inputId="company" :options="companyLargeAmount" optionLabel="label" class="w-full" />
+                <label for="company">Company Size<i class="text-red-400 text-italic">*</i></label>
+                <Dropdown v-model="numEmployees" inputId="company" :options="companyLargeAmount" optionLabel="label" placeholder="Select Size" class="w-full" />
             </div>
             <div class="field">
-                <label for="worktype">Company work type?</label>
-                <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" class="w-full" />
+                <label for="worktype">Company Work Type?<i class="text-red-400 text-italic">*</i></label>
+                <Dropdown v-model="sSolution" inputId="worktype" :options="solutions" optionLabel="label" placeholder="Select Type" class="w-full" />
             </div>
-          
             <div class="field">
-                <label for="email">Email address</label>
-                <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="invite" @Input="handleEmail" />
+                <label for="email">Email Address<i class="text-red-400 text-italic">*</i></label>
+                <InputText type="email" inputId="email" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Email" v-model="invite" @Input="handleEmail" />
                 <p v-if="validEmailStatus !== null && validEmailStatus !== true" class="text-danger text-center text-xs mt-2">Invalid Email!</p>
             </div>
             <div class="field">
-                <label for="company">Company name</label>
-                <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" v-model="workSpaceName" />
+                <label for="company">Company Name<i class="text-red-400 text-italic">*</i></label>
+                <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
             </div>
             <br />
-            <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
+            <p v-if="errorHandler" style="color: red">Please fill/check up all the fields properly</p>
             <div class="create-btn-wrapper">
                 <Button @click="handleEditCompany" class="text-white py-2 px-6 tracking-wide" label="Update Company" :loading="btnLoading" />
             </div>

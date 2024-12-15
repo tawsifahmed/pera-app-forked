@@ -1,13 +1,13 @@
 <template>
     <div>
         <div class="field">
-            <label for="email">Email address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText type="email" v-model="email" class="w-full" />
+            <label for="email">Email address<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <InputText id="inviteEmail" type="email" v-model="email" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label>Role <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Dropdown v-model="selectedRoles" :options="rolesLists" optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
+            <label>Role<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <Dropdown v-model="selectedRoles" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields</p>
@@ -66,13 +66,22 @@ const handleSubmitData = async () => {
                 employeeForm.value = false;
                 emit('closeInviteModal', false);
                 isButtonLoading.value = false;
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invited successfully!', group: 'br', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Employee invitation sent!', group: 'br', life: 3000 });
             } else {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invited Failed!', group: 'br', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Employee invitation failed!', group: 'br', life: 3000 });
             }
         }
     }
 };
+
+onMounted(() => {
+    const inviteEmail = document.getElementById('inviteEmail');
+    nextTick(() => {
+        if (inviteEmail){
+            inviteEmail.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss" scoped>

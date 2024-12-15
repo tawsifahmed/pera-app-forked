@@ -1,17 +1,17 @@
 <template>
     <div>
         <div class="field">
-            <label for="company">Role Name <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <InputText v-model="name" class="w-full" placeholder="Enter role name" />
+            <label for="company">Role Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <InputText id="createRoleName" v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
         <div class="field permission_selection">
-            <label>Permissions <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
+            <label>Permissions<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter role name</p>
-        <div class="create-btn-wrapper">
+        <div class="create-btn-wrapper mb-0">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
     </div>
@@ -69,6 +69,15 @@ const handleSubmitData = async () => {
         }
     }
 };
+
+onMounted(() => {
+    const createRoleName = document.getElementById('createRoleName');
+    nextTick(() => {
+        if (createRoleName){
+            createRoleName.focus();
+        }
+    });
+});
 </script>
 
 <style lang="scss">
