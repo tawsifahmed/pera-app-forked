@@ -26,7 +26,14 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const tableView = ref(true);
+const viewMode = ref('table');
+
+
+
+const handleViews = (view) => {
+        viewMode.value = view;
+};
+
 const priorities = ref([
     { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
@@ -88,14 +95,14 @@ const handleInlineNameEdit = (node) => {
 };
 
 const inputChanged = ref(false);
-watch(inlineTaskNameInput, (newVal, oldVal) => {
-    console.log('newVal', newVal);
-    console.log('oldVal', oldVal);
-    if (oldVal !== null) {
-        inputChanged.value = true;
-        console.log('inputChanged', inputChanged.value);
-    }
-});
+// watch(inlineTaskNameInput, (newVal, oldVal) => {
+//     console.log('newVal', newVal);
+//     console.log('oldVal', oldVal);
+//     if (oldVal !== null) {
+//         inputChanged.value = true;
+//         console.log('inputChanged', inputChanged.value);
+//     }
+// });
 
 
 // Timer reference for managing click delay
@@ -284,7 +291,7 @@ const downloadTaskSheet = (taskLists) => {
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
                     const assignees = task.data.assignee.split(', ').join('; ');
-                    const priority = task.data.priority ? task.data.priority : '';
+                    const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
                     const hours = Math.floor(timeTracked / 3600);
@@ -507,6 +514,118 @@ const handleChange = (event, name) => {
         handleTaskStatus(name, event.added.element.key);
     }
 };
+
+import VueApexCharts from 'vue3-apexcharts';
+import moment from 'moment';
+ 
+
+// Register the ApexCharts component globally or in your current setup
+const series = ref(
+    [
+            {
+              data: [
+                {
+                  x: 'Analysis',
+                  y: [
+                    new Date('2019-02-27').getTime(),
+                    new Date('2019-03-04').getTime()
+                  ],
+                  fillColor: '#008FFB'
+                },
+                {
+                  x: 'Design',
+                  y: [
+                    new Date('2019-03-04').getTime(),
+                    new Date('2019-03-08').getTime()
+                  ],
+                  fillColor: '#00E396'
+                },
+                {
+                  x: 'Coding',
+                  y: [
+                    new Date('2019-03-07').getTime(),
+                    new Date('2019-03-10').getTime()
+                  ],
+                  fillColor: '#775DD0'
+                },
+                {
+                  x: 'Testing',
+                  y: [
+                    new Date('2019-03-08').getTime(),
+                    new Date('2019-03-12').getTime()
+                  ],
+                  fillColor: '#FEB019'
+                },
+                {
+                  x: 'Deployment',
+                  y: [
+                    new Date('2019-03-12').getTime(),
+                    new Date('2019-03-17').getTime()
+                  ],
+                  fillColor: '#FF4560'
+                },
+                {
+                    x: 'Maintenance',
+                    y: [
+                        new Date('2019-03-17').getTime(),
+                        new Date('2019-03-22').getTime()
+                    ],
+                    fillColor: '#775DD0'
+                },
+              ]
+            }
+          ]
+)
+
+const ganttChartOptions = ref({
+  chart: {
+    height: 350,
+    type: 'rangeBar',
+    zoom: {
+      enabled: false
+    }
+  },
+  plotOptions: {
+    bar: {
+      horizontal: true,
+      distributed: true,
+      dataLabels: {
+        hideOverflowingLabels: false
+      }
+    }
+  },
+  dataLabels: {
+    enabled: true,
+    formatter: function (val, opts) {
+      var label = opts.w.globals.labels[opts.dataPointIndex];
+      var a = moment(val[0]);
+      var b = moment(val[1]);
+      var diff = b.diff(a, 'days');
+      return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
+    },
+    style: {
+      colors: ['#f3f4f5', '#fff']
+    }
+  },
+  xaxis: {
+    type: 'datetime',
+    range: 864000000, // Set the initial view range to 10 days (864000000 ms)
+
+  },
+  yaxis: {
+    show: false
+  },
+  grid: {
+    row: {
+      colors: ['#f3f4f5', '#fff'],
+      opacity: 1
+    }
+  },
+  scrollbar: {
+    enabled: true, // Enable the scrollbar for horizontal scrolling
+    autoHide: false,
+  },
+});
 </script>
 
 <template>
@@ -539,10 +658,12 @@ const handleChange = (event, name) => {
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
                     @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
                 <div>
-                    <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="table-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': tableView }" />
-                    <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="board-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': !tableView }" />
+                    <Button icon="pi pi-list" label="List" @click="handleViews('table')" class="table-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'table' }" />
+                    <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
+                    <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
@@ -567,7 +688,7 @@ const handleChange = (event, name) => {
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
+    <TreeTable v-if="viewMode === 'table'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
      filterDisplay="menu" style="overflow: auto;" :tableProps="{ style: { minWidth: '1024px' } }">
         <template #empty>
             <p class=" text-center font-medium font-italic">No data found</p>
@@ -752,7 +873,7 @@ const handleChange = (event, name) => {
 
     <!-- Kanban Board -->
     <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
-    <div v-if="!tableView" class="main-container">
+    <div v-if="viewMode === 'board'" class="main-container">
         <div class="content">
             <div>
                 <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
@@ -884,6 +1005,12 @@ const handleChange = (event, name) => {
             </div>
         </div>
     </div>
+
+    <!-- gantt chart -->
+     <div v-if="viewMode === 'gantt'">
+          <!-- <ApexCharts :options="chartOptions" :series="series" type="rangeBar" height="350"/> -->
+          <VueApexCharts type="rangeBar" height="450" :options="ganttChartOptions" :series="series" />
+     </div>
 </template>
 
 <style lang="scss">
@@ -1362,6 +1489,12 @@ textarea {
 }
 
 .board-btn {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
+}
+
+.gantt-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
 }
