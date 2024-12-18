@@ -28,12 +28,12 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const viewMode = ref('gantt');
+const viewMode = ref('list');
 
 
 
 const handleViews = (view) => {
-        viewMode.value = view;
+    viewMode.value = view;
 };
 
 const priorities = ref([
@@ -57,7 +57,7 @@ const hoveredRowKey = ref(null);
 
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
-    if(editClikedRowKey.value !== key) {
+    if (editClikedRowKey.value !== key) {
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [key]: false
@@ -77,7 +77,7 @@ const handleInlineNameEdit = (node) => {
     inlineTaskNameInput.value = node.data.name;
     const inputT = document.getElementById(`inputTaskName${node.key}`);
     console.log('inputTFunc', inputT);
-    
+
     editClikedRowKey.value = node.key;
     checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
         acc[key] = false;
@@ -88,23 +88,23 @@ const handleInlineNameEdit = (node) => {
             inputT.focus();
         }
     });
-    
+
     checkMarkInput.value = {
         ...checkMarkInput.value,
         [node.key]: true
     };
-    
+
 };
 
 const inputChanged = ref(false);
-// watch(inlineTaskNameInput, (newVal, oldVal) => {
-//     console.log('newVal', newVal);
-//     console.log('oldVal', oldVal);
-//     if (oldVal !== null) {
-//         inputChanged.value = true;
-//         console.log('inputChanged', inputChanged.value);
-//     }
-// });
+watch(inlineTaskNameInput, (newVal, oldVal) => {
+    console.log('newVal', newVal);
+    console.log('oldVal', oldVal);
+    if (oldVal !== null) {
+        inputChanged.value = true;
+        console.log('inputChanged', inputChanged.value);
+    }
+});
 
 
 // Timer reference for managing click delay
@@ -112,38 +112,38 @@ let clickTimer = ref(null);
 
 // Single click handler
 const handleClick = (node) => {
-  // Clear the timer if already set to prevent single click on double click
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the timer if already set to prevent single click on double click
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Set timer to trigger the single-click action
-  clickTimer.value = setTimeout(() => {
-    emit('handleTaskDetailView', node);
-    clickTimer.value = null; // Reset the timer after the function runs
-  }, 250); // Delay for single click detection (250ms)
+    // Set timer to trigger the single-click action
+    clickTimer.value = setTimeout(() => {
+        emit('handleTaskDetailView', node);
+        clickTimer.value = null; // Reset the timer after the function runs
+    }, 250); // Delay for single click detection (250ms)
 };
 
 
 // Double click handler
 const handleDblClick = (node) => {
-  // Clear the single click timer to avoid running both functions
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the single click timer to avoid running both functions
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Call the double-click function
-  handleInlineNameEdit(node);
+    // Call the double-click function
+    handleInlineNameEdit(node);
 };
 
 
 const updateTaskName = async (taskId) => {
-    if(inputChanged.value !== true) {
-        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
-    } else{
-        await handleTaskChanges( inlineTaskNameInput.value, taskId);
+    if (inputChanged.value !== true) {
+        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+    } else {
+        await handleTaskChanges(inlineTaskNameInput.value, taskId);
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [taskId]: false
@@ -409,7 +409,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
 
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
         }
-    } else{
+    } else {
         inputLoading.value = true;
         const editTaskData = {
             id: task_id,
@@ -518,52 +518,52 @@ const handleChange = (event, name) => {
 };
 
 
- 
+
 
 // Register the ApexCharts component globally or in your current setup
 const series = ref(
     [
-            {
-              data: [
+        {
+            data: [
                 {
-                  x: 'Analysis',
-                  y: [
-                    new Date('2019-02-27').getTime(),
-                    new Date('2019-03-04').getTime()
-                  ],
-                  fillColor: '#008FFB'
+                    x: 'Analysis',
+                    y: [
+                        new Date('2019-02-27').getTime(),
+                        new Date('2019-03-04').getTime()
+                    ],
+                    fillColor: '#008FFB'
                 },
                 {
-                  x: 'Design',
-                  y: [
-                    new Date('2019-03-04').getTime(),
-                    new Date('2019-03-08').getTime()
-                  ],
-                  fillColor: '#00E396'
+                    x: 'Design',
+                    y: [
+                        new Date('2019-03-04').getTime(),
+                        new Date('2019-03-08').getTime()
+                    ],
+                    fillColor: '#00E396'
                 },
                 {
-                  x: 'Coding',
-                  y: [
-                    new Date('2019-03-07').getTime(),
-                    new Date('2019-03-10').getTime()
-                  ],
-                  fillColor: '#775DD0'
+                    x: 'Coding',
+                    y: [
+                        new Date('2019-03-07').getTime(),
+                        new Date('2019-03-10').getTime()
+                    ],
+                    fillColor: '#775DD0'
                 },
                 {
-                  x: 'Testing',
-                  y: [
-                    new Date('2019-03-08').getTime(),
-                    new Date('2019-03-12').getTime()
-                  ],
-                  fillColor: '#FEB019'
+                    x: 'Testing',
+                    y: [
+                        new Date('2019-03-08').getTime(),
+                        new Date('2019-03-12').getTime()
+                    ],
+                    fillColor: '#FEB019'
                 },
                 {
-                  x: 'Deployment',
-                  y: [
-                    new Date('2019-03-12').getTime(),
-                    new Date('2019-03-17').getTime()
-                  ],
-                  fillColor: '#FF4560'
+                    x: 'Deployment',
+                    y: [
+                        new Date('2019-03-12').getTime(),
+                        new Date('2019-03-17').getTime()
+                    ],
+                    fillColor: '#FF4560'
                 },
                 {
                     x: 'Maintenance',
@@ -573,76 +573,76 @@ const series = ref(
                     ],
                     fillColor: '#775DD0'
                 },
-              ]
-            }
-          ]
+            ]
+        }
+    ]
 )
 
 const ganttChartOptions = ref({
-  chart: {
-    height: 350,
-    type: 'rangeBar',
-    toolbar: {
-        show: true,
-        offsetX: 0,
-        offsetY: 0,
-        tools: {
-          download: false,
-          selection: true,
-          zoom: false,
-          zoomin: false,
-          zoomout: false,
-          pan: true,
-          reset: '<img src="/reset.png" width="20" />',
-          customIcons: []
-        },
-        
-      },
-  },
-  plotOptions: {
-    bar: {
-      horizontal: true,
-      distributed: true,
-      dataLabels: {
-        hideOverflowingLabels: false
-      }
-    }
-  },
-  dataLabels: {
-    enabled: true,
-    formatter: function (val, opts) {
-      var label = opts.w.globals.labels[opts.dataPointIndex];
-      var a = moment(val[0]);
-      var b = moment(val[1]);
-      var diff = b.diff(a, 'days');
-      return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
-    },
-    style: {
-      colors: ['#f3f4f5', '#fff']
-    }
-  },
-  xaxis: {
-    type: 'datetime',
-    position: 'top', 
-    range: 864000000, // Set the initial view range to 10 days (864000000 ms)
-    labels: {
-      hideOverlappingLabels: false,
-    },
+    chart: {
+        height: 350,
+        type: 'rangeBar',
+        toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+                download: false,
+                selection: true,
+                zoom: false,
+                zoomin: false,
+                zoomout: false,
+                pan: true,
+                reset: '<img src="/reset.png" width="20" />',
+                customIcons: []
+            },
 
-  },
-  yaxis: {
-    show: false
-  },
-  grid: {
-    row: {
-      colors: ['#f3f4f5', '#fff'],
-      opacity: 1
-    }
-  },
-  scrollbar: {
-    enabled: true, // Enable the scrollbar for horizontal scrolling
-    autoHide: false,
-  },
+        },
+    },
+    plotOptions: {
+        bar: {
+            horizontal: true,
+            distributed: true,
+            dataLabels: {
+                hideOverflowingLabels: false
+            }
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val, opts) {
+            var label = opts.w.globals.labels[opts.dataPointIndex];
+            var a = moment(val[0]);
+            var b = moment(val[1]);
+            var diff = b.diff(a, 'days');
+            return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
+        },
+        style: {
+            colors: ['#f3f4f5', '#fff']
+        }
+    },
+    xaxis: {
+        type: 'datetime',
+        position: 'top',
+        range: 864000000, // Set the initial view range to 10 days (864000000 ms)
+        labels: {
+            hideOverlappingLabels: false,
+        },
+
+    },
+    yaxis: {
+        show: false
+    },
+    grid: {
+        row: {
+            colors: ['#f3f4f5', '#fff'],
+            opacity: 1
+        }
+    },
+    scrollbar: {
+        enabled: true, // Enable the scrollbar for horizontal scrolling
+        autoHide: false,
+    },
 });
 </script>
 
@@ -676,8 +676,8 @@ const ganttChartOptions = ref({
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
                     @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
                 <div>
-                    <Button icon="pi pi-list" label="List" @click="handleViews('table')" class="table-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'table' }" />
+                    <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
                     <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn"
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
                     <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn"
@@ -706,18 +706,18 @@ const ganttChartOptions = ref({
         </template>
     </Toolbar>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="viewMode === 'table'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-     filterDisplay="menu" style="overflow: auto;" :tableProps="{ style: { minWidth: '1024px' } }">
+    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both"
+        :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto;"
+        :tableProps="{ style: { minWidth: '1024px' } }">
         <template #empty>
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }"
-            :showAddButton="true">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
-                    >
-                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
+                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative"
+                    @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -743,29 +743,33 @@ const ganttChartOptions = ref({
                                 </template>
                             </Dropdown>
                         </div>
-                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" v-tooltip.left="{
-                            value: `${slotProps.node.data.name}`
-                        }">{{ slotProps.node.data.name }} 
+                        <span @click="handleClick(slotProps.node)"
+                            :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'"
+                            class="taskTitle cursor-pointer"  :title="slotProps.node.data.name" >{{ slotProps.node.data.name }}
                         </span>
                         <span>
-                            <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                            <InputText :id="`inputTaskName${slotProps.node.key}`"
+                                :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'"
+                                class="inline-task-input" v-model="inlineTaskNameInput" type="text"
+                                placeholder="Edit task title" />
                         </span>
                     </div>
                 </div>
             </template>
         </Column>
         <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
-            <template #body="slotProps" >
+            <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
+                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center"
+                        v-if="hoveredRowKey === slotProps.node.key">
                         <Button @click="handleInlineNameEdit(slotProps.node)"
-                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1"
-                            style="font-size: 0.8rem !important;" />
+                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key]" severity="secondary" icon="pi pi-pencil"
+                            class="w-fit h-fit p-1" style="font-size: 0.8rem !important;" />
                         <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1"
-                            style="font-size: 0.2rem" />
+                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key]" severity="secondary" icon="pi pi-plus"
+                            class="w-fit h-fit p-1" style="font-size: 0.2rem" />
                         <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                             v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
                             severity="primary" icon="pi pi-check" class=" p-1 w-full"
@@ -804,7 +808,7 @@ const ganttChartOptions = ref({
                             optionLabel="name">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{
+                                    <div :title="slotProps.value.name" :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1 status-truncate">{{
                                         slotProps.value.name }}</div>
                                 </div>
                                 <span v-else>
@@ -829,11 +833,11 @@ const ganttChartOptions = ref({
                 <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
                     {{slotProps.node.data.dueDateValue }}
                 </div> -->
-               
-                    <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
-                        :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
-                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
-             
+
+                <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
+                    :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
+                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
+
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
@@ -1025,12 +1029,10 @@ const ganttChartOptions = ref({
     </div>
 
     <!-- gantt chart -->
-     <div v-if="viewMode === 'gantt'">
-          <!-- <ApexCharts :options="chartOptions" :series="series" type="rangeBar" height="350"/> -->
-           <ClientOnly>
-               <vue-apex-charts type="rangeBar" height="450" :options="ganttChartOptions" :series="toRaw(series)" />
-           </ClientOnly>
-     </div>
+    <div v-if="viewMode === 'gantt'">
+        <!-- <ApexCharts :options="chartOptions" :series="series" type="rangeBar" height="350"/> --> 
+            <vue-apex-charts class="mt-2" type="rangeBar" height="450" :options="ganttChartOptions" :series="toRaw(series)" />
+    </div>
 </template>
 
 <style lang="scss">
@@ -1096,13 +1098,13 @@ const ganttChartOptions = ref({
     width: 100% !important;
 }
 
-.table-st .p-treetable-emptymessage{
+.table-st .p-treetable-emptymessage {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.table-st thead th:hover{
+.table-st thead th:hover {
     border: 2px solid #e2e8f0;
     border-top: none;
     border-bottom: 1px solid #e2e8f0;
@@ -1163,7 +1165,7 @@ const ganttChartOptions = ref({
     font-weight: 500;
 }
 
-.taskTitle{
+.taskTitle {
     max-width: 100%;
     position: absolute;
     white-space: nowrap;
@@ -1673,6 +1675,7 @@ textarea {
     @media (min-width: 1440px) {
         max-width: 4.2vw !important;
     }
+
     cursor: pointer !important;
 
     .p-inputtext {
@@ -1685,7 +1688,7 @@ textarea {
 }
 
 
-.inline-task-input{
+.inline-task-input {
     padding: 0.35rem 0.75rem !important;
     width: 98.6%;
     position: absolute;
@@ -1693,5 +1696,10 @@ textarea {
     top: -6px;
 }
 
-
+.status-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 65px;
+}
 </style>
