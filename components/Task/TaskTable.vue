@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+import VueApexCharts from 'vue3-apexcharts';
+import moment from 'moment';
 
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
@@ -26,7 +28,7 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const viewMode = ref('table');
+const viewMode = ref('gantt');
 
 
 
@@ -472,23 +474,23 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
-function countTasks(tasks) {
-    let count = 0;
+// function countTasks(tasks) {
+//     let count = 0;
 
-    function countSubTasks(task) {
-        count++; // Count the current task
+//     function countSubTasks(task) {
+//         count++; // Count the current task
 
-        if (task.sub_task) {
-            countSubTasks(task.sub_task); // Recursively count sub-tasks
-        }
-    }
+//         if (task.sub_task) {
+//             countSubTasks(task.sub_task); // Recursively count sub-tasks
+//         }
+//     }
 
-    tasks.forEach((task) => {
-        countSubTasks(task); // Start counting from each top-level task
-    });
+//     tasks.forEach((task) => {
+//         countSubTasks(task); // Start counting from each top-level task
+//     });
 
-    return count;
-}
+//     return count;
+// }
 
 
 // Kanban
@@ -515,8 +517,7 @@ const handleChange = (event, name) => {
     }
 };
 
-import VueApexCharts from 'vue3-apexcharts';
-import moment from 'moment';
+
  
 
 // Register the ApexCharts component globally or in your current setup
@@ -581,9 +582,22 @@ const ganttChartOptions = ref({
   chart: {
     height: 350,
     type: 'rangeBar',
-    zoom: {
-      enabled: false
-    }
+    toolbar: {
+        show: true,
+        offsetX: 0,
+        offsetY: 0,
+        tools: {
+          download: false,
+          selection: true,
+          zoom: false,
+          zoomin: false,
+          zoomout: false,
+          pan: true,
+          reset: '<img src="/reset.png" width="20" />',
+          customIcons: []
+        },
+        
+      },
   },
   plotOptions: {
     bar: {
@@ -609,7 +623,11 @@ const ganttChartOptions = ref({
   },
   xaxis: {
     type: 'datetime',
+    position: 'top', 
     range: 864000000, // Set the initial view range to 10 days (864000000 ms)
+    labels: {
+      hideOverlappingLabels: false,
+    },
 
   },
   yaxis: {
@@ -1009,7 +1027,9 @@ const ganttChartOptions = ref({
     <!-- gantt chart -->
      <div v-if="viewMode === 'gantt'">
           <!-- <ApexCharts :options="chartOptions" :series="series" type="rangeBar" height="350"/> -->
-          <VueApexCharts type="rangeBar" height="450" :options="ganttChartOptions" :series="series" />
+           <ClientOnly>
+               <vue-apex-charts type="rangeBar" height="450" :options="ganttChartOptions" :series="toRaw(series)" />
+           </ClientOnly>
      </div>
 </template>
 
