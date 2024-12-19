@@ -205,8 +205,7 @@ initFilters();
                     <img src="/assets/icons/excel-export-icon.png" />
                 </Button>
             <!-- <pre>{{selectedRoles}}</pre> -->
-                <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide
-                                optionLabel="name" placeholder="Filter User Type" class="w-full mx-2" />
+                <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide :maxSelectedLabels="2" optionLabel="name" placeholder="Filter User Type" class="w-full mx-2" />
                 <IconField iconPosition="right" raised>
                     <InputIcon>
                         <i class="pi pi-search" />
