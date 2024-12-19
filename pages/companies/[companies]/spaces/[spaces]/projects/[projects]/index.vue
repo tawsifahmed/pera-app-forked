@@ -150,7 +150,7 @@ const updateTaskTable = () => {
     getSingleProject(projects);
 };
 
-getSingleProject(projects);
+// getSingleProject(projects);
 
 
 watch(() => useRoute().query.task_key, (newTaskKey) => {
@@ -188,6 +188,7 @@ watchEffect(() => {
         <!-- Datatable -->
         <TaskTable
             v-if="readTask"
+            
             :kanbanTasks="kanbanTasks"
             :tasks="tasks"
             @openCreateSpace="openCreateSpace"

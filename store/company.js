@@ -41,6 +41,7 @@ export const useCompanyStore = defineStore('workStation', {
         isTaskEdited: false,
         tasks: [],
         kanbanTasks: [],
+        ganttChartData: [],
         asngUsers: [],
 
         subTasks: [],
@@ -325,7 +326,7 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
-            this.statuslist = data.value?.data?.statuses;
+            this.statuslist = data.value?.taskStatus;
 
             const updatedData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
@@ -334,6 +335,41 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.kanbanTasks = updatedData
             this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
+            function formatTaskData(tasks) {
+                let formattedData = [];
+            
+                function formatTask(task) {
+                    const { name, created_at, dueDate, status } = task.data;
+            
+                    // Only format if both created_at and dueDate are available
+                    if (created_at && dueDate) {
+                        formattedData.push({
+                            x: name,  // Task name
+                            y: [
+                                new Date(created_at).getTime(),  // created_at timestamp
+                                new Date(dueDate).getTime()      // dueDate timestamp
+                            ],
+                            fillColor: status.color_code  // Status color code
+                        });
+                    }
+            
+                    // If there are children, recurse through them
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach(childTask => formatTask(childTask));
+                    }
+                }
+            
+                // Iterate over the top-level tasks and format them
+                tasks.forEach(task => formatTask(task));
+            
+                return [
+                    {
+                        data: formattedData
+                    }
+                ];
+            }
+            this.ganttChartData = formatTaskData(this.tasks);
+            console.log('ganttChartData', this.ganttChartData);
         },
 
         async createProject({ name, description, space_id, statuses }) {

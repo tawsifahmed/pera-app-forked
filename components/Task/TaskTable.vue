@@ -10,14 +10,14 @@ import moment from 'moment';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
 const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
+const { kanbanTasks, tasks, } = defineProps([ 'kanbanTasks', 'tasks']);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -518,65 +518,71 @@ const handleChange = (event, name) => {
 };
 
 
-
+const computedHeight = computed(() => {
+  const tasksCount = series.value[0]?.data.length || 0; // Get the number of tasks in the first series
+  const heightPerTask = 50; // Set height per task, adjust as needed
+  return `${tasksCount * heightPerTask}px`; // Calculate total height dynamically
+});
 
 // Register the ApexCharts component globally or in your current setup
-const series = ref(
-    [
-        {
-            data: [
-                {
-                    x: 'Analysis',
-                    y: [
-                        new Date('2019-02-27').getTime(),
-                        new Date('2019-03-04').getTime()
-                    ],
-                    fillColor: '#008FFB'
-                },
-                {
-                    x: 'Design',
-                    y: [
-                        new Date('2019-03-04').getTime(),
-                        new Date('2019-03-08').getTime()
-                    ],
-                    fillColor: '#00E396'
-                },
-                {
-                    x: 'Coding',
-                    y: [
-                        new Date('2019-03-07').getTime(),
-                        new Date('2019-03-10').getTime()
-                    ],
-                    fillColor: '#775DD0'
-                },
-                {
-                    x: 'Testing',
-                    y: [
-                        new Date('2019-03-08').getTime(),
-                        new Date('2019-03-12').getTime()
-                    ],
-                    fillColor: '#FEB019'
-                },
-                {
-                    x: 'Deployment',
-                    y: [
-                        new Date('2019-03-12').getTime(),
-                        new Date('2019-03-17').getTime()
-                    ],
-                    fillColor: '#FF4560'
-                },
-                {
-                    x: 'Maintenance',
-                    y: [
-                        new Date('2019-03-17').getTime(),
-                        new Date('2019-03-22').getTime()
-                    ],
-                    fillColor: '#775DD0'
-                },
-            ]
-        }
-    ]
-)
+
+const series = ref(ganttChartData ? ganttChartData : []);
+// const series = ref(
+//     [
+//         {
+//             data: [
+//                 {
+//                     x: 'Analysis',
+//                     y: [
+//                         new Date('2019-02-27').getTime(),
+//                         new Date('2019-03-04').getTime()
+//                     ],
+//                     fillColor: '#008FFB'
+//                 },
+//                 {
+//                     x: 'Design',
+//                     y: [
+//                         new Date('2019-03-04').getTime(),
+//                         new Date('2019-03-08').getTime()
+//                     ],
+//                     fillColor: '#00E396'
+//                 },
+//                 {
+//                     x: 'Coding',
+//                     y: [
+//                         new Date('2019-03-07').getTime(),
+//                         new Date('2019-03-10').getTime()
+//                     ],
+//                     fillColor: '#775DD0'
+//                 },
+//                 {
+//                     x: 'Testing',
+//                     y: [
+//                         new Date('2019-03-08').getTime(),
+//                         new Date('2019-03-12').getTime()
+//                     ],
+//                     fillColor: '#FEB019'
+//                 },
+//                 {
+//                     x: 'Deployment',
+//                     y: [
+//                         new Date('2019-03-12').getTime(),
+//                         new Date('2019-03-17').getTime()
+//                     ],
+//                     fillColor: '#FF4560'
+//                 },
+//                 {
+//                     x: 'Maintenance',
+//                     y: [
+//                         new Date('2019-03-17').getTime(),
+//                         new Date('2019-03-22').getTime()
+//                     ],
+//                     fillColor: '#775DD0'
+//                 },
+//             ]
+//         }
+//     ]
+// )
 
 const ganttChartOptions = ref({
     chart: {
@@ -624,7 +630,7 @@ const ganttChartOptions = ref({
     xaxis: {
         type: 'datetime',
         position: 'top',
-        range: 864000000, // Set the initial view range to 10 days (864000000 ms)
+        range: 432000000, // Set the initial view range to 10 days (864000000 ms)
         labels: {
             hideOverlappingLabels: false,
         },
@@ -675,12 +681,12 @@ const ganttChartOptions = ref({
             <div class="flex flex-wrap gap-1">
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
                     @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <div>
-                    <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn"
+                <div class="view-btns">
+                    <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn"
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
-                    <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn"
+                    <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn view-btn"
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
-                    <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn"
+                    <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn view-btn"
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
@@ -1030,8 +1036,7 @@ const ganttChartOptions = ref({
 
     <!-- gantt chart -->
     <div v-if="viewMode === 'gantt'">
-        <!-- <ApexCharts :options="chartOptions" :series="series" type="rangeBar" height="350"/> --> 
-            <vue-apex-charts class="mt-2" type="rangeBar" height="450" :options="ganttChartOptions" :series="toRaw(series)" />
+            <vue-apex-charts class="mt-2" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
     </div>
 </template>
 
@@ -1510,7 +1515,7 @@ textarea {
     min-width: 91.22px;
 }
 
-.board-btn {
+/*.board-btn {
     border-radius: 0px;
     border-left: 2px solid #e2e8f0;
     border-right: 2px solid #e2e8f0;
@@ -1519,6 +1524,22 @@ textarea {
 .gantt-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+}*/
+
+.view-btns .view-btn:first-child {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.view-btns .view-btn:last-child {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.view-btns .view-btn:not(:first-child):not(:last-child) {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
 }
 
 .webView-action {
