@@ -4,18 +4,20 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
+import VueApexCharts from 'vue3-apexcharts';
+import moment from 'moment';
 
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData, recentTaskData, tasksAttachments, totalTaskCount } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
 const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
+const { kanbanTasks, tasks, } = defineProps([ 'kanbanTasks', 'tasks']);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -26,7 +28,14 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const tableView = ref(true);
+const viewMode = ref('list');
+
+
+
+const handleViews = (view) => {
+    viewMode.value = view;
+};
+
 const priorities = ref([
     { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
@@ -42,13 +51,24 @@ const onChangePriorities = ref([
     { name: 'Low', code: 'Low' }
 ])
 
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}-${month}-${year}`;
+};
+
 const isSpeedDialVisible = ref({});
 
 const hoveredRowKey = ref(null);
 
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
-    if(editClikedRowKey.value !== key) {
+    if (editClikedRowKey.value !== key) {
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [key]: false
@@ -68,7 +88,7 @@ const handleInlineNameEdit = (node) => {
     inlineTaskNameInput.value = node.data.name;
     const inputT = document.getElementById(`inputTaskName${node.key}`);
     console.log('inputTFunc', inputT);
-    
+
     editClikedRowKey.value = node.key;
     checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
         acc[key] = false;
@@ -79,12 +99,12 @@ const handleInlineNameEdit = (node) => {
             inputT.focus();
         }
     });
-    
+
     checkMarkInput.value = {
         ...checkMarkInput.value,
         [node.key]: true
     };
-    
+
 };
 
 const inputChanged = ref(false);
@@ -103,38 +123,38 @@ let clickTimer = ref(null);
 
 // Single click handler
 const handleClick = (node) => {
-  // Clear the timer if already set to prevent single click on double click
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the timer if already set to prevent single click on double click
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Set timer to trigger the single-click action
-  clickTimer.value = setTimeout(() => {
-    emit('handleTaskDetailView', node);
-    clickTimer.value = null; // Reset the timer after the function runs
-  }, 250); // Delay for single click detection (250ms)
+    // Set timer to trigger the single-click action
+    clickTimer.value = setTimeout(() => {
+        emit('handleTaskDetailView', node);
+        clickTimer.value = null; // Reset the timer after the function runs
+    }, 250); // Delay for single click detection (250ms)
 };
 
 
 // Double click handler
 const handleDblClick = (node) => {
-  // Clear the single click timer to avoid running both functions
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the single click timer to avoid running both functions
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Call the double-click function
-  handleInlineNameEdit(node);
+    // Call the double-click function
+    handleInlineNameEdit(node);
 };
 
 
 const updateTaskName = async (taskId) => {
-    if(inputChanged.value !== true) {
-        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
-    } else{
-        await handleTaskChanges( inlineTaskNameInput.value, taskId);
+    if (inputChanged.value !== true) {
+        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+    } else {
+        await handleTaskChanges(inlineTaskNameInput.value, taskId);
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [taskId]: false
@@ -284,7 +304,7 @@ const downloadTaskSheet = (taskLists) => {
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
                     const assignees = task.data.assignee.split(', ').join('; ');
-                    const priority = task.data.priority ? task.data.priority : '';
+                    const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
                     const hours = Math.floor(timeTracked / 3600);
@@ -339,8 +359,7 @@ async function handleTaskStatus(status, task_id) {
         });
 
         if (data.value?.app_message === 'success') {
-            // getTaskDetails(singleTask.key);
-            console.log('Status Changed', data);
+            // console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             await getSingleProject(id);
         } else {
@@ -400,7 +419,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
 
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
         }
-    } else{
+    } else {
         inputLoading.value = true;
         const editTaskData = {
             id: task_id,
@@ -465,23 +484,23 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
-function countTasks(tasks) {
-    let count = 0;
+// function countTasks(tasks) {
+//     let count = 0;
 
-    function countSubTasks(task) {
-        count++; // Count the current task
+//     function countSubTasks(task) {
+//         count++; // Count the current task
 
-        if (task.sub_task) {
-            countSubTasks(task.sub_task); // Recursively count sub-tasks
-        }
-    }
+//         if (task.sub_task) {
+//             countSubTasks(task.sub_task); // Recursively count sub-tasks
+//         }
+//     }
 
-    tasks.forEach((task) => {
-        countSubTasks(task); // Start counting from each top-level task
-    });
+//     tasks.forEach((task) => {
+//         countSubTasks(task); // Start counting from each top-level task
+//     });
 
-    return count;
-}
+//     return count;
+// }
 
 
 // Kanban
@@ -507,25 +526,103 @@ const handleChange = (event, name) => {
         handleTaskStatus(name, event.added.element.key);
     }
 };
+
+
+const computedHeight = computed(() => {
+  const tasksCount = series.value[0]?.data.length || 0; // Get the number of tasks in the first series
+  const heightPerTask = 50; // Set height per task, adjust as needed
+  return `${tasksCount * heightPerTask}px`; // Calculate total height dynamically
+});
+
+// Register the ApexCharts component globally or in your current setup
+
+const series = ref(ganttChartData ? ganttChartData : []);
+
+const ganttChartOptions = ref({
+    chart: {
+        height: 350,
+        type: 'rangeBar',
+        toolbar: {
+            show: true,
+            offsetX: 0,
+            offsetY: 0,
+            tools: {
+                download: false,
+                selection: true,
+                zoom: false,
+                zoomin: false,
+                zoomout: false,
+                pan: true,
+                reset: '<img src="/reset.png" width="20" />',
+                customIcons: []
+            },
+
+        },
+    },
+    plotOptions: {
+        bar: {
+            horizontal: true,
+            distributed: true,
+            dataLabels: {
+                hideOverflowingLabels: false
+            }
+        }
+    },
+    dataLabels: {
+        enabled: true,
+        formatter: function (val, opts) {
+            var label = opts.w.globals.labels[opts.dataPointIndex];
+            var a = moment(val[0]);
+            var b = moment(val[1]);
+            var diff = b.diff(a, 'days');
+            return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
+        },
+        style: {
+            colors: ['#f3f4f5', '#fff']
+        }
+    },
+    xaxis: {
+        type: 'datetime',
+        position: 'top',
+        range: 432000000, // Set the initial view range to 10 days (864000000 ms)
+        labels: {
+            hideOverlappingLabels: false,
+        },
+
+    },
+    yaxis: {
+        show: false
+    },
+    grid: {
+        row: {
+            colors: ['#f3f4f5', '#fff'],
+            opacity: 1
+        }
+    },
+    scrollbar: {
+        enabled: true, // Enable the scrollbar for horizontal scrolling
+        autoHide: false,
+    },
+});
 </script>
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
         <!-- <pre>{{modStatusList}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
-            resetFilterOnHide optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3"
+            resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3"
             class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
-            placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
+            placeholder="Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
-            placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+            placeholder="Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
             <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate"
-                placeholder="Filter Start Due Date" class="w-full md:w-17rem" />
+                placeholder="Start Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
         </div>
         <div class="mb-2 relative">
-            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Filter End Due Date"
+            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="End Due Date"
                 class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected2" @click="handleDateDelete2"
                 class="pi pi-times end-cross absolute cursor-pointer"></p>
@@ -538,11 +635,15 @@ const handleChange = (event, name) => {
             <div class="flex flex-wrap gap-1">
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
                     @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <div>
-                    <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="table-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': tableView }" />
-                    <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="board-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': !tableView }" />
+                <div class="view-btns">
+                    <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
+                    <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
+                    <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn view-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
+                    <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn view-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
 
@@ -566,19 +667,123 @@ const handleChange = (event, name) => {
             </IconField>
         </template>
     </Toolbar>
+
+    <!-- project overview -->
+    <div v-if="viewMode === 'overview'">
+       <div class="grid mt-2">
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clone text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 xl:col-6" >
+            <div class="card h-full">
+                <div class="flex gap-2 align-items-center flex-wrap" >
+                  <h5 class="mb-0" >Recent Tasks</h5>
+                </div>
+          
+                <div class="task-container">
+                  <!-- <div  class="flex justify-content-center align-items-center" style="height: 22rem;">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
+                  </div> -->
+          
+                  <div> <!-- Show task list when not loading and tasks are available -->
+                    <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                      <div class="title-group">
+                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`status`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                        <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                        <!-- <p>{{ recentTask?.project_name }}</p> -->
+                      </div>
+                      <div>
+                        <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
+                      </div>
+                    </div>
+                  </div>
+          
+                  <!-- <div v-else> 
+                    <p class="text-black text-lg text-center">No Tasks found!</p>
+                  </div> -->
+          
+                  <div class="w-full flex justify-content-center">
+                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="col-12 xl:col-6">
+            <div class="card" style="height: 80%">
+                <h5>Attachments:</h5>
+                <!-- <Chart type="line" :data="lineData" :options="lineOptions" /> -->
+                 <h6 class="text-center"> No Attachments</h6>
+            </div>
+        </div>
+       </div>
+    </div>
     <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-     filterDisplay="menu" style="overflow: auto;" :tableProps="{ style: { minWidth: '1024px' } }">
+    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both"
+        :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto;"
+        :tableProps="{ style: { minWidth: '1024px' } }">
         <template #empty>
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }"
-            :showAddButton="true">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
-                    >
-                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
+                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative"
+                    @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
                             <Dropdown class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
@@ -604,33 +809,37 @@ const handleChange = (event, name) => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" v-tooltip.left="{
-                            value: `${slotProps.node.data.name}`
-                        }">{{ slotProps.node.data.name }} 
+                        <span @click="handleClick(slotProps.node)"
+                            :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'"
+                            class="taskTitle cursor-pointer"  :title="slotProps.node.data.name" >{{ slotProps.node.data.name }}
                         </span>
                         <span>
-                            <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                            <InputText :id="`inputTaskName${slotProps.node.key}`"
+                                :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'"
+                                class="inline-task-input" v-model="inlineTaskNameInput" type="text"
+                                placeholder="Edit task title" />
                         </span>
                     </div>
                 </div>
             </template>
         </Column>
         <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
-            <template #body="slotProps" >
+            <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
+                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center"
+                        v-if="hoveredRowKey === slotProps.node.key">
                         <Button @click="handleInlineNameEdit(slotProps.node)"
-                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1"
-                            style="font-size: 0.8rem !important;" />
+                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key]" severity="secondary" icon="pi pi-pencil"
+                            class="w-fit h-fit p-1" style="font-size: 0.8rem !important;" />
                         <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1"
-                            style="font-size: 0.2rem" />
+                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key]" severity="secondary" icon="pi pi-plus"
+                            class="w-fit h-fit p-1" style="font-size: 0.2rem" />
                         <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                             v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
-                            severity="primary" icon="pi pi-check" class=" p-1 w-full"
-                            style="font-size: 0.2rem; margin: 0 0.65rem;" />
+                            severity="secondary" label="Save" class=" p-1 w-full"
+                            style=" margin: 0 5px;" />
                     </div>
                 </div>
             </template>
@@ -665,7 +874,7 @@ const handleChange = (event, name) => {
                             optionLabel="name">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{
+                                    <div :title="slotProps.value.name" :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1 status-truncate">{{
                                         slotProps.value.name }}</div>
                                 </div>
                                 <span v-else>
@@ -687,21 +896,18 @@ const handleChange = (event, name) => {
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
             <template #body="slotProps">
-                <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
-                    {{slotProps.node.data.dueDateValue }}
-                </div> -->
-               
-                    <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
-                        :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
-                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
-             
+                <i class="pi pi-calendar"></i>
+                <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
+                    :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
+                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : '--:--'" />
+
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
                 <div class="inline-block">
-                    <div class="task-status-2">
-                        <!-- <pre>{{slotProps.node.data}}</pre> -->
+                    <div class="task-status-2 flex">
+                         <i class="pi pi-flag pt-2"></i>
                         <Dropdown class="mr-1 flex justify-content-center align-items-center"
                             @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
                             v-model="slotProps.node.data.priority" :options="onChangePriorities"
@@ -713,7 +919,7 @@ const handleChange = (event, name) => {
                                         class="pt-1">{{
                                             slotProps.value.name }}
                                     </div>
-                                    <div v-else class="pt-1">Set </div>
+                                    <div v-else class="pt-1"> ----- </div>
                                 </div>
                                 <span v-else>
                                     {{ slotProps.placeholder }}
@@ -752,7 +958,7 @@ const handleChange = (event, name) => {
 
     <!-- Kanban Board -->
     <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
-    <div v-if="!tableView" class="main-container">
+    <div v-if="viewMode === 'board'" class="main-container">
         <div class="content">
             <div>
                 <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
@@ -833,7 +1039,7 @@ const handleChange = (event, name) => {
                                                 @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                                 <p class="font-semibold truncate text-sm title">{{ element.data.name }}
                                                 </p>
-                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon"
                                                         :style="`background-color:${element.data.status.color_code}`">
@@ -867,7 +1073,7 @@ const handleChange = (event, name) => {
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-angle-right text-lg"></i>
@@ -883,6 +1089,11 @@ const handleChange = (event, name) => {
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- gantt chart -->
+    <div v-if="viewMode === 'gantt'">
+            <vue-apex-charts class="mt-2" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
     </div>
 </template>
 
@@ -949,13 +1160,13 @@ const handleChange = (event, name) => {
     width: 100% !important;
 }
 
-.table-st .p-treetable-emptymessage{
+.table-st .p-treetable-emptymessage {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.table-st thead th:hover{
+.table-st thead th:hover {
     border: 2px solid #e2e8f0;
     border-top: none;
     border-bottom: 1px solid #e2e8f0;
@@ -1016,7 +1227,7 @@ const handleChange = (event, name) => {
     font-weight: 500;
 }
 
-.taskTitle{
+.taskTitle {
     max-width: 100%;
     position: absolute;
     white-space: nowrap;
@@ -1061,7 +1272,15 @@ const handleChange = (event, name) => {
 .task-status-2 .p-dropdown .p-inputtext {
     padding: 0.25rem 0.5rem !important;
 }
-
+.task-status-2 .p-dropdown {
+    background: transparent;
+    border: none;
+    box-shadow: 0 0 #ffffff, 0 0 #ffffff, 0 1px 2px 0 #ffffff;
+}
+.task-status-2 .p-dropdown:focus {
+    background: transparent;
+    border: none;
+}
 .task-status-2 .status-bg {
     position: absolute;
     top: -1px;
@@ -1074,6 +1293,12 @@ const handleChange = (event, name) => {
 
 .task-status-2 .p-dropdown-label {
     margin-top: -4px;
+}
+.task-status-2 .p-focus {
+    outline: none;
+    outline-offset: -1px;
+    box-shadow: none;
+    border-color:none;
 }
 
 /* Kanban */
@@ -1361,9 +1586,31 @@ textarea {
     min-width: 91.22px;
 }
 
-.board-btn {
+/*.board-btn {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
+}
+
+.gantt-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+}*/
+
+.view-btns .view-btn:first-child {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.view-btns .view-btn:last-child {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.view-btns .view-btn:not(:first-child):not(:last-child) {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
 }
 
 .webView-action {
@@ -1519,26 +1766,89 @@ textarea {
 .inline-calendar {
     @media (min-width: 1440px) {
         max-width: 4.2vw !important;
+        border: none;
+         font-weight: 400;
     }
+
     cursor: pointer !important;
 
     .p-inputtext {
         padding: 0.25rem 0.5rem !important;
         cursor: pointer !important;
-        text-align: center !important;
         caret-color: transparent !important;
-
+        border: 1px solid #fff;
+         box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
+         font-weight: 400;
     }
+
 }
 
 
-.inline-task-input{
-    padding: 0.35rem 0.75rem !important;
+.inline-task-input {
+    padding: 0.35rem 0rem !important;
     width: 98.6%;
     position: absolute;
     left: 23px;
     top: -6px;
+    border: transparent;
+    box-shadow: none;
+}
+.p-inputtext.inline-task-input:enabled:focus {
+    outline: none;
+}
+
+.status-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 65px;
 }
 
 
+.filter-container {
+    padding: 0 10px;
+}
+
+.task-container {
+    max-height: 25rem;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.task-card {
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.task-card:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.status {
+    height: 12px;
+    width: 12px;
+    border-radius: 25px;
+    background: #000;
+}
+
+.title {
+    margin: auto 0;
+    max-width: 300px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 </style>

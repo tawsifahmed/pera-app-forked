@@ -87,28 +87,38 @@ onMounted(() => {
 <template>
     <div>
         <div class="field">
-            <label for="company">Name<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Name<i class="text-red-400">*</i> 
+                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            </label>
             <InputText id="createTeamName" v-model="name" class="w-full" />
         </div>
 
         <div class="field flex flex-column">
-            <label for="email">Description <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="email">Description 
+                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+            </label>
             <Textarea id="description" class="border-gray-300" v-model="teamDescripInput" rows="3" cols="20" :invalid="teamDescriptionError" />        
         </div>
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Line Manager<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Line Manager<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Dropdown v-model="selectedLineManager" :options="usersLists" optionLabel="name" placeholder="Select Line Manager" checkmark :highlightOnSelect="false" class="w-full" />
         </div> 
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
-            <label>Team Lead<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Team Lead<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <!-- {{ selectedTeamLead.id }} -->
             <Dropdown v-model="selectedTeamLead" :options="usersLists" optionLabel="name" placeholder="Select Team Lead" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 
         <div class="field">
-            <label>Team Members<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Team Members<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <MultiSelect display="chip" v-model="selectedMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Team Members" class="w-full" />
         </div>
 

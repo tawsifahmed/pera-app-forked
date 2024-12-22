@@ -80,7 +80,8 @@ const closeInviteModal = (evn) => {
     init();
 };
 
-const selectedRole = ref([]);
+const selectedRoles = ref([]);
+const filterRoles = ref([]);
 
 const editEmployee = (data) => {
     visibleEditEmployee.value = true;
@@ -124,10 +125,18 @@ const confirmDeleteEmployee = async () => {
 
 };
 
-const init = async () => {
+const userI = ref();
+
+
+const changeAttribute = async () => {
+    userI.value = selectedRoles.value ? selectedRoles.value.map((item) => item.id) : '';
+    init(userI.value);
+}
+
+const init = async (userTypes) => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch(`${url.public.apiUrl}/users/list`, {
+        $fetch(`${url.public.apiUrl}/users/list${userTypes ? `?role_id=${userTypes}` : ''}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -150,7 +159,8 @@ const getRoleList = async () => {
     if (data.value?.data?.length > 0) {
         // console.log('data', data.value?.data);
         rolesLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        // console.log('rolesLists', rolesLists.value);
+        filterRoles.value = data.value?.data.map((item) => ({ name: item.name, id: item.id }));
+        console.log('rolesLists', rolesLists.value);
     }
 };
 
@@ -161,6 +171,7 @@ const initFilters = () => {
 };
 
 const rolePermission = useCookie('rolePermission');
+
 
 onMounted(() => {
     init();
@@ -188,6 +199,13 @@ initFilters();
             </template>
 
             <template #end>
+                 <Button @click="downloadTaskSheet(tasks)"
+                    v-tooltip.left="{ value: `Download Employee List` }"
+                     class="excel-export-btn">
+                    <img src="/assets/icons/excel-export-icon.png" />
+                </Button>
+            <!-- <pre>{{selectedRoles}}</pre> -->
+                <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide :maxSelectedLabels="2" optionLabel="name" placeholder="Filter User Type" class="w-full mx-2" />
                 <IconField iconPosition="right" raised>
                     <InputIcon>
                         <i class="pi pi-search" />
@@ -247,5 +265,26 @@ initFilters();
 }
 .table-st thead tr {
     background: #ededed;
+}
+
+.excel-export-btn {
+    background: #f1f5f9;
+    border: 1px solid #f1f5f9;
+    text-decoration: none;
+    padding: 0.2rem 1rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.excel-export-btn img {
+    width: 21px;
+    height: 20px;
+}
+
+.excel-export-btn:hover {
+    background: #e2e8f0;
+    color: #334155;
+    border-color: #e2e8f0;
 }
 </style>

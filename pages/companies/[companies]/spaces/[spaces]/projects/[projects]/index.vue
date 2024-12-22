@@ -17,17 +17,14 @@ const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const { getSingleProject, deleteTask, getTaskAssignModalData, getTagsAssignModalData, getTaskDetails } = useCompanyStore();
 const { singleProject, isTaskDeleted, tasks, kanbanTasks } = storeToRefs(useCompanyStore());
-
 const filters = ref({});
 const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
 const singleTask = ref(null);
 const task_key = useRoute().query.task_key;
-console.log(task_key);
 const { projects } = useRoute().params;
 const visible = ref(false);
-
 const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
@@ -122,7 +119,6 @@ const handleTaskDetailView = async (task) => {
     document.documentElement.removeChild(overlayD);
 };
 
-console.log('visibleTaskDetailView', visibleTaskDetailView.value);
 watch(visibleTaskDetailView, (value) => {
     if(value === true) {
         return 0;
@@ -150,8 +146,7 @@ const updateTaskTable = () => {
     getSingleProject(projects);
 };
 
-getSingleProject(projects);
-
+// getSingleProject(projects);
 
 watch(() => useRoute().query.task_key, (newTaskKey) => {
     if (newTaskKey) {
@@ -188,6 +183,7 @@ watchEffect(() => {
         <!-- Datatable -->
         <TaskTable
             v-if="readTask"
+            
             :kanbanTasks="kanbanTasks"
             :tasks="tasks"
             @openCreateSpace="openCreateSpace"
@@ -208,7 +204,7 @@ watchEffect(() => {
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal :header="projects" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskDetail
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"

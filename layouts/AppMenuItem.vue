@@ -129,21 +129,21 @@ const toggle = (event) => {
                     <Button v-tooltip.top="{ value: 'Manage Space' }" type="button" icon="pi pi-ellipsis-h " class="p-button-sm w-2rem h-2rem" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                     <Menu ref="menu" id="overlay_menu" @click="clickSpaceMenu(items)" :model="items" :popup="true" />
                     <SpaceCreateSpace v-if="createSpaceP" v-tooltip.top="{ value: 'Create Space' }" />
-                    <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div>
+                    <!-- <div v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer text-sm instruction-tip"></div> -->
                 </div>
             </div>
         </div>
         <a class="p-1 pl-2" v-if="(!item.to || item.items) && item.visible !== false" :class="item.class" :target="item.target" tabindex="0">
             <div class="flex align-items-center">
                 <Avatar :label="item.label?.charAt(0)" class="mr-2 capitalize" size="small" :style="{ 'background-color': [item.color ? item.color : '#3b82f6'], color: ['#ededed'] }" />
-                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{ value: `${item.label}` }">
-                    {{ item.label.length > 16 ? item.label.slice(0, 16) + '...' : item.label }}
+                <NuxtLink :class="[item.class, { 'active-route': checkActiveRoute(item) }]" :to="item.to" class="layout-menuitem-text space-items" v-tooltip.right="{ value: `${item.label.length > 20 ? item.label : ''}` }">
+                    {{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}
                 </NuxtLink>
             </div>
             <div class="flex align-items-center ml-auto">
                 <i @click="itemClickSubMenu($event, item, index)" v-if="item.items.length > 0" class="text-sm pi pi-fw pi-angle-down layout-submenu-toggler"></i>
                 <CreateSpecificProject v-if="createProjectP" v-tooltip="{ value: 'Create Project' }" :singleSpace="item" :spaces="item.id" />
-                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
             </div>
         </a>
         <router-link
@@ -156,45 +156,45 @@ const toggle = (event) => {
         >
             <div class="flex flex-row align-items-center">
                 <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important;"></i>
-                <span v-tooltip.right="{ value: `${item.label.length > 20 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 20 ? item.label.slice(0, 20) + '...' : item.label }}</span>
+                <span v-tooltip.right="{ value: `${item.label.length > 25 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 25 ? item.label.slice(0, 25) + '...' : item.label }}</span>
             </div>
-            <span
+            <!-- <span
                 v-if="item.label == 'Employees'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
-            <span v-if="item.label == 'Teams'" style="left: 7px; position: relative" v-tooltip.right="{ value: 'Demo Text Text For Teams.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
-            <span
+            ></span> -->
+            <!-- <span v-if="item.label == 'Teams'" style="left: 7px; position: relative" v-tooltip.right="{ value: 'Demo Text Text For Teams.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            <!-- <span
                 v-if="item.label == 'Roles'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
-            <span
+            ></span> -->
+            <!-- <span
                 v-if="item.label == 'Tags'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
-            <span
+            ></span> -->
+            <!-- <span
                 v-if="item.label == 'Task Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
-            <span
+            ></span> -->
+            <!-- <span
                 v-if="item.label == 'User Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
-            <span
+            ></span> -->
+            <!-- <span
                 v-if="item.label == 'KPI Reports'"
                 style="left: 7px; position: relative"
                 v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }"
                 class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"
-            ></span>
+            ></span> -->
 
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
