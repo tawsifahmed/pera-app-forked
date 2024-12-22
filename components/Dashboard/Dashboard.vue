@@ -1,7 +1,10 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { GridStack } from 'gridstack';
-
+definePageMeta({
+    middleware: 'auth',
+    layout: false
+});
 const layout = ref([
     { x: 4, y: 0, w: 2, h: 2, i: '0' },
     { x: 2, y: 0, w: 2, h: 4, i: '1' },
@@ -61,9 +64,9 @@ onMounted(() => {
     // Initialize Gridstack with 12 columns and 30 rows, and custom margins
     const grid = GridStack.init(
         {
-            // cellHeight: 30, // Height of the grid cells
-            // column: 12, // Number of columns
-            // row: 30, // Number of rows
+            cellHeight: 30, // Height of the grid cells
+            column: 12, // Number of columns
+            row: 30, // Number of rows
             draggable: {
                 handle: '.grid-stack-item-content' // Drag handle
             },
@@ -102,10 +105,10 @@ onMounted(() => {
         layout.value = updateItems;
         localStorage.setItem('gridLayout', JSON.stringify(layout.value));
     });
-    // grid.on('gridstackchange', () => {
-    //     // Save layout to localStorage whenever there's a change
-    //     console.log(grid);
-    // });
+    grid.on('gridstackchange', () => {
+        // Save layout to localStorage whenever there's a change
+        console.log(grid);
+    });
 });
 </script>
 
