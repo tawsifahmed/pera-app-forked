@@ -40,23 +40,23 @@ const handleGenerate = async () => {
     loading.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    const formData = new FormData();  
+    const formData = new FormData();
     // formData.append('user_id[]', userIds);
 
     // Only append project IDs if there are valid projects selected
     if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map(item => item.id);
+        const projectIds = selectedProject.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            projectIds.forEach((id) =>{
-                formData.append('project_id[]', id)
-            })
+            projectIds.forEach((id) => {
+                formData.append('project_id[]', id);
+            });
         }
     }
 
     if (startDate.value && endDate.value) {
-            formData.append('start_due_date', formattedStartDate);
-            formData.append('end_due_date', formattedEndDate);
+        formData.append('start_due_date', formattedStartDate);
+        formData.append('end_due_date', formattedEndDate);
     }
 
     const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/project-wise-task-report-view`, {
@@ -68,7 +68,7 @@ const handleGenerate = async () => {
     });
 
     if (data.value?.code == 200) {
-        previewData.value = data.value.data.map((item, index) => ({ ...item, index: index + 1 }));;
+        previewData.value = data.value.data.map((item, index) => ({ ...item, index: index + 1 }));
         return (loading.value = false);
     } else {
         loading.value = false;
@@ -84,33 +84,30 @@ const handleReportDownload = async () => {
     }
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    const formData = new FormData(); 
+    const formData = new FormData();
 
     if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map(item => item.id);
+        const projectIds = selectedProject.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            projectIds.forEach((id) =>{
-                formData.append('project_id[]', id)
-            })
+            projectIds.forEach((id) => {
+                formData.append('project_id[]', id);
+            });
         }
     }
 
     if (startDate.value && endDate.value) {
-            formData.append('start_due_date', formattedStartDate);
-            formData.append('end_due_date', formattedEndDate);
+        formData.append('start_due_date', formattedStartDate);
+        formData.append('end_due_date', formattedEndDate);
     }
 
-    const { data, error } = await useFetch(
-        `${url.public.apiUrl}/tasks/project-wise-task-report-download`,
-        {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            },
-            body: formData
-        }
-    );
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/project-wise-task-report-download`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
     if (error.value) {
         console.log(error);
         return (loading1.value = false);
@@ -136,7 +133,6 @@ const handleChange = (field, event) => {
     }
 };
 
-
 onMounted(() => {
     // init();
 });
@@ -146,8 +142,7 @@ onMounted(() => {
         <!-- <pre>{{ usersListStore }}</pre> -->
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
-            <h5 class="mb-1">
-                Task Reports</h5>
+            <h5 class="mb-1">Task Reports</h5>
             <!-- <pre>
                 sp =>{{  selectedProject?.length }}
             
@@ -159,19 +154,16 @@ onMounted(() => {
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">Project:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide
-                                optionLabel="name" placeholder="Select Project" class="w-full" />
+                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full" />
                         </div>
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" clearButton="true" showIcon
-                            iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" clearButton="true" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">To: </label>
-                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" clearButton showIcon
-                            iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" clearButton showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>
             </template>
@@ -192,10 +184,10 @@ onMounted(() => {
                     <p class="text-center">No Data found...</p>
                 </template>
                 <Column field="index" header="Serial" sortable></Column>
-                <Column field="task_name" style="width: 40%;" header="Task Name"></Column>
+                <Column field="task_name" style="width: 40%" header="Task Name"></Column>
                 <Column field="project_name" header="Project Name"></Column>
                 <Column field="task_status" header="Status">
-                  <!-- <template #body="slotProps">
+                    <!-- <template #body="slotProps">
                     <div v-for="(assignee, index) in slotProps.data.assignee_name">
                       {{ assignee.name }}<span class="font-bold" v-if="index < slotProps.data.assignee_name.length - 1">, </span>
                     </div>
@@ -205,7 +197,7 @@ onMounted(() => {
                 <Column field="task_date_done" header="Date Done"></Column>
                 <Column field="duration" header="Duration"></Column>
                 <Column field="unit" header="Unit"></Column>
-                <Column field="overdue" header="Missed Deadlines" ></Column>
+                <Column field="overdue" header="Missed Deadlines"></Column>
                 <!-- <Column field="bounce" header="Bounce"></Column> -->
             </DataTable>
         </div>
@@ -213,7 +205,6 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .user-selection {
     display: flex;
     flex-direction: column;
