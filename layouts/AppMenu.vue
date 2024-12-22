@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 const { switchCompany } = useCompanyStore(); // use authenticateUser action from  auth store
-const { companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore()); 
+const { companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());
 const companies = useActiveCompanyStore();
 companies.getCompany();
 
@@ -61,7 +61,10 @@ if (readDashboard.value) {
     model.value.unshift({
         label: 'Home',
         option: 'home_option',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home text-lg', to: '/' }]
+        items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home text-lg', to: '/' },
+            { label: 'Scrum', icon: 'pi pi-fw pi-comments text-lg', to: '/scrum-meeting' }
+        ]
     });
 }
 
@@ -97,31 +100,30 @@ onMounted(() => {
     console.log('readDashboard', accessPermission('read_dashboard'));
 });
 
-
 const selectedComp = ref(null);
-selectedComp.value = companyList.value.find(item => item.id === selectedCompany.value.id);
+selectedComp.value = companyList.value.find((item) => item.id === selectedCompany.value.id);
 
 watch(selectedCompany, (newVal) => {
-    selectedComp.value = companyList.value.find(item => item.id === newVal.id);
+    selectedComp.value = companyList.value.find((item) => item.id === newVal.id);
 });
 
 const router = useRouter();
 
 const switchCompanyHandler = async (switchCompId) => {
-    if(switchCompId === Number(localStorage.getItem('userCompany'))){
+    if (switchCompId === Number(localStorage.getItem('userCompany'))) {
         return;
-    }else{
+    } else {
         await switchCompany(switchCompId);
-        if(isCompanySwitched.value === true){
+        if (isCompanySwitched.value === true) {
             localStorage.setItem('userCompany', JSON.stringify(switchCompId));
             // await companies.getCompany();
             toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
             if (window.location.pathname !== '/' && window.location.pathname !== '/companies') {
                 window.location.href = '/';
             }
-        }else{
+        } else {
             toast.add({ severity: 'error', summary: 'Error', detail: companySwitchToast, group: 'br', life: 3000 });
-            selectedComp.value = companyList.value.find(item => item.id === selectedCompany.value.id);
+            selectedComp.value = companyList.value.find((item) => item.id === selectedCompany.value.id);
         }
     }
 };
@@ -154,7 +156,6 @@ const visibleCreateCompany = ref(false);
 const handleCreateCompanyModal = () => {
     visibleCreateCompany.value = true;
 };
-
 </script>
 
 <template>
@@ -164,19 +165,21 @@ const handleCreateCompanyModal = () => {
             <!-- <pre>cList => {{companyList.length}}</pre> -->
             <!-- <pre>pre2: {{selectedComp}}</pre> -->
             <!-- <pre>selC{{selectedCompany}}</pre> -->
-           <div v-if="companyList.length > 0" class="flex align-items-center">
-                <span v-tooltip.right="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{ company?.charAt(0) }}</span>
-                <div class="comp-switch"  v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
-                    <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList"  optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
+            <div v-if="companyList.length > 0" class="flex align-items-center">
+                <span v-tooltip.right="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{
+                    company?.charAt(0)
+                }}</span>
+                <div class="comp-switch" v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
+                    <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList" optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
                 </div>
                 <Button v-tooltip.right="{ value: 'Manage Company' }" type="button" icon="pi pi-ellipsis-v" class="p-button-sm w-2rem h-2rem ml-1" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                 <Menu ref="menu1" id="overlay_menu" @click="clickCompanyMenu(cItems)" :model="cItems" :popup="true" />
-           </div>
+            </div>
         </div>
         <div v-else class="fullscreen-loader flex justify-content-center align-items-center">
-                <div class="waved-logo relative">
-                    <img class="loader-wrapper absolute" src="/demo/wave.gif" alt="">
-                </div>     
+            <div class="waved-logo relative">
+                <img class="loader-wrapper absolute" src="/demo/wave.gif" alt="" />
+            </div>
         </div>
         <hr />
         <ul class="layout-menu">
@@ -194,20 +197,20 @@ const handleCreateCompanyModal = () => {
     text-transform: capitalize;
 }
 
-.comp-switch{
+.comp-switch {
     width: 75.1%;
     min-width: 75.1%;
 }
 
-.comp-switch > div > .p-inputtext{
+.comp-switch > div > .p-inputtext {
     font-size: 1.3rem !important;
     font-weight: 700 !important;
 }
-.comp-switch > div > .p-dropdown-trigger{
+.comp-switch > div > .p-dropdown-trigger {
     width: 2rem !important;
 }
 
-.company-first-letter{
+.company-first-letter {
     min-width: 2.8rem;
     height: 2.7rem;
 }
@@ -226,38 +229,35 @@ const handleCreateCompanyModal = () => {
     z-index: 10999 !important; /* Ensure it's on top of all other elements */
 }
 
-.waved-logo{
+.waved-logo {
     background-image: url('/demo/images/login/avatar.svg');
     background-size: cover;
     background-repeat: no-repeat;
     width: 80px;
     height: 80px;
     margin: 0 auto;
-    animation: waveIconPulse 1.83s .4s infinite;
-
-    
+    animation: waveIconPulse 1.83s 0.4s infinite;
 }
 
-.loader-wrapper{
+.loader-wrapper {
     top: -84px;
     left: -74.5px;
     width: 240px;
     height: 240px;
 }
 
-@keyframes waveIconPulse{
-    0%{
+@keyframes waveIconPulse {
+    0% {
         transform: scaleZ(1);
     }
-    30%{
+    30% {
         transform: scale3d(1.1, 1.1, 1.1);
     }
-    60%{
+    60% {
         transform: scale3d(1.1, 1.1, 1.1);
     }
-    100%{
+    100% {
         transform: scaleZ(1);
     }
 }
-
 </style>
