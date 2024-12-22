@@ -65,7 +65,7 @@ const handleGenerate = async () => {
         headers: {
             Authorization: `Bearer ${token.value}`
         },
-        body: formData
+        
     }); 
 
     if (data.value?.code == 200) {
@@ -151,10 +151,6 @@ const handleChange = (field, event) => {
                     <Toast position="bottom-right" group="br" />
                     <div class="d-flex mr-2">
                         <h5 class="mb-1">Task Reports</h5>
-                        <!-- <pre>
-                            sp =>{{  selectedProject?.length }}
-                        
-                        </pre> -->
                     </div>
                     <Toolbar class="border-0 px-0">
                         <template #start>
@@ -167,11 +163,11 @@ const handleChange = (field, event) => {
                                 </div>
                                 <div class="flex-auto">
                                     <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                                    <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" clearButton="true" showIcon iconDisplay="input" inputId="icondisplay" />
+                                    <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                                 </div>
                                 <div class="flex-auto">
                                     <label for="icondisplay" class="font-bold block mb-2">To: </label>
-                                    <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" clearButton showIcon iconDisplay="input" inputId="icondisplay" />
+                                    <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                                 </div>
                             </div>
                         </template>
