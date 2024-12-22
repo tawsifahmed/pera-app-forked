@@ -671,19 +671,18 @@ const ganttChartOptions = ref({
        <div class="grid mt-2">
         <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between mb-3">
+                <div  to="/tags" class="flex justify-content-between">
                     <div>
                         <h4 class="block text-500 font-bold mb-3">Total Tasks</h4>
                         <div class="text-900 font-bold text-xl">{{ totalTaskCount }}</div>
                     </div>
-                   
                 </div>
             </div>
         </div>
       
         <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between mb-3">
+                <div  to="/tags" class="flex justify-content-between">
                     <div>
                         <h4 :style="`color : ${statsC.statusColor};`" class="block font-bold mb-3">{{statsC.statusName}}</h4>
                         <div class="text-900 font-medium text-xl">{{ statsC.taskCount }}</div>
@@ -698,28 +697,18 @@ const ganttChartOptions = ref({
                 </div>
           
                 <div class="task-container">
-                  <!-- <div  class="flex justify-content-center align-items-center" style="height: 22rem;">
-                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
-                  </div> -->
-          
-                  <div> <!-- Show task list when not loading and tasks are available -->
+                  <div>
                     <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
                       <div class="title-group">
                         <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`status`" :style="`background-color: ${recentTask?.statusColor};`"></div>
                         <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
                         <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                        <!-- <p>{{ recentTask?.project_name }}</p> -->
                       </div>
                       <div>
                         <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
                       </div>
                     </div>
                   </div>
-          
-                  <!-- <div v-else> 
-                    <p class="text-black text-lg text-center">No Tasks found!</p>
-                  </div> -->
-          
                   <div class="w-full flex justify-content-center">
                     <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
                   </div>
