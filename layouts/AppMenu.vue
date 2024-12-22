@@ -41,6 +41,7 @@ const model = ref([
             { label: 'Task Reports', icon: 'pi pi-fw pi-flag', to: '/task-reports' },
             { label: 'User Reports', icon: 'pi pi-fw pi-flag', to: '/user-reports' },
             { label: 'Project Reports', icon: 'pi pi-fw pi-flag', to: '/project-reports' },
+            { label: 'Time Sheet', icon: 'pi pi-fw pi-database', to: '/time-sheet' },
             { label: 'KPI Reports', icon: 'pi pi-fw pi-book', to: '/kpi-reports' }
         ]
     }

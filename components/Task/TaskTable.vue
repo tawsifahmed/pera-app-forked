@@ -10,7 +10,7 @@ import moment from 'moment';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData, recentTaskData, tasksAttachments, totalTaskCount } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -50,6 +50,17 @@ const onChangePriorities = ref([
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
 ])
+
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}-${month}-${year}`;
+};
 
 const isSpeedDialVisible = ref({});
 
@@ -348,8 +359,7 @@ async function handleTaskStatus(status, task_id) {
         });
 
         if (data.value?.app_message === 'success') {
-            // getTaskDetails(singleTask.key);
-            console.log('Status Changed', data);
+            // console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             await getSingleProject(id);
         } else {
@@ -682,6 +692,8 @@ const ganttChartOptions = ref({
                 <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
                     @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
                 <div class="view-btns">
+                    <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn"
+                        severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn"
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
                     <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn view-btn"
@@ -711,6 +723,110 @@ const ganttChartOptions = ref({
             </IconField>
         </template>
     </Toolbar>
+
+    <!-- project overview -->
+    <div v-if="viewMode === 'overview'">
+       <div class="grid mt-2">
+        <div class="col-12 lg:col-6 xl:col-3">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clone text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+            <div class="card mb-0">
+                <div  to="/tags" class="flex justify-content-between mb-3">
+                    <div>
+                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
+                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                    </div>
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
+                        style="width: 2.5rem; height: 2.5rem">
+                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 xl:col-6" >
+            <div class="card h-full">
+                <div class="flex gap-2 align-items-center flex-wrap" >
+                  <h5 class="mb-0" >Recent Tasks</h5>
+                </div>
+          
+                <div class="task-container">
+                  <!-- <div  class="flex justify-content-center align-items-center" style="height: 22rem;">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
+                  </div> -->
+          
+                  <div> <!-- Show task list when not loading and tasks are available -->
+                    <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                      <div class="title-group">
+                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`status`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                        <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                        <!-- <p>{{ recentTask?.project_name }}</p> -->
+                      </div>
+                      <div>
+                        <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
+                      </div>
+                    </div>
+                  </div>
+          
+                  <!-- <div v-else> 
+                    <p class="text-black text-lg text-center">No Tasks found!</p>
+                  </div> -->
+          
+                  <div class="w-full flex justify-content-center">
+                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                  </div>
+                </div>
+              </div>
+        </div>
+        <div class="col-12 xl:col-6">
+            <div class="card" style="height: 80%">
+                <h5>Attachments:</h5>
+                <!-- <Chart type="line" :data="lineData" :options="lineOptions" /> -->
+                 <h6 class="text-center"> No Attachments</h6>
+            </div>
+        </div>
+       </div>
+    </div>
     <!-- <pre>{{ tasks }}</pre> -->
     <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both"
         :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto;"
@@ -982,7 +1098,7 @@ const ganttChartOptions = ref({
                                                 @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                                 <p class="font-semibold truncate text-sm title">{{ element.data.name }}
                                                 </p>
-                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                                <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon"
                                                         :style="`background-color:${element.data.status.color_code}`">
@@ -1016,7 +1132,7 @@ const ganttChartOptions = ref({
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-angle-right text-lg"></i>
@@ -1722,5 +1838,53 @@ textarea {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 65px;
+}
+
+
+.filter-container {
+    padding: 0 10px;
+}
+
+.task-container {
+    max-height: 25rem;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.task-card {
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.task-card:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.status {
+    height: 12px;
+    width: 12px;
+    border-radius: 25px;
+    background: #000;
+}
+
+.title {
+    margin: auto 0;
+    max-width: 300px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 </style>

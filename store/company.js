@@ -42,6 +42,10 @@ export const useCompanyStore = defineStore('workStation', {
         tasks: [],
         kanbanTasks: [],
         ganttChartData: [],
+        recentTaskData: [],
+        tasksAttachments: [],
+        totalTaskCount: [],
+        taskStatusCounts: [],
         asngUsers: [],
 
         subTasks: [],
@@ -368,8 +372,105 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 ];
             }
+            function formatRecentTaskData(tasks) {
+                let recentTaskData = [];
+                const currentTime = new Date().getTime();
+                const threeDaysAgo = currentTime - (3 * 24 * 60 * 60 * 1000); // 3 days in milliseconds
+            
+                function formatTask(task) {
+                    const { name, created_at, dueDate, status } = task.data;
+                    const { key } = task;
+                    const createdAtTime = new Date(created_at).getTime();
+            
+                    // Check if task was created within the last 3 days
+                    if (createdAtTime >= threeDaysAgo && createdAtTime <= currentTime) {
+                        recentTaskData.push({
+                            key: key,
+                            taskName: name,        // Task name
+                            dueDate: dueDate,      // Due date
+                            statusName: status.name,  // Status name
+                            statusColor: status.color_code // Status color code
+                        });
+                    }
+            
+                    // If there are children, recurse through them
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach(childTask => formatTask(childTask));
+                    }
+                }
+            
+                // Iterate over the top-level tasks and format them
+                tasks.forEach(task => formatTask(task));
+            
+                return recentTaskData;
+            }
+
+            function extractAttchTaskData(tasks) {
+                let attachmentData = [];
+                let totalTaskCount = 0;
+                let statusMap = {}; // To segregate tasks by status
+            
+                function processTask(task) {
+                    const { name, dueDate, status } = task.data;
+                    
+                    // Increment total task count
+                    totalTaskCount++;
+                    
+                    // Segregate tasks by status
+                    if (!statusMap[status]) {
+                        statusMap[status] = {
+                            statusName: status,
+                            length: 0
+                        };
+                    }
+                    statusMap[status].length++;
+            
+                    // Check for attachments (assuming there is an 'attachments' property in the task)
+                    if (task.data.attachments && task.data.attachments.length > 0) {
+                        attachmentData.push({
+                            taskName: name,               // Task name to identify
+                            attachments: task.data.attachments // Attachments data
+                        });
+                    }
+            
+                    // Recurse through sub-tasks
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach(childTask => processTask(childTask));
+                    }
+                }
+            
+                // Iterate over the top-level tasks and format them
+                tasks.forEach(task => processTask(task));
+            
+                // Prepare the status list from statusMap
+                let statusList = Object.keys(statusMap).map(key => ({
+                    statusName: statusMap[key].statusName,
+                    length: statusMap[key].length
+                }));
+            
+                return {
+                    attachments: attachmentData,
+                    totalTaskCount: totalTaskCount,
+                    taskStatusCounts: statusList
+                };
+            }
+
+            
+            // Call the function with your task data
+            let result = extractAttchTaskData(this.tasks);
+            
+            // Call the function with your task data
+            this.recentTaskData = formatRecentTaskData(this.tasks);
+            console.log('recentTaskData', this.recentTaskData);
+            this.tasksAttachments = result.attachments;
+            console.log('tasksAttachments', this.tasksAttachments);
+            this.totalTaskCount = result.totalTaskCount;
+            console.log('totalTaskCount', this.totalTaskCount);
+            this.taskStatusCounts = result.taskStatusCounts;
+            console.log('taskStatusCounts', this.taskStatusCounts);
             this.ganttChartData = formatTaskData(this.tasks);
             console.log('ganttChartData', this.ganttChartData);
+
         },
 
         async createProject({ name, description, space_id, statuses }) {
