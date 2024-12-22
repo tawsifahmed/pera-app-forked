@@ -1747,6 +1747,10 @@ textarea {
         border: 1px solid #fff;
          box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
          font-weight: 400;
+         outline: none !important;
+        outline-offset: -1px !important;
+        box-shadow: none !important;
+        border-color:none !important;
     }
 
 }
