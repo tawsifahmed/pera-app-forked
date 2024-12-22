@@ -915,12 +915,10 @@ const ganttChartOptions = ref({
     </TreeTable>
 
     <!-- Kanban Board -->
-    <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
     <div v-if="viewMode === 'board'" class="main-container">
         <div class="content">
             <div>
                 <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
-                    <!-- <pre>khn {{ updateTaskP }}</pre> -->
                     <div v-for="list in kanbanTasks" :key="list" class="groupColumnContainer">
                         <div class="column-container">
                             <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name
@@ -934,17 +932,17 @@ const ganttChartOptions = ref({
                                         <div class="task-card" :style="taskCardStyle" :key="element.id"
                                             @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate text-sm title"
+                                                <p class="font-semibold truncate-board text-sm title"
                                                     v-tooltip.top="{ value: `${element.data.name}` }">{{
                                                         element.data.name }}</p>
-                                                <!-- <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon"
                                                         :style="`background-color:${element.data.status.color_code}`">
                                                     </div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                            
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
                                                     <i class="pi pi-user text-lg"></i>
                                                     <div class="flex justify-content-start gap-1">
                                                         <span v-for="(assignee, index) in element.data.assigneeObj"
@@ -964,12 +962,12 @@ const ganttChartOptions = ref({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
                                                     <i class="pi pi-calendar-minus text-lg"></i>
                                                     <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`"
                                                         class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
                                                     <i class="pi pi-flag text-lg"></i>
                                                     <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
@@ -995,7 +993,7 @@ const ganttChartOptions = ref({
                                             <div v-for="element in element.children" :key="element.unique_id"
                                                 class="sub-card"
                                                 @click="$emit('handleTaskDetailView', element, list.content, list.name)">
-                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}
+                                                <p class="font-semibold truncate-board text-sm title">{{ element.data.name }}
                                                 </p>
                                                 <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
@@ -1004,7 +1002,7 @@ const ganttChartOptions = ref({
                                                     </div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
                                                     <i class="pi pi-user text-lg"></i>
                                                     <div class="flex justify-content-start gap-1">
                                                         <span v-for="(assignee, index) in element.data.assigneeObj"
@@ -1024,12 +1022,12 @@ const ganttChartOptions = ref({
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
                                                     <i class="pi pi-calendar-minus text-lg"></i>
                                                     <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`"
                                                         class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
                                                     <i class="pi pi-flag text-lg"></i>
                                                     <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
@@ -1065,7 +1063,7 @@ const ganttChartOptions = ref({
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 8px;
-    width: calc(20rem - 15px);
+    width: calc(23rem - 15px);
 }
 
 .action-dropdown {
@@ -1496,9 +1494,9 @@ textarea {
 
 .status-icon {
     /* background-color: red; */
-    height: 10px;
-    width: 10px;
-    border-radius: 10px;
+    height: 12px;
+    width: 12px;
+    border-radius: 12px;
 }
 
 .status {
@@ -1510,6 +1508,11 @@ textarea {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+}
+.truncate-board {
+    overflow: hidden;
+        text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media only screen and (max-width: 1250px) {
@@ -1805,12 +1808,12 @@ textarea {
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
-.status {
-    height: 12px;
-    width: 12px;
-    border-radius: 25px;
-    background: #000;
-}
+// .status {
+//     height: 12px;
+//     width: 12px;
+//     border-radius: 25px;
+//     background: #000;
+// }
 
 .title {
     margin: auto 0;
