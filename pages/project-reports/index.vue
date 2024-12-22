@@ -56,12 +56,12 @@ const handleGenerate = async () => {
     }
 
     if (startDate.value && endDate.value) {
-        formData.append('start_due_date', formattedStartDate);
-        formData.append('end_due_date', formattedEndDate);
+        formData.append('start_date', formattedStartDate);
+        formData.append('end_date', formattedEndDate);
     }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/projects/report-view`, {
-        method: 'POST',
+    const { data, error } = await useFetch(`${url.public.apiUrl}/projects/report-view`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
         },
@@ -102,7 +102,7 @@ const handleReportDownload = async () => {
         formData.append('end_due_date', formattedEndDate);
     }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/project-wise-task-report-download`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/project-wise-task-report-download`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -212,43 +212,11 @@ const handleChange = (field, event) => {
                 </div>
             </TabPanel>
             <TabPanel header="Specific Monthly Summary">
-                <Toolbar class="border-0 px-0">
-                    <template #start>
-                        <div class="flex gap-2">
-                            <div class="flex-auto">
-                                <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                                <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
-                            </div>
-                            <div class="flex-auto">
-                                <label for="icondisplay" class="font-bold block mb-2"> To: </label>
-                                <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
-                            </div>
-                        </div>
-                    </template>
-
-                    <template #end>
-                        <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
-                    </template>
-                </Toolbar>
+                
             </TabPanel>
             <TabPanel header="Executive Summary">
                 <Toolbar class="border-0 px-0">
-                    <template #start>
-                        <div class="flex gap-2">
-                            <div class="flex-auto">
-                                <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                                <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
-                            </div>
-                            <div class="flex-auto">
-                                <label for="icondisplay" class="font-bold block mb-2"> To: </label>
-                                <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
-                            </div>
-                        </div>
-                    </template>
-
-                    <template #end>
-                        <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
-                    </template>
+                  
                 </Toolbar>
             </TabPanel>
         </TabView>
