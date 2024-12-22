@@ -10,7 +10,7 @@ import moment from 'moment';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData, recentTaskData, tasksAttachments, totalTaskCount } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData, recentTaskData, countTasksByStatus, totalTaskCount } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -673,59 +673,25 @@ const ganttChartOptions = ref({
             <div class="card mb-0">
                 <div  to="/tags" class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
-                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
+                        <h4 class="block text-500 font-bold mb-3">Total Tasks</h4>
+                        <div class="text-900 font-bold text-xl">{{ totalTaskCount }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-clone text-green-500 text-xl"></i>
-                    </div>
+                   
                 </div>
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
+      
+        <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <div  to="/tags" class="flex justify-content-between mb-3">
                     <div>
-                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
-                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
+                        <h4 :style="`color : ${statsC.statusColor};`" class="block font-bold mb-3">{{statsC.statusName}}</h4>
+                        <div class="text-900 font-medium text-xl">{{ statsC.taskCount }}</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
-            <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
-                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3" style="visibility:hidden;">
-            <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between mb-3">
-                    <div>
-                        <span class="block text-500 font-medium mb-3">Total Tasks</span>
-                        <div class="text-900 font-medium text-xl">{{ totalTaskCount }}</div>
-                    </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
-                        <i class="pi pi-clipboard text-green-500 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 xl:col-6" >
+        <div class="col-12 " >
             <div class="card h-full">
                 <div class="flex gap-2 align-items-center flex-wrap" >
                   <h5 class="mb-0" >Recent Tasks</h5>
@@ -760,13 +726,7 @@ const ganttChartOptions = ref({
                 </div>
               </div>
         </div>
-        <div class="col-12 xl:col-6">
-            <div class="card" style="height: 80%">
-                <h5>Attachments:</h5>
-                <!-- <Chart type="line" :data="lineData" :options="lineOptions" /> -->
-                 <h6 class="text-center"> No Attachments</h6>
-            </div>
-        </div>
+     
        </div>
     </div>
     <!-- <pre>{{ tasks }}</pre> -->
