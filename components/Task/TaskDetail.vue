@@ -547,9 +547,7 @@ const handleShareTaskId = () => {
             <div class="flex gap-1">
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }"
                     class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
-                <!-- <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span> -->
                 <h5 class="m-0 ml-2">Activity</h5>
-                <!-- <pre>isTagsEdited {{isTagsEdited}}</pre> -->
             </div>
         </div>
         <div class="col-12 lg:col-7">

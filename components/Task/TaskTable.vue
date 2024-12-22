@@ -537,62 +537,6 @@ const computedHeight = computed(() => {
 // Register the ApexCharts component globally or in your current setup
 
 const series = ref(ganttChartData ? ganttChartData : []);
-// const series = ref(
-//     [
-//         {
-//             data: [
-//                 {
-//                     x: 'Analysis',
-//                     y: [
-//                         new Date('2019-02-27').getTime(),
-//                         new Date('2019-03-04').getTime()
-//                     ],
-//                     fillColor: '#008FFB'
-//                 },
-//                 {
-//                     x: 'Design',
-//                     y: [
-//                         new Date('2019-03-04').getTime(),
-//                         new Date('2019-03-08').getTime()
-//                     ],
-//                     fillColor: '#00E396'
-//                 },
-//                 {
-//                     x: 'Coding',
-//                     y: [
-//                         new Date('2019-03-07').getTime(),
-//                         new Date('2019-03-10').getTime()
-//                     ],
-//                     fillColor: '#775DD0'
-//                 },
-//                 {
-//                     x: 'Testing',
-//                     y: [
-//                         new Date('2019-03-08').getTime(),
-//                         new Date('2019-03-12').getTime()
-//                     ],
-//                     fillColor: '#FEB019'
-//                 },
-//                 {
-//                     x: 'Deployment',
-//                     y: [
-//                         new Date('2019-03-12').getTime(),
-//                         new Date('2019-03-17').getTime()
-//                     ],
-//                     fillColor: '#FF4560'
-//                 },
-//                 {
-//                     x: 'Maintenance',
-//                     y: [
-//                         new Date('2019-03-17').getTime(),
-//                         new Date('2019-03-22').getTime()
-//                     ],
-//                     fillColor: '#775DD0'
-//                 },
-//             ]
-//         }
-//     ]
-// )
 
 const ganttChartOptions = ref({
     chart: {
@@ -666,19 +610,19 @@ const ganttChartOptions = ref({
     <div class="filter-wrapper pb-2 mb-1">
         <!-- <pre>{{modStatusList}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
-            resetFilterOnHide optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3"
+            resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3"
             class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
-            placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
+            placeholder="Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
-            placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+            placeholder="Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
             <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate"
-                placeholder="Filter Start Due Date" class="w-full md:w-17rem" />
+                placeholder="Start Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
         </div>
         <div class="mb-2 relative">
-            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Filter End Due Date"
+            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="End Due Date"
                 class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected2" @click="handleDateDelete2"
                 class="pi pi-times end-cross absolute cursor-pointer"></p>
@@ -894,8 +838,8 @@ const ganttChartOptions = ref({
                             class="w-fit h-fit p-1" style="font-size: 0.2rem" />
                         <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
                             v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
-                            severity="primary" icon="pi pi-check" class=" p-1 w-full"
-                            style="font-size: 0.2rem; margin: 0 0.65rem;" />
+                            severity="secondary" label="Save" class=" p-1 w-full"
+                            style=" margin: 0 5px;" />
                     </div>
                 </div>
             </template>
@@ -952,21 +896,18 @@ const ganttChartOptions = ref({
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
             <template #body="slotProps">
-                <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
-                    {{slotProps.node.data.dueDateValue }}
-                </div> -->
-
+                <i class="pi pi-calendar"></i>
                 <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
                     :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
-                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
+                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : '--:--'" />
 
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
                 <div class="inline-block">
-                    <div class="task-status-2">
-                        <!-- <pre>{{slotProps.node.data}}</pre> -->
+                    <div class="task-status-2 flex">
+                         <i class="pi pi-flag pt-2"></i>
                         <Dropdown class="mr-1 flex justify-content-center align-items-center"
                             @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
                             v-model="slotProps.node.data.priority" :options="onChangePriorities"
@@ -978,7 +919,7 @@ const ganttChartOptions = ref({
                                         class="pt-1">{{
                                             slotProps.value.name }}
                                     </div>
-                                    <div v-else class="pt-1">Set </div>
+                                    <div v-else class="pt-1"> ----- </div>
                                 </div>
                                 <span v-else>
                                     {{ slotProps.placeholder }}
@@ -1331,7 +1272,15 @@ const ganttChartOptions = ref({
 .task-status-2 .p-dropdown .p-inputtext {
     padding: 0.25rem 0.5rem !important;
 }
-
+.task-status-2 .p-dropdown {
+    background: transparent;
+    border: none;
+    box-shadow: 0 0 #ffffff, 0 0 #ffffff, 0 1px 2px 0 #ffffff;
+}
+.task-status-2 .p-dropdown:focus {
+    background: transparent;
+    border: none;
+}
 .task-status-2 .status-bg {
     position: absolute;
     top: -1px;
@@ -1344,6 +1293,12 @@ const ganttChartOptions = ref({
 
 .task-status-2 .p-dropdown-label {
     margin-top: -4px;
+}
+.task-status-2 .p-focus {
+    outline: none;
+    outline-offset: -1px;
+    box-shadow: none;
+    border-color:none;
 }
 
 /* Kanban */
@@ -1811,6 +1766,8 @@ textarea {
 .inline-calendar {
     @media (min-width: 1440px) {
         max-width: 4.2vw !important;
+        border: none;
+         font-weight: 400;
     }
 
     cursor: pointer !important;
@@ -1818,19 +1775,26 @@ textarea {
     .p-inputtext {
         padding: 0.25rem 0.5rem !important;
         cursor: pointer !important;
-        text-align: center !important;
         caret-color: transparent !important;
-
+        border: 1px solid #fff;
+         box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
+         font-weight: 400;
     }
+
 }
 
 
 .inline-task-input {
-    padding: 0.35rem 0.75rem !important;
+    padding: 0.35rem 0rem !important;
     width: 98.6%;
     position: absolute;
     left: 23px;
     top: -6px;
+    border: transparent;
+    box-shadow: none;
+}
+.p-inputtext.inline-task-input:enabled:focus {
+    outline: none;
 }
 
 .status-truncate {
