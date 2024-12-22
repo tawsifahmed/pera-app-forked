@@ -7,7 +7,7 @@ import accessPermission from '~/composables/usePermission';
 import Editor from 'primevue/editor';
 import Calendar from 'primevue/calendar';
 import { onMounted } from 'vue';
-
+import Inplace from 'primevue/inplace';
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -536,12 +536,7 @@ const handleShareTaskId = () => {
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
-            <h5 v-tooltip.top="{
-                value: `${taskDetails.name}`,
-                pt: {
-                    width: '200px'
-                }
-            }" class="m-0 detail-task-name cursor-pointer">
+            <h5 class="m-0 detail-task-name cursor-pointer">
                 {{ taskDetails.name }}
             </h5>
             <div class="flex gap-1">
@@ -563,19 +558,6 @@ const handleShareTaskId = () => {
                             <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
                                 <div class="w-full lg:w-fit">
                                     <div
-                                        class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
-                                            <span class="pi pi-user"></span>
-                                            <p>Assignee:</p>
-                                        </div>
-                                        <FloatLabel style="width: 164.94px" class="input-fields">
-                                            <MultiSelect display="chip" v-model="assignees" filter resetFilterOnHide :options="usersLists"
-                                                optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2"
-                                                class="w-full" />
-                                        </FloatLabel>
-                                    </div>
-                                    <div
                                         class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start gap-2 align-items-center task-detail-property">
@@ -583,9 +565,19 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate"
+                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate"
                                                 placeholder="Set Due Date" showTime hourFormat="12"
                                                 @date-select="handleDateChange($event)" />
+                                        </FloatLabel>
+                                    </div>
+                                    <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3 mb-3">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-tags"></span>
+                                            <p>Tags:</p>
+                                        </div>
+                                        <FloatLabel class="input-fields" style="width:168px">
+                                            <MultiSelect display="chip" v-model="tags" filter resetFilterOnHide :options="tagsLists"
+                                                optionLabel="name" placeholder="Select Tags" class="w-full" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -602,7 +594,7 @@ const handleShareTaskId = () => {
                                             style="width: 146.41px" />
                                     </div>
                                     <div
-                                        class="flex mt-2 justify-content-start gap-6 align-items-center task-detail-wrapper">
+                                        class="flex mt-4 mb-3 justify-content-start gap-6 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
@@ -653,12 +645,6 @@ const handleShareTaskId = () => {
                                             </ConfirmPopup>
                                             <Button :loading="timeLoading" class="clock-btn" v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"  @click="handleClickClock" :icon="taskDetails?.is_timer_start == 'true' ? 'pi pi-stop' : 'pi pi-play'" :severity="taskDetails?.is_timer_start == 'true' ? ' stop-color' : ''" rounded aria-label="Filter" />
 
-                                            <!-- <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
-                                                :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`"
-                                                @click="handleClickClock">
-                                                <i
-                                                    :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
-                                            </div> -->
                                             <div class="text-sm absolute" @click="requireConfirmation($event)">
                                                 {{ taskDetails?.is_timer_start == 'true' ? timeTrack :
                                                 secondsToHHMMSS(taskDetails?.total_duration) }}
@@ -671,18 +657,19 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3"
-                                style="width: 100%">
-                                <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property"
-                                    style="width: 10%">
-                                    <span class="pi pi-tags"></span>
-                                    <p>Tags:</p>
+                             <div class="flex justify-content-between gap-2">
+                                <div
+                                    class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
+                                    <span class="pi pi-user"></span>
+                                    <p>Assignee:</p>
                                 </div>
-                                <FloatLabel style="width: 90%" class="input-fields">
-                                    <MultiSelect display="chip" v-model="tags" filter resetFilterOnHide :options="tagsLists"
-                                        optionLabel="name" placeholder="Select Tags" class="w-full" />
+                                <FloatLabel style="width:100%" class="input-fields">
+                                    <MultiSelect display="chip" v-model="assignees" filter resetFilterOnHide :options="usersLists"
+                                        optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3"
+                                        class="w-full" />
                                 </FloatLabel>
-                            </div>
+                             </div>
+                            
                             
 
                             <!-- {{manualTime}} -->
@@ -1040,7 +1027,7 @@ const handleShareTaskId = () => {
 
 .comment-wrapper {
     overflow-y: auto;
-    height: 78vh;
+    height: 76vh;
     padding: 5px !important;
     background-color: #f7fafc;
 }
@@ -1088,7 +1075,7 @@ const handleShareTaskId = () => {
 
 .task-wrapper {
     overflow: hidden;
-    height: 78vh;
+    height: 76vh;
     padding: 5px !important;
 }
 
@@ -1285,8 +1272,8 @@ input[type='file']::file-selector-button:hover {
 }
 
 .clock-btn {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     position: absolute;
     right: 7px;
     display: flex;
@@ -1323,6 +1310,7 @@ input[type='file']::file-selector-button:hover {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+    max-width: 85%;
 }
 
 .text-danger {

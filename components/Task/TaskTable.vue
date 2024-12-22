@@ -87,8 +87,6 @@ const inputLoading = ref(false);
 const handleInlineNameEdit = (node) => {
     inlineTaskNameInput.value = node.data.name;
     const inputT = document.getElementById(`inputTaskName${node.key}`);
-    console.log('inputTFunc', inputT);
-
     editClikedRowKey.value = node.key;
     checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
         acc[key] = false;
@@ -1093,7 +1091,7 @@ const ganttChartOptions = ref({
 
     <!-- gantt chart -->
     <div v-if="viewMode === 'gantt'">
-            <vue-apex-charts class="mt-2" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
+            <vue-apex-charts class="mt-2" style="border: 1px solid #ededed;padding-top: 10px;border-radius: 5px;" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
     </div>
 </template>
 
@@ -1180,7 +1178,7 @@ const ganttChartOptions = ref({
 
 .filter-wrapper {
     display: flex;
-    flex-wrap: wrap;
+    // flex-wrap: wrap;
     align-items: center;
     justify-content: start;
     gap: 10px;
@@ -1427,16 +1425,26 @@ textarea {
     box-shadow: 2px 3px #e2e2e2;
     border: none;
 }
-
+@media only screen and (max-width: 1380px) {
+    .filter-wrapper{
+        flex-wrap: wrap;
+    }
+}
 @media only screen and (max-width: 1250px) {
     .boardContainer {
         max-width: 1025px;
+    }
+     .filter-wrapper{
+        flex-wrap: wrap;
     }
 }
 
 @media only screen and (max-width: 1025px) {
     .boardContainer {
         max-width: 600px;
+    }
+    .filter-wrapper{
+        flex-wrap: wrap;
     }
 }
 

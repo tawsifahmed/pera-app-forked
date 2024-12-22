@@ -70,10 +70,8 @@ watch(
 );
 
 const itemClick = (event, item) => {
-    console.log('clicked item', item);
     if (item.disabled) {
         event.preventDefault();
-        console.log('clicked ids');
         return;
     }
 
@@ -93,7 +91,6 @@ const itemClick = (event, item) => {
 };
 
 const itemClickSubMenu = (event, item, index) => {
-    console.log('clicked itemPPP', index);
     const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
     console.log(foundItemKey);
     setActiveMenuItem(foundItemKey);
@@ -102,7 +99,6 @@ const itemClickSubMenu = (event, item, index) => {
 
 const clickSpaceMenu = (event) => {
     if (event[0].items[0].label == 'Manage Space') {
-        console.log('company_id', company_id.value);
         return navigateTo(`/companies/${company_id.value}`);
     }
 };
