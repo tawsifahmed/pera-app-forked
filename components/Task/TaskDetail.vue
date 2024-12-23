@@ -275,18 +275,14 @@ const handleTaskDetailSubmit = async () => {
         sendEditDate = selectedDate.toISOString();
     }
 
-    console.log('checkDate', checkDate.value);
     const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-    console.log('formattedDueDate', formattedDueDate);
     const taskDetailData = {
         id: taskDetails.value?.id,
         // name: taskDetails.value?.name,
         ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
         project_id: projID,
         ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
-        // assignees: assignees.value.map((obj) => obj.id),
         ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
-        // tags: tags.value.map((obj) => obj.id)
         ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {}),
     };
 

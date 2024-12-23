@@ -90,7 +90,7 @@ watch(description, (newValue) => {
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
     <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem">
-        <Column style="width: 2%" field="id" header="id"></Column>
+        <Column style="width: 2%" field="id" header="Serial"></Column>
         <Column style="width: 10%" field="meeting_date" header="Date"></Column>
         <Column style="width: 10%" field="space_id" header="Space">
             <template #body="slotProps">
