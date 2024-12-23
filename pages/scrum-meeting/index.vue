@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import Editor from 'primevue/editor';
 import { useActiveCompanyStore } from '~/store/workCompany';
 const toast = useToast();
 const { menu } = storeToRefs(useActiveCompanyStore());
@@ -12,6 +13,7 @@ const employee = ref('');
 const selectedSpace = ref('');
 const description = ref('');
 const isSubmitting = ref(false);
+const isLoading = ref(true);
 // New Scrum Submission
 const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload
@@ -35,6 +37,7 @@ const handleSubmit = async (e) => {
         createModal.value = false; // Close modal on success
         // Optionally, refresh data or notify the user
         toast.add({ severity: 'success', summary: 'Meeting Minutes', detail: 'Created successfully!', group: 'br', life: 3000 });
+        fetchScrum();
     } catch (error) {
         console.error('Submission failed:', error);
         toast.add({ severity: 'error', summary: 'Meeting Minutes', detail: 'Failed to create Meeting Minutes', group: 'br', life: 3000 });
@@ -45,6 +48,7 @@ const handleSubmit = async (e) => {
 
 // Fetch Scrum
 const fetchScrum = async () => {
+    isLoading.value = true;
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('scrumData', () =>
         $fetch(`${url.public.apiUrl}/scrum-meeting/list`, {
@@ -56,6 +60,7 @@ const fetchScrum = async () => {
     if (data.value?.data?.length > 0) {
         scrumData.value = data.value?.data;
     }
+    return (isLoading.value = false);
 };
 
 const init = async () => {
@@ -68,7 +73,7 @@ const init = async () => {
         })
     );
     if (data.value?.data?.length > 0) {
-        employees.value = data.value?.data;
+        employees.value = data.value?.data.map((e) => ({ name: e.name, id: e.id }));
     }
 };
 onMounted(() => {
@@ -85,10 +90,10 @@ onMounted(() => {
             <h3>Meeting Minutes</h3>
             <Button @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
         </header>
-        <ScrumTable :scrumData="scrumData" />
+        <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" />
     </div>
 
-    <Dialog v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '25vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleSubmit" class="form" action="">
             <div class="flex-auto">
                 <label for="space" class="font-bold block mb-2">Space: </label>
@@ -96,7 +101,25 @@ onMounted(() => {
             </div>
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>
-                <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." />
+                <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
+                <Editor v-model="description" editorStyle="height: 200px">
+                    <template v-slot:toolbar>
+                        <span class="ql-formats flex justify-content-end mr-0">
+                            <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                            <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                            <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                            <button v-tooltip.bottom="'Strikethrough'" class="ql-strike"></button>
+                            <span class="ql-formats">
+                                <select class="ql-color"></select>
+                                <select class="ql-background"></select>
+                            </span>
+
+                            <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
+                            <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                            <button class="ql-link" type="button" data-pc-section="link"></button>
+                        </span>
+                    </template>
+                </Editor>
             </div>
             <div class="flex-auto">
                 <label for="members" class="font-bold block mb-2">Members: </label>
