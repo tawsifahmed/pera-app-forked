@@ -337,6 +337,9 @@ quaterYear.value = date.getFullYear();
                     </TabPanel>
                 </TabView>
             </TabPanel>
+            <TabPanel v-if="readSection" header="Daily Report">
+                <KpiDailyReport />
+            </TabPanel>
             <TabPanel v-if="readSection" header="Sections">
                 <KpiSection />
             </TabPanel>

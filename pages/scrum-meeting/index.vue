@@ -21,7 +21,7 @@ const handleSubmit = async (e) => {
     try {
         const token = useCookie('token');
         const payload = new FormData();
-        payload.append('space_id', selectedSpace.value.id);
+        // payload.append('space_id', selectedSpace.value.id);
         payload.append('description', description.value);
         employee.value.forEach((e) => payload.append('user_ids[]', e.id));
 
@@ -95,10 +95,10 @@ onMounted(() => {
 
     <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleSubmit" class="form" action="">
-            <div class="flex-auto">
+            <!-- <div class="flex-auto">
                 <label for="space" class="font-bold block mb-2">Space: </label>
                 <Dropdown v-model="selectedSpace" id="space" :options="menu" optionLabel="name" placeholder="Select Space" class="w-full" />
-            </div>
+            </div> -->
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>
                 <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->

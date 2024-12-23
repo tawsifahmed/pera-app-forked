@@ -481,7 +481,7 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getChartData();
             }
         },
-        async editProject({ id, name, description, space_id, statuses }) {
+        async editProject({ id, name, description, space_id, statuses, git_project_id }) {
             console.log('statuses Pinia', statuses);
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
@@ -494,7 +494,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     space_id: space_id,
-                    statuses: statuses
+                    statuses: statuses,
+                    git_project_id: git_project_id
                 }
             });
 

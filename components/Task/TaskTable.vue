@@ -34,6 +34,62 @@ const viewMode = ref('list');
 
 const handleViews = (view) => {
     viewMode.value = view;
+
+    if (view === 'git') {
+        gitCommitinit();
+    }       
+};
+
+const gitBranchesList = ref([]);
+
+const gitBranchinit = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('branchList', () =>
+        $fetch(`${url.public.apiUrl}/gitlab/${id}/branch`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.branch_list.length > 0) {
+        // gitBranchesList.value = [{ label: '', name: 'All' }, ...this.statuslist];
+        let branchData = data.value.branch_list?.map((item) => ({ label: item.name, name: item.name }))
+        gitBranchesList.value = [{ label: '', name: 'All' }, ...branchData];
+        console.log('gitBranchesList', gitBranchesList.value);
+    }else{
+        gitBranchesList.value = [{ label: 'No Branches', name: 'No Branches' }];
+    }
+};
+
+
+gitBranchinit();
+
+const selectedGitBranch = ref({label: '', name: 'All'});
+
+const gitCommits = ref([]);
+const gitCommitinit = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('commitsList', () =>
+        $fetch(`${url.public.apiUrl}/gitlab/${id}/commit?branch=${selectedGitBranch.value ? selectedGitBranch.value?.label : ''}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.code === 200) {
+        gitCommits.value = data.value.commit_list
+        console.log('gitCommits', gitCommits.value);
+    }else{
+        gitCommits.value = [];
+    }
+};
+
+if(viewMode.value === 'git') {
+    gitCommitinit();
+}
+
+const filterBranches = () => {
+    gitCommitinit();
 };
 
 const priorities = ref([
@@ -644,13 +700,12 @@ const ganttChartOptions = ref({
                         severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
-
+                <Button icon="pi pi-github" v-tooltip.right="{ value: `Git Commits` }"  @click="handleViews('git')" class="px-4"  :class="{ 'bg-indigo-400 text-white': viewMode === 'git' }"
+                severity="secondary" />
                 <!-- task report download -->
+                 
                 <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)"
-                    v-tooltip.right="{ value: `Download Tasks` }" :loading="loading"
-                    :style="`${loading === true ? 'backGround: red' : ''}`" class="excel-export-btn">
-                    <img src="/assets/icons/excel-export-icon.png" />
-                </Button>
+                    v-tooltip.right="{ value: `Download Tasks` }" :loading="loading" severity="secondary" class="px-4" icon="pi pi-file-excel" />
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
             </div>
@@ -700,9 +755,9 @@ const ganttChartOptions = ref({
                   <div>
                     <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
                       <div class="title-group">
-                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`status`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
                         <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
-                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                        <!-- <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div> -->
                       </div>
                       <div>
                         <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
@@ -1039,6 +1094,54 @@ const ganttChartOptions = ref({
     <!-- gantt chart -->
     <div v-if="viewMode === 'gantt'">
             <vue-apex-charts class="mt-2" style="border: 1px solid #ededed;padding-top: 10px;border-radius: 5px;" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
+    </div>
+    <div v-if="viewMode === 'git'" class="card">
+        <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name"
+        placeholder="Branches" class="w-full md:w-17rem mb-2" />
+        <br>
+        <br>
+        <br>
+        <div>
+            <div class="commit-card-wrapper mb-2">
+                <!-- <div v-for="commit in gitCommits" :key="commit" class="card commit-card">
+                    <div class="flex justify-content-between">
+                        <div>
+                            <div class="flex align-items-center gap-2">
+                                <div class="pi pi-user "></div>
+                                <h6 class="m-0">{{ commit.author_name }}</h6>
+                            </div>
+                            <div>
+                                <h6 class="font-light mt-2 mb-0 commit-title"> - {{commit.title}}</h6>
+                            </div>
+                        </div>
+                    </div>        
+                </div> -->
+                    <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
+                        <template #content="slotProps">
+                            <div class="flex justify-content-between align-items-center bb">
+                                <div>
+                                    <div class="flex align-items-center gap-2">
+                                        <div class="pi pi-user "></div>
+                                        <h6 class="m-0"> {{ slotProps.item.author_name }} </h6>
+                                    </div>
+                                    <div>
+                                        <h6 class="font-light mt-2 mb-0 commit-title"> - {{slotProps.item.title}} <a :href="slotProps.item.web_url" target="_blank" class="font-medium">· {{slotProps.item.short_id}}</a> </h6>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 class="font-normal"> {{ slotProps.item.authored_date }} </h6>
+                                </div>
+                            </div>
+                            <!-- <div>
+                                <h6> {{ slotProps.item.author_name }}</h6>
+                            </div> -->
+                        </template>
+                    </Timeline>
+                    <div v-else class="w-full flex justify-content-center my-1" >
+                        <h4 > <i>No Commits Found</i>  </h4>
+                    </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -1814,5 +1917,39 @@ textarea {
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+
+
+
+.commit-card-wrapper .p-timeline-event-opposite {
+    display: none !important;
+}
+
+.commit-card{
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    padding: 10px 5px !important;
+    margin-bottom: 0px !important;
+}
+
+.commit-title{
+    max-width: 550px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.bb{
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.recenttaskstatus{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
 }
 </style>
