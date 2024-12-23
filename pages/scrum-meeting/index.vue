@@ -73,7 +73,7 @@ const init = async () => {
         })
     );
     if (data.value?.data?.length > 0) {
-        employees.value = data.value?.data;
+        employees.value = data.value?.data.map((e) => ({ name: e.name, id: e.id }));
     }
 };
 onMounted(() => {
@@ -90,7 +90,7 @@ onMounted(() => {
             <h3>Meeting Minutes</h3>
             <Button @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
         </header>
-        <ScrumTable :scrumData="scrumData" />
+        <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" />
     </div>
 
     <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
