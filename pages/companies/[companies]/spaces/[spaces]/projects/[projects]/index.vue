@@ -117,14 +117,14 @@ const handleTaskDetailView = async (task) => {
     visibleTaskDetailView.value = true;
     document.documentElement.style.cursor = 'auto';
     document.documentElement.removeChild(overlayD);
-    console.log(taskDetails?.value?.project?.name,'taskDetails')
+    console.log(taskDetails?.value?.project?.name, 'taskDetails');
 };
 
 watch(visibleTaskDetailView, (value) => {
-    if(value === true) {
+    if (value === true) {
         return 0;
-    }else{
-        localStorage.removeItem('taskDetailID')
+    } else {
+        localStorage.removeItem('taskDetailID');
     }
 });
 
@@ -148,11 +148,14 @@ const updateTaskTable = () => {
 };
 
 // getSingleProject(projects);
-watch(() => useRoute().query.task_key, (newTaskKey) => {
-    if (newTaskKey) {
-        handleTaskDetailView({ key: newTaskKey });
+watch(
+    () => useRoute().query.task_key,
+    (newTaskKey) => {
+        if (newTaskKey) {
+            handleTaskDetailView({ key: newTaskKey });
+        }
     }
-});
+);
 
 if (task_key) {
     handleTaskDetailView({ key: task_key });
@@ -181,16 +184,7 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <TaskTable
-            v-if="readTask"
-            
-            :kanbanTasks="kanbanTasks"
-            :tasks="tasks"
-            @openCreateSpace="openCreateSpace"
-            @handleTaskEdit="handleTaskEdit($event)"
-            @handleTaskDetailView="handleTaskDetailView($event)"
-            @confirmDeleteTask="confirmDeleteTask($event)"
-        >
+        <TaskTable v-if="readTask" :kanbanTasks="kanbanTasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)">
         </TaskTable>
 
         <!-- Create Task Modal -->
@@ -207,8 +201,10 @@ watchEffect(() => {
         <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <template #header>
                 <div class="inline-flex align-items-center justify-content-center gap-2">
-                    <Avatar :label="taskDetails?.project?.space_name?.charAt(0)" class=" capitalize p-0" size="small" :style="{ 'background-color': ['#ededed'], color: ['#000'],width:['1.4rem'],height:['1.4rem'],text:['12px'] }" />
-                    <span class="white-space-nowrap">{{taskDetails?.project?.space_name}} / <strong>{{taskDetails?.project?.name}}</strong></span>
+                    <Avatar :label="taskDetails?.project?.space_name?.charAt(0)" class="capitalize p-0" size="small" :style="{ 'background-color': ['#ededed'], color: ['#000'], width: ['1.4rem'], height: ['1.4rem'], text: ['12px'] }" />
+                    <span class="white-space-nowrap"
+                        >{{ taskDetails?.project?.space_name }} / <strong>{{ taskDetails?.project?.name }}</strong></span
+                    >
                 </div>
             </template>
             <TaskDetail
