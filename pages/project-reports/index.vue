@@ -40,14 +40,14 @@ const handleGenerate = async () => {
     loading.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    const formData = new FormData();
+    // const formData = new FormData();
     // formData.append('user_id[]', userIds);
-
+    let projectIds
     // Only append project IDs if there are valid projects selected
     if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map((item) => item.id);
+        projectIds = selectedProject.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
-        formData.append('project_id', projectIds);
+        // formData.append('project_id', projectIds);
         // if (projectIds.length > 0) {
         //     projectIds.forEach((id) => {
         //         formData.append('project_id[]', id);
@@ -60,7 +60,7 @@ const handleGenerate = async () => {
         formData.append('end_date', formattedEndDate);
     }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/projects/report-view`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/projects/report-view?project_ids=${projectIds ? projectIds : ''}?start_date=${startDate.value ? formattedStartDate : ''}?end_date=${endDate.value ? formattedEndDate : ''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
