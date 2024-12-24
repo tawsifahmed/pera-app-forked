@@ -1725,6 +1725,7 @@ textarea {
 .table-btn {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
+    border-right: 0px !important;
     min-width: 91.22px;
 }
 
