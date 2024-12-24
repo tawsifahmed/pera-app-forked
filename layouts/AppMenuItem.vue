@@ -152,7 +152,7 @@ const toggle = (event) => {
         >
             <div class="flex flex-row align-items-center">
                 <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important;"></i>
-                <span v-tooltip.right="{ value: `${item.label.length > 25 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 25 ? item.label.slice(0, 25) + '...' : item.label }}</span>
+                <span v-tooltip.right="{ value: `${item.label.length > 22 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 22 ? item.label.slice(0, 22) + '...' : item.label }}</span>
             </div>
             <!-- <span
                 v-if="item.label == 'Employees'"
