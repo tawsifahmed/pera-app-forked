@@ -750,7 +750,7 @@ console.log(calendarData);
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
                     <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
-                    <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" />
+                    <!-- <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" /> -->
                     <Button icon="pi pi-calendar" label="Calendar" @click="handleViews('calendar')" class="calendar-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'calendar' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
@@ -1177,9 +1177,9 @@ console.log(calendarData);
     </div>
 
     <!-- gantt chart -->
-    <div v-if="viewMode === 'gantt'">
+    <!-- <div v-if="viewMode === 'gantt'">
         <vue-apex-charts class="mt-2" style="border: 1px solid #ededed; padding-top: 10px; border-radius: 5px" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
-    </div>
+    </div> -->
     <div v-if="viewMode === 'calendar'" class="">
         <!-- <pre>{{ calendarTasks }}</pre> -->
         <VueCal :events="calendarTasks" :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px" />
