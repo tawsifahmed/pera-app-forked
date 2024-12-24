@@ -728,17 +728,9 @@ console.log(calendarData);
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{modStatusList}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Status" class="w-full md:w-17rem mb-2" />
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
-            resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3"
-            class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
-            placeholder="Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
-            placeholder="Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
             <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate" placeholder="Start Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
@@ -787,85 +779,36 @@ console.log(calendarData);
             <div class="col-12 lg:col-6 xl:col-3">
                 <div class="card mb-0">
                     <div to="/tags" class="flex justify-content-between">
-                        <div>
-                            <h4 class="block text-500 font-bold mb-3">Total Tasks</h4>
-                            <div class="text-900 font-bold text-xl">{{ totalTaskCount }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
-                <div class="card mb-0">
-                    <div to="/tags" class="flex justify-content-between">
-                        <div>
-                            <h4 :style="`color : ${statsC.statusColor};`" class="block font-bold mb-3">{{ statsC.statusName }}</h4>
-                            <div class="text-900 font-medium text-xl">{{ statsC.taskCount }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="card h-full">
-                    <div class="flex gap-2 align-items-center flex-wrap">
-                        <h5 class="mb-0">Recent Tasks</h5>
-                    </div>
-
-                    <div class="task-container">
-                        <div>
-                            <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
-                                <div class="title-group">
-                                    <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
-                                    <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
-                                    <!-- <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div> -->
-                                </div>
-                                <div>
-                                    <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-full flex justify-content-center">
-                            <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto" :tableProps="{ style: { minWidth: '1024px' } }">
-       <div class="grid mt-2">
-            <div class="col-12 lg:col-6 xl:col-3">
-                <div class="card mb-0">
-                    <div  to="/tags" class="flex justify-content-between">
                         <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
                         <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
                     </div>
                 </div>
             </div>
-        
+
             <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
                 <div class="card mb-0" :style="`background : ${statsC.statusColor};`">
-                    <div  to="/tags" class="flex justify-content-between">
-                        <h4 class="mb-0 text-xl font-semibold tracking-tight text-white">{{statsC.statusName}}</h4>
+                    <div to="/tags" class="flex justify-content-between">
+                        <h4 class="mb-0 text-xl font-semibold tracking-tight text-white">{{ statsC.statusName }}</h4>
                         <div class="font-large text-2xl text-white">{{ statsC.taskCount }}</div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 " >
+            <div class="col-12">
                 <Card class="h-full">
                     <template #title>Recent Tasks</template>
-                      <template #content>
+                    <template #content>
                         <div class="task-container">
                             <div>
                                 <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
-                                <div class="title-group">
-                                    <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
-                                    <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
-                                </div>
-                                <div>
-                                   <i> <p style="font-size: 12px"><strong>Due Date:</strong> {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : '-- Not Set --' }}</p></i>
-                                </div>
+                                    <div class="title-group">
+                                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                                        <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                                    </div>
+                                    <div>
+                                        <i>
+                                            <p style="font-size: 12px"><strong>Due Date:</strong> {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : '-- Not Set --' }}</p></i
+                                        >
+                                    </div>
                                 </div>
                             </div>
                             <div class="w-full flex justify-content-center">
@@ -875,13 +818,11 @@ console.log(calendarData);
                     </template>
                 </Card>
             </div>
-       </div>
+        </div>
     </div>
 
     <!-- Tree table -->
-    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both"
-        :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto;"
-        :tableProps="{ style: { minWidth: '1024px' } }">
+    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto" :tableProps="{ style: { minWidth: '1024px' } }">
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
@@ -1243,60 +1184,12 @@ console.log(calendarData);
         <!-- <pre>{{ calendarTasks }}</pre> -->
         <VueCal :events="calendarTasks" :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px" />
     </div>
-    <div v-if="viewMode === 'git'" class="card">
-        <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name" placeholder="Branches" class="w-full md:w-17rem mb-2" />
-        <br />
-        <br />
-        <br />
-        <div>
-            <div class="commit-card-wrapper mb-2">
-                <!-- <div v-for="commit in gitCommits" :key="commit" class="card commit-card">
-                    <div class="flex justify-content-between">
-                        <div>
-                            <div class="flex align-items-center gap-2">
-                                <div class="pi pi-user "></div>
-                                <h6 class="m-0">{{ commit.author_name }}</h6>
-                            </div>
-                            <div>
-                                <h6 class="font-light mt-2 mb-0 commit-title"> - {{commit.title}}</h6>
-                            </div>
-                        </div>
-                    </div>        
-                </div> -->
-                <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
-                    <template #content="slotProps">
-                        <div class="flex justify-content-between align-items-center bb">
-                            <div>
-                                <div class="flex align-items-center gap-2">
-                                    <div class="pi pi-user"></div>
-                                    <h6 class="m-0">{{ slotProps.item.author_name }}</h6>
-                                </div>
-                                <div>
-                                    <h6 class="font-light mt-2 mb-0 commit-title">
-                                        - {{ slotProps.item.title }} <a :href="slotProps.item.web_url" target="_blank" class="font-medium">· {{ slotProps.item.short_id }}</a>
-                                    </h6>
-                                </div>
-                            </div>
-                            <div>
-                                <h6 class="font-normal">{{ slotProps.item.authored_date }}</h6>
-                            </div>
-                        </div>
-                        <!-- <div>
-                                <h6> {{ slotProps.item.author_name }}</h6>
-                            </div> -->
-                    </template>
-                </Timeline>
-                <div v-else class="w-full flex justify-content-center my-1">
-                    <h4><i>No Commits Found</i></h4>
-                </div>
-            </div>
-        </div>
 
     <div v-if="viewMode === 'git'">
         <Card>
             <template #title>Commit List</template>
             <template #content>
-                 <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name" placeholder="Branches" class="w-full md:w-17rem mb-3 mt-2" />
+                <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name" placeholder="Branches" class="w-full md:w-17rem mb-3 mt-2" />
                 <div>
                     <div class="commit-card-wrapper mb-2">
                         <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
@@ -1304,28 +1197,31 @@ console.log(calendarData);
                                 <div class="flex justify-content-between align-items-center bb">
                                     <div>
                                         <div class="flex align-items-center gap-2">
-                                            <div class="pi pi-user "></div>
-                                            <h6 class="m-0"> {{ slotProps.item.author_name }} </h6>
+                                            <div class="pi pi-user"></div>
+                                            <h6 class="m-0">{{ slotProps.item.author_name }}</h6>
                                         </div>
                                         <div>
-                                            <h6 class="font-light mt-2 mb-0 commit-title"> - {{slotProps.item.title}}  </h6>
+                                            <h6 class="font-light mt-2 mb-0 commit-title">- {{ slotProps.item.title }}</h6>
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="font-normal mb-0 text-mute"> <small>{{ slotProps.item.authored_date }} </small></p>
-                                        <a :href="slotProps.item.web_url" target="_blank" class="font-small text-end"> <small>{{slotProps.item.short_id}}</small></a>
+                                        <p class="font-normal mb-0 text-mute">
+                                            <small>{{ slotProps.item.authored_date }} </small>
+                                        </p>
+                                        <a :href="slotProps.item.web_url" target="_blank" class="font-small text-end">
+                                            <small>{{ slotProps.item.short_id }}</small></a
+                                        >
                                     </div>
                                 </div>
                             </template>
                         </Timeline>
-                        <div v-else class="w-full flex justify-content-center my-1" >
-                            <h4 > <i>No Commits Found</i>  </h4>
+                        <div v-else class="w-full flex justify-content-center my-1">
+                            <h4><i>No Commits Found</i></h4>
                         </div>
                     </div>
                 </div>
             </template>
         </Card>
-       
     </div>
 </template>
 
