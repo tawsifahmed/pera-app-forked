@@ -29,7 +29,7 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const viewMode = ref('calendar');
+const viewMode = ref('list');
 
 const handleViews = (view) => {
     viewMode.value = view;
