@@ -31,6 +31,8 @@ definePageMeta({
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
+
+
 const lineData = ref({
     labels: chartProjectInfo,
     datasets: [
@@ -53,27 +55,6 @@ const lineData = ref({
     ]
 });
 
-const pieData = ref({
-    labels: ['In Progress', 'Completed', 'Unassigned'],
-    datasets: [
-        {
-            data: [inProgressTasksChartData, completedTasksChartData, unAssignedTasksChartData],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }
-    ]
-})
-
-const pieOptions = ref({
-    plugins: {
-            legend: {
-                labels: {
-                    usePointStyle: true,
-                    color: '#000'  
-                }
-            }
-        }
-})
 
 onMounted(() => {
     pieChartData.value = setPieChartData();
@@ -119,23 +100,6 @@ const setPieChartOptions = () => {
 
 const taskList = ref([]);
 
-// const lineOptions = ref({
-//     scales: {
-//         x: {
-//             title: {
-//                 display: true,
-//                 text: 'X Axis Title'
-//             }
-//         },
-//         y: {
-//             title: {
-//                 display: true,
-//                 text: 'Y Axis Title'
-//             }
-//         }
-//     }
-// });
-
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
     { label: 'Remove', icon: 'pi pi-fw pi-minus' }
@@ -160,8 +124,6 @@ const checkUser = () => {
     }
 };
 
-const nchartOptions = ref(null);
-
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
@@ -183,41 +145,6 @@ const applyLightTheme = () => {
                 grid: {
                     color: '#ebedef'
                 },
-                title: {
-                    display: true,
-                    text: 'Projects'
-                }
-            },
-            y: {
-                ticks: {
-                    color: '#495057'
-                },
-                grid: {
-                    color: '#ebedef'
-                }
-                // title: {
-                //     display: true,
-                //     text: 'Numbers  of  Tasks'
-                // }
-            }
-        }
-    };
-    nchartOptions.value = {
-        plugins: {
-            legend: {
-                labels: {
-                    color: '#495057'
-                }
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: '#495057'
-                },
-                grid: {
-                    color: '#ebedef'
-                }
                 // title: {
                 //     display: true,
                 //     text: 'Projects'
@@ -728,7 +655,7 @@ watch(
             </div>
             
         </div>
-        <div class="col-12">
+        <div class="col-12 h-full">
             <div class="card dashChart">
                 <div class="flex justify-content-between align-items-center ">
                     <div class="flex align-items-center gap-3">
@@ -742,78 +669,17 @@ watch(
                         <Button :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
                     </div>
                 </div>
-                <Chart type="bar" :data="lineData" :options="lineOptions" />
-            </div>
-
-            <!-- <div class="card">
-                <div class="flex align-items-center justify-content-between mb-4">
-                    <h5>Notifications</h5>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
-                        <Menu ref="menu1" :popup="true" :model="items"></Menu>
+                <div class="chartWrapper">
+                    <div class="chartAreaWrapper">
+                      <!-- <canvas id="chart" height="400" width="15000"></canvas> -->
+                      <Chart type="bar" :data="lineData" :options="lineOptions" />
                     </div>
-                </div>
-
-                <span class="block text-600 font-medium mb-3">TODAY</span>
-                <ul class="p-0 mx-0 mt-0 mb-4 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Richard Jones
-                            <span class="text-700">has purchased a blue t-shirt for <span class="text-blue-500">79$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-download text-xl text-orange-500"></i>
-                        </div>
-                        <span class="text-700 line-height-3">Your request for withdrawal of <span class="text-blue-500 font-medium">2500$</span> has been initiated.</span>
-                    </li>
-                </ul>
-
-                <span class="block text-600 font-medium mb-3">YESTERDAY</span>
-                <ul class="p-0 m-0 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Keyser Wick
-                            <span class="text-700">has purchased a black jacket for <span class="text-blue-500">59$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-question text-xl text-pink-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Jane Davis
-                            <span class="text-700">has posted a new questions about your product.</span>
-                        </span>
-                    </li>
-                </ul>
-            </div> -->
-
-            <!-- <div
-                class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3"
-                style="border-radius: 1rem; background: linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1c80cf 47.88%, #ffffff 100.01%)"
-            >
-                <div>
-                    <div class="text-blue-100 font-medium text-xl mt-2 mb-3">TAKE THE NEXT STEP</div>
-                    <div class="text-white font-medium text-5xl">Try PrimeBlocks</div>
-                </div>
-                <div class="mt-4 mr-auto md:mt-0 md:mr-0">
-                    <a href="https://www.primefaces.org/primeblocks-vue" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised"> Get Started </a>
-                </div>
-            </div> -->
-        </div>
-        <!-- <div class="col-12">
-            <div class="card">
-                <Chart type="bar" :data="nchartData" :options="nchartOptions" class="h-30rem"  />
+                  </div>
+                <!-- <div class="chart-container">
+                  </div> -->
             </div>
-        </div> -->
+        </div>
+   
         <div v-if="visibleCreateCompany">
             <CreateCompany />
         </div>
@@ -897,4 +763,6 @@ watch(
 .dashChart button {
     cursor: default !important;
 }
+
+
 </style>
