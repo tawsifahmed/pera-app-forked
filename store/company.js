@@ -41,6 +41,7 @@ export const useCompanyStore = defineStore('workStation', {
         isTaskEdited: false,
         tasks: [],
         kanbanTasks: [],
+        calendarTasks: [],
         ganttChartData: [],
         recentTaskData: [],
         tasksAttachments: [],
@@ -336,12 +337,28 @@ export const useCompanyStore = defineStore('workStation', {
             this.tasks = data.value?.tasks;
             this.statuslist = data.value?.taskStatus;
 
-            const updatedData = this.statuslist.map((val) => {
+            const kanbanData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
                 return { name: val.name, statusColor: val.color_code, status: val, content: content };
             });
 
-            this.kanbanTasks = updatedData;
+            this.kanbanTasks = kanbanData;
+            const calendarData = this.tasks.map((val) => {
+                console.log('company task 1:', val);
+                const formatDate = (isoDate) => {
+                    const date = new Date(isoDate);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    return `${year}-${month}-${day} ${hours}:${minutes}`;
+                };
+                return { title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), style: { backgroundColor: 'red' } };
+            });
+            this.calendarTasks = calendarData;
+
             this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
             function formatTaskData(tasks) {
                 let formattedData = [];
