@@ -66,7 +66,11 @@ export const useCompanyStore = defineStore('workStation', {
         statuslist: [],
         modStatusList: [],
         chartProjectInfo: null,
-        chartTaskInfo: null,
+        totalDashboardProjects: null,
+        completedTasksChartData: null,
+        inProgressTasksChartData: null,
+        unAssignedTasksChartData: null,
+        inProgressCnt: null,
         chartClosedTaskInfo: null,
         rolesLists: null
     }),
@@ -719,21 +723,36 @@ export const useCompanyStore = defineStore('workStation', {
         async getChartData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('chartData', () =>
-                $fetch(`https://pbe.singularitybd.net/api/v1/chart-data`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/dashboard/task-status`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
                 })
             );
-            console.log('chartData', data.value);
+            // console.log('chartData', data.value);
             if (data?.value?.code === 200) {
-                this.chartProjectInfo = data?.value?.data?.projects;
-                console.log('chartProjectInfo', this.chartProjectInfo);
-                this.chartTaskInfo = data?.value?.data?.total_task_count;
-                this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
+                // this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => project.project_name);
+
+                this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => {
+                    let projectName = project.project_name;
+                    if (projectName.length > 7) {
+                        projectName = projectName.substring(0, 7) + '...';
+                    }
+                    return projectName;
+                });
+                // console.log('chartProjectInfo', this.chartProjectInfo);
+                this.inProgressCnt = data?.value?.data?.projectCounts.map(project => project.inProgressCounts);
+                this.chartClosedTaskInfo = data?.value?.data?.projectCounts.map(project => project.completedCounts);
+                this.totalDashboardProjects = data?.value?.data?.projectCounts.length;
+                this.completedTasksChartData = data?.value?.data?.completed;
+                localStorage.setItem('completedTasksChartData', JSON.stringify(data?.value?.data?.completed));
+                this.inProgressTasksChartData = data?.value?.data?.inProgress;
+                localStorage.setItem('inProgressTasksChartData', JSON.stringify(data?.value?.data?.inProgress));
+                this.unAssignedTasksChartData = data?.value?.data?.unAssigneeCount;
+                localStorage.setItem('unAssignedTasksChartData', JSON.stringify(data?.value?.data?.unAssigneeCount));
             } else {
                 this.chartProjectInfo = [];
-                this.chartTaskInfo = [];
+                this.inProgressCnt = [];
             }
         },
         async getRoles() {

@@ -180,6 +180,34 @@ onMounted(() => {
 });
 
 initFilters();
+
+const downloadTaskSheet = () => {
+    if (usersLists.value.length > 0) {
+        const csvContent =
+            'data:text/csv;charset=utf-8,' +
+            '"Serial No.","Employee Name","Email","Phone","Address","User Type",\n' +
+            usersLists.value.map((task, index) => {
+                    const serialNo = index + 1;
+                    const employeeName = task.name;
+                    const email = task.email;
+                    const phone = task.phone;
+                    const address = task.address;
+                    const userType = task.user_type;
+
+                    return `"${serialNo}","${employeeName}","${email}","${phone}","${address}","${userType}"`;
+                })
+                .join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'tasks.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);    
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
+    }
+};
 </script>
 
 <template>
@@ -189,23 +217,18 @@ initFilters();
             <div class="d-flex mr-2">
                 <h5 class="mb-1">Employees</h5>
             </div>
+            <!-- <pre>{{usersLists}}</pre> -->
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>
                 <Button v-if="createUserP" icon="pi pi-plus" label="Create" @click="handleCreateCompanyModal" class="mr-2" severity="secondary"/>
-                <!-- <Button icon="pi pi-file-excel" label="" class="mr-2" severity="secondary" /> -->
-                <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <Button v-if="createUserP" icon="pi pi-users" @click="handleInviteUserModal" label="Invite a guest" severity="secondary" />
             </template>
 
             <template #end>
-                 <Button @click="downloadTaskSheet(tasks)"
-                    v-tooltip.left="{ value: `Download Employee List` }"
-                     class="excel-export-btn">
-                    <img src="/assets/icons/excel-export-icon.png" />
-                </Button>
-            <!-- <pre>{{selectedRoles}}</pre> -->
-                <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide :maxSelectedLabels="2" optionLabel="name" placeholder="Filter User Type" class="w-full mx-2" />
+                <Button @click="downloadTaskSheet(tasks)"
+                v-tooltip.right="{ value: `Download Tasks` }" :loading="loading" severity="secondary" class="px-4" icon="pi pi-file-excel" />
+                <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide :maxSelectedLabels="2" optionLabel="name" placeholder="Filter User Type" class="w-full mx-2 filtr" />
                 <IconField iconPosition="right" raised>
                     <InputIcon>
                         <i class="pi pi-search" />
@@ -286,5 +309,10 @@ initFilters();
     background: #e2e8f0;
     color: #334155;
     border-color: #e2e8f0;
+}
+
+.filtr{
+    max-width: 200px !important;
+    min-width: 200px !important;
 }
 </style>
