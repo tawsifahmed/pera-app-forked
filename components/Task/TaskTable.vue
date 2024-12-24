@@ -662,7 +662,6 @@ const ganttChartOptions = ref({
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{modStatusList}}</pre> -->
         <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
             resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3"
             class="w-full md:w-17rem mb-2" />
@@ -724,56 +723,50 @@ const ganttChartOptions = ref({
     <!-- project overview -->
     <div v-if="viewMode === 'overview'">
        <div class="grid mt-2">
-        <div class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between">
-                    <div>
-                        <h4 class="block text-500 font-bold mb-3">Total Tasks</h4>
-                        <div class="text-900 font-bold text-xl">{{ totalTaskCount }}</div>
+            <div class="col-12 lg:col-6 xl:col-3">
+                <div class="card mb-0">
+                    <div  to="/tags" class="flex justify-content-between">
+                        <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
+                        <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-      
-        <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
-            <div class="card mb-0">
-                <div  to="/tags" class="flex justify-content-between">
-                    <div>
-                        <h4 :style="`color : ${statsC.statusColor};`" class="block font-bold mb-3">{{statsC.statusName}}</h4>
-                        <div class="text-900 font-medium text-xl">{{ statsC.taskCount }}</div>
+        
+            <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
+                <div class="card mb-0" :style="`background : ${statsC.statusColor};`">
+                    <div  to="/tags" class="flex justify-content-between">
+                        <h4 class="mb-0 text-xl font-semibold tracking-tight text-white">{{statsC.statusName}}</h4>
+                        <div class="font-large text-2xl text-white">{{ statsC.taskCount }}</div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 " >
-            <div class="card h-full">
-                <div class="flex gap-2 align-items-center flex-wrap" >
-                  <h5 class="mb-0" >Recent Tasks</h5>
-                </div>
-          
-                <div class="task-container">
-                  <div>
-                    <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
-                      <div class="title-group">
-                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
-                        <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
-                        <!-- <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div> -->
-                      </div>
-                      <div>
-                        <p style="font-size: 12px">Due: {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : 'Not Set' }}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="w-full flex justify-content-center">
-                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                  </div>
-                </div>
-              </div>
-        </div>
-     
+            <div class="col-12 " >
+                <Card class="h-full">
+                    <template #title>Recent Tasks</template>
+                      <template #content>
+                        <div class="task-container">
+                            <div>
+                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                                <div class="title-group">
+                                    <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                                    <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                                </div>
+                                <div>
+                                   <i> <p style="font-size: 12px"><strong>Due Date:</strong> {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : '-- Not Set --' }}</p></i>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="w-full flex justify-content-center">
+                                <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
        </div>
     </div>
-    <!-- <pre>{{ tasks }}</pre> -->
+
+    <!-- Tree table -->
     <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both"
         :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto;"
         :tableProps="{ style: { minWidth: '1024px' } }">
@@ -781,7 +774,7 @@ const ganttChartOptions = ref({
             <p class=" text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '44%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative"
                     @mouseenter="handleMouseEnter(slotProps.node.key)">
@@ -847,7 +840,7 @@ const ganttChartOptions = ref({
             </template>
         </Column>
 
-        <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '14%' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
@@ -865,7 +858,7 @@ const ganttChartOptions = ref({
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '10%' }">
+        <Column field="status" header="Status" :style="{ width: '11%' }">
             <template #body="slotProps">
                 <div class="inline-block">
                     <div class="task-status-2">
@@ -896,7 +889,7 @@ const ganttChartOptions = ref({
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '11%' }">
             <template #body="slotProps">
                 <i class="pi pi-calendar"></i>
                 <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
@@ -1095,53 +1088,41 @@ const ganttChartOptions = ref({
     <div v-if="viewMode === 'gantt'">
             <vue-apex-charts class="mt-2" style="border: 1px solid #ededed;padding-top: 10px;border-radius: 5px;" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
     </div>
-    <div v-if="viewMode === 'git'" class="card">
-        <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name"
-        placeholder="Branches" class="w-full md:w-17rem mb-2" />
-        <br>
-        <br>
-        <br>
-        <div>
-            <div class="commit-card-wrapper mb-2">
-                <!-- <div v-for="commit in gitCommits" :key="commit" class="card commit-card">
-                    <div class="flex justify-content-between">
-                        <div>
-                            <div class="flex align-items-center gap-2">
-                                <div class="pi pi-user "></div>
-                                <h6 class="m-0">{{ commit.author_name }}</h6>
-                            </div>
-                            <div>
-                                <h6 class="font-light mt-2 mb-0 commit-title"> - {{commit.title}}</h6>
-                            </div>
-                        </div>
-                    </div>        
-                </div> -->
-                    <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
-                        <template #content="slotProps">
-                            <div class="flex justify-content-between align-items-center bb">
-                                <div>
-                                    <div class="flex align-items-center gap-2">
-                                        <div class="pi pi-user "></div>
-                                        <h6 class="m-0"> {{ slotProps.item.author_name }} </h6>
-                                    </div>
+
+    <div v-if="viewMode === 'git'">
+        <Card>
+            <template #title>Commit List</template>
+            <template #content>
+                 <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name" placeholder="Branches" class="w-full md:w-17rem mb-3 mt-2" />
+                <div>
+                    <div class="commit-card-wrapper mb-2">
+                        <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
+                            <template #content="slotProps">
+                                <div class="flex justify-content-between align-items-center bb">
                                     <div>
-                                        <h6 class="font-light mt-2 mb-0 commit-title"> - {{slotProps.item.title}} <a :href="slotProps.item.web_url" target="_blank" class="font-medium">· {{slotProps.item.short_id}}</a> </h6>
+                                        <div class="flex align-items-center gap-2">
+                                            <div class="pi pi-user "></div>
+                                            <h6 class="m-0"> {{ slotProps.item.author_name }} </h6>
+                                        </div>
+                                        <div>
+                                            <h6 class="font-light mt-2 mb-0 commit-title"> - {{slotProps.item.title}}  </h6>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-normal mb-0 text-mute"> <small>{{ slotProps.item.authored_date }} </small></p>
+                                        <a :href="slotProps.item.web_url" target="_blank" class="font-small text-end"> <small>{{slotProps.item.short_id}}</small></a>
                                     </div>
                                 </div>
-                                <div>
-                                    <h6 class="font-normal"> {{ slotProps.item.authored_date }} </h6>
-                                </div>
-                            </div>
-                            <!-- <div>
-                                <h6> {{ slotProps.item.author_name }}</h6>
-                            </div> -->
-                        </template>
-                    </Timeline>
-                    <div v-else class="w-full flex justify-content-center my-1" >
-                        <h4 > <i>No Commits Found</i>  </h4>
+                            </template>
+                        </Timeline>
+                        <div v-else class="w-full flex justify-content-center my-1" >
+                            <h4 > <i>No Commits Found</i>  </h4>
+                        </div>
                     </div>
-            </div>
-        </div>
+                </div>
+            </template>
+        </Card>
+       
     </div>
 </template>
 
@@ -1319,6 +1300,7 @@ const ganttChartOptions = ref({
 
 .task-status-2 .p-dropdown .p-inputtext {
     padding: 0.25rem 0.5rem !important;
+    padding-right: 4px !important;
 }
 .task-status-2 .p-dropdown {
     background: transparent;
@@ -1879,7 +1861,7 @@ textarea {
 .task-container {
     max-height: 25rem;
     overflow-y: auto;
-    padding: 10px;
+    padding: 0px 8px 0px 1px;
 }
 
 .task-card {
