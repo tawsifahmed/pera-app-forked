@@ -130,6 +130,9 @@ const formatCurrency = (value) => {
 
 const applyLightTheme = () => {
     lineOptions.value = {
+        // indexAxis: 'y',
+        // maintainAspectRatio: false,
+        // aspectRatio: 1,
         plugins: {
             legend: {
                 labels: {
@@ -644,7 +647,7 @@ watch(
         </div>
         <div class="col-12 xl:col-6">
             <div class="card h-full">
-                <h5>Pie Chart</h5>
+                <h5>Tasks Statistics</h5>
                 <div class="w-full flex justify-content-center">
 
                     <Chart  type="pie" :data="pieChartData" :options="pieChartOptions" class="w-full md:w-30rem" />
@@ -659,7 +662,7 @@ watch(
             <div class="card dashChart">
                 <div class="flex justify-content-between align-items-center ">
                     <div class="flex align-items-center gap-3">
-                        <h5 class="mb-0">Overview</h5>
+                        <h5 class="mb-0">Projects Overview</h5>
                         <Button :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
                     </div>
                     <div class="flex gap-2" >
