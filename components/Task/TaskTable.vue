@@ -607,11 +607,10 @@ const inlineCreateSubTask = async (parentNode) => {
     };
     showInput.value = true;
     const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
-    tableData.value = [...updateTable];
-    currentParentNode.value = node;
+    tableData.value = structuredClone(updateTable);
     newTaskName.value = '';
-    expandedKeys.value[parentNode.node.key] == true ? (expandedKeys.value[parentNode.node.key] = false) : (expandedKeys.value[parentNode.node.key] = true);
-    expandedKeys.value[parentNode.node.key] = true;
+    expandedKeys.value[parentNode.node.key] == true ? null : (expandedKeys.value[parentNode.node.key] = true);
+    // expandedKeys.value[parentNode.node.key] = true;
 
     await nextTick();
     const newInput = document.getElementById('newSubTask');
@@ -642,7 +641,7 @@ function removeChild(node = toRaw(tableData.value)) {
             item.children = removeChild(item.children);
         }
     });
-    return (tableData.value = filtered);
+    return (tableData.value = structuredClone(filtered));
 }
 </script>
 
