@@ -165,7 +165,6 @@ export const useCompanyStore = defineStore('workStation', {
                 }
             });
             if (data.value?.code === 200) {
-                // console.log('data', data);
                 const userType = useCookie('userType');
                 userType.value = data?.value?.user_type;
                 const rolePermission = useCookie('rolePermission');
@@ -344,7 +343,6 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.kanbanTasks = kanbanData;
             const calendarData = this.tasks.map((val) => {
-                console.log('company task 1:', val);
                 const formatDate = (isoDate) => {
                     const date = new Date(isoDate);
                     const year = date.getFullYear();
@@ -355,8 +353,8 @@ export const useCompanyStore = defineStore('workStation', {
 
                     return `${year}-${month}-${day} ${hours}:${minutes}`;
                 };
-                
-                return {key:val.key, title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), color: val.data?.status?.color_code };
+
+                return { key: val.key, title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), color: val.data?.status?.color_code };
             });
             this.calendarTasks = calendarData;
 
@@ -473,7 +471,6 @@ export const useCompanyStore = defineStore('workStation', {
             this.tasks.forEach((task) => countTasksByStatus(task));
 
             this.countTasksByStatus = taskCountsByStat;
-            console.log('this.countTasksByStatus', this.countTasksByStatus);
 
             let result = extractAttchTaskData(this.tasks);
             this.recentTaskData = formatRecentTaskData(this.tasks);
@@ -504,7 +501,6 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async editProject({ id, name, description, space_id, statuses, git_project_id }) {
-            console.log('statuses Pinia', statuses);
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
@@ -573,7 +569,6 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
-            console.log('dueDate formatted', dueDate);
             // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
@@ -631,7 +626,6 @@ export const useCompanyStore = defineStore('workStation', {
                     // 'attachments' : attachments,
                 }
             });
-            console.log('data', data);
 
             if (error.value) {
                 if (error.value.data.code === 400) {
@@ -747,9 +741,7 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            // console.log('chartData', data.value);
             if (data?.value?.code === 200) {
-                // this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => project.project_name);
 
                 this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => {
                     let projectName = project.project_name;
@@ -758,7 +750,6 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                     return projectName;
                 });
-                // console.log('chartProjectInfo', this.chartProjectInfo);
                 this.inProgressCnt = data?.value?.data?.projectCounts.map(project => project.inProgressCounts);
                 this.chartClosedTaskInfo = data?.value?.data?.projectCounts.map(project => project.completedCounts);
                 this.totalDashboardProjects = data?.value?.data?.projectCounts.length;
@@ -782,7 +773,6 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            console.log('rolesData', data);
             if (data.value?.data?.length > 0) {
                 this.rolesLists = data.value?.data;
             } else {
