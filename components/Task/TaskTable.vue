@@ -611,6 +611,36 @@ const showInput = ref(false);
 const newTaskName = ref('');
 const parentTaskId = ref(null);
 
+const createNewTask = async () => {
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+    }
+    const newChild = {
+        key: `new`, // Unique key
+        unique_id: `new-${Date.now()}`,
+        data: {
+            name: '', // Initially empty, will be filled by user input
+            assignee: '',
+            created_at: new Date().toISOString(),
+            dueDateValue: '',
+            status: {
+                id: null,
+                name: 'New',
+                color_code: '#6466f1'
+            },
+            is_overdue: false
+        },
+        children: []
+    };
+    showInput.value = true;
+    tableData.value = [newChild, ...tableData.value];
+    await nextTick();
+    const newInput = document.getElementById('newSubTask');
+    console.log(newInput);
+    if (newInput) {
+        newInput.focus();
+    }
+};
 const inlineCreateSubTask = async (parentNode) => {
     if (showInput.value) {
         removeChild(toRaw(tableData.value));
@@ -698,7 +728,7 @@ function removeChild(node = toRaw(tableData.value)) {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
                 <div class="view-btns">
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
