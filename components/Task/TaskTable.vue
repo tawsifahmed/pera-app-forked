@@ -4,21 +4,20 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
-import VueApexCharts from 'vue3-apexcharts';
-import moment from 'moment';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
-const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited, ganttChartData, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks } = storeToRefs(useCompanyStore());
+const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
+const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
 const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
+const { kanbanTasks } = defineProps(['kanbanTasks']);
+const tableData = ref(tasks || []);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -30,7 +29,7 @@ const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
 const viewMode = ref('list');
-
+const newTaskNameInput = ref(null);
 const handleViews = (view) => {
     viewMode.value = view;
 
@@ -54,7 +53,6 @@ const gitBranchinit = async () => {
         // gitBranchesList.value = [{ label: '', name: 'All' }, ...this.statuslist];
         let branchData = data.value.branch_list?.map((item) => ({ label: item.name, name: item.name }));
         gitBranchesList.value = [{ label: '', name: 'All' }, ...branchData];
-        console.log('gitBranchesList', gitBranchesList.value);
     } else {
         gitBranchesList.value = [{ label: 'No Branches', name: 'No Branches' }];
     }
@@ -76,7 +74,6 @@ const gitCommitinit = async () => {
     );
     if (data.value?.code === 200) {
         gitCommits.value = data.value.commit_list;
-        console.log('gitCommits', gitCommits.value);
     } else {
         gitCommits.value = [];
     }
@@ -159,11 +156,8 @@ const handleInlineNameEdit = (node) => {
 
 const inputChanged = ref(false);
 watch(inlineTaskNameInput, (newVal, oldVal) => {
-    console.log('newVal', newVal);
-    console.log('oldVal', oldVal);
     if (oldVal !== null) {
         inputChanged.value = true;
-        console.log('inputChanged', inputChanged.value);
     }
 });
 
@@ -172,7 +166,6 @@ let clickTimer = ref(null);
 
 // Single click handler
 const handleClick = (node) => {
-    console.log("click",node)
     // Clear the timer if already set to prevent single click on double click
     if (clickTimer.value) {
         clearTimeout(clickTimer.value);
@@ -198,18 +191,32 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (taskId) => {
-    if (inputChanged.value !== true) {
-        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
-    } else {
-        await handleTaskChanges(inlineTaskNameInput.value, taskId);
-        checkMarkInput.value = {
-            ...checkMarkInput.value,
-            [taskId]: false
+const updateTaskName = async (node) => {
+    if (node.key === 'new') {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
         };
-        inlineTaskNameInput.value = null;
-        editClikedRowKey.value = null;
-        inputChanged.value = false;
+        await createTask(newTask);
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    } else {
+        if (inputChanged.value !== true) {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+        } else {
+            await handleTaskChanges(inlineTaskNameInput.value, node.key);
+            checkMarkInput.value = {
+                ...checkMarkInput.value,
+                [taskId]: false
+            };
+            inlineTaskNameInput.value = null;
+            editClikedRowKey.value = null;
+            inputChanged.value = false;
+        }
     }
 };
 
@@ -336,7 +343,6 @@ const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
     loading.value = true;
-    console.log('lod', taskLists);
     if (taskLists.length > 0) {
         const csvContent =
             'data:text/csv;charset=utf-8,' +
@@ -475,15 +481,12 @@ const handleTaskChanges = async (taskValue, task_id) => {
 const inlineDueDate = ref();
 
 const handleDateChange = async (newDate, slotKey) => {
-    console.log('newDate', newDate);
     let oldDate = slotKey.node.data.dueDateValue;
 
     const selectedDate = new Date(newDate);
     selectedDate.setHours(23, 59, 0, 0);
     inlineDueDate.value = selectedDate;
-    console.log('inlineDueDate', inlineDueDate.value);
     let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-    console.log('placeHolderValue', placeHolderValue);
     slotKey.node.data.dueDateValue = placeHolderValue;
     await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
@@ -517,7 +520,6 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
-console.log(calendarTasks,'calendarTasks');
 
 // Kanban
 const editable = ref(true);
@@ -543,12 +545,105 @@ const handleChange = (event, name) => {
     }
 };
 
-const computedHeight = computed(() => {
-    const tasksCount = series.value[0]?.data.length || 0; 
-    const heightPerTask = 50;
-    return `${tasksCount * heightPerTask}px`; 
-});
+// Inline Task Adding functionality
+const expandedKeys = ref({});
+const currentParentNode = ref(null);
+const showInput = ref(false);
+const newTaskName = ref('');
+const parentTaskId = ref(null);
 
+const createNewTask = async () => {
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+        newTaskName.value = '';
+    }
+    const newChild = {
+        key: `new`, // Unique key
+        unique_id: `new-${Date.now()}`,
+        data: {
+            name: '', // Initially empty, will be filled by user input
+            assignee: '',
+            created_at: new Date().toISOString(),
+            dueDateValue: '',
+            status: {
+                id: null,
+                name: 'New',
+                color_code: '#6466f1'
+            },
+            is_overdue: false
+        },
+        children: []
+    };
+    showInput.value = true;
+    tableData.value = [newChild, ...tableData.value];
+    await nextTick();
+    const newInput = document.getElementById('newSubTask');
+    if (newInput) {
+        newInput.focus();
+    }
+};
+const inlineCreateSubTask = async (parentNode) => {
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+    }
+    const node = toRaw(parentNode.node);
+    parentTaskId.value = node.key;
+    const newChild = {
+        key: `new`, // Unique key
+        unique_id: `new-${Date.now()}`,
+        data: {
+            name: '', // Initially empty, will be filled by user input
+            assignee: '',
+            created_at: new Date().toISOString(),
+            dueDateValue: '',
+            status: {
+                id: null,
+                name: 'New',
+                color_code: '#6466f1'
+            },
+            is_overdue: false
+        },
+        children: []
+    };
+    showInput.value = true;
+    const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
+    tableData.value = [...updateTable];
+    currentParentNode.value = node;
+    newTaskName.value = '';
+    expandedKeys.value[parentNode.node.key] == true ? (expandedKeys.value[parentNode.node.key] = false) : (expandedKeys.value[parentNode.node.key] = true);
+    expandedKeys.value[parentNode.node.key] = true;
+
+    await nextTick();
+    const newInput = document.getElementById('newSubTask');
+    if (newInput) {
+        newInput.focus();
+    }
+};
+
+// Recursive function to add a child
+function addChild(parentKey, newChild, node) {
+    for (const child of node) {
+        if (child.key === parentKey) {
+            child.children.unshift(newChild);
+            return node;
+        }
+        if (addChild(parentKey, newChild, child.children)) {
+            return node;
+        }
+    }
+    return false;
+}
+
+// Recursive function to remove a child
+function removeChild(node = toRaw(tableData.value)) {
+    const filtered = node.filter((item) => item.key !== 'new');
+    filtered.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+            item.children = removeChild(item.children);
+        }
+    });
+    return (tableData.value = filtered);
+}
 </script>
 
 <template>
@@ -570,7 +665,7 @@ const computedHeight = computed(() => {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
                 <div class="view-btns">
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
@@ -602,7 +697,7 @@ const computedHeight = computed(() => {
     <div v-if="viewMode === 'overview'">
         <div class="grid mt-2">
             <div class="col-12 lg:col-6 xl:col-3">
-                <div class="card mb-0"  :style="`border-left:6px solid #000;`">
+                <div class="card mb-0" :style="`border-left:6px solid #000;`">
                     <div to="/tags" class="flex justify-content-between">
                         <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
                         <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
@@ -647,12 +742,25 @@ const computedHeight = computed(() => {
     </div>
 
     <!-- Tree table -->
-    <TreeTable v-if="viewMode === 'list'" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader" filterDisplay="menu" style="overflow: auto" :tableProps="{ style: { minWidth: '1024px' } }">
+    <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        scrollable
+        scrollDirection="both"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        style="overflow: auto"
+        :tableProps="{ style: { minWidth: '1024px' } }"
+    >
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '44%' }" :showAddButton="true">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -691,9 +799,22 @@ const computedHeight = computed(() => {
                                 class="inline-task-input"
                                 v-model="inlineTaskNameInput"
                                 type="text"
-                                placeholder="Edit task title"
+                                placeholder="Edit task name"
                             />
                         </span>
+
+                        <form
+                            v-if="slotProps.node.key == 'new'"
+                            :onsubmit="
+                                (e) => {
+                                    e.preventDefault();
+                                    updateTaskName(slotProps.node);
+                                }
+                            "
+                            action=""
+                        >
+                            <InputText id="newSubTask" class="inline-task-input" v-model="newTaskNameInput" type="text" placeholder="Task Name" autocomplete="off" />
+                        </form>
                     </div>
                 </div>
             </template>
@@ -705,37 +826,38 @@ const computedHeight = computed(() => {
                         <Button
                             @click="handleInlineNameEdit(slotProps.node)"
                             v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }"
-                            v-if="!checkMarkInput[slotProps.node.key]"
+                            v-if="!checkMarkInput[slotProps.node.key] && slotProps.node.key !== 'new'"
                             severity="secondary"
                             icon="pi pi-pencil"
                             class="w-fit h-fit p-1"
                             style="font-size: 0.8rem !important"
                         />
                         <Button
-                            @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
+                            @click="inlineCreateSubTask(slotProps)"
                             v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500 }"
-                            v-if="!checkMarkInput[slotProps.node.key]"
+                            v-if="!checkMarkInput[slotProps.node.key] && slotProps.node.key !== 'new'"
                             severity="secondary"
                             icon="pi pi-plus"
                             class="w-fit h-fit p-1"
                             style="font-size: 0.2rem"
                         />
                         <Button
-                            @click="updateTaskName(slotProps.node.key)"
+                            @click="updateTaskName(slotProps.node)"
                             :loading="inputLoading"
-                            v-tooltip.top="{ value: `Update Name` }"
-                            v-if="checkMarkInput[slotProps.node.key]"
+                            v-tooltip.top="{ value: slotProps.node.key !== 'new' ? `Update Name` : 'Add Task' }"
+                            v-if="checkMarkInput[slotProps.node.key] || slotProps.node.key == 'new'"
                             severity="secondary"
-                            label="Save"
-                            class="p-1 w-full"
+                            :label="slotProps.node.key == 'new' ? 'Add' : 'Save'"
+                            class="p-1 w-fit h-full"
                             style="margin: 0 5px"
                         />
+
+                        <Button @click="removeChild()" v-tooltip.top="{ value: `Cancel Task`, showDelay: 500 }" v-if="slotProps.node.key == 'new'" severity="secondary" icon="pi pi-minus" class="w-fit h-fit p-1" />
                     </div>
                 </div>
             </template>
         </Column>
-
-        <Column field="assignee" header="Assignee" :style="{ width: '14%' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
                 <div class="flex justify-content-start gap-1">
                     <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
@@ -761,9 +883,9 @@ const computedHeight = computed(() => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '11%' }">
+        <Column field="status" header="Status" :style="{ width: '10%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
                         <Dropdown
@@ -794,10 +916,11 @@ const computedHeight = computed(() => {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '11%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
             <template #body="slotProps">
-                <i class="pi pi-calendar"></i>
+                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar"></i>
                 <Calendar
+                    v-if="slotProps.node.key !== 'new'"
                     @date-select="handleDateChange($event, slotProps)"
                     class="inline-calendar cursor-pointer"
                     :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
@@ -807,7 +930,7 @@ const computedHeight = computed(() => {
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2 flex">
                         <i class="pi pi-flag pt-2"></i>
                         <Dropdown
@@ -850,10 +973,10 @@ const computedHeight = computed(() => {
         </Column>
         <Column field="action" header="Action" :style="{ width: '6%', position: 'relative' }">
             <template #body="slotProps">
-                <div class="justify-content-start align-items-center webView-action" style="width: fit-content" @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
+                <div v-if="slotProps.node.key !== 'new'" class="justify-content-start align-items-center webView-action" style="width: fit-content" @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]" :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
                 </div>
-                <div class="justify-content-start align-items-center tabView-action" style="width: fit-content" @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
+                <div v-if="slotProps.node.key !== 'new'" class="justify-content-start align-items-center tabView-action" style="width: fit-content" @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
                     <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]" :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
                 </div>
                 <!-- PrimeVue SpeedDial -->
@@ -1004,11 +1127,10 @@ const computedHeight = computed(() => {
     <!-- task calendar -->
     <div v-if="viewMode === 'calendar'" class="">
         <!-- <VueCal :events="calendarTasks"  :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px"/> -->
-        <vue-cal
-                :events="calendarTasks"  :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px">
-                <template #event="{ event }">
-                    <div @click="handleClick(event)" class="vuecal__event" :style="{'background':event.color}" v-html="event.title" />
-                </template>
+        <vue-cal :events="calendarTasks" :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px">
+            <template #event="{ event }">
+                <div @click="handleClick(event)" class="vuecal__event" :style="{ background: event.color }" v-html="event.title" />
+            </template>
         </vue-cal>
     </div>
 
@@ -1885,7 +2007,7 @@ textarea {
     padding: 4px;
 }
 .vuecal__event {
-    padding: 3px ;
+    padding: 3px;
     border-radius: 5px;
     color: #ffffff;
     position: relative;
@@ -1896,7 +2018,7 @@ textarea {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
-.vuecal__event--focus{
+.vuecal__event--focus {
     box-shadow: none !important;
 }
 </style>
