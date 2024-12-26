@@ -145,7 +145,6 @@ const handleDblClick = (node) => {
 };
 
 const updateTaskName = async (node) => {
-    // return console.log(node);
     if (node.key === 'new') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
@@ -613,7 +612,9 @@ const newTaskName = ref('');
 const parentTaskId = ref(null);
 
 const inlineCreateSubTask = async (parentNode) => {
-    if (showInput.value) return;
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+    }
     console.log(expandedKeys.value);
     const node = toRaw(parentNode.node);
     parentTaskId.value = node.key;
@@ -634,19 +635,17 @@ const inlineCreateSubTask = async (parentNode) => {
         },
         children: []
     };
-    showInput.value = true; // Show the input field
-    node.children.unshift(newChild);
-    // testing
-    // const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
-    // console.log(updateTable);
-    // tableData.value = [...updateTable];
+    showInput.value = true;
+    const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
+    tableData.value = [...updateTable];
     currentParentNode.value = node;
-    newTaskName.value = ''; // Clear the input field
+    newTaskName.value = '';
     expandedKeys.value[parentNode.node.key] == true ? (expandedKeys.value[parentNode.node.key] = false) : (expandedKeys.value[parentNode.node.key] = true);
     expandedKeys.value[parentNode.node.key] = true;
 
     await nextTick();
     const newInput = document.getElementById('newSubTask');
+    console.log(newInput);
     if (newInput) {
         newInput.focus();
     }
@@ -654,41 +653,28 @@ const inlineCreateSubTask = async (parentNode) => {
 
 // Recursive function to add a child
 function addChild(parentKey, newChild, node) {
-    // Traverse children
     for (const child of node) {
         if (child.key === parentKey) {
             child.children.unshift(newChild);
-            return node; // Child added successfully
+            return node;
         }
-
-        if (addChild(parentKey, newChild, child)) {
-            return node; // Child added in the subtree
+        if (addChild(parentKey, newChild, child.children)) {
+            return node;
         }
     }
-
-    return false; // Parent not found
+    return false;
 }
 
 // Recursive function to remove a child
-function removeChild(childKey, node) {
-    // Check if the current node has children
-    if (node.children) {
-        // Find the index of the child to remove
-        const index = node.children.findIndex((child) => child.key === childKey);
-        if (index !== -1) {
-            node.children.splice(index, 1); // Remove the child
-            return true; // Child removed successfully
+function removeChild(node = toRaw(tableData.value)) {
+    console.log('remove child: ', node);
+    const filtered = node.filter((item) => item.key !== 'new');
+    filtered.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+            item.children = removeChild(item.children);
         }
-
-        // Traverse children
-        for (const child of node.children) {
-            if (removeChild(childKey, child)) {
-                return true; // Child removed in the subtree
-            }
-        }
-    }
-
-    return false; // Child not found
+    });
+    return (tableData.value = filtered);
 }
 </script>
 
@@ -884,13 +870,15 @@ function removeChild(childKey, node) {
                         <Button
                             @click="updateTaskName(slotProps.node)"
                             :loading="inputLoading"
-                            v-tooltip.top="{ value: `Update Name` }"
+                            v-tooltip.top="{ value: slotProps.node.key !== 'new' ? `Update Name` : 'Add Task' }"
                             v-if="checkMarkInput[slotProps.node.key] || slotProps.node.key == 'new'"
                             severity="secondary"
                             :label="slotProps.node.key == 'new' ? 'Add' : 'Save'"
-                            class="p-1 w-full"
+                            class="p-1 w-fit h-full"
                             style="margin: 0 5px"
                         />
+
+                        <Button @click="removeChild()" v-tooltip.top="{ value: `Cancel Task`, showDelay: 500 }" v-if="slotProps.node.key == 'new'" severity="secondary" icon="pi pi-minus" class="w-fit h-fit p-1" />
                     </div>
                 </div>
             </template>
@@ -923,7 +911,7 @@ function removeChild(childKey, node) {
         </Column>
         <Column field="status" header="Status" :style="{ width: '10%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
                         <Dropdown
@@ -956,8 +944,9 @@ function removeChild(childKey, node) {
         </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
             <template #body="slotProps">
-                <i class="pi pi-calendar"></i>
+                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar"></i>
                 <Calendar
+                    v-if="slotProps.node.key !== 'new'"
                     @date-select="handleDateChange($event, slotProps)"
                     class="inline-calendar cursor-pointer"
                     :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
@@ -967,7 +956,7 @@ function removeChild(childKey, node) {
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2 flex">
                         <i class="pi pi-flag pt-2"></i>
                         <Dropdown
