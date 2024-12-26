@@ -614,6 +614,7 @@ const parentTaskId = ref(null);
 const createNewTask = async () => {
     if (showInput.value) {
         removeChild(toRaw(tableData.value));
+        newTaskName.value = '';
     }
     const newChild = {
         key: `new`, // Unique key
@@ -645,7 +646,6 @@ const inlineCreateSubTask = async (parentNode) => {
     if (showInput.value) {
         removeChild(toRaw(tableData.value));
     }
-    console.log(expandedKeys.value);
     const node = toRaw(parentNode.node);
     parentTaskId.value = node.key;
     const newChild = {
@@ -868,9 +868,19 @@ function removeChild(node = toRaw(tableData.value)) {
                                 placeholder="Edit task name"
                             />
                         </span>
-                        <span>
-                            <InputText v-if="slotProps.node.key == 'new'" id="newSubTask" class="inline-task-input" v-model="newTaskNameInput" type="text" placeholder="Task Name" autocomplete="off" />
-                        </span>
+
+                        <form
+                            v-if="slotProps.node.key == 'new'"
+                            :onsubmit="
+                                (e) => {
+                                    e.preventDefault();
+                                    updateTaskName(slotProps.node);
+                                }
+                            "
+                            action=""
+                        >
+                            <InputText id="newSubTask" class="inline-task-input" v-model="newTaskNameInput" type="text" placeholder="Task Name" autocomplete="off" />
+                        </form>
                     </div>
                 </div>
             </template>
