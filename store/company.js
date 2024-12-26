@@ -355,7 +355,8 @@ export const useCompanyStore = defineStore('workStation', {
 
                     return `${year}-${month}-${day} ${hours}:${minutes}`;
                 };
-                return { title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), style: { backgroundColor: 'red' } };
+                
+                return {key:val.key, title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), color: val.data?.status?.color_code };
             });
             this.calendarTasks = calendarData;
 

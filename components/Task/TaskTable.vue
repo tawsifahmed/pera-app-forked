@@ -172,6 +172,7 @@ let clickTimer = ref(null);
 
 // Single click handler
 const handleClick = (node) => {
+    console.log("click",node)
     // Clear the timer if already set to prevent single click on double click
     if (clickTimer.value) {
         clearTimeout(clickTimer.value);
@@ -233,7 +234,6 @@ const getActionItems = (node) => {
             icon: 'pi pi-plus text-white',
             command: () => {
                 emit('openCreateSpace', node.key, 'sub-task');
-                // toast.add({ severity: 'info', summary: 'Add Sub Task', detail: `Sub Task Added to ${node.data.name}`, life: 3000 });
             },
             disabled: !createTaskP
         },
@@ -242,7 +242,6 @@ const getActionItems = (node) => {
             icon: 'pi pi-pencil text-white',
             command: () => {
                 emit('handleTaskEdit', node);
-                // toast.add({ severity: 'success', summary: 'Edit Task', detail: `Editing ${node.data.name}`, life: 3000 });
             },
             disabled: !updateTaskP
         },
@@ -251,7 +250,6 @@ const getActionItems = (node) => {
             icon: 'pi pi-window-maximize text-white',
             command: () => {
                 emit('handleTaskDetailView', node);
-                // toast.add({ severity: 'info', summary: 'Task Details', detail: `Viewing details of ${node.data.name}`, life: 3000 });
             }
         },
         {
@@ -259,7 +257,6 @@ const getActionItems = (node) => {
             icon: 'pi pi-trash text-white',
             command: () => {
                 emit('confirmDeleteTask', node.key);
-                // toast.add({ severity: 'error', summary: 'Delete Task', detail: `Deleted ${node.data.name}`, life: 3000 });
             },
             disabled: !deleteTaskP
         }
@@ -405,7 +402,6 @@ async function handleTaskStatus(status, task_id) {
         });
 
         if (data.value?.app_message === 'success') {
-            // console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             await getSingleProject(id);
         } else {
@@ -429,12 +425,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
         }
         const editTaskData = {
             id: task_id,
-            // name: taskNameEditInput.value,
-            // description: taskEditDescriptionInput.value,
-            // priority: taskValue.name,
             dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - 18 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
-            // assignees: assignees.value.map((obj) => obj.id),
-            // tags: tags.value.map((obj) => obj.id),
             project_id: id
         };
 
@@ -526,23 +517,7 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
-// function countTasks(tasks) {
-//     let count = 0;
-
-//     function countSubTasks(task) {
-//         count++; // Count the current task
-
-//         if (task.sub_task) {
-//             countSubTasks(task.sub_task); // Recursively count sub-tasks
-//         }
-//     }
-
-//     tasks.forEach((task) => {
-//         countSubTasks(task); // Start counting from each top-level task
-//     });
-
-//     return count;
-// }
+console.log(calendarTasks,'calendarTasks');
 
 // Kanban
 const editable = ref(true);
@@ -569,161 +544,11 @@ const handleChange = (event, name) => {
 };
 
 const computedHeight = computed(() => {
-    const tasksCount = series.value[0]?.data.length || 0; // Get the number of tasks in the first series
-    const heightPerTask = 50; // Set height per task, adjust as needed
-    return `${tasksCount * heightPerTask}px`; // Calculate total height dynamically
+    const tasksCount = series.value[0]?.data.length || 0; 
+    const heightPerTask = 50;
+    return `${tasksCount * heightPerTask}px`; 
 });
 
-// Register the ApexCharts component globally or in your current setup
-
-// Gantt Chart
-const series = ref(ganttChartData ? ganttChartData : []);
-
-const ganttChartOptions = ref({
-    chart: {
-        height: 350,
-        type: 'rangeBar',
-        toolbar: {
-            show: true,
-            offsetX: 0,
-            offsetY: 0,
-            tools: {
-                download: false,
-                selection: true,
-                zoom: false,
-                zoomin: false,
-                zoomout: false,
-                pan: true,
-                reset: '<img src="/reset.png" width="20" />',
-                customIcons: []
-            }
-        }
-    },
-    plotOptions: {
-        bar: {
-            horizontal: true,
-            distributed: true,
-            dataLabels: {
-                hideOverflowingLabels: false
-            }
-        }
-    },
-    dataLabels: {
-        enabled: true,
-        formatter: function (val, opts) {
-            var label = opts.w.globals.labels[opts.dataPointIndex];
-            var a = moment(val[0]);
-            var b = moment(val[1]);
-            var diff = b.diff(a, 'days');
-            return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
-        },
-        style: {
-            colors: ['#f3f4f5', '#fff']
-        }
-    },
-    xaxis: {
-        type: 'datetime',
-        position: 'top',
-        range: 432000000, // Set the initial view range to 10 days (864000000 ms)
-        labels: {
-            hideOverlappingLabels: false
-        }
-    },
-    yaxis: {
-        show: false
-    },
-    grid: {
-        row: {
-            colors: ['#f3f4f5', '#fff'],
-            opacity: 1
-        }
-    },
-    scrollbar: {
-        enabled: true, // Enable the scrollbar for horizontal scrolling
-        autoHide: false
-    }
-});
-
-// Calendar
-const events = ref([
-    // {
-    //     title: 'Post Deployment CR - Phase 1',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'Bug & Feedback (17/10/24)',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'Bug & Feedback (11.12.2024)',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'General',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'Bug & Feedback All',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'Coordinating with the backend team to resolve issues with the "Me" and "All" task lists in the Dashboard, and the "All Task List" accessed from the Tasks screen',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    // {
-    //     title: 'Upload new build to play store',
-    //     start: '2012-12-20 14:00',
-    //     end: '2012-12-26 14:00'
-    // },
-    {
-        title: 'Bug & Feedback (December S1+S2)',
-        start: '2024-12-20 14:00',
-        end: '2024-12-26 14:00'
-    },
-    {
-        start: '2024-12-20 14:00',
-        end: '2024-12-20 18:00',
-        title: 'Need to go shopping'
-    },
-    {
-        start: '2024-12-24 10:00',
-        end: '2024-12-24 15:00',
-        title: 'Golf with John'
-    }
-]);
-
-const calendarDataMaker = (data) => {
-    console.log(data);
-    let result = [];
-    for (const item of data) {
-        // Add the current item's data
-        result.push({
-            start: item.data.created_at,
-            end: item.data.dueDateValue || item.data.created_at,
-            title: item.data.name
-        });
-
-        // Recursively process children and add their results
-        if (item.children.length > 0) {
-            result = result.concat(calendarDataMaker(item.children));
-        }
-    }
-    return result;
-};
-
-const calendarData = calendarDataMaker(tasks);
-console.log(calendarData);
-// watch(tasks, (newVal, oldVal) => {
-//     events.value = calendarDataMaker(newVal);
-//     console.log(events.value);
-// });
-// events.value = calendarDataMaker(tasks);
 </script>
 
 <template>
@@ -1176,13 +1001,15 @@ console.log(calendarData);
         </div>
     </div>
 
-    <!-- gantt chart -->
-    <!-- <div v-if="viewMode === 'gantt'">
-        <vue-apex-charts class="mt-2" style="border: 1px solid #ededed; padding-top: 10px; border-radius: 5px" type="rangeBar" :height="computedHeight" :options="ganttChartOptions" :series="toRaw(series)" />
-    </div> -->
+    <!-- task calendar -->
     <div v-if="viewMode === 'calendar'" class="">
-        <!-- <pre>{{ calendarTasks }}</pre> -->
-        <VueCal :events="calendarTasks" :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px" />
+        <!-- <VueCal :events="calendarTasks"  :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px"/> -->
+        <vue-cal
+                :events="calendarTasks"  :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px">
+                <template #event="{ event }">
+                    <div @click="handleClick(event)" class="vuecal__event" :style="{'background':event.color}" v-html="event.title" />
+                </template>
+        </vue-cal>
     </div>
 
     <div v-if="viewMode === 'git'">
@@ -2058,16 +1885,18 @@ textarea {
     padding: 4px;
 }
 .vuecal__event {
-    padding: 5px 0;
+    padding: 3px ;
     border-radius: 5px;
     color: #ffffff;
-    background: linear-gradient(to right, #715cfc, #ad99fd);
     position: relative;
-    box-sizing: border-box;
-    left: 0;
-    width: 100%;
-    z-index: 1;
-    transition: box-shadow 0.3s, left 0.3s, width 0.3s;
+    cursor: pointer;
     overflow: hidden;
+    white-space: wrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.vuecal__event--focus{
+    box-shadow: none !important;
 }
 </style>
