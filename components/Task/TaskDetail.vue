@@ -807,19 +807,21 @@ const handleShareTaskId = () => {
                                     v-tooltip.right="{ value: `Create Sub Task` }"
                                     @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')"
                                     class="mr-2 sub-create" severity="secondary" />
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
+                                <TreeTable class=" tree-table" :value="subTasks" :lazy="true"
                                     :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer " field="name" header="Name" expander
+                                    <Column class="cursor-pointer toneS" field="name" header="Name" expander
                                         :style="{ width: '45%' }">
                                         <template #body="slotProps">
+                                      
                                             <span class="subtaskTitle"
-                                                @click="emit('handleTaskDetailView', slotProps.node)"
-                                                v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
-                                                slotProps.node.data.name }} 
-                                            </span>
+                                            @click="emit('handleTaskDetailView', slotProps.node)"
+                                            v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
+                                            slotProps.node.data.name }} 
+                                        </span>
+                                        
                                         </template>
                                     </Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
@@ -1377,11 +1379,15 @@ a {
     background-color: #ef4444;
 }
 
-.subtaskTitle{
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; 
+.toneS {
+    overflow: hidden !important;
+    /*text-overflow: ellipsis !important;*/
+    white-space: nowrap !important;
+}
+
+.subTaskTitle:hover {
+    color: #00c8ff;
+    font-weight: 500;
 }
 
 

@@ -846,12 +846,13 @@ function removeChild(node = toRaw(tableData.value)) {
                             v-tooltip.top="{ value: slotProps.node.key !== 'new' ? `Update Name` : 'Add Task' }"
                             v-if="checkMarkInput[slotProps.node.key] || slotProps.node.key == 'new'"
                             severity="secondary"
-                            :label="slotProps.node.key == 'new' ? 'Add' : 'Save'"
+                            :label="slotProps.node.key == 'new' ? '' : 'Save'"
+                            :icon="slotProps.node.key == 'new' ? 'pi pi-check' : ''"
                             class="p-1 w-fit h-full"
-                            style="margin: 0 5px"
+                            :style="slotProps.node.key == 'new' ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
                         />
 
-                        <Button @click="removeChild()" v-tooltip.top="{ value: `Cancel Task`, showDelay: 500 }" v-if="slotProps.node.key == 'new'" severity="secondary" icon="pi pi-minus" class="w-fit h-fit p-1" />
+                        <Button @click="removeChild()" v-tooltip.top="{ value: `Cancel Task`, showDelay: 500 }" v-if="slotProps.node.key == 'new'" severity="secondary" icon="pi pi-minus" class="w-fit h-fit p-1" style="font-size: 0.8rem !important" />
                     </div>
                 </div>
             </template>
@@ -915,7 +916,7 @@ function removeChild(node = toRaw(tableData.value)) {
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%', padding: '0.75rem 0.5rem' }">
             <template #body="slotProps">
                 <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar"></i>
                 <Calendar
@@ -1243,9 +1244,9 @@ function removeChild(node = toRaw(tableData.value)) {
 }
 
 .table-st thead th:hover {
-    border: 2px solid #e2e8f0;
+    /*border: 2px solid #e2e8f0;
     border-top: none;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;*/
 }
 
 .table-st table {
