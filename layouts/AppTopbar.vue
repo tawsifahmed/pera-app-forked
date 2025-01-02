@@ -458,7 +458,7 @@ const visibleTop = ref(false);
         <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
-        <Sidebar v-model:visible="visibleTop" header="Search..." position="top" class="search-container" style="height: auto">
+        <Sidebar v-model:visible="visibleTop" header=" " position="top" class="search-container" style="height: auto">
             <Search />
         </Sidebar>
     </div>
@@ -648,10 +648,14 @@ const visibleTop = ref(false);
 
 .search-container {
     top: 70px;
-    width: 68%;
+    width: 55%;
     border-radius: 10px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+}
+
+.search-container .p-sidebar-header {
+    padding-bottom: 0 !important;
 }
 .p-sidebar-top{
     backdrop-filter: blur(1px);
