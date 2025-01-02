@@ -8,7 +8,7 @@
         </div>
         <br />
         <div class="result-wrapper">
-            <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 22rem">
+            <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 10rem">
                 <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
             </div>
             <div v-else-if="tasksResult.length > 0 || projectsResult.length > 0 || spacesResult.length > 0" class="result-container">
@@ -17,7 +17,7 @@
                     <template #content>
                         <div class="task-container">
                             <div>
-                                <div v-for="task in tasksResult" :key="task" class="task-card">
+                                <NuxtLink v-for="task in tasksResult" :key="task" :to="{path: `/companies/${task.company_id}/spaces/${task.space_id}/projects/${task.project_id}`, query: {task_key: task.task_id} }" class="task-card">
                                     <div class="title-group flex justify-content-start align-items-center gap-2">
                                         <div :class="`staskstatus`" :style="`background-color: ${task.task_status_color};`"></div>
                                         <p class="stitle line-clamp-1" style="font-weight: 600">{{task.task_name}}</p>
@@ -27,7 +27,7 @@
                                             <p style="font-size: 12px"><strong>Project:</strong> {{task?.project_name}}</p></i
                                         >
                                     </div>
-                                </div>
+                                </NuxtLink>
                             </div>
                         </div>
                     </template>
@@ -45,9 +45,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- <div class="w-full flex justify-content-center">
-                                <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                            </div> -->
                         </div>
                     </template>
                 </Card>
@@ -65,9 +62,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <!-- <div class="w-full flex justify-content-center">
-                                <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                            </div> -->
                         </div>
                     </template>
                 </Card>
@@ -89,9 +83,6 @@ const tasksResult = ref([]);
 const projectsResult = ref([]);
 const spacesResult = ref([]);
 const hasResult = ref('not_typing');
-const noResultFound = ref(false);
-
-const typedText = ref('');
 
 watch(searchText, (val) => {
     const trimmedVal = val.trim();
@@ -105,23 +96,9 @@ watch(searchText, (val) => {
     }
 });
 
-// const insertSearch = () => {
-//     typedText.value = searchText.value;
-//     typedText.value = typedText.value.trim();
-//     if(typedText.value !== '' && typedText.value.length >= 2){
-//         fetchResult(typedText.value);
-//     }
-//         // hasResult.value = 'no';
-// }
-
-const taskLoading = ref(false); // Add loading state
+const taskLoading = ref(false);
 
 const fetchResult = async (input) => {
-    // const limit = 15;
-    // if (!hideLoading.value) {
-    //     taskLoading.value = true;
-    // }
-    // console.log('status', status);
     taskLoading.value = true;
     try {
         const token = useCookie('token');
@@ -149,22 +126,10 @@ const fetchResult = async (input) => {
             hasResult.value = 'no';
         }
 
-        // Update taskList only if data is valid and total pages are available
-        // if (data.value && data.value.data && data.value.counts?.total_tasks) {
-        //     totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
-        //     taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
-        //     loadMoreLoading.value = false; // Reset loading flag after fetch
-        // } else {
-        //     taskList.value = []; // Clear taskList if no data or pagination info
-        //     loadMoreLoading.value = false; // Reset loading flag after fetch
-        // }
-
-        // console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
-        // loadMoreLoading.value = false; // Reset loading flag after fetch
     } finally {
-        taskLoading.value = false; // Reset loading flag after fetch
+        taskLoading.value = false;
     }
 };
 
@@ -179,7 +144,7 @@ onMounted(() => {
 <style lang="scss">
 .result-wrapper {
     height: auto;
-    min-height: 15rem;
+    min-height: 10rem;
 }
 .task-container {
     max-height: 23rem;
@@ -224,6 +189,7 @@ onMounted(() => {
     justify-content: space-between;
     width: 100%;
     flex-wrap: wrap;
+    color: #000;
 }
 
 .task-card:hover {
