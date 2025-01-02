@@ -128,6 +128,7 @@ const handleEmail = () => {
 };
 // Lastly, what would you like to name your Workspace?
 const workSpaceName = ref(null);
+const imageData = ref(null);
 const errorHandler = ref(false);
 const loading = ref(false);
 const handleCreateWorkspace = async () => {
@@ -197,6 +198,21 @@ const handleCreateWorkspace = async () => {
                 <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
             </label>
             <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
+        </div>
+        <div class="field">
+            <label for="company">Company Logo 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
+            <div class="relative w-fit mx-auto">
+                <img v-if="imageData" :src="`${imageData}`" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover" />
+                <img v-else src='../assets/dummy_company.png' alt="" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover">
+                <div class="img-label">
+                    <label for="image">
+                        <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 8px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
+                    </label>
+                    <input class="hidden" type="file" :v-model="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
+                </div>
+            </div>
         </div>
         <p v-if="errorHandler" style="color: red">Please fill/check up all the fields properly</p>
         <template #footer>
