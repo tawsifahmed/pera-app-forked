@@ -517,6 +517,10 @@ const handleShare = async () => {
     }
 };
 
+const truncatedUniqueId = computed(() => {
+    return taskDetails.value?.unique_id ? taskDetails.value.unique_id.slice(0, 6) + '...' : '';
+});
+
 const handleShareTaskId = () => {
     if (taskDetails.value?.id) {
         // navigator.clipboard.writeText(singleTask?.key);
@@ -540,6 +544,14 @@ const handleShareTaskId = () => {
                 {{ taskDetails.name }}
             </h5>
             <div class="flex gap-1">
+                <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
+                    <span  class="ml-1 text-lg pi pi-copy my-auto cursor-pointer " style="padding-top: 1px;">
+                        
+                    </span>
+                    <span>
+                        {{ truncatedUniqueId }}
+                    </span>
+                </div>
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }"
                     class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
                 <h5 class="m-0 ml-2">Activity</h5>
@@ -1408,6 +1420,12 @@ a {
 .subTaskTitle:hover {
     color: #00c8ff;
     font-weight: 500;
+}
+
+.uniq-id-wrapper{
+    border: 1px solid gray;
+    padding: 3px 5px;
+    border-radius: 5px;
 }
 
 
