@@ -239,6 +239,10 @@ const hideActivity = () => {
 };
 
 const handleTaskComment = async () => {
+    if(taskCommentInput.value === null || taskCommentInput.value === ''){
+        toast.add({ severity: 'warn', summary: 'Warn', detail: 'Comment required', group: 'br', life: 3000 });
+        return;
+    }
     btnLoading.value = true;
     await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
@@ -920,8 +924,8 @@ const handleShareTaskId = () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p class="m-0 ml-1" style="font-size: 0.9rem;">
-                                    {{ val?.comment ? val?.comment : '' }}
+                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1" style="font-size: 0.9rem;">
+                                    
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time)
                                     }}</i>
@@ -939,8 +943,24 @@ const handleShareTaskId = () => {
                             </div>
                         </div>
                         <div>
-                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15"
-                                class="border-gray-300 mb-1 comment-text" required />
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" editorStyle="height: 76px">
+                                <template v-slot:toolbar>
+                                    <span class="ql-formats flex justify-content-end mr-0">
+                                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                                        <button v-tooltip.bottom="'Strikethrough'" class="ql-strike"></button>
+                                        <span class="ql-formats">
+                                            <select class="ql-color"></select>
+                                            <select class="ql-background"></select>
+                                        </span>
+                
+                                        <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
+                                        <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                                        <button class="ql-link" type="button" data-pc-section="link"></button>
+                                    </span>
+                                </template>
+                            </Editor>
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
 
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />

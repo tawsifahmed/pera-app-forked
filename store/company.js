@@ -103,20 +103,24 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createCompany({ name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
 
             if (data.value?.app_message === 'success') {
@@ -131,21 +135,26 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editCompany({ id, name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            else{
+                formdata.append('image', null);
+            }
+
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    id: id,
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyEdited = true;

@@ -147,7 +147,7 @@ onMounted(() => {
     min-height: 10rem;
 }
 .task-container {
-    max-height: 23rem;
+    max-height: 20rem;
     overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }

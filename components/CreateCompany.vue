@@ -1,5 +1,6 @@
 <script setup>
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
 const { createCompany } = useCompanyStore();
 const { singleSpace, isCompanyCreated } = storeToRefs(useCompanyStore());
@@ -129,6 +130,18 @@ const handleEmail = () => {
 // Lastly, what would you like to name your Workspace?
 const workSpaceName = ref(null);
 const imageData = ref(null);
+const uploadedImage = ref(null);
+
+const handleImageUpload = (value) => {
+    uploadedImage.value = value.target.files[0];
+    imageData.value = URL.createObjectURL(uploadedImage.value);
+};
+
+const handleImageCancel = () => {
+    uploadedImage.value = null;
+    imageData.value = null;
+};
+
 const errorHandler = ref(false);
 const loading = ref(false);
 const handleCreateWorkspace = async () => {
@@ -148,7 +161,7 @@ const handleCreateWorkspace = async () => {
             contact_number: null,
             number_of_employees: nE,
             company_type: sS,
-            logo: null
+            logo: uploadedImage.value ? uploadedImage.value : null
         };
         await createCompany(workspaceData);
         if (isCompanyCreated.value === true) {
@@ -168,10 +181,16 @@ const handleCreateWorkspace = async () => {
         }
     }
 };
+
+
+const handleClose = () => {
+    imageData.value = null;
+
+};
 </script>
 
 <template>
-    <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Company" :modal="true" class="p-fluid">
+    <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Company" :modal="true" class="p-fluid" @update:visible="handleClose">
         <!-- <pre>nE=>{{typeof numEmployees}}</pre> -->
         <div class="field">
             <label for="company">Company Size<i class="text-red-400 text-italic">*</i> 
@@ -199,18 +218,22 @@ const handleCreateWorkspace = async () => {
             </label>
             <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
         </div>
-        <div class="field">
-            <label for="company">Company Logo 
+        <div class="field mb-0">
+            <label class="mb-0" for="company">Company Logo 
                 <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
             </label>
             <div class="relative w-fit mx-auto">
                 <img v-if="imageData" :src="`${imageData}`" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover" />
                 <img v-else src='../assets/dummy_company.png' alt="" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover">
                 <div class="img-label">
-                    <label for="image">
-                        <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 8px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
+                    <label v-if="imageData" for="imageCancel">
+                        <i class="pi pi-minus" @click="handleImageCancel" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 5px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
+                    </label>
+                    <label v-else for="image">
+                        <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 5px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
                     </label>
                     <input class="hidden" type="file" :v-model="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
+                    
                 </div>
             </div>
         </div>
@@ -229,5 +252,13 @@ const handleCreateWorkspace = async () => {
 .create-btn-wrapper {
     display: flex;
     justify-content: center;
+}
+
+.img-label {
+    position: absolute;
+    right: -7px;
+    bottom: -3px;
+    z-index: 1;
+    cursor: pointer;
 }
 </style>

@@ -166,9 +166,12 @@ const handleCreateCompanyModal = () => {
             <!-- <pre>pre2: {{selectedComp}}</pre> -->
             <!-- <pre>selC{{selectedCompany}}</pre> -->
             <div v-if="companyList.length > 0" class="flex align-items-center">
-                <span v-tooltip.right="{ value: `${company}` }" class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{
-                    company?.charAt(0)
+                <span v-if="!company.logo" v-tooltip.right="{ value: `${company.name}` }" class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{
+                    company.name?.charAt(0)
                 }}</span>
+                <span v-tooltip.right="{ value: `${company.name}` }" class="cLogo mr-2" v-else>
+                    <img :src="company.logo" alt="">
+                </span>
                 <div class="comp-switch" v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
                     <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList" optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
                 </div>
@@ -211,8 +214,20 @@ const handleCreateCompanyModal = () => {
 }
 
 .company-first-letter {
-    min-width: 2.8rem;
+    min-width: 2.7rem;
     height: 2.7rem;
+}
+
+.cLogo{
+    width: 3.7rem;
+    height: 2.7rem;
+   
+    img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 5px;
+    }
 }
 
 .fullscreen-loader {

@@ -124,6 +124,18 @@ const handleEmail = () => {
 };
 
 const workSpaceName = ref(refCompanyId?.name);
+const imageData = ref(refCompanyId?.logo);
+const uploadedImage = ref(null);
+const handleImageUpload = (value) => {
+    uploadedImage.value = value.target.files[0];
+    imageData.value = URL.createObjectURL(uploadedImage.value);
+};
+
+const handleImageCancel = () => {
+    uploadedImage.value = null;
+    imageData.value = null;
+};
+
 const errorHandler = ref(false);
 
 const btnLoading = ref(false);
@@ -147,7 +159,7 @@ const handleEditCompany = async () => {
             contact_number: null,
             number_of_employees: nE,
             company_type: sS,
-            logo: null
+            logo: uploadedImage.value ? uploadedImage.value : null
         };
         console.log('workspaceData', workspaceData);
 
@@ -190,6 +202,25 @@ const handleEditCompany = async () => {
                 <label for="company">Company Name<i class="text-red-400 text-italic">*</i></label>
                 <InputText type="company" class="w-full px-2 py-2 shadow border focus:border-purple-500" placeholder="Type Name" v-model="workSpaceName" />
             </div>
+            <div class="field mb-0">
+                <label class="mb-0" for="company">Company Logo 
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
+                <div class="relative w-fit mx-auto">
+                    <img v-if="imageData" :src="`${imageData}`" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover" />
+                    <img v-else src='../assets/dummy_company.png' alt="" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover">
+                    <div class="img-label">
+                        <label v-if="imageData" for="imageCancel">
+                            <i class="pi pi-minus" @click="handleImageCancel" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 5px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
+                        </label>
+                        <label v-else for="image">
+                            <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 5px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
+                        </label>
+                        <input class="hidden" type="file" :v-model="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
+                        
+                    </div>
+                </div>
+            </div>
             <br />
             <p v-if="errorHandler" style="color: red">Please fill/check up all the fields properly</p>
             <div class="create-btn-wrapper">
@@ -206,5 +237,13 @@ const handleEditCompany = async () => {
 .create-btn-wrapper {
     display: flex;
     justify-content: center;
+}
+
+.img-label {
+    position: absolute;
+    right: -7px;
+    bottom: -3px;
+    z-index: 1;
+    cursor: pointer;
 }
 </style>
