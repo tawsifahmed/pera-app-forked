@@ -371,7 +371,7 @@ watchEffect(async () => {
     <div class="layout-topbar">
         
         <Toast position="bottom-right" group="br" />
-        <router-link to="/" class="layout-topbar-logo absolute" style="left: 73px;">
+        <router-link to="/" class="layout-topbar-logo absolute">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
         </router-link>
 
@@ -379,7 +379,7 @@ watchEffect(async () => {
             <i class="pi pi-bars"></i>
         </button>
         <div class="p-link layout-topbar-menu-button layout-topbar-button">
-            <button class="nav-btn" @click="onTopBarMenuButton()">
+            <button class="nav-btn" @click="handleNotificationComp">
                 <i class="pi pi-bell"></i>
             </button>
             <button class="nav-btn" @click="onTopBarMenuButton()">

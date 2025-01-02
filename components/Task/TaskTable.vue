@@ -915,10 +915,10 @@ function removeChild(node = toRaw(tableData.value)) {
                     <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
-        </Column>
+        </Column>        
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%', padding: '0.75rem 0.5rem' }">
             <template #body="slotProps">
-                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar"></i>
+                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar" style="padding-top: 0.1rem;"></i>
                 <Calendar
                     v-if="slotProps.node.key !== 'new'"
                     @date-select="handleDateChange($event, slotProps)"
@@ -1861,7 +1861,7 @@ textarea {
     cursor: pointer !important;
 
     .p-inputtext {
-        padding: 0.25rem 0.5rem !important;
+        padding: 0.25rem 0.4rem !important;
         cursor: pointer !important;
         caret-color: transparent !important;
         border: 1px solid #fff;

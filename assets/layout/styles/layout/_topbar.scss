@@ -20,6 +20,7 @@
         font-weight: 500;
         width: 300px;
         border-radius: 12px;
+        left: 73px;
 
         img {
             height: 2.5rem;
@@ -89,10 +90,12 @@
 @media (max-width: 991px) {
     .layout-topbar {
         justify-content: space-between;
+        padding: 0 1rem;
 
         .layout-topbar-logo {
             width: auto;
             order: 2;
+            left: 57px;
         }
 
         .layout-menu-button {
