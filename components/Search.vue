@@ -7,8 +7,8 @@
             </IconField>
         </div>
         <br />
-        <div class="result-wrapper">
-            <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 10rem">
+        <div class="result-wrapper" :class="hasResult === 'no' ? 'flex justify-content-center align-items-center' : ''">
+            <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 8rem">
                 <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
             </div>
             <div v-else-if="tasksResult.length > 0 || projectsResult.length > 0 || spacesResult.length > 0" class="result-container">
@@ -84,15 +84,25 @@ const projectsResult = ref([]);
 const spacesResult = ref([]);
 const hasResult = ref('not_typing');
 
+import { watch, ref } from 'vue';
+import { debounce } from 'lodash';
+
+const debouncedFetchResult = debounce((input) => {
+    if (input.trim().length >= 2) {
+        fetchResult(input);
+    }
+}, 300);
+
 watch(searchText, (val) => {
     const trimmedVal = val.trim();
-    if (trimmedVal && trimmedVal.length >= 2) {
-        fetchResult(trimmedVal);
-    } if(trimmedVal === '') {
+    console.log('Trimmed: ', trimmedVal.length);
+    if (trimmedVal === '') {
         hasResult.value = 'not_typing';
         tasksResult.value = [];
         projectsResult.value = [];
         spacesResult.value = [];
+    } else {
+        debouncedFetchResult(trimmedVal);
     }
 });
 
@@ -144,7 +154,7 @@ onMounted(() => {
 <style lang="scss">
 .result-wrapper {
     height: auto;
-    min-height: 10rem;
+    min-height: 5.5rem;
 }
 .task-container {
     max-height: 20rem;

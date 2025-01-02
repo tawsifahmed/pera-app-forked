@@ -648,7 +648,7 @@ const visibleTop = ref(false);
 
 .search-container {
     top: 70px;
-    width: 55%;
+    width: 50%;
     border-radius: 10px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
