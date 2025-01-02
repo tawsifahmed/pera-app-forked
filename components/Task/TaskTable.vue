@@ -721,7 +721,7 @@ function removeChild(node = toRaw(tableData.value)) {
                                 <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
                                     <div class="title-group">
                                         <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
-                                        <p class="title line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                                        <p class="rtitle line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
                                     </div>
                                     <div>
                                         <i>
@@ -1929,7 +1929,7 @@ textarea {
 //     background: #000;
 // }
 
-.title {
+.rTitle {
     margin: auto 0;
     max-width: 300px;
 }
