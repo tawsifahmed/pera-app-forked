@@ -358,7 +358,7 @@ const downloadTaskSheet = (taskLists) => {
                     const serialNo = index + 1;
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
-                    const assignees = task.data.assignee.split(', ').join('; ');
+                    const assignees = task.data.assigneeObj.map(assignee => assignee.name).join('; ');
                     const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
