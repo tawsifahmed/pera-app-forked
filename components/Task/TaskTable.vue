@@ -426,7 +426,6 @@ async function handleTaskStatus(status, task_id) {
 
 const inlineAssignees = ref([]);
 
-
 // const handleAssigneeChanges = () => {
 //     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
 //     handleTaskChanges(inlineAssigneesIds.value, )
@@ -492,25 +491,34 @@ const handleTaskChanges = async (taskValue, task_id) => {
     }
 };
 
-const inlineAssigL = ref(false)
-const handleAssigneeChanges = async (key) => {
-    inlineAssigL.value = true
-    const editTaskData = {
-        id: key,
-        assignees: inlineAssignees.value?.map((assignee) => assignee.id),
-        project_id: id
-    }
-    await editTask(editTaskData);
-    if (isTaskEdited.value === true) {
+const inlineAssigL = ref(false);
+const handleAssigneeChanges = async (type, values, key) => {
+    if (type === 'add') {
+        inlineAssigL.value = true;
+        const editTaskData = {
+            id: key,
+            assignees: inlineAssignees.value?.map((assignee) => assignee.id),
+            project_id: id
+        };
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
             inlineAssignees.value = [];
-            inlineAssigL.value = false
+            inlineAssigL.value = false;
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update assignees!', group: 'br', life: 3000 });
-            inlineAssigL.value = false
-            
+            inlineAssigL.value = false;
         }
-}
+    }
+    if(type === 'edit'){
+        const editTaskData = {
+            id: key,
+            assignees: values?.map((assignee) => assignee.id),
+            project_id: id
+        }
+        await editTask(editTaskData);
+    }
+};
 
 const inlineDueDate = ref();
 
@@ -543,7 +551,7 @@ function avatarStyle(index) {
     };
 }
 
-const mUserL = ref([])
+const mUserL = ref([]);
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
@@ -598,7 +606,7 @@ const createNewTask = async () => {
         unique_id: `new-${Date.now()}`,
         data: {
             name: '', // Initially empty, will be filled by user input
-            assignee: '',
+            assignee: {},
             created_at: new Date().toISOString(),
             dueDateValue: '',
             status: {
@@ -629,7 +637,7 @@ const inlineCreateSubTask = async (parentNode) => {
         unique_id: `new-${Date.now()}`,
         data: {
             name: '', // Initially empty, will be filled by user input
-            assignee: '',
+            assignee: {},
             created_at: new Date().toISOString(),
             dueDateValue: '',
             status: {
@@ -895,8 +903,7 @@ function removeChild(node = toRaw(tableData.value)) {
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
-                <div class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <!-- {{ slotProps.node.data?.assigneeObj }} -->
+                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <span class="flex justify-content-center assignee-wrapper" v-if="slotProps.node.data?.assigneeObj.length > 0">
                         <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
                             <img
@@ -918,32 +925,28 @@ function removeChild(node = toRaw(tableData.value)) {
                                 :style="avatarStyle(index)"
                             />
                         </span>
-                        <!-- {{ slotProps.node.data?.assigneeObj }} -->
-                          <!-- <pre>{{ slotProps.node.data }}</pre> -->
-                    
                     </span>
                     <span v-else>
                         <div class="s-assignee">
                             <div class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
                                 <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
                                 <i class="pi pi-angle-down text-sm mt-1"></i>
-                                <!-- Set Assignees Button -->
                                 <Button
-                            @click="handleAssigneeChanges(slotProps.node.key)"
-                            v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
-                            v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
-                            severity="secondary"
-                            icon="pi pi-check"
-                            class="w-fit h-fit p-1"
-                            style="font-size: 0.8rem !important; z-index: 10;"
-                            :id="`assigneeBtn${slotProps.node.key}`"
-                            :loading="inlineAssigL"
-                        />
+                                    @click="handleAssigneeChanges('add', 0, slotProps.node.key)"
+                                    v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
+                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
+                                    severity="secondary"
+                                    icon="pi pi-check"
+                                    class="w-fit h-fit p-1"
+                                    style="font-size: 0.8rem !important; z-index: 10"
+                                    :id="`assigneeBtn${slotProps.node.key}`"
+                                    :loading="inlineAssigL"
+                                />
                                 <MultiSelect v-model="inlineAssignees" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full absolute" style="opacity: 0" />
                             </div>
                         </div>
                     </span>
-                    <div class="assigneeSelect ">
+                    <div class="assigneeSelect">
                         <div class="relative h-full">
                             <Button
                                 v-if="slotProps.node.data?.assigneeObj.length > 0"
@@ -953,7 +956,18 @@ function removeChild(node = toRaw(tableData.value)) {
                                 class="w-fit h-fit p-1"
                                 style="font-size: 0.8rem !important"
                             />
-                            <MultiSelect v-model="slotProps.node.data.assignee" :options="mUserL" filter resetFilterOnHide="true" optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full absolute cursor-default" style="opacity: 0; left: 0; top: 0; " />
+                            <MultiSelect
+                                v-model="slotProps.node.data.assignee"
+                                @change="handleAssigneeChanges('edit', slotProps.node.data.assignee, slotProps.node.key)"
+                                :options="mUserL"
+                                filter
+                                resetFilterOnHide="true"
+                                optionLabel="name"
+                                placeholder="Assignees"
+                                :maxSelectedLabels="3"
+                                class="w-full absolute cursor-default"
+                                style="opacity: 0; left: 0; top: 0"
+                            />
                         </div>
                     </div>
                 </div>
@@ -988,7 +1002,6 @@ function removeChild(node = toRaw(tableData.value)) {
                             </template>
                         </Dropdown>
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
         </Column>
@@ -1043,7 +1056,6 @@ function removeChild(node = toRaw(tableData.value)) {
                             </template>
                         </Dropdown>
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
         </Column>
