@@ -117,6 +117,12 @@ const isSpeedDialVisible = ref({});
 
 const hoveredRowKey = ref(null);
 
+watch(hoveredRowKey, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        inlineAssignees.value = [];
+    }
+});
+
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
     if (editClikedRowKey.value !== key) {
@@ -418,6 +424,14 @@ async function handleTaskStatus(status, task_id) {
     }
 }
 
+const inlineAssignees = ref([]);
+
+
+// const handleAssigneeChanges = () => {
+//     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
+//     handleTaskChanges(inlineAssigneesIds.value, )
+// }
+
 const cLoading = ref(false);
 
 const handleTaskChanges = async (taskValue, task_id) => {
@@ -478,6 +492,26 @@ const handleTaskChanges = async (taskValue, task_id) => {
     }
 };
 
+const inlineAssigL = ref(false)
+const handleAssigneeChanges = async (key) => {
+    inlineAssigL.value = true
+    const editTaskData = {
+        id: key,
+        assignees: inlineAssignees.value?.map((assignee) => assignee.id),
+        project_id: id
+    }
+    await editTask(editTaskData);
+    if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
+            inlineAssignees.value = [];
+            inlineAssigL.value = false
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update assignees!', group: 'br', life: 3000 });
+            inlineAssigL.value = false
+            
+        }
+}
+
 const inlineDueDate = ref();
 
 const handleDateChange = async (newDate, slotKey) => {
@@ -509,9 +543,11 @@ function avatarStyle(index) {
     };
 }
 
+const mUserL = ref([])
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
+    mUserL.value = usersListStore.users;
 };
 
 const load = () => {
@@ -859,27 +895,67 @@ function removeChild(node = toRaw(tableData.value)) {
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
-                <div class="flex justify-content-start gap-1">
-                    <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" class="flex justify-content-center assignee-wrapper" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                        <img
-                            v-tooltip.top="{ value: `${assignee.name}` }"
-                            class="mr-2 capitalize cursor-pointer"
-                            v-if="assignee.image"
-                            :src="assignee.image"
-                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
-                            alt=""
-                            srcset=""
-                        />
-                        <Avatar
-                            v-else
-                            v-tooltip.top="{ value: `${assignee.name}` }"
-                            :label="assignee.name.charAt(0)"
-                            class="mr-2 capitalize cursor-pointer"
-                            size="small"
-                            style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                            :style="avatarStyle(index)"
-                        />
+                <div class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <!-- {{ slotProps.node.data?.assigneeObj }} -->
+                    <span class="flex justify-content-center assignee-wrapper" v-if="slotProps.node.data?.assigneeObj.length > 0">
+                        <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
+                            <img
+                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                class="mr-2 capitalize cursor-pointer"
+                                v-if="assignee.image"
+                                :src="assignee.image"
+                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                alt=""
+                                srcset=""
+                            />
+                            <Avatar
+                                v-else
+                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                :label="assignee.name.charAt(0)"
+                                class="mr-2 capitalize cursor-pointer"
+                                size="small"
+                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                :style="avatarStyle(index)"
+                            />
+                        </span>
+                        <!-- {{ slotProps.node.data?.assigneeObj }} -->
+                          <!-- <pre>{{ slotProps.node.data }}</pre> -->
+                    
                     </span>
+                    <span v-else>
+                        <div class="s-assignee">
+                            <div class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
+                                <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
+                                <i class="pi pi-angle-down text-sm mt-1"></i>
+                                <!-- Set Assignees Button -->
+                                <Button
+                            @click="handleAssigneeChanges(slotProps.node.key)"
+                            v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
+                            v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
+                            severity="secondary"
+                            icon="pi pi-check"
+                            class="w-fit h-fit p-1"
+                            style="font-size: 0.8rem !important; z-index: 10;"
+                            :id="`assigneeBtn${slotProps.node.key}`"
+                            :loading="inlineAssigL"
+                        />
+                                <MultiSelect v-model="inlineAssignees" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full absolute" style="opacity: 0" />
+                            </div>
+                        </div>
+                    </span>
+                    <div class="assigneeSelect ">
+                        <div class="relative h-full">
+                            <Button
+                                v-if="slotProps.node.data?.assigneeObj.length > 0"
+                                v-tooltip.top="{ value: `Edit Assignee`, showDelay: 500 }"
+                                severity="secondary"
+                                icon="pi pi-user-edit"
+                                class="w-fit h-fit p-1"
+                                style="font-size: 0.8rem !important"
+                            />
+                            <MultiSelect v-model="slotProps.node.data.assignee" :options="mUserL" filter resetFilterOnHide="true" optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full absolute cursor-default" style="opacity: 0; left: 0; top: 0; " />
+                        </div>
+                    </div>
                 </div>
             </template>
         </Column>
@@ -915,10 +991,10 @@ function removeChild(node = toRaw(tableData.value)) {
                     <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
-        </Column>        
+        </Column>
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%', padding: '0.75rem 0.5rem' }">
             <template #body="slotProps">
-                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar" style="padding-top: 0.1rem;"></i>
+                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar" style="padding-top: 0.1rem"></i>
                 <Calendar
                     v-if="slotProps.node.key !== 'new'"
                     @date-select="handleDateChange($event, slotProps)"
@@ -2020,5 +2096,22 @@ textarea {
 }
 .vuecal__event--focus {
     box-shadow: none !important;
+}
+
+.userL {
+    position: relative;
+}
+
+.userL:hover {
+    .assigneeSelect {
+        visibility: visible;
+        right: -19px;
+        top: 3px;
+        position: absolute;
+    }
+}
+
+.assigneeSelect {
+    visibility: hidden;
 }
 </style>
