@@ -517,6 +517,14 @@ const handleAssigneeChanges = async (type, values, key) => {
             project_id: id
         }
         await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
+            inlineAssignees.value = [];
+            inlineAssigL.value = false;
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update assignees!', group: 'br', life: 3000 });
+            inlineAssigL.value = false;
+        }
     }
 };
 
