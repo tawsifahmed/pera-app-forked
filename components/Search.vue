@@ -1,17 +1,14 @@
 <template>
     <div class="w-full">
         <div class="flex justify-content-center">
-            <IconField iconPosition="left" style="width: 50%">
-                <InputIcon class="pi pi-search text-xl"> </InputIcon>
+            <IconField style="width: 50%">
+                <InputIcon :class="`${taskLoading ? `pi-spin pi-spinner text-2xl spinnner` : 'pi-search text-xl'} pi  font-me`"> </InputIcon>
                 <InputText id="searchField" class="w-full" v-model="searchText" placeholder="Search..." size="large" />
             </IconField>
         </div>
         <br />
         <div class="result-wrapper" :class="hasResult === 'no' ? 'flex justify-content-center align-items-center' : ''">
-            <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 8rem">
-                <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
-            </div>
-            <div v-else-if="tasksResult.length > 0 || projectsResult.length > 0 || spacesResult.length > 0" class="result-container">
+            <div v-if="tasksResult.length > 0 || projectsResult.length > 0 || spacesResult.length > 0" class="result-container">
                 <Card v-if="tasksResult.length > 0" class="h-full">
                     <template class="result-title" #title>Tasks</template>
                     <template #content>
@@ -208,5 +205,9 @@ onMounted(() => {
 
 .result-title {
     font-size: 1rem !important;
+}
+
+.spinnner{
+    top: 42% !important;
 }
 </style>

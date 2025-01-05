@@ -246,13 +246,13 @@ const fetchActiveTimer = async () => {
         if (data.value) {
             console.log('active timer data =>', data.value);
             // return;
-            fetchedTimerData.value = data.value.data.is_timer_start;
-            if (data.value.data.is_timer_start === 'true') {
-                timerCompanyID.value = data.value.data.company_id;
-                timerSpaceId.value = data.value.data.space_id;
-                timerProjectId.value = data.value.data.project_id;
-                timerTaskId.value = data.value.data.task_id;
-                timerStartTime.value = data.value.data.start_time;
+            fetchedTimerData.value = data.value?.data?.is_timer_start;
+            if (data.value?.data?.is_timer_start === 'true') {
+                timerCompanyID.value = data.value?.data.company_id;
+                timerSpaceId.value = data.value?.data?.space_id;
+                timerProjectId.value = data.value?.data?.project_id;
+                timerTaskId.value = data.value?.data?.task_id;
+                timerStartTime.value = data.value?.data?.start_time;
             }
             console.log('fetchedTimerData', data.value.data);
             console.log('timerTaskId', timerTaskId.value);
