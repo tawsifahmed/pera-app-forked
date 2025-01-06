@@ -41,7 +41,8 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
     },
     company(state) {
       if (state.compInLoclStrg) {
-        return state.compInLoclStrg?.label;
+        let cNI = { name: state.compInLoclStrg?.label, logo: state.compInLoclStrg?.logo };
+        return cNI;
       } else {
         return '';
       }
@@ -107,8 +108,8 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
         const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
         this.getSpaces = companyWSpaces;
         if (companyWSpaces) {
-          const { id, name } = companyWSpaces;
-          this.compInLoclStrg = { 'id': id, 'label': name };
+          const { id, name, logo } = companyWSpaces;
+          this.compInLoclStrg = { 'id': id, 'label': name, 'logo': logo };
           return { name, id };
         }
       }

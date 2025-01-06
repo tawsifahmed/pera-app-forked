@@ -64,6 +64,8 @@ const projectNameInput = ref(refProjectId?.name);
 
 const projectDescriptionInput = ref(refProjectId?.description);
 
+const gitLabProjectId = ref(refProjectId?.git_project_id);
+
 const addTaskStatus = () => {
   taskStatusName.value ? addTaskSTatusError.value = false : addTaskSTatusError.value = true;
   if (taskStatusName?.value?.length > 0) {
@@ -154,6 +156,7 @@ const handleCreateProject = async () => {
       'description': projectDescriptionInput.value,
       'space_id': refProjectId?.space_id,
       'statuses': transformedTaskStatusList,
+      'git_project_id': gitLabProjectId.value
     }
 
     await editProject(createProjectData);
@@ -267,7 +270,7 @@ onMounted(() => {
         </div>
       </div>
       <!-- <pre>{{dummyStatusList}}</pre> -->
-      <div class="mb-3">
+      <div class="">
         <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i> </p>
         <div class="container">
           <div class="field">
@@ -281,6 +284,12 @@ onMounted(() => {
           </p>
         </div>
       </div>
+      <div class="field flex flex-column mb-3">
+        <label for="name">Gitlab ID
+            <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
+        <InputText  v-model="gitLabProjectId" required="true" />
+    </div>
       <p class="text-center" v-if="errorHandler" style="color: red;"> Please add/fill/check up all the fields</p>
     </div>
 

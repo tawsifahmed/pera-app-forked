@@ -67,6 +67,7 @@ const taskStatusNullCheck = ref(null);
 const addTaskSTatusError = ref(false);
 const closeStatusError = ref(false);
 const projectNameInput = ref(null);
+const gitLabProjectId = ref(null);
 const projectDescriptionInput = ref('');
 
 const addTaskStatus = () => {
@@ -135,7 +136,8 @@ const handleCreateProject = async () => {
             name: projectNameInput.value,
             description: projectDescriptionInput.value,
             space_id: spaces,
-            statuses: taskStatusList.value
+            statuses: taskStatusList.value,
+            git_project_id: gitLabProjectId.value,
         };
         console.log('statuses', taskStatusList.value);
         await project.createProjects(createProjectData);
@@ -274,21 +276,23 @@ const handleClose = () => {
                 <label for="name">Create project for <strong>{{ singleSpace?.name }}</strong> space</label>
             </div>
             <div class="field">
-                <label for="name">Project Name<i class="text-red-400 text-italic">*</i><span
-                        v-tooltip.right="{ value: 'Demo Text Text' }"
-                        class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Project Name<i class="text-red-400 text-italic">*</i>
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                    </label>
                 <InputText id="createProjectName" v-model="projectNameInput" required="true" />
             </div>
             <div class="field">
-                <label for="name">Project Description <span v-tooltip.right="{ value: 'Demo Text Text' }"
-                        class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Project Description 
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
                 <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput" rows="3"
                     cols="20" />
             </div>
             <div class="mb-4">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status<i
-                        class="text-red-400 text-italic">*</i><span v-tooltip.right="{ value: 'Demo Text Text' }"
-                        class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></p>
+                        class="text-red-400 text-italic">*</i>
+                        <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                    </p>
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
@@ -361,11 +365,10 @@ const handleClose = () => {
                 </div>
             </div>
             <!-- <pre>{{taskStatusList}}</pre> -->
-            <div class="mb-4">
+            <div class="">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i
                         class="text-red-400 text-italic">*</i>
-                    <span v-tooltip.right="{ value: 'Demo Text Text' }"
-                        class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                 </p>
                 <div class="container">
                     <div class="field">
@@ -376,6 +379,12 @@ const handleClose = () => {
 
                     <p v-if="closeStatusError" class="text-red-600 text-small">Please set close status!</p>
                 </div>
+            </div>
+            <div class="field">
+                <label for="name">Gitlab ID
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                    </label>
+                <InputText  v-model="gitLabProjectId" required="true" />
             </div>
             <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
             <template #footer>

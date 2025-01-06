@@ -2,29 +2,61 @@
     <div>
         <InputText type="hidden" v-model="tskId" />
         <div class="field flex flex-column">
-            <label for="name">Set Task Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
-            <Textarea id="createTaskName" class="border-gray-300" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
+            <label for="name">Set Task Name<i class="text-red-400 text-italic">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
+            <Textarea id="createTaskName" class="border-gray-300" v-model="name"  :invalid="spaceDescriptionError" />
+        </div>
+        <div class="field">
+            <label for="description" class="block mb-2">Description: </label>
+            <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
+            <Editor v-model="description" editorStyle="height: 120px">
+                <template v-slot:toolbar>
+                    <span class="ql-formats flex justify-content-end mr-0">
+                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                        <button v-tooltip.bottom="'Strikethrough'" class="ql-strike"></button>
+                        <span class="ql-formats">
+                            <select class="ql-color"></select>
+                            <select class="ql-background"></select>
+                        </span>
+
+                        <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
+                        <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                        <button class="ql-link" type="button" data-pc-section="link"></button>
+                    </span>
+                </template>
+            </Editor>
         </div>
         <!-- <div class="field">
             <label for="company">Set Task Name</label>
             <Textarea id="description" v-model="name" rows="3" cols="20" :invalid="spaceDescriptionError" />
         </div> -->
         <div class="field">
-            <label>Assignees <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Assignees 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <MultiSelect display="chip" v-model="assignees" :options="usersLists" filter resetFilterOnHide optionLabel="name"
                 placeholder="Select Assignees" :maxSelectedLabels="5" class="w-full" />
         </div>
         <div class="field">
-            <label>Tags <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Tags 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <MultiSelect display="chip" v-model="tags" :options="tagsLists" filter resetFilterOnHide optionLabel="name"
                 placeholder="Select Tags" :maxSelectedLabels="5" class="w-full" />
         </div>
         <div class="field">
-            <label>Due Date <span v-tooltip.right="{ value: 'Set your task due date' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Due Date 
+                <!-- <span v-tooltip.right="{ value: 'Set your task due date' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Calendar v-model="dueDate" class="w-full clndr" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)"/>
         </div>
         <div class="field">
-            <label>Priority <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label>Priority 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Dropdown v-model="priority" :options="priorities" optionLabel="name" placeholder="Set Priority"
                 class="w-full" />
         </div>
@@ -40,6 +72,8 @@
 import { storeToRefs } from 'pinia';
 import { nextTick, onBeforeMount, onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
+import Editor from 'primevue/editor';
+
 const { createTask } = useCompanyStore();
 const { isTaskCreated, detectDuplicateTask } = storeToRefs(useCompanyStore());
 const { createTaskTitle, taskId, projects, usersLists, tagsLists } = defineProps(['createTaskTitle', 'taskId', 'projects', 'usersLists', 'tagsLists']);
@@ -53,6 +87,12 @@ const showFinalMsg = ref(false);
 const errorHandler = ref(false);
 
 const name = ref(null);
+const description = ref(' ');
+watch(description, (newValue) => {
+    if (newValue.length === 0) {
+        description.value = ' ';
+    }
+});
 const dueDate = ref(null);
 
 const assignees = ref(null);
@@ -101,7 +141,8 @@ const handleCreateTask = async () => {
             sendDate = selectedDate.toISOString();
         }
         const createTaskData = {
-            name: name.value, 
+            name: name.value,
+            description: description.value, 
             dueDate: sendDate ? new Date(new Date(sendDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
             assignees: assignees.value?.map((assignee) => assignee.id),
             tags: tags.value?.map((tag) => tag.id),
@@ -157,5 +198,9 @@ onMounted(() => {
 
 .clndr{
     cursor: pointer;
+}
+
+#createTaskName{
+    height: 75px !important;
 }
 </style>
