@@ -695,6 +695,42 @@ function removeChild(node = toRaw(tableData.value)) {
     });
     return (tableData.value = structuredClone(filtered));
 }
+
+
+// This will store the column widths
+const columnWidths = ref({});
+
+
+const onColumnResizeEnd = (event) => {
+    const { element, delta } = event; // Get the element and delta (resize change)
+    console.log('event ==>', event);
+    console.log('delta', delta);
+    console.log('element', element);
+    
+    const columnField = element.getAttribute('data-field'); // Get the column field name
+    let currentWidth = element.offsetWidth; // Get the current width after resizing
+
+    // Calculate the new width by adding delta to the previous width
+    if (columnWidths.value[columnField]) {
+        currentWidth = columnWidths.value[columnField] + delta;
+    }
+
+    columnWidths.value[columnField] = currentWidth; // Store the updated width
+    applyColumnWidths(); // Apply updated widths to the table
+};
+
+const applyColumnWidths = () => {
+    // Loop through all columns and apply the new width
+    const columns = document.querySelectorAll('.p-column'); // Select all column elements
+    columns.forEach((column) => {
+        const columnField = column.getAttribute('data-field'); // Get the column field name
+        const columnWidth = columnWidths.value[columnField];
+
+        if (columnWidth) {
+            column.style.width = `${columnWidth}px`; // Apply the width to each column
+        }
+    });
+};
 </script>
 
 <template>
@@ -793,7 +829,7 @@ function removeChild(node = toRaw(tableData.value)) {
     </div>
 
     <!-- Tree table -->
-    <TreeTable
+    <!-- <TreeTable
         v-if="viewMode === 'list'"
         class="table-st"
         stripedRows
@@ -805,13 +841,35 @@ function removeChild(node = toRaw(tableData.value)) {
         :loading="tableLoader"
         filterDisplay="menu"
         style="overflow: auto"
+        :resizableColumns="true"
         :tableProps="{ style: { minWidth: '1024px' } }"
-    >
+    > -->
+    <!-- <TreeTable
+    v-if="viewMode === 'list'"
+        :value="tableData" :resizableColumns="true" showGridlines :tableProps="{ style: { minWidth: '50rem' } }" 
+>-->
+    <TreeTable
+    v-if="viewMode === 'list'"
+        class="table-sts"
+        stripedRows
+        :value="tableData"
+        scrollable
+        scrollDirection="both"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        style="overflow: auto"
+        :resizableColumns="true"
+        showGridlines 
+        :tableProps="{ style: { minWidth: '1024px' } }"
+        @columnResizeEnd="onColumnResizeEnd"
+>
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
+        <Column field="name" header="Name" class="" expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -1339,10 +1397,22 @@ function removeChild(node = toRaw(tableData.value)) {
     align-items: center;
 }
 
+.col-1 {
+    width: 45%;
+}
+
+// .p-resizable-column {
+//     width: 45%;
+// }
+
 .table-st thead th:hover {
-    /*border: 2px solid #e2e8f0;
+    border: 1px solid #e2e8f0;
     border-top: none;
-    border-bottom: 1px solid #e2e8f0;*/
+    border-bottom: 1px solid #e2e8f0;
+
+    // border: 2px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
 }
 
 .table-st table {
