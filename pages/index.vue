@@ -317,16 +317,16 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
             taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
             loadMoreLoading.value = false; // Reset loading flag after fetch
         } else {
-            taskList.value = []; // Clear taskList if no data or pagination info
-            loadMoreLoading.value = false; // Reset loading flag after fetch
+            taskList.value = []; 
+            loadMoreLoading.value = false; 
         }
 
         console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
-        loadMoreLoading.value = false; // Reset loading flag after fetch
+        loadMoreLoading.value = false; 
     } finally {
-        taskLoading.value = false; // Reset loading flag after fetch
+        taskLoading.value = false;
     }
 };
 
@@ -660,16 +660,16 @@ watch(
         </div>
         <div class="col-12 h-full">
             <div class="card dashChart">
-                <div class="flex justify-content-between align-items-center ">
-                    <div class="flex align-items-center gap-3">
+                <div class="flex justify-content-between align-items-start dash-inf">
+                    <div class="flex align-items-center gap-3 dash-inf-left">
                         <h5 class="mb-0">Projects Overview</h5>
-                        <Button :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
+                        <Button class="nwrp" :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
                     </div>
-                    <div class="flex gap-2" >
+                    <div class="flex gap-2 flex-wrap dash-inf-right">
                         <!-- {{ cM }} -->
-                        <Button :label="`In Progress: ${inProgressTasksChartData}`" class="" severity="info" outlined  />
-                        <Button :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
-                        <Button :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
+                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined  />
+                        <Button class="nwrp" :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
+                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
                     </div>
                 </div>
                 <div class="chartWrapper">
@@ -767,5 +767,32 @@ watch(
     cursor: default !important;
 }
 
+.nwrp{
+    text-wrap: nowrap;
+}
+
+.dash-inf{
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: flex-start;
+        .dash-inf-left{
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            width: 100%;
+            @media(max-width: 500px){
+              flex-direction: column;
+              align-items: start !important;
+            }
+        }
+        .dash-inf-right{
+            justify-content: flex-end;
+            width: 100%;
+            @media(max-width: 500px){
+                justify-content: center;
+            }
+            
+        }
+    }
+}
 
 </style>

@@ -131,6 +131,7 @@ const handleEmail = () => {
 const workSpaceName = ref(null);
 const imageData = ref(null);
 const uploadedImage = ref(null);
+const inputFile = ref(null);
 
 const handleImageUpload = (value) => {
     uploadedImage.value = value.target.files[0];
@@ -140,6 +141,8 @@ const handleImageUpload = (value) => {
 const handleImageCancel = () => {
     uploadedImage.value = null;
     imageData.value = null;
+    inputFile.value.value = null;
+
 };
 
 const errorHandler = ref(false);
@@ -220,7 +223,7 @@ const handleClose = () => {
         </div>
         <div class="field mb-0">
             <label class="mb-0" for="company">Company Logo 
-                <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                <span v-tooltip.right="{ value: 'Upload 1:1 ratio size' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span>
             </label>
             <div class="relative w-fit mx-auto">
                 <img v-if="imageData" :src="`${imageData}`" style="height: 60px; width: 60px; border-radius: 100%; object-fit: cover" />
@@ -232,7 +235,7 @@ const handleClose = () => {
                     <label v-else for="image">
                         <i class="pi pi-plus" style="color: red; right: 0.2rem; bottom: 0.2rem; z-index: 5; background-color: white; padding: 5px; border-radius: 20px; box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; cursor: pointer"></i>
                     </label>
-                    <input class="hidden" type="file" :v-model="uploadedImage" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
+                    <input class="hidden" type="file" :v-model="uploadedImage" ref="inputFile" id="image" @input="(event) => handleImageUpload(event)" accept=".png, .jpeg, .jpg" />
                     
                 </div>
             </div>

@@ -35,12 +35,12 @@
                     <template #content>
                         <div class="project-container">
                             <div>
-                                <div v-for="project in projectsResult" :key="project" class="task-card">
+                                <NuxtLink v-for="project in projectsResult" :key="project" :to="{path: `/companies/${project.company_id}/spaces/${project.space_id}/projects/${project.project_id}`}" class="task-card">
                                     <div class="title-group flex justify-content-start gap-2 align-items-center">
                                         <span class="pi pi-bars"></span>
                                         <p class="stitle line-clamp-1" style="font-weight: 600">{{project.project_name}}</p>
                                     </div>
-                                </div>
+                                </NuxtLink>
                             </div>
                         </div>
                     </template>
