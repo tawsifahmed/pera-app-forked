@@ -41,6 +41,13 @@ export const useCompanyStore = defineStore('workStation', {
         isTaskEdited: false,
         tasks: [],
         kanbanTasks: [],
+        calendarTasks: [],
+        ganttChartData: [],
+        recentTaskData: [],
+        tasksAttachments: [],
+        totalTaskCount: [],
+        countTasksByStatus: [],
+        taskStatusCounts: [],
         asngUsers: [],
 
         subTasks: [],
@@ -60,9 +67,13 @@ export const useCompanyStore = defineStore('workStation', {
         statuslist: [],
         modStatusList: [],
         chartProjectInfo: null,
-        chartTaskInfo: null,
+        totalDashboardProjects: null,
+        completedTasksChartData: null,
+        inProgressTasksChartData: null,
+        unAssignedTasksChartData: null,
+        inProgressCnt: null,
         chartClosedTaskInfo: null,
-        rolesLists: null,
+        rolesLists: null
     }),
 
     actions: {
@@ -92,20 +103,24 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createCompany({ name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
 
             if (data.value?.app_message === 'success') {
@@ -120,21 +135,26 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editCompany({ id, name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            else{
+                formdata.append('image', null);
+            }
+
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    id: id,
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyEdited = true;
@@ -154,7 +174,6 @@ export const useCompanyStore = defineStore('workStation', {
                 }
             });
             if (data.value?.code === 200) {
-                // console.log('data', data);
                 const userType = useCookie('userType');
                 userType.value = data?.value?.user_type;
                 const rolePermission = useCookie('rolePermission');
@@ -162,7 +181,7 @@ export const useCompanyStore = defineStore('workStation', {
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
                 location.reload();
-            }else{
+            } else {
                 this.isCompanySwitched = false;
                 this.companySwitchToast = 'Unable to switch company';
             }
@@ -228,7 +247,6 @@ export const useCompanyStore = defineStore('workStation', {
             this.singleSpaceProjects = this.singleSpace?.projects.map((item, index) => ({ ...item, index: index + 1 }));
         },
         async createSpace({ name, description, company_id, color, users }) {
-            
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/space/create`, {
                 method: 'POST',
@@ -325,15 +343,148 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
-            this.statuslist = data.value?.data?.statuses;
+            this.statuslist = data.value?.taskStatus;
 
-            const updatedData = this.statuslist.map((val) => {
+            const kanbanData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
                 return { name: val.name, statusColor: val.color_code, status: val, content: content };
-            })
+            });
 
-            this.kanbanTasks = updatedData
+            this.kanbanTasks = kanbanData;
+            const calendarData = this.tasks.map((val) => {
+                const formatDate = (isoDate) => {
+                    const date = new Date(isoDate);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    return `${year}-${month}-${day} ${hours}:${minutes}`;
+                };
+
+                return { key: val.key, title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), color: val.data?.status?.color_code };
+            });
+            this.calendarTasks = calendarData;
+
             this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
+            function formatTaskData(tasks) {
+                let formattedData = [];
+
+                function formatTask(task) {
+                    const { name, created_at, dueDate, status } = task.data;
+
+                    // Only format if both created_at and dueDate are available
+                    if (created_at && dueDate) {
+                        formattedData.push({
+                            x: name, // Task name
+                            y: [
+                                new Date(created_at).getTime(), // created_at timestamp
+                                new Date(dueDate).getTime() // dueDate timestamp
+                            ],
+                            fillColor: status.color_code // Status color code
+                        });
+                    }
+
+                    // If there are children, recurse through them
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach((childTask) => formatTask(childTask));
+                    }
+                }
+
+                // Iterate over the top-level tasks and format them
+                tasks.forEach((task) => formatTask(task));
+
+                return [
+                    {
+                        data: formattedData
+                    }
+                ];
+            }
+            function formatRecentTaskData(tasks) {
+                let recentTaskData = [];
+                const currentTime = new Date().getTime();
+                const threeDaysAgo = currentTime - 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+
+                function formatTask(task) {
+                    const { name, created_at, dueDate, status } = task.data;
+                    const { key } = task;
+                    const createdAtTime = new Date(created_at).getTime();
+
+                    // Check if task was created within the last 3 days
+                    if (createdAtTime >= threeDaysAgo && createdAtTime <= currentTime) {
+                        recentTaskData.push({
+                            key: key,
+                            taskName: name, // Task name
+                            dueDate: dueDate, // Due date
+                            statusName: status.name, // Status name
+                            statusColor: status.color_code // Status color code
+                        });
+                    }
+
+                    // If there are children, recurse through them
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach((childTask) => formatTask(childTask));
+                    }
+                }
+
+                // Iterate over the top-level tasks and format them
+                tasks.forEach((task) => formatTask(task));
+
+                return recentTaskData;
+            }
+
+            function extractAttchTaskData(tasks) {
+                let totalTaskCount = 0;
+                function processTask(task) {
+                    // Increment total task count
+                    totalTaskCount++;
+
+                    // Recurse through sub-tasks
+                    if (task.children && task.children.length > 0) {
+                        task.children.forEach((childTask) => processTask(childTask));
+                    }
+                }
+
+                // Iterate over the top-level tasks and format them
+                tasks.forEach((task) => processTask(task));
+
+                return {
+                    totalTaskCount: totalTaskCount
+                };
+            }
+
+            const taskCountsByStat = this.statuslist.map((status) => ({
+                statusName: status.name,
+                statusColor: status.color_code,
+                taskCount: 0
+            }));
+
+            // Recursive function to traverse tasks and their children
+            function countTasksByStatus(task) {
+                const taskStatus = task.data.status;
+
+                // Find the matching status in taskCountsByStatus and increment the taskCount
+                const statusIndex = taskCountsByStat.findIndex((status) => status.statusName === taskStatus.name);
+                if (statusIndex !== -1) {
+                    taskCountsByStat[statusIndex].taskCount += 1;
+                }
+
+                // If the task has children, count them as well
+                if (task.children && task.children.length > 0) {
+                    task.children.forEach((childTask) => countTasksByStatus(childTask));
+                }
+            }
+
+            // Traverse through the parent tasks and their children
+            this.tasks.forEach((task) => countTasksByStatus(task));
+
+            this.countTasksByStatus = taskCountsByStat;
+
+            let result = extractAttchTaskData(this.tasks);
+            this.recentTaskData = formatRecentTaskData(this.tasks);
+            this.totalTaskCount = result.totalTaskCount;
+            this.ganttChartData = formatTaskData(this.tasks);
         },
 
         async createProject({ name, description, space_id, statuses }) {
@@ -358,8 +509,7 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getChartData();
             }
         },
-        async editProject({ id, name, description, space_id, statuses }) {
-            console.log('statuses Pinia', statuses);
+        async editProject({ id, name, description, space_id, statuses, git_project_id }) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
@@ -371,7 +521,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     space_id: space_id,
-                    statuses: statuses
+                    statuses: statuses,
+                    git_project_id: git_project_id
                 }
             });
 
@@ -427,7 +578,6 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
-            console.log('dueDate formatted', dueDate);
             // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
@@ -459,14 +609,13 @@ export const useCompanyStore = defineStore('workStation', {
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
                     let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
-                    if(taskIdInLclStrg){
+                    if (taskIdInLclStrg) {
                         this.getTaskDetails(taskIdInLclStrg);
                     }
                 }
             }
         },
         async editTask({ id, name, description, project_id, dueDate, priority, assignees, tags }) {
-            
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${id}`, {
                 method: 'POST',
@@ -486,7 +635,6 @@ export const useCompanyStore = defineStore('workStation', {
                     // 'attachments' : attachments,
                 }
             });
-            console.log('data', data);
 
             if (error.value) {
                 if (error.value.data.code === 400) {
@@ -500,7 +648,7 @@ export const useCompanyStore = defineStore('workStation', {
                     this.detectDuplicateTask = false;
                     this.getSingleProject(project_id);
                     let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
-                    if(taskIdInLclStrg){
+                    if (taskIdInLclStrg) {
                         this.getTaskDetails(taskIdInLclStrg);
                     }
                 }
@@ -522,8 +670,8 @@ export const useCompanyStore = defineStore('workStation', {
                 // this.getSpaceList();
                 this.getSingleProject(projectId);
                 let taskIdInLclStrg = Number(localStorage.getItem('taskDetailID'));
-                if(taskIdInLclStrg){
-                this.getTaskDetails(taskIdInLclStrg);
+                if (taskIdInLclStrg) {
+                    this.getTaskDetails(taskIdInLclStrg);
                 }
             }
         },
@@ -542,7 +690,7 @@ export const useCompanyStore = defineStore('workStation', {
                 data.value?.data.forEach((element) => {
                     let obj = {
                         id: element.id,
-                        name: element.name,
+                        name: element.name
                     };
                     this.users.push(obj);
                 });
@@ -596,21 +744,33 @@ export const useCompanyStore = defineStore('workStation', {
         async getChartData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('chartData', () =>
-                $fetch(`https://pbe.singularitybd.net/api/v1/chart-data`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/dashboard/task-status`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
                 })
             );
-            console.log('chartData', data.value);
             if (data?.value?.code === 200) {
-                this.chartProjectInfo = data?.value?.data?.projects;
-                console.log('chartProjectInfo', this.chartProjectInfo);
-                this.chartTaskInfo = data?.value?.data?.total_task_count;
-                this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
+
+                this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => {
+                    let projectName = project.project_name;
+                    if (projectName.length > 7) {
+                        projectName = projectName.substring(0, 7) + '...';
+                    }
+                    return projectName;
+                });
+                this.inProgressCnt = data?.value?.data?.projectCounts.map(project => project.inProgressCounts);
+                this.chartClosedTaskInfo = data?.value?.data?.projectCounts.map(project => project.completedCounts);
+                this.totalDashboardProjects = data?.value?.data?.projectCounts.length;
+                this.completedTasksChartData = data?.value?.data?.completed;
+                localStorage.setItem('completedTasksChartData', JSON.stringify(data?.value?.data?.completed));
+                this.inProgressTasksChartData = data?.value?.data?.inProgress;
+                localStorage.setItem('inProgressTasksChartData', JSON.stringify(data?.value?.data?.inProgress));
+                this.unAssignedTasksChartData = data?.value?.data?.unAssigneeCount;
+                localStorage.setItem('unAssignedTasksChartData', JSON.stringify(data?.value?.data?.unAssigneeCount));
             } else {
                 this.chartProjectInfo = [];
-                this.chartTaskInfo = [];
+                this.inProgressCnt = [];
             }
         },
         async getRoles() {
@@ -622,11 +782,9 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            console.log('rolesData', data);
             if (data.value?.data?.length > 0) {
                 this.rolesLists = data.value?.data;
-            }
-            else {
+            } else {
                 this.rolesLists = [];
             }
         },

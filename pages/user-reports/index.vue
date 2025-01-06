@@ -17,8 +17,7 @@ const selectedDateCategory = ref('Create');
 
 const dateCategories = ref([
     { name: 'Create', key: 'A' },
-    { name: 'Due Date', key: 'B' },
-
+    { name: 'Due Date', key: 'B' }
 ]);
 
 const endDate = ref('');
@@ -55,22 +54,22 @@ const handleGenerate = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
     const formData = new FormData();
-    const userIds = employee.value?.map(item => item.id);
-        console.log('User ID', userIds);
+    const userIds = employee.value?.map((item) => item.id);
+    console.log('User ID', userIds);
 
     userIds.forEach((id) => {
-        formData.append('user_id[]', id)
-    })    
+        formData.append('user_id[]', id);
+    });
     // formData.append('user_id[]', userIds);
 
     // Only append project IDs if there are valid projects selected
     if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map(item => item.id);
+        const projectIds = selectedProject.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            projectIds.forEach((id) =>{
-                formData.append('project_id[]', id)
-            })
+            projectIds.forEach((id) => {
+                formData.append('project_id[]', id);
+            });
         }
     }
 
@@ -114,20 +113,20 @@ const handleReportDownload = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
     const formData = new FormData();
-    const userIds = employee.value?.map(item => item.id);
-        console.log('User ID', userIds);
+    const userIds = employee.value?.map((item) => item.id);
+    console.log('User ID', userIds);
 
     userIds.forEach((id) => {
-        formData.append('user_id[]', id)
-    })    
+        formData.append('user_id[]', id);
+    });
 
     if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map(item => item.id);
+        const projectIds = selectedProject.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         if (projectIds.length > 0) {
-            projectIds.forEach((id) =>{
-                formData.append('project_id[]', id)
-            })
+            projectIds.forEach((id) => {
+                formData.append('project_id[]', id);
+            });
         }
     }
 
@@ -141,16 +140,13 @@ const handleReportDownload = async () => {
         }
     }
 
-    const { data, error } = await useFetch(
-        `${url.public.apiUrl}/tasks/task-report-download`,
-        {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            },
-            body: formData
-        }
-    );
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/task-report-download`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        },
+        body: formData
+    });
     if (error.value) {
         console.log(error);
         return (loading1.value = false);
@@ -210,33 +206,28 @@ onMounted(() => {
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">User:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="employee" :options="employees" filter resetFilterOnHide
-                                optionLabel="name" placeholder="Select User" class="w-full" />
+                            <MultiSelect display="chip" v-model="employee" :options="employees" filter resetFilterOnHide optionLabel="name" placeholder="Select User" class="w-full" />
                         </div>
                     </div>
                     <div class="user-selection w-full md:w-14rem w-full">
                         <label class="font-bold block mb-2">Project:</label>
                         <div class="flex justify-content-center">
-                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide
-                                optionLabel="name" placeholder="Select Project" class="w-full" />
+                            <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full" />
                         </div>
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon
-                            iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
                         <label for="icondisplay" class="font-bold block mb-2">To: </label>
-                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon
-                            iconDisplay="input" inputId="icondisplay" />
+                        <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto ml-2">
                         <label for="icondisplay" class="font-bold block mb-2">Date Type: </label>
                         <div class="flex flex-wrap gap-2 mt-3 mb-2 text-sm">
                             <div v-for="category in dateCategories" :key="category.key" class="flex align-items-center">
-                                <RadioButton v-model="selectedDateCategory" :inputId="category.key" name="dynamic"
-                                    :value="category.name" />
+                                <RadioButton v-model="selectedDateCategory" :inputId="category.key" name="dynamic" :value="category.name" />
                                 <label :for="category.key" class="ml-2">{{ category.name }}</label>
                             </div>
                         </div>
@@ -262,17 +253,15 @@ onMounted(() => {
                 <Column field="task_name" header="Task"></Column>
                 <Column field="project_name" header="Project"></Column>
                 <Column field="assignee_name" header="Assignee">
-                  <template #body="slotProps">
-                    <div v-for="(assignee, index) in slotProps.data.assignee_name">
-                      {{ assignee.name }}<span class="font-bold" v-if="index < slotProps.data.assignee_name.length - 1">, </span>
-                    </div>
-                  </template>
+                    <template #body="slotProps">
+                        <div v-for="(assignee, index) in slotProps.data.assignee_name">{{ assignee.name }}<span class="font-bold" v-if="index < slotProps.data.assignee_name.length - 1">, </span></div>
+                    </template>
                 </Column>
                 <Column field="task_status" header="Status"></Column>
                 <Column field="task_due_date" header="Due Date"></Column>
                 <Column field="task_date_done" header="Completed Date"></Column>
                 <Column field="formatted_time_tracked" header="Time Track"></Column>
-                <Column field="overdue" header="Over Due" ></Column>
+                <Column field="overdue" header="Over Due"></Column>
                 <Column field="bounce" header="Bounce"></Column>
             </DataTable>
         </div>
@@ -280,7 +269,6 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .user-selection {
     display: flex;
     flex-direction: column;

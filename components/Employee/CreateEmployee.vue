@@ -106,29 +106,35 @@ onMounted(() => {
         <div class="field">
             <label for="company"
                 >Name<i class="text-red-400 text-italic">*</i>
-                <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span -->
             ></label>
             <InputText id="createEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
         <div class="field">
             <label for="email"
-                >Email address<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
-            ></label>
+                >Email address<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
         </div>
         <div class="field">
-            <label for="phoneNo">Phone <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="phoneNo">Phone 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <InputText v-model="phone" inputId="worktype" type="tel" class="w-full" maxlength="14" placeholder="Enter Phone No."/>
         </div>
         <div class="field">
-            <label for="company">Address <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+            <label for="company">Address 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Enter Address"/>
         </div>
         <div class="field">
             <label for="company"
-                >Password<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
-            ></label>
+                >Password<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Password v-model="password" placeholder="Enter password" :feedback="false" :invalid="confirmPassError" toggleMask class="w-full" inputClass="w-full"></Password>
 
             <!-- <InputText type="password" v-model="password" class="w-full" /> -->
@@ -137,8 +143,9 @@ onMounted(() => {
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->
             <label
-                >Role<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span
-            ></label>
+                >Role<i class="text-red-400">*</i> 
+                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            </label>
             <Dropdown v-model="selectedRoles" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
         </div>
 

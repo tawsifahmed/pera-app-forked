@@ -16,18 +16,15 @@ const readTask = ref(accessPermission('read_task'));
 const usersListStore = useCompanyStore();
 const tagsListStore = useCompanyStore();
 const { getSingleProject, deleteTask, getTaskAssignModalData, getTagsAssignModalData, getTaskDetails } = useCompanyStore();
-const { singleProject, isTaskDeleted, tasks, kanbanTasks } = storeToRefs(useCompanyStore());
-
+const { singleProject, isTaskDeleted, tasks, kanbanTasks, taskDetails } = storeToRefs(useCompanyStore());
 const filters = ref({});
 const loading = ref(true);
 const toast = useToast();
 const btnLoading = ref(false);
 const singleTask = ref(null);
 const task_key = useRoute().query.task_key;
-console.log(task_key);
 const { projects } = useRoute().params;
 const visible = ref(false);
-
 const refTaskId = ref(null);
 const taskId = ref(null);
 const createTaskTitle = ref(null);
@@ -120,9 +117,9 @@ const handleTaskDetailView = async (task) => {
     visibleTaskDetailView.value = true;
     document.documentElement.style.cursor = 'auto';
     document.documentElement.removeChild(overlayD);
+    console.log(taskDetails?.value?.project?.name,'taskDetails')
 };
 
-console.log('visibleTaskDetailView', visibleTaskDetailView.value);
 watch(visibleTaskDetailView, (value) => {
     if(value === true) {
         return 0;
@@ -150,9 +147,7 @@ const updateTaskTable = () => {
     getSingleProject(projects);
 };
 
-getSingleProject(projects);
-
-
+// getSingleProject(projects);
 watch(() => useRoute().query.task_key, (newTaskKey) => {
     if (newTaskKey) {
         handleTaskDetailView({ key: newTaskKey });
@@ -188,6 +183,7 @@ watchEffect(() => {
         <!-- Datatable -->
         <TaskTable
             v-if="readTask"
+            
             :kanbanTasks="kanbanTasks"
             :tasks="tasks"
             @openCreateSpace="openCreateSpace"
@@ -208,7 +204,13 @@ watchEffect(() => {
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header=" " :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+            <template #header>
+                <div class="inline-flex align-items-center justify-content-center gap-2">
+                    <Avatar :label="taskDetails?.project?.space_name?.charAt(0)" class=" capitalize p-0" size="small" :style="{ 'background-color': ['#ededed'], color: ['#000'],width:['1.4rem'],height:['1.4rem'],text:['12px'] }" />
+                    <span class="white-space-nowrap">{{taskDetails?.project?.space_name}} / <strong>{{taskDetails?.project?.name}}</strong></span>
+                </div>
+            </template>
             <TaskDetail
                 :usersLists="usersLists"
                 :tagsLists="tagsLists"

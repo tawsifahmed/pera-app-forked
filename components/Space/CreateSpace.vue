@@ -127,15 +127,21 @@ const handleClose = () => {
         <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid"  @update:visible="handleClose">
             <div class="field">
                 <!-- <pre>{{spacePage}}</pre> -->
-                <label for="createSpaceName">Space Name<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="createSpaceName">Space Name<i class="text-red-400 text-italic">*</i> 
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
                 <InputText id="createSpaceName" v-model="spaceNameInput" required="true" :invalid="spaceNameError" />
             </div>
             <div class="field">
-                <label for="name">Space Description <span v-tooltip.right="{ value: 'After setting space name, you can provide description.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Space Description 
+                    <!-- <span v-tooltip.right="{ value: 'After setting space name, you can provide description.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
                 <Textarea id="description" class="border-gray-300" v-model="spaceDescripInput" rows="3" cols="20" :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
-                <label for="name">Space Color<i class="text-red-400 text-italic">*</i> <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label for="name">Space Color<i class="text-red-400 text-italic">*</i> 
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
                 <div class="m-0 d-flex colorpicker-wrapper">
                     <div class="flex justify-center align-items-center">
                         <div id="dynamic-div" :style="`background-color: ${spaceAvatarPreview};`" class="d-flex align-items-center justify-content-center text-3xl text-white">{{ spaceNameInput ? spaceNameInput.charAt(0).toUpperCase() : 'S' }}</div>
@@ -159,7 +165,9 @@ const handleClose = () => {
                 </div>
             </div>
             <div class="field">
-                <label>Space Members<i class="text-red-400">*</i> <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span></label>
+                <label>Space Members<i class="text-red-400">*</i> 
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </label>
                 <MultiSelect display="chip" v-model="selectedMembers" :options="usersLists" filter optionLabel="name" placeholder="Select Space Members" class="w-full" :invalid="userError"/>
             </div>
             <template #footer>

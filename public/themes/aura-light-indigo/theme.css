@@ -257,6 +257,7 @@
   color: #334155;
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
+  padding: 7px 7px !important;
 }
 .p-editor-container .ql-snow.ql-toolbar button:hover,
 .p-editor-container .ql-snow.ql-toolbar button:focus {

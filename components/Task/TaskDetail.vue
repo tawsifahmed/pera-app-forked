@@ -7,7 +7,7 @@ import accessPermission from '~/composables/usePermission';
 import Editor from 'primevue/editor';
 import Calendar from 'primevue/calendar';
 import { onMounted } from 'vue';
-
+import Inplace from 'primevue/inplace';
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -239,6 +239,10 @@ const hideActivity = () => {
 };
 
 const handleTaskComment = async () => {
+    if(taskCommentInput.value === null || taskCommentInput.value === ''){
+        toast.add({ severity: 'warn', summary: 'Warn', detail: 'Comment required', group: 'br', life: 3000 });
+        return;
+    }
     btnLoading.value = true;
     await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
@@ -275,18 +279,14 @@ const handleTaskDetailSubmit = async () => {
         sendEditDate = selectedDate.toISOString();
     }
 
-    console.log('checkDate', checkDate.value);
     const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-    console.log('formattedDueDate', formattedDueDate);
     const taskDetailData = {
         id: taskDetails.value?.id,
         // name: taskDetails.value?.name,
         ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
         project_id: projID,
         ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
-        // assignees: assignees.value.map((obj) => obj.id),
         ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
-        // tags: tags.value.map((obj) => obj.id)
         ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {}),
     };
 
@@ -517,6 +517,10 @@ const handleShare = async () => {
     }
 };
 
+const truncatedUniqueId = computed(() => {
+    return taskDetails.value?.unique_id ? taskDetails.value.unique_id.slice(0, 6) + '...' : '';
+});
+
 const handleShareTaskId = () => {
     if (taskDetails.value?.id) {
         // navigator.clipboard.writeText(singleTask?.key);
@@ -536,20 +540,21 @@ const handleShareTaskId = () => {
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
-            <h5 v-tooltip.top="{
-                value: `${taskDetails.name}`,
-                pt: {
-                    width: '200px'
-                }
-            }" class="m-0 detail-task-name cursor-pointer">
+            <h5 class="m-0 detail-task-name cursor-pointer">
                 {{ taskDetails.name }}
             </h5>
             <div class="flex gap-1">
+                <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
+                    <span  class="ml-1 text-lg pi pi-copy my-auto cursor-pointer " style="padding-top: 1px;">
+                        
+                    </span>
+                    <span>
+                        {{ truncatedUniqueId }}
+                    </span>
+                </div>
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }"
                     class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
-                <!-- <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn"></span> -->
                 <h5 class="m-0 ml-2">Activity</h5>
-                <!-- <pre>isTagsEdited {{isTagsEdited}}</pre> -->
             </div>
         </div>
         <div class="col-12 lg:col-7">
@@ -565,19 +570,6 @@ const handleShareTaskId = () => {
                             <div class="flex justify-content-between gap-2 flex-wrap align-items-center">
                                 <div class="w-full lg:w-fit">
                                     <div
-                                        class="flex justify-content-between gap-2 flex-wrap align-items-centertask-detail-wrapper">
-                                        <div
-                                            class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
-                                            <span class="pi pi-user"></span>
-                                            <p>Assignee:</p>
-                                        </div>
-                                        <FloatLabel style="width: 164.94px" class="input-fields">
-                                            <MultiSelect display="chip" v-model="assignees" filter resetFilterOnHide :options="usersLists"
-                                                optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="2"
-                                                class="w-full" />
-                                        </FloatLabel>
-                                    </div>
-                                    <div
                                         class="flex mt-2 justify-content-between gap-2 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start gap-2 align-items-center task-detail-property">
@@ -585,9 +577,19 @@ const handleShareTaskId = () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px`" v-model="dueDate"
+                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate"
                                                 placeholder="Set Due Date" showTime hourFormat="12"
                                                 @date-select="handleDateChange($event)" />
+                                        </FloatLabel>
+                                    </div>
+                                    <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3 mb-3">
+                                        <div class="flex justify-content-start gap-2 align-items-center task-detail-property">
+                                            <span class="pi pi-tags"></span>
+                                            <p>Tags:</p>
+                                        </div>
+                                        <FloatLabel class="input-fields" style="width:168px">
+                                            <MultiSelect display="chip" v-model="tags" filter resetFilterOnHide :options="tagsLists"
+                                                optionLabel="name" placeholder="Select Tags" class="w-full" />
                                         </FloatLabel>
                                     </div>
                                 </div>
@@ -604,7 +606,7 @@ const handleShareTaskId = () => {
                                             style="width: 146.41px" />
                                     </div>
                                     <div
-                                        class="flex mt-2 justify-content-start gap-6 align-items-center task-detail-wrapper">
+                                        class="flex mt-4 mb-3 justify-content-start gap-6 align-items-center task-detail-wrapper">
                                         <div
                                             class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
                                             <span class="pi pi-stopwatch"></span>
@@ -655,12 +657,6 @@ const handleShareTaskId = () => {
                                             </ConfirmPopup>
                                             <Button :loading="timeLoading" class="clock-btn" v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"  @click="handleClickClock" :icon="taskDetails?.is_timer_start == 'true' ? 'pi pi-stop' : 'pi pi-play'" :severity="taskDetails?.is_timer_start == 'true' ? ' stop-color' : ''" rounded aria-label="Filter" />
 
-                                            <!-- <div v-tooltip.top="{ value: taskDetails?.is_timer_start == 'true' ? 'Stop' : 'Start' }"
-                                                :class="`clock-btn ${taskDetails?.is_timer_start == 'true' ? 'bg-pink-300' : 'bg-primary-400'}`"
-                                                @click="handleClickClock">
-                                                <i
-                                                    :class="`pi ${taskDetails?.is_timer_start == 'true' ? 'pi-stop stop' : 'pi-play start'}`"></i>
-                                            </div> -->
                                             <div class="text-sm absolute" @click="requireConfirmation($event)">
                                                 {{ taskDetails?.is_timer_start == 'true' ? timeTrack :
                                                 secondsToHHMMSS(taskDetails?.total_duration) }}
@@ -673,18 +669,19 @@ const handleShareTaskId = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3"
-                                style="width: 100%">
-                                <div class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property"
-                                    style="width: 10%">
-                                    <span class="pi pi-tags"></span>
-                                    <p>Tags:</p>
+                             <div class="flex justify-content-between gap-2">
+                                <div
+                                    class="flex justify-content-start w-fit gap-2 align-items-center task-detail-property">
+                                    <span class="pi pi-user"></span>
+                                    <p>Assignee:</p>
                                 </div>
-                                <FloatLabel style="width: 90%" class="input-fields">
-                                    <MultiSelect display="chip" v-model="tags" filter resetFilterOnHide :options="tagsLists"
-                                        optionLabel="name" placeholder="Select Tags" class="w-full" />
+                                <FloatLabel style="width:100%" class="input-fields">
+                                    <MultiSelect display="chip" v-model="assignees" filter resetFilterOnHide :options="usersLists"
+                                        optionLabel="name" placeholder="Select Assignees" :maxSelectedLabels="3"
+                                        class="w-full" />
                                 </FloatLabel>
-                            </div>
+                             </div>
+                            
                             
 
                             <!-- {{manualTime}} -->
@@ -826,19 +823,21 @@ const handleShareTaskId = () => {
                                     v-tooltip.right="{ value: `Create Sub Task` }"
                                     @click="emit('openCreateSpace', taskDetails?.id, 'sub-task')"
                                     class="mr-2 sub-create" severity="secondary" />
-                                <TreeTable class="tree-table" :value="subTasks" :lazy="true"
+                                <TreeTable class=" tree-table" :value="subTasks" :lazy="true"
                                     :tableProps="{ style: { minWidth: '650px' } }" style="overflow: auto;">
                                     <template #empty>
                                         <p class="text-center">No Data found...</p>
                                     </template>
-                                    <Column class="cursor-pointer " field="name" header="Name" expander
+                                    <Column class="cursor-pointer toneS" field="name" header="Name" expander
                                         :style="{ width: '45%' }">
                                         <template #body="slotProps">
+                                      
                                             <span class="subtaskTitle"
-                                                @click="emit('handleTaskDetailView', slotProps.node)"
-                                                v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
-                                                slotProps.node.data.name }} 
-                                            </span>
+                                            @click="emit('handleTaskDetailView', slotProps.node)"
+                                            v-tooltip.left="{ value: `${slotProps.node.data.name}` }">{{
+                                            slotProps.node.data.name }} 
+                                        </span>
+                                        
                                         </template>
                                     </Column>
                                     <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
@@ -937,8 +936,8 @@ const handleShareTaskId = () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p class="m-0 ml-1" style="font-size: 0.9rem;">
-                                    {{ val?.comment ? val?.comment : '' }}
+                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1" style="font-size: 0.9rem;">
+                                    
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time)
                                     }}</i>
@@ -956,8 +955,24 @@ const handleShareTaskId = () => {
                             </div>
                         </div>
                         <div>
-                            <Textarea placeholder="Add comment" v-model="taskCommentInput" rows="3" cols="15"
-                                class="border-gray-300 mb-1 comment-text" required />
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" editorStyle="height: 76px">
+                                <template v-slot:toolbar>
+                                    <span class="ql-formats flex justify-content-end mr-0">
+                                        <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                                        <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                                        <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                                        <button v-tooltip.bottom="'Strikethrough'" class="ql-strike"></button>
+                                        <span class="ql-formats">
+                                            <select class="ql-color"></select>
+                                            <select class="ql-background"></select>
+                                        </span>
+                
+                                        <button class="ql-list" type="button" data-pc-section="list" value="ordered"></button>
+                                        <button class="ql-list" type="button" data-pc-section="list" value="bullet"></button>
+                                        <button class="ql-link" type="button" data-pc-section="link"></button>
+                                    </span>
+                                </template>
+                            </Editor>
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
 
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
@@ -1042,7 +1057,7 @@ const handleShareTaskId = () => {
 
 .comment-wrapper {
     overflow-y: auto;
-    height: 78vh;
+    height: 76vh;
     padding: 5px !important;
     background-color: #f7fafc;
 }
@@ -1090,7 +1105,7 @@ const handleShareTaskId = () => {
 
 .task-wrapper {
     overflow: hidden;
-    height: 78vh;
+    height: 76vh;
     padding: 5px !important;
 }
 
@@ -1287,8 +1302,8 @@ input[type='file']::file-selector-button:hover {
 }
 
 .clock-btn {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     position: absolute;
     right: 7px;
     display: flex;
@@ -1325,6 +1340,7 @@ input[type='file']::file-selector-button:hover {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+    max-width: 85%;
 }
 
 .text-danger {
@@ -1395,11 +1411,21 @@ a {
     background-color: #ef4444;
 }
 
-.subtaskTitle{
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; 
+.toneS {
+    overflow: hidden !important;
+    /*text-overflow: ellipsis !important;*/
+    white-space: nowrap !important;
+}
+
+.subTaskTitle:hover {
+    color: #00c8ff;
+    font-weight: 500;
+}
+
+.uniq-id-wrapper{
+    border: 1px solid gray;
+    padding: 3px 5px;
+    border-radius: 5px;
 }
 
 

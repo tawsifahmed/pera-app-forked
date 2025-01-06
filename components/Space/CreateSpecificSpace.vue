@@ -63,7 +63,7 @@ const handleCreateSpace = async () => {
     }
 }
 watchEffect(() => {
-    getCompanyList();
+    // getCompanyList();
 });
 
 

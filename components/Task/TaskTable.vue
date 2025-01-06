@@ -4,18 +4,20 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
-
+import VueCal from 'vue-cal';
+import 'vue-cal/dist/vuecal.css';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
-const { getSingleProject, getTaskAssignModalData, editTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited } = storeToRefs(useCompanyStore());
+const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
+const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks } = storeToRefs(useCompanyStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
 const downloadTaskP = ref(accessPermission('download_task'));
 const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
-const { kanbanTasks, tasks } = defineProps(['kanbanTasks', 'tasks']);
+const { kanbanTasks } = defineProps(['kanbanTasks']);
+const tableData = ref(tasks || []);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -26,7 +28,65 @@ const filterStartDueDate = ref();
 const filterEndDueDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
-const tableView = ref(true);
+const viewMode = ref('list');
+const newTaskNameInput = ref(null);
+const handleViews = (view) => {
+    viewMode.value = view;
+
+    if (view === 'git') {
+        gitCommitinit();
+    }
+};
+
+const gitBranchesList = ref([]);
+
+const gitBranchinit = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('branchList', () =>
+        $fetch(`${url.public.apiUrl}/gitlab/${id}/branch`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.branch_list.length > 0) {
+        // gitBranchesList.value = [{ label: '', name: 'All' }, ...this.statuslist];
+        let branchData = data.value.branch_list?.map((item) => ({ label: item.name, name: item.name }));
+        gitBranchesList.value = [{ label: '', name: 'All' }, ...branchData];
+    } else {
+        gitBranchesList.value = [{ label: 'No Branches', name: 'No Branches' }];
+    }
+};
+
+gitBranchinit();
+
+const selectedGitBranch = ref({ label: '', name: 'All' });
+
+const gitCommits = ref([]);
+const gitCommitinit = async () => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('commitsList', () =>
+        $fetch(`${url.public.apiUrl}/gitlab/${id}/commit?branch=${selectedGitBranch.value ? selectedGitBranch.value?.label : ''}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.code === 200) {
+        gitCommits.value = data.value.commit_list;
+    } else {
+        gitCommits.value = [];
+    }
+};
+
+if (viewMode.value === 'git') {
+    gitCommitinit();
+}
+
+const filterBranches = () => {
+    gitCommitinit();
+};
+
 const priorities = ref([
     { name: 'All', code: '' },
     { name: 'Urgent', code: 'Urgent' },
@@ -40,15 +100,32 @@ const onChangePriorities = ref([
     { name: 'High', code: 'High' },
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
-])
+]);
+
+const dateFormatter = (data) => {
+    const dateStr = data;
+    const date = new Date(dateStr);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}-${month}-${year}`;
+};
 
 const isSpeedDialVisible = ref({});
 
 const hoveredRowKey = ref(null);
 
+watch(hoveredRowKey, (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+        inlineAssignees.value = [];
+    }
+});
+
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
-    if(editClikedRowKey.value !== key) {
+    if (editClikedRowKey.value !== key) {
         checkMarkInput.value = {
             ...checkMarkInput.value,
             [key]: false
@@ -63,12 +140,9 @@ const checkMarkInput = ref({});
 const inlineTaskNameInput = ref(null);
 const inputLoading = ref(false);
 
-
 const handleInlineNameEdit = (node) => {
     inlineTaskNameInput.value = node.data.name;
     const inputT = document.getElementById(`inputTaskName${node.key}`);
-    console.log('inputTFunc', inputT);
-    
     editClikedRowKey.value = node.key;
     checkMarkInput.value = Object.keys(checkMarkInput.value).reduce((acc, key) => {
         acc[key] = false;
@@ -79,84 +153,90 @@ const handleInlineNameEdit = (node) => {
             inputT.focus();
         }
     });
-    
+
     checkMarkInput.value = {
         ...checkMarkInput.value,
         [node.key]: true
     };
-    
 };
 
 const inputChanged = ref(false);
 watch(inlineTaskNameInput, (newVal, oldVal) => {
-    console.log('newVal', newVal);
-    console.log('oldVal', oldVal);
     if (oldVal !== null) {
         inputChanged.value = true;
-        console.log('inputChanged', inputChanged.value);
     }
 });
-
 
 // Timer reference for managing click delay
 let clickTimer = ref(null);
 
 // Single click handler
 const handleClick = (node) => {
-  // Clear the timer if already set to prevent single click on double click
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the timer if already set to prevent single click on double click
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Set timer to trigger the single-click action
-  clickTimer.value = setTimeout(() => {
-    emit('handleTaskDetailView', node);
-    clickTimer.value = null; // Reset the timer after the function runs
-  }, 250); // Delay for single click detection (250ms)
+    // Set timer to trigger the single-click action
+    clickTimer.value = setTimeout(() => {
+        emit('handleTaskDetailView', node);
+        clickTimer.value = null; // Reset the timer after the function runs
+    }, 250); // Delay for single click detection (250ms)
 };
-
 
 // Double click handler
 const handleDblClick = (node) => {
-  // Clear the single click timer to avoid running both functions
-  if (clickTimer.value) {
-    clearTimeout(clickTimer.value);
-    clickTimer.value = null;
-  }
+    // Clear the single click timer to avoid running both functions
+    if (clickTimer.value) {
+        clearTimeout(clickTimer.value);
+        clickTimer.value = null;
+    }
 
-  // Call the double-click function
-  handleInlineNameEdit(node);
+    // Call the double-click function
+    handleInlineNameEdit(node);
 };
 
-
-const updateTaskName = async (taskId) => {
-    if(inputChanged.value !== true) {
-        return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });    
-    } else{
-        await handleTaskChanges( inlineTaskNameInput.value, taskId);
-        checkMarkInput.value = {
-            ...checkMarkInput.value,
-            [taskId]: false
+const updateTaskName = async (node) => {
+    if (node.key === 'new') {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
         };
-        inlineTaskNameInput.value = null;
-        editClikedRowKey.value = null;
-        inputChanged.value = false;
+        await createTask(newTask);
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    } else {
+        if (inputChanged.value !== true) {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Change task name!', group: 'br', life: 3000 });
+        } else {
+            await handleTaskChanges(inlineTaskNameInput.value, node.key);
+            checkMarkInput.value = {
+                ...checkMarkInput.value,
+                [taskId]: false
+            };
+            inlineTaskNameInput.value = null;
+            editClikedRowKey.value = null;
+            inputChanged.value = false;
+        }
     }
-}
-
+};
 
 const showSpeedDial = (key) => {
     isSpeedDialVisible.value = {
         ...isSpeedDialVisible.value,
-        [key]: true,
+        [key]: true
     };
 };
 
 const hideSpeedDial = (key) => {
     isSpeedDialVisible.value = {
         ...isSpeedDialVisible.value,
-        [key]: false,
+        [key]: false
     };
 };
 
@@ -167,25 +247,22 @@ const getActionItems = (node) => {
             icon: 'pi pi-plus text-white',
             command: () => {
                 emit('openCreateSpace', node.key, 'sub-task');
-                // toast.add({ severity: 'info', summary: 'Add Sub Task', detail: `Sub Task Added to ${node.data.name}`, life: 3000 });
             },
-            disabled: !createTaskP,
+            disabled: !createTaskP
         },
         {
             label: 'Edit Task',
             icon: 'pi pi-pencil text-white',
             command: () => {
                 emit('handleTaskEdit', node);
-                // toast.add({ severity: 'success', summary: 'Edit Task', detail: `Editing ${node.data.name}`, life: 3000 });
             },
-            disabled: !updateTaskP,
+            disabled: !updateTaskP
         },
         {
             label: 'Task Detail',
             icon: 'pi pi-window-maximize text-white',
             command: () => {
                 emit('handleTaskDetailView', node);
-                // toast.add({ severity: 'info', summary: 'Task Details', detail: `Viewing details of ${node.data.name}`, life: 3000 });
             }
         },
         {
@@ -193,10 +270,9 @@ const getActionItems = (node) => {
             icon: 'pi pi-trash text-white',
             command: () => {
                 emit('confirmDeleteTask', node.key);
-                // toast.add({ severity: 'error', summary: 'Delete Task', detail: `Deleted ${node.data.name}`, life: 3000 });
             },
-            disabled: !deleteTaskP,
-        },
+            disabled: !deleteTaskP
+        }
     ];
 };
 
@@ -273,7 +349,6 @@ const loading = ref(false);
 
 const downloadTaskSheet = (taskLists) => {
     loading.value = true;
-    console.log('lod', taskLists);
     if (taskLists.length > 0) {
         const csvContent =
             'data:text/csv;charset=utf-8,' +
@@ -283,8 +358,8 @@ const downloadTaskSheet = (taskLists) => {
                     const serialNo = index + 1;
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
-                    const assignees = task.data.assignee.split(', ').join('; ');
-                    const priority = task.data.priority ? task.data.priority : '';
+                    const assignees = task.data.assigneeObj.map(assignee => assignee.name).join('; ');
+                    const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
                     const hours = Math.floor(timeTracked / 3600);
@@ -339,8 +414,6 @@ async function handleTaskStatus(status, task_id) {
         });
 
         if (data.value?.app_message === 'success') {
-            // getTaskDetails(singleTask.key);
-            console.log('Status Changed', data);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Status Changed', group: 'br', life: 3000 });
             await getSingleProject(id);
         } else {
@@ -351,8 +424,14 @@ async function handleTaskStatus(status, task_id) {
     }
 }
 
-const cLoading = ref(false);
+const inlineAssignees = ref([]);
 
+// const handleAssigneeChanges = () => {
+//     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
+//     handleTaskChanges(inlineAssigneesIds.value, )
+// }
+
+const cLoading = ref(false);
 
 const handleTaskChanges = async (taskValue, task_id) => {
     if (taskValue instanceof Date) {
@@ -365,12 +444,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
         }
         const editTaskData = {
             id: task_id,
-            // name: taskNameEditInput.value,
-            // description: taskEditDescriptionInput.value,
-            // priority: taskValue.name,
-            dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null,
-            // assignees: assignees.value.map((obj) => obj.id),
-            // tags: tags.value.map((obj) => obj.id),
+            dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - 18 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
             project_id: id
         };
 
@@ -379,7 +453,6 @@ const handleTaskChanges = async (taskValue, task_id) => {
         if (isTaskEdited.value === true) {
             cLoading.value = false;
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 3000 });
-
         } else {
             cLoading.value = false;
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update due date!', group: 'br', life: 3000 });
@@ -397,10 +470,9 @@ const handleTaskChanges = async (taskValue, task_id) => {
         if (isTaskEdited.value === true) {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Priority updated ', group: 'br', life: 3000 });
         } else {
-
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update task priority!', group: 'br', life: 3000 });
         }
-    } else{
+    } else {
         inputLoading.value = true;
         const editTaskData = {
             id: task_id,
@@ -419,19 +491,52 @@ const handleTaskChanges = async (taskValue, task_id) => {
     }
 };
 
+const inlineAssigL = ref(false);
+const handleAssigneeChanges = async (type, values, key) => {
+    if (type === 'add') {
+        inlineAssigL.value = true;
+        const editTaskData = {
+            id: key,
+            assignees: inlineAssignees.value?.map((assignee) => assignee.id),
+            project_id: id
+        };
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
+            inlineAssignees.value = [];
+            inlineAssigL.value = false;
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update assignees!', group: 'br', life: 3000 });
+            inlineAssigL.value = false;
+        }
+    }
+    if(type === 'edit'){
+        const editTaskData = {
+            id: key,
+            assignees: values?.map((assignee) => assignee.id),
+            project_id: id
+        }
+        await editTask(editTaskData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
+            inlineAssignees.value = [];
+            inlineAssigL.value = false;
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to update assignees!', group: 'br', life: 3000 });
+            inlineAssigL.value = false;
+        }
+    }
+};
 
 const inlineDueDate = ref();
 
 const handleDateChange = async (newDate, slotKey) => {
-    console.log('newDate', newDate);
     let oldDate = slotKey.node.data.dueDateValue;
 
     const selectedDate = new Date(newDate);
     selectedDate.setHours(23, 59, 0, 0);
     inlineDueDate.value = selectedDate;
-    console.log('inlineDueDate', inlineDueDate.value);
     let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-    console.log('placeHolderValue', placeHolderValue);
     slotKey.node.data.dueDateValue = placeHolderValue;
     await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
@@ -454,9 +559,11 @@ function avatarStyle(index) {
     };
 }
 
+const mUserL = ref([]);
 const getUserlist = async () => {
     await getTaskAssignModalData();
     usersLists.value = usersListStore.users;
+    mUserL.value = usersListStore.users;
 };
 
 const load = () => {
@@ -465,24 +572,6 @@ const load = () => {
         loading.value = false;
     }, 2000);
 };
-function countTasks(tasks) {
-    let count = 0;
-
-    function countSubTasks(task) {
-        count++; // Count the current task
-
-        if (task.sub_task) {
-            countSubTasks(task.sub_task); // Recursively count sub-tasks
-        }
-    }
-
-    tasks.forEach((task) => {
-        countSubTasks(task); // Start counting from each top-level task
-    });
-
-    return count;
-}
-
 
 // Kanban
 const editable = ref(true);
@@ -507,28 +596,119 @@ const handleChange = (event, name) => {
         handleTaskStatus(name, event.added.element.key);
     }
 };
+
+// Inline Task Adding functionality
+const expandedKeys = ref({});
+const currentParentNode = ref(null);
+const showInput = ref(false);
+const newTaskName = ref('');
+const parentTaskId = ref(null);
+
+const createNewTask = async () => {
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+        newTaskName.value = '';
+    }
+    const newChild = {
+        key: `new`, // Unique key
+        unique_id: `new-${Date.now()}`,
+        data: {
+            name: '', // Initially empty, will be filled by user input
+            assignee: {},
+            created_at: new Date().toISOString(),
+            dueDateValue: '',
+            status: {
+                id: null,
+                name: 'New',
+                color_code: '#6466f1'
+            },
+            is_overdue: false
+        },
+        children: []
+    };
+    showInput.value = true;
+    tableData.value = [newChild, ...tableData.value];
+    await nextTick();
+    const newInput = document.getElementById('newSubTask');
+    if (newInput) {
+        newInput.focus();
+    }
+};
+const inlineCreateSubTask = async (parentNode) => {
+    if (showInput.value) {
+        removeChild(toRaw(tableData.value));
+    }
+    const node = toRaw(parentNode.node);
+    parentTaskId.value = node.key;
+    const newChild = {
+        key: `new`, // Unique key
+        unique_id: `new-${Date.now()}`,
+        data: {
+            name: '', // Initially empty, will be filled by user input
+            assignee: {},
+            created_at: new Date().toISOString(),
+            dueDateValue: '',
+            status: {
+                id: null,
+                name: 'New',
+                color_code: '#6466f1'
+            },
+            is_overdue: false
+        },
+        children: []
+    };
+    showInput.value = true;
+    const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
+    tableData.value = structuredClone(updateTable);
+    newTaskName.value = '';
+    expandedKeys.value[parentNode.node.key] == true ? null : (expandedKeys.value[parentNode.node.key] = true);
+    // expandedKeys.value[parentNode.node.key] = true;
+
+    await nextTick();
+    const newInput = document.getElementById('newSubTask');
+    if (newInput) {
+        newInput.focus();
+    }
+};
+
+// Recursive function to add a child
+function addChild(parentKey, newChild, node) {
+    for (const child of node) {
+        if (child.key === parentKey) {
+            child.children.unshift(newChild);
+            return node;
+        }
+        if (addChild(parentKey, newChild, child.children)) {
+            return node;
+        }
+    }
+    return false;
+}
+
+// Recursive function to remove a child
+function removeChild(node = toRaw(tableData.value)) {
+    const filtered = node.filter((item) => item.key !== 'new');
+    filtered.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+            item.children = removeChild(item.children);
+        }
+    });
+    return (tableData.value = structuredClone(filtered));
+}
 </script>
 
 <template>
     <div class="filter-wrapper pb-2 mb-1">
-        <!-- <pre>{{modStatusList}}</pre> -->
-        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter
-            resetFilterOnHide optionLabel="name" placeholder="Filter Assignees" :maxSelectedLabels="3"
-            class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name"
-            placeholder="Filter Priority" class="w-full md:w-17rem mb-2" />
-        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name"
-            placeholder="Filter Status" class="w-full md:w-17rem mb-2" />
+        <MultiSelect @change="changeAttribute()" v-model="filterAssignees" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Priority" class="w-full md:w-17rem mb-2" />
+        <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
-            <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate"
-                placeholder="Filter Start Due Date" class="w-full md:w-17rem" />
+            <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate" placeholder="Start Due Date" class="w-full md:w-17rem" />
             <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
         </div>
         <div class="mb-2 relative">
-            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="Filter End Due Date"
-                class="w-full md:w-17rem" />
-            <p v-if="isCalendarSelected2" @click="handleDateDelete2"
-                class="pi pi-times end-cross absolute cursor-pointer"></p>
+            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="End Due Date" class="w-full md:w-17rem" />
+            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
         </div>
         <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-15rem mb-2" severity="secondary" />
     </div>
@@ -536,22 +716,19 @@ const handleChange = (event, name) => {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task"
-                    @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-                <div>
-                    <Button icon="pi pi-list" label="List" @click="() => (tableView = true)" class="table-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': tableView }" />
-                    <Button icon="pi pi-th-large" label="Board" @click="() => (tableView = false)" class="board-btn"
-                        severity="secondary" :class="{ 'bg-indigo-400 text-white': !tableView }" />
+                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
+                <div class="view-btns">
+                    <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
+                    <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
+                    <Button icon="pi pi-th-large" label="Board" @click="handleViews('board')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'board' }" />
+                    <!-- <Button icon="pi pi-sliders-h" label="Gantt" @click="handleViews('gantt')" class="gantt-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'gantt' }" /> -->
+                    <Button icon="pi pi-calendar" label="Calendar" @click="handleViews('calendar')" class="calendar-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'calendar' }" />
                 </div>
                 <!-- <Button type="button" label="Search" icon="pi pi-search" :loading="loading" @click="downloadTaskSheet(tasks)" /> -->
-
+                <Button icon="pi pi-github" v-tooltip.right="{ value: `Git Commits` }" @click="handleViews('git')" class="px-4" :class="{ 'bg-indigo-400 text-white': viewMode === 'git' }" severity="secondary" />
                 <!-- task report download -->
-                <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)"
-                    v-tooltip.right="{ value: `Download Tasks` }" :loading="loading"
-                    :style="`${loading === true ? 'backGround: red' : ''}`" class="excel-export-btn">
-                    <img src="/assets/icons/excel-export-icon.png" />
-                </Button>
+
+                <Button v-if="downloadTaskP" @click="downloadTaskSheet(tasks)" v-tooltip.right="{ value: `Download Tasks` }" :loading="loading" severity="secondary" class="px-4" icon="pi pi-file-excel" />
                 <!-- <Button icon="pi pi-upload" label="" class="mr-2" severity="secondary" /> -->
                 <!-- <Button icon="pi pi-users" label="Invite a guest" severity="secondary" /> -->
             </div>
@@ -566,29 +743,90 @@ const handleChange = (event, name) => {
             </IconField>
         </template>
     </Toolbar>
-    <!-- <pre>{{ tasks }}</pre> -->
-    <TreeTable v-if="tableView" class="table-st" stripedRows :value="tasks" scrollable scrollDirection="both" :lazy="true" :loading="tableLoader"
-     filterDisplay="menu" style="overflow: auto;" :tableProps="{ style: { minWidth: '1024px' } }">
+
+    <!-- project overview -->
+    <div v-if="viewMode === 'overview'">
+        <div class="grid mt-2">
+            <div class="col-12 lg:col-6 xl:col-3">
+                <div class="card mb-0" :style="`border-left:6px solid #000;`">
+                    <div to="/tags" class="flex justify-content-between">
+                        <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
+                        <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
+                <div class="card mb-0" :style="`border-left:6px solid ${statsC.statusColor};`">
+                    <div to="/tags" class="flex justify-content-between">
+                        <h4 class="mb-0 text-xl font-semibold tracking-tight">{{ statsC.statusName }}</h4>
+                        <div class="text-900 font-bold text-2xl">{{ statsC.taskCount }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <Card class="h-full">
+                    <template #title>Recent Tasks</template>
+                    <template #content>
+                        <div class="task-container">
+                            <div>
+                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                                    <div class="title-group">
+                                        <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
+                                        <p class="rtitle line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
+                                    </div>
+                                    <div>
+                                        <i>
+                                            <p style="font-size: 12px"><strong>Due Date:</strong> {{ recentTask.dueDate ? dateFormatter(recentTask?.dueDate) : '-- Not Set --' }}</p></i
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full flex justify-content-center">
+                                <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tree table -->
+    <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        scrollable
+        scrollDirection="both"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        style="overflow: auto"
+        :tableProps="{ style: { minWidth: '1024px' } }"
+    >
         <template #empty>
-            <p class=" text-center font-medium font-italic">No data found</p>
+            <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }"
-            :showAddButton="true">
+        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
-                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)"
-                    >
-                    <div  @dblclick="handleDblClick(slotProps.node)" class="flex w-full ">
+                <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
                         <div class="task-status" v-tooltip.top="{ value: `${slotProps.node.data.status.name}` }">
-                            <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                            <Dropdown
+                                class="mr-1 flex justify-content-center align-items-center"
                                 @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
-                                v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
-                                optionLabel="name">
+                                v-model="slotProps.node.data.status"
+                                :options="statuslist"
+                                :disabled="!updateTaskP"
+                                optionLabel="name"
+                            >
                                 <template #value="slotProps">
-                                    <div v-if="slotProps.value" class="flex align-items-center"
-                                        :style="{ backgroundColor: slotProps.value.color_code }">
-                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg">
-                                        </div>
+                                    <div v-if="slotProps.value" class="flex align-items-center" :style="{ backgroundColor: slotProps.value.color_code }">
+                                        <div :style="{ backgroundColor: slotProps.value.color_code }" class="status-bg"></div>
                                     </div>
                                     <span v-else>
                                         {{ slotProps.placeholder }}
@@ -596,77 +834,169 @@ const handleChange = (event, name) => {
                                 </template>
                                 <template #option="slotProps">
                                     <div class="flex align-items-center">
-                                        <div :style="{ backgroundColor: slotProps.option.color_code }"
-                                            style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi">
-                                        </div>
+                                        <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
                                         <div>{{ slotProps.option.name }}</div>
                                     </div>
                                 </template>
                             </Dropdown>
                         </div>
-                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" v-tooltip.left="{
-                            value: `${slotProps.node.data.name}`
-                        }">{{ slotProps.node.data.name }} 
+                        <span @click="handleClick(slotProps.node)" :style="editClikedRowKey === slotProps.node.key ? 'display: none;' : 'display: block;'" class="taskTitle cursor-pointer" :title="slotProps.node.data.name"
+                            >{{ slotProps.node.data.name }}
                         </span>
                         <span>
-                            <InputText :id="`inputTaskName${slotProps.node.key}`" :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'" class="inline-task-input" v-model="inlineTaskNameInput" type="text"  placeholder="Edit task title" />
+                            <InputText
+                                :id="`inputTaskName${slotProps.node.key}`"
+                                :style="editClikedRowKey === slotProps.node.key ? 'display: block;' : 'display: none;'"
+                                class="inline-task-input"
+                                v-model="inlineTaskNameInput"
+                                type="text"
+                                placeholder="Edit task name"
+                            />
                         </span>
+
+                        <form
+                            v-if="slotProps.node.key == 'new'"
+                            :onsubmit="
+                                (e) => {
+                                    e.preventDefault();
+                                    updateTaskName(slotProps.node);
+                                }
+                            "
+                            action=""
+                        >
+                            <InputText id="newSubTask" class="inline-task-input" v-model="newTaskNameInput" type="text" placeholder="Task Name" autocomplete="off" />
+                        </form>
                     </div>
                 </div>
             </template>
         </Column>
         <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
-            <template #body="slotProps" >
+            <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
-                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key" >
-                        <Button @click="handleInlineNameEdit(slotProps.node)"
-                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-pencil" class="w-fit h-fit p-1"
-                            style="font-size: 0.8rem !important;" />
-                        <Button @click="emit('openCreateSpace', slotProps.node.key, 'sub-task')"
-                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500  }" v-if="!checkMarkInput[slotProps.node.key]"
-                            severity="secondary" icon="pi pi-plus" class="w-fit h-fit p-1"
-                            style="font-size: 0.2rem" />
-                        <Button @click="updateTaskName(slotProps.node.key)" :loading="inputLoading"
-                            v-tooltip.top="{ value: `Update Name` }" v-if="checkMarkInput[slotProps.node.key]"
-                            severity="primary" icon="pi pi-check" class=" p-1 w-full"
-                            style="font-size: 0.2rem; margin: 0 0.65rem;" />
+                    <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key">
+                        <Button
+                            @click="handleInlineNameEdit(slotProps.node)"
+                            v-tooltip.top="{ value: `Edit Name`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key] && slotProps.node.key !== 'new'"
+                            severity="secondary"
+                            icon="pi pi-pencil"
+                            class="w-fit h-fit p-1"
+                            style="font-size: 0.8rem !important"
+                        />
+                        <Button
+                            @click="inlineCreateSubTask(slotProps)"
+                            v-tooltip.top="{ value: `Add Sub Task`, showDelay: 500 }"
+                            v-if="!checkMarkInput[slotProps.node.key] && slotProps.node.key !== 'new'"
+                            severity="secondary"
+                            icon="pi pi-plus"
+                            class="w-fit h-fit p-1"
+                            style="font-size: 0.2rem"
+                        />
+                        <Button
+                            @click="updateTaskName(slotProps.node)"
+                            :loading="inputLoading"
+                            v-tooltip.top="{ value: slotProps.node.key !== 'new' ? `Update Name` : 'Add Task' }"
+                            v-if="checkMarkInput[slotProps.node.key] || slotProps.node.key == 'new'"
+                            severity="secondary"
+                            :label="slotProps.node.key == 'new' ? '' : 'Save'"
+                            :icon="slotProps.node.key == 'new' ? 'pi pi-check' : ''"
+                            class="p-1 w-fit h-full"
+                            :style="slotProps.node.key == 'new' ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
+                        />
+
+                        <Button @click="removeChild()" v-tooltip.top="{ value: `Cancel Task`, showDelay: 500 }" v-if="slotProps.node.key == 'new'" severity="secondary" icon="pi pi-minus" class="w-fit h-fit p-1" style="font-size: 0.8rem !important" />
                     </div>
                 </div>
             </template>
         </Column>
-
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
-                <div class="flex justify-content-start gap-1">
-                    <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index"
-                        class="flex justify-content-center assignee-wrapper"
-                        :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                        <img v-tooltip.top="{ value: `${assignee.name}` }" class="mr-2 capitalize cursor-pointer"
-                            v-if="assignee.image" :src="assignee.image"
-                            style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white" alt=""
-                            srcset="" />
-                        <Avatar v-else v-tooltip.top="{ value: `${assignee.name}` }" :label="assignee.name.charAt(0)"
-                            class="mr-2 capitalize cursor-pointer" size="small"
-                            style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                            :style="avatarStyle(index)" />
+                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                    <span class="flex justify-content-center assignee-wrapper" v-if="slotProps.node.data?.assigneeObj.length > 0">
+                        <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
+                            <img
+                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                class="mr-2 capitalize cursor-pointer"
+                                v-if="assignee.image"
+                                :src="assignee.image"
+                                style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                alt=""
+                                srcset=""
+                            />
+                            <Avatar
+                                v-else
+                                v-tooltip.top="{ value: `${assignee.name}` }"
+                                :label="assignee.name.charAt(0)"
+                                class="mr-2 capitalize cursor-pointer"
+                                size="small"
+                                style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                :style="avatarStyle(index)"
+                            />
+                        </span>
                     </span>
+                    <span v-else>
+                        <div class="s-assignee">
+                            <div class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
+                                <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
+                                <i class="pi pi-angle-down text-sm mt-1"></i>
+                                <Button
+                                    @click="handleAssigneeChanges('add', 0, slotProps.node.key)"
+                                    v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
+                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
+                                    severity="secondary"
+                                    icon="pi pi-check"
+                                    class="w-fit h-fit p-1"
+                                    style="font-size: 0.8rem !important; z-index: 10"
+                                    :id="`assigneeBtn${slotProps.node.key}`"
+                                    :loading="inlineAssigL"
+                                />
+                                <MultiSelect v-model="inlineAssignees" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Assignees" :maxSelectedLabels="3" class="w-full absolute" style="opacity: 0" />
+                            </div>
+                        </div>
+                    </span>
+                    <div class="assigneeSelect">
+                        <div class="relative h-full">
+                            <Button
+                                v-if="slotProps.node.data?.assigneeObj.length > 0"
+                                v-tooltip.top="{ value: `Edit Assignee`, showDelay: 500 }"
+                                severity="secondary"
+                                icon="pi pi-user-edit"
+                                class="w-fit h-fit p-1"
+                                style="font-size: 0.8rem !important"
+                            />
+                            <MultiSelect
+                                v-model="slotProps.node.data.assignee"
+                                @change="handleAssigneeChanges('edit', slotProps.node.data.assignee, slotProps.node.key)"
+                                :options="mUserL"
+                                filter
+                                resetFilterOnHide="true"
+                                optionLabel="name"
+                                placeholder="Assignees"
+                                :maxSelectedLabels="3"
+                                class="w-full absolute cursor-default"
+                                style="opacity: 0; left: 0; top: 0"
+                            />
+                        </div>
+                    </div>
                 </div>
             </template>
         </Column>
         <Column field="status" header="Status" :style="{ width: '10%' }">
             <template #body="slotProps">
-                <div class="inline-block">
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2">
                         <!-- <pre>{{statuslist}}</pre> -->
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                        <Dropdown
+                            class="mr-1 flex justify-content-center align-items-center"
                             @change="handleTaskStatus(slotProps.node.data.status, slotProps.node.key)"
-                            v-model="slotProps.node.data.status" :options="statuslist" :disabled="!updateTaskP"
-                            optionLabel="name">
+                            v-model="slotProps.node.data.status"
+                            :options="statuslist"
+                            :disabled="!updateTaskP"
+                            optionLabel="name"
+                        >
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1">{{
-                                        slotProps.value.name }}</div>
+                                    <div :title="slotProps.value.name" :style="{ color: slotProps.value.color_code, fontWeight: 500 }" class="pt-1 status-truncate">{{ slotProps.value.name }}</div>
                                 </div>
                                 <span v-else>
                                     {{ slotProps.placeholder }}
@@ -674,46 +1004,54 @@ const handleChange = (event, name) => {
                             </template>
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <div :style="{ backgroundColor: slotProps.option.color_code }"
-                                        style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
+                                    <div :style="{ backgroundColor: slotProps.option.color_code }" style="width: 15px; height: 15px; border-radius: 50%" class="p-1 mr-2 pi"></div>
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
                             </template>
                         </Dropdown>
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
         </Column>
-        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%' }">
+        <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%', padding: '0.75rem 0.5rem' }">
             <template #body="slotProps">
-                <!-- <div class="cursor-pointer surface-border" :style="`color: ${slotProps.node.data.dueDateColor}; font-weight: 600;`">
-                    {{slotProps.node.data.dueDateValue }}
-                </div> -->
-               
-                    <Calendar @date-select="handleDateChange($event, slotProps)" class="inline-calendar cursor-pointer"
-                        :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
-                        :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : 'Set'" />
-             
+                <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar" style="padding-top: 0.1rem"></i>
+                <Calendar
+                    v-if="slotProps.node.key !== 'new'"
+                    @date-select="handleDateChange($event, slotProps)"
+                    class="inline-calendar cursor-pointer"
+                    :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
+                    :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : '--:--'"
+                />
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
             <template #body="slotProps">
-                <div class="inline-block">
-                    <div class="task-status-2">
-                        <!-- <pre>{{slotProps.node.data}}</pre> -->
-                        <Dropdown class="mr-1 flex justify-content-center align-items-center"
+                <div v-if="slotProps.node.key !== 'new'" class="inline-block">
+                    <div class="task-status-2 flex">
+                        <i class="pi pi-flag pt-2"></i>
+                        <Dropdown
+                            class="mr-1 flex justify-content-center align-items-center"
                             @change="handleTaskChanges(slotProps.node.data.priority, slotProps.node.key)"
-                            v-model="slotProps.node.data.priority" :options="onChangePriorities"
-                            :disabled="!updateTaskP" optionLabel="name" placeholder="Set Priority">
+                            v-model="slotProps.node.data.priority"
+                            :options="onChangePriorities"
+                            :disabled="!updateTaskP"
+                            optionLabel="name"
+                            placeholder="Set Priority"
+                        >
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class="flex align-items-center">
-                                    <div v-if="slotProps.value.name"
-                                        :style="{ color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '', fontWeight: 500 }"
-                                        class="pt-1">{{
-                                            slotProps.value.name }}
+                                    <div
+                                        v-if="slotProps.value.name"
+                                        :style="{
+                                            color: slotProps.value.name === 'Low' ? '#e1aa1e' : slotProps.value.name === 'Normal' ? '#067bea' : slotProps.value.name === 'High' ? '#ff4928' : slotProps.value.name === 'Urgent' ? 'crimson' : '',
+                                            fontWeight: 500
+                                        }"
+                                        class="pt-1"
+                                    >
+                                        {{ slotProps.value.name }}
                                     </div>
-                                    <div v-else class="pt-1">Set </div>
+                                    <div v-else class="pt-1">-----</div>
                                 </div>
                                 <span v-else>
                                     {{ slotProps.placeholder }}
@@ -725,25 +1063,17 @@ const handleChange = (event, name) => {
                                 </div>
                             </template>
                         </Dropdown>
-
                     </div>
-                    <!-- <div>{{slotProps.node.data.status.name}}</div> -->
                 </div>
             </template>
         </Column>
         <Column field="action" header="Action" :style="{ width: '6%', position: 'relative' }">
             <template #body="slotProps">
-                <div class=" justify-content-start align-items-center webView-action" style="width: fit-content;"
-                    @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
-                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
-                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
-                        :tooltipOptions="{ position: 'top' }" />
+                <div v-if="slotProps.node.key !== 'new'" class="justify-content-start align-items-center webView-action" style="width: fit-content" @mouseover="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
+                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]" :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
                 </div>
-                <div class=" justify-content-start align-items-center tabView-action" style="width: fit-content;"
-                    @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
-                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]"
-                        :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial"
-                        :tooltipOptions="{ position: 'top' }" />
+                <div v-if="slotProps.node.key !== 'new'" class="justify-content-start align-items-center tabView-action" style="width: fit-content" @click="showSpeedDial(slotProps.node.key)" @mouseleave="hideSpeedDial(slotProps.node.key)">
+                    <SpeedDial v-model:visible="isSpeedDialVisible[slotProps.node.key]" :model="getActionItems(slotProps.node)" direction="left" class="custom-speed-dial" :tooltipOptions="{ position: 'top' }" />
                 </div>
                 <!-- PrimeVue SpeedDial -->
             </template>
@@ -751,123 +1081,128 @@ const handleChange = (event, name) => {
     </TreeTable>
 
     <!-- Kanban Board -->
-    <!-- <TaskKanban v-if="!tableView" :tasks="tasks" :statuslist="statuslist" :handleStatus="handleTaskStatus" @modalHandler="modalHandler"></TaskKanban> -->
-    <div v-if="!tableView" class="main-container">
+    <div v-if="viewMode === 'board'" class="main-container">
         <div class="content">
             <div>
                 <div class="boardContainer" style="display: flex; overflow-x: auto; align-items: start">
-                    <!-- <pre>khn {{ updateTaskP }}</pre> -->
                     <div v-for="list in kanbanTasks" :key="list" class="groupColumnContainer">
                         <div class="column-container">
-                            <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name
-                                }} -
-                                {{ list.content.length }}</div>
-                            <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP"
-                                class="draggable scrollbar" itemKey="name" group="cardItem"
-                                @change="(e) => handleChange(e, list.status)">
+                            <div :style="`background-color: ${list.statusColor}; `" class="column-header">{{ list.name }} - {{ list.content.length }}</div>
+                            <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
                                 <template v-slot:item="{ element }">
                                     <div class="">
-                                        <div class="task-card" :style="taskCardStyle" :key="element.id"
-                                            @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                        <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate text-sm title"
-                                                    v-tooltip.top="{ value: `${element.data.name}` }">{{
-                                                        element.data.name }}</p>
-                                                <!-- <p class="truncate text-sm desc" v-tooltip.bottom="{value: `${element.data.description}`}">{{ element.data.description }}</p> -->
+                                                <p class="font-semibold truncate-board text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
-                                                    <div class="status-icon"
-                                                        :style="`background-color:${element.data.status.color_code}`">
-                                                    </div>
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
                                                     <i class="pi pi-user text-lg"></i>
                                                     <div class="flex justify-content-start gap-1">
-                                                        <span v-for="(assignee, index) in element.data.assigneeObj"
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
                                                             :key="index"
                                                             class="flex justify-content-center assignee-wrapper"
-                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                                                            <img v-tooltip.top="{ value: `${assignee.name}` }"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
                                                                 class="mr-2 capitalize cursor-pointer"
-                                                                v-if="assignee.image" :src="assignee.image"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
                                                                 style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
-                                                                alt="" srcset="" />
-                                                            <Avatar v-else v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
                                                                 :label="assignee.name.charAt(0)"
-                                                                class="mr-2 capitalize cursor-pointer" size="small"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
                                                                 style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                                                                :style="avatarStyle(index)" />
+                                                                :style="avatarStyle(index)"
+                                                            />
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
                                                     <i class="pi pi-calendar-minus text-lg"></i>
-                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`"
-                                                        class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
                                                     <i class="pi pi-flag text-lg"></i>
                                                     <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
-                                                    style="border-radius: 5px" @click="(event) => {
-                                                        event.stopPropagation();
-                                                        if (activeSubTask == element.unique_id) {
-                                                            activeSubTask = null;
-                                                        } else {
-                                                            activeSubTask = element.unique_id;
+                                                <div
+                                                    class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
+                                                    style="border-radius: 5px"
+                                                    @click="
+                                                        (event) => {
+                                                            event.stopPropagation();
+                                                            if (activeSubTask == element.unique_id) {
+                                                                activeSubTask = null;
+                                                            } else {
+                                                                activeSubTask = element.unique_id;
+                                                            }
                                                         }
-                                                    }
-                                                        ">
+                                                    "
+                                                >
                                                     <p class="mb-1">Subtask</p>
-                                                    <i
-                                                        :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
+                                                    <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
                                                 </div>
                                             </div>
                                             {{ element.t_name }}
                                         </div>
                                         <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
-                                            <div v-for="element in element.children" :key="element.unique_id"
-                                                class="sub-card"
-                                                @click="$emit('handleTaskDetailView', element, list.content, list.name)">
-                                                <p class="font-semibold truncate text-sm title">{{ element.data.name }}
-                                                </p>
-                                                <p class="truncate text-sm desc">{{ element.data.description }}</p>
+                                            <div v-for="element in element.children" :key="element.unique_id" class="sub-card" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                                <p class="font-semibold truncate-board text-sm title">{{ element.data.name }}</p>
+                                                <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
-                                                    <div class="status-icon"
-                                                        :style="`background-color:${element.data.status.color_code}`">
-                                                    </div>
+                                                    <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
                                                     <i class="pi pi-user text-lg"></i>
                                                     <div class="flex justify-content-start gap-1">
-                                                        <span v-for="(assignee, index) in element.data.assigneeObj"
+                                                        <span
+                                                            v-for="(assignee, index) in element.data.assigneeObj"
                                                             :key="index"
                                                             class="flex justify-content-center assignee-wrapper"
-                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
-                                                            <img v-tooltip.top="{ value: `${assignee.name}` }"
+                                                            :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                                        >
+                                                            <img
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
                                                                 class="mr-2 capitalize cursor-pointer"
-                                                                v-if="assignee.image" :src="assignee.image"
+                                                                v-if="assignee.image"
+                                                                :src="assignee.image"
                                                                 style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
-                                                                alt="" srcset="" />
-                                                            <Avatar v-else v-tooltip.top="{ value: `${assignee.name}` }"
+                                                                alt=""
+                                                                srcset=""
+                                                            />
+                                                            <Avatar
+                                                                v-else
+                                                                v-tooltip.top="{ value: `${assignee.name}` }"
                                                                 :label="assignee.name.charAt(0)"
-                                                                class="mr-2 capitalize cursor-pointer" size="small"
+                                                                class="mr-2 capitalize cursor-pointer"
+                                                                size="small"
                                                                 style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                                                                :style="avatarStyle(index)" />
+                                                                :style="avatarStyle(index)"
+                                                            />
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
                                                     <i class="pi pi-calendar-minus text-lg"></i>
-                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`"
-                                                        class="text-sm">{{ element.data.dueDateValue }}</p>
+                                                    <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
-                                                <div class="mt-2 flex align-items-center gap-2">
+                                                <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
                                                     <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority }}</p>
+                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2">
                                                     <i class="pi pi-angle-right text-lg"></i>
@@ -884,6 +1219,55 @@ const handleChange = (event, name) => {
             </div>
         </div>
     </div>
+
+    <!-- task calendar -->
+    <div v-if="viewMode === 'calendar'" class="">
+        <!-- <VueCal :events="calendarTasks"  :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px"/> -->
+        <vue-cal :events="calendarTasks" :selected-date="new Date().current" :time-from="8 * 60" :disable-views="['years', 'year', 'week']" active-view="month" events-on-month-view="short" style="height: 600px">
+            <template #event="{ event }">
+                <div @click="handleClick(event)" class="vuecal__event" :style="{ background: event.color }" v-html="event.title" />
+            </template>
+        </vue-cal>
+    </div>
+
+    <div v-if="viewMode === 'git'">
+        <Card>
+            <template #title>Commit List</template>
+            <template #content>
+                <Dropdown @change="filterBranches" v-model="selectedGitBranch" :options="gitBranchesList" optionLabel="name" placeholder="Branches" class="w-full md:w-17rem mb-3 mt-2" />
+                <div>
+                    <div class="commit-card-wrapper mb-2">
+                        <Timeline v-if="gitCommits.length > 0" :value="gitCommits">
+                            <template #content="slotProps">
+                                <div class="flex justify-content-between align-items-center bb">
+                                    <div>
+                                        <div class="flex align-items-center gap-2">
+                                            <div class="pi pi-user"></div>
+                                            <h6 class="m-0">{{ slotProps.item.author_name }}</h6>
+                                        </div>
+                                        <div>
+                                            <h6 class="font-light mt-2 mb-0 commit-title">- {{ slotProps.item.title }}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-normal mb-0 text-mute">
+                                            <small>{{ slotProps.item.authored_date }} </small>
+                                        </p>
+                                        <a :href="slotProps.item.web_url" target="_blank" class="font-small text-end">
+                                            <small>{{ slotProps.item.short_id }}</small></a
+                                        >
+                                    </div>
+                                </div>
+                            </template>
+                        </Timeline>
+                        <div v-else class="w-full flex justify-content-center my-1">
+                            <h4><i>No Commits Found</i></h4>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </Card>
+    </div>
 </template>
 
 <style lang="scss">
@@ -896,7 +1280,7 @@ const handleChange = (event, name) => {
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 8px;
-    width: calc(20rem - 15px);
+    width: calc(23rem - 15px);
 }
 
 .action-dropdown {
@@ -949,27 +1333,25 @@ const handleChange = (event, name) => {
     width: 100% !important;
 }
 
-.table-st .p-treetable-emptymessage{
+.table-st .p-treetable-emptymessage {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.table-st thead th:hover{
-    border: 2px solid #e2e8f0;
+.table-st thead th:hover {
+    /*border: 2px solid #e2e8f0;
     border-top: none;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;*/
 }
 
 .table-st table {
     width: 100% !important;
 }
 
-
-
 .filter-wrapper {
     display: flex;
-    flex-wrap: wrap;
+    // flex-wrap: wrap;
     align-items: center;
     justify-content: start;
     gap: 10px;
@@ -1016,7 +1398,7 @@ const handleChange = (event, name) => {
     font-weight: 500;
 }
 
-.taskTitle{
+.taskTitle {
     max-width: 100%;
     position: absolute;
     white-space: nowrap;
@@ -1060,8 +1442,17 @@ const handleChange = (event, name) => {
 
 .task-status-2 .p-dropdown .p-inputtext {
     padding: 0.25rem 0.5rem !important;
+    padding-right: 4px !important;
 }
-
+.task-status-2 .p-dropdown {
+    background: transparent;
+    border: none;
+    box-shadow: 0 0 #ffffff, 0 0 #ffffff, 0 1px 2px 0 #ffffff;
+}
+.task-status-2 .p-dropdown:focus {
+    background: transparent;
+    border: none;
+}
 .task-status-2 .status-bg {
     position: absolute;
     top: -1px;
@@ -1074,6 +1465,12 @@ const handleChange = (event, name) => {
 
 .task-status-2 .p-dropdown-label {
     margin-top: -4px;
+}
+.task-status-2 .p-focus {
+    outline: none;
+    outline-offset: -1px;
+    box-shadow: none;
+    border-color: none;
 }
 
 /* Kanban */
@@ -1202,16 +1599,26 @@ textarea {
     box-shadow: 2px 3px #e2e2e2;
     border: none;
 }
-
+@media only screen and (max-width: 1380px) {
+    .filter-wrapper {
+        flex-wrap: wrap;
+    }
+}
 @media only screen and (max-width: 1250px) {
     .boardContainer {
         max-width: 1025px;
+    }
+    .filter-wrapper {
+        flex-wrap: wrap;
     }
 }
 
 @media only screen and (max-width: 1025px) {
     .boardContainer {
         max-width: 600px;
+    }
+    .filter-wrapper {
+        flex-wrap: wrap;
     }
 }
 
@@ -1303,9 +1710,9 @@ textarea {
 
 .status-icon {
     /* background-color: red; */
-    height: 10px;
-    width: 10px;
-    border-radius: 10px;
+    height: 12px;
+    width: 12px;
+    border-radius: 12px;
 }
 
 .status {
@@ -1317,6 +1724,11 @@ textarea {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+}
+.truncate-board {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 @media only screen and (max-width: 1250px) {
@@ -1358,12 +1770,35 @@ textarea {
 .table-btn {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
+    border-right: 0px !important;
     min-width: 91.22px;
 }
 
-.board-btn {
+/*.board-btn {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
+}
+
+.gantt-btn {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+}*/
+
+.view-btns .view-btn:first-child {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.view-btns .view-btn:last-child {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.view-btns .view-btn:not(:first-child):not(:last-child) {
+    border-radius: 0px;
+    border-left: 2px solid #e2e8f0;
+    border-right: 2px solid #e2e8f0;
 }
 
 .webView-action {
@@ -1373,7 +1808,6 @@ textarea {
 .tabView-action {
     display: none;
 }
-
 
 @media (max-width: 1024px) {
     .webView-action {
@@ -1385,7 +1819,7 @@ textarea {
     }
 }
 
-.p-treetable .p-treetable-tbody>tr>td .p-treetable-toggler {
+.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler {
     margin-right: 0.2rem !important;
     flex-shrink: 0;
     margin-top: 0.1rem;
@@ -1445,7 +1879,6 @@ textarea {
 }
 
 .p-speeddial-list {
-
     li:nth-child(1) a {
         background-color: #22c55e;
     }
@@ -1467,7 +1900,6 @@ textarea {
     transform: rotate(90deg);
 }
 
-
 .p-treetable-loading-overlay {
     background: transparent !important;
     z-index: 100;
@@ -1475,43 +1907,42 @@ textarea {
     -webkit-backdrop-filter: blur(100px) !important;
 }
 
-
-.green-calendar>input::-webkit-input-placeholder {
+.green-calendar > input::-webkit-input-placeholder {
     color: #087641;
     font-weight: 600;
 }
 
-.green-calendar>input:-moz-placeholder {
+.green-calendar > input:-moz-placeholder {
     color: #087641;
     font-weight: 600;
 }
 
-.green-calendar>input::-moz-placeholder {
+.green-calendar > input::-moz-placeholder {
     color: #087641;
     font-weight: 600;
 }
 
-.green-calendar>input:-ms-input-placeholder {
+.green-calendar > input:-ms-input-placeholder {
     color: #087641;
     font-weight: 600;
 }
 
-.red-calendar>input::-webkit-input-placeholder {
+.red-calendar > input::-webkit-input-placeholder {
     color: #b13a41;
     font-weight: 600;
 }
 
-.red-calendar>input:-moz-placeholder {
+.red-calendar > input:-moz-placeholder {
     color: #b13a41;
     font-weight: 600;
 }
 
-.red-calendar>input::-moz-placeholder {
+.red-calendar > input::-moz-placeholder {
     color: #b13a41;
     font-weight: 600;
 }
 
-.red-calendar>input:-ms-input-placeholder {
+.red-calendar > input:-ms-input-placeholder {
     color: #b13a41;
     font-weight: 600;
 }
@@ -1519,26 +1950,188 @@ textarea {
 .inline-calendar {
     @media (min-width: 1440px) {
         max-width: 4.2vw !important;
+        border: none;
+        font-weight: 400;
     }
+
     cursor: pointer !important;
 
     .p-inputtext {
-        padding: 0.25rem 0.5rem !important;
+        padding: 0.25rem 0.4rem !important;
         cursor: pointer !important;
-        text-align: center !important;
         caret-color: transparent !important;
-
+        border: 1px solid #fff;
+        box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
+        font-weight: 400;
+        outline: none !important;
+        outline-offset: -1px !important;
+        box-shadow: none !important;
+        border-color: none !important;
     }
 }
 
-
-.inline-task-input{
-    padding: 0.35rem 0.75rem !important;
+.inline-task-input {
+    padding: 0.35rem 0rem !important;
     width: 98.6%;
     position: absolute;
     left: 23px;
     top: -6px;
+    border: transparent;
+    box-shadow: none;
+}
+.p-inputtext.inline-task-input:enabled:focus {
+    outline: none;
 }
 
+.status-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 65px;
+}
 
+.filter-container {
+    padding: 0 10px;
+}
+
+.task-container {
+    max-height: 25rem;
+    overflow-y: auto;
+    padding: 0px 8px 0px 1px;
+}
+
+.task-card {
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.task-card:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+// .status {
+//     height: 12px;
+//     width: 12px;
+//     border-radius: 25px;
+//     background: #000;
+// }
+
+.rTitle {
+    margin: auto 0;
+    max-width: 300px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.commit-card-wrapper .p-timeline-event-opposite {
+    display: none !important;
+}
+
+.commit-card {
+    border: none !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    padding: 10px 5px !important;
+    margin-bottom: 0px !important;
+}
+
+.commit-title {
+    max-width: 550px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.bb {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.recenttaskstatus {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.vuecal__menu {
+    background-color: #8183f4;
+}
+.vuecal__view-btn {
+    color: #ffffff;
+}
+.vuecal__title-bar {
+    background-color: #b8b9fd;
+    color: white !important;
+}
+.vuecal__arrow--prev i.angle {
+    border: 1px solid #ffff;
+    border-width: 0 2px 2px 0;
+    rotate: 180deg;
+}
+.vuecal__arrow i.angle {
+    border: 1px solid #ffff;
+    border-width: 0 2px 2px 0;
+}
+.vuecal__weekdays-headings {
+    background-color: transparent;
+}
+.vuecal__bg {
+    background-color: #f9f9f9;
+}
+.vuecal__cell-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 5px;
+}
+.vuecal__cell-content {
+    justify-content: start !important;
+    padding: 4px;
+}
+.vuecal__event {
+    padding: 3px;
+    border-radius: 5px;
+    color: #ffffff;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: wrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.vuecal__event--focus {
+    box-shadow: none !important;
+}
+
+.userL {
+    position: relative;
+}
+
+.userL:hover {
+    .assigneeSelect {
+        visibility: visible;
+        right: -19px;
+        top: 3px;
+        position: absolute;
+    }
+}
+
+.assigneeSelect {
+    visibility: hidden;
+}
 </style>
