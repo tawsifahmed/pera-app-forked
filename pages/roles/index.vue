@@ -84,6 +84,7 @@ const init = async () => {
     }
 };
 
+const groupPermissions = ref([]);
 const permissionList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('permissionList', () =>
@@ -95,6 +96,14 @@ const permissionList = async () => {
     );
     if (data.value?.data?.length > 0) {
         permissionsList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        groupPermissions.value = Object.entries(data.value.group).map(([groupName, permissions]) => ({
+            group: groupName,
+            children: permissions.map(permission => ({
+                id: permission.id,
+                name: permission.name
+            }))
+        }));
+        console.log(groupPermissions.value);
     }
 };
 
@@ -161,8 +170,8 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoleCreateRole :param="{ permissionsList }" @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoleCreateRole :param="{ permissionsList, groupPermissions }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->

@@ -321,7 +321,7 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
             loadMoreLoading.value = false; 
         }
 
-        console.log('Task list: ', taskList.value);
+        // console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
         loadMoreLoading.value = false; 
