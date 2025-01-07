@@ -4,19 +4,22 @@
             <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText id="editTeamName" v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
-        <label
-            >Permissions<i class="text-red-400 text-italic">*</i>
-            <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-        </label>
+        <label>Permissions<i class="text-red-400 text-italic">*</i></label>
         <div class="groupPer-container">
-            <div v-for="group in groupPermissions" :key="group">
+            <div v-for="group in groupPermissions" :key="group.group.id">
+                <!-- Group Checkbox -->
                 <div class="flex align-items-start justify-content-between w-full mb-3">
                     <div class="flex justify-content-center" style="width: 50%">
-                        <p class="grp-title">{{ group.group }}</p>
+                        <div class="group-selection">
+                            <Checkbox v-model="selectedGroupPerms" :value="group.group.id" @change="handleGroupChange(group)" />
+                            <label class="grp-title ml-2">{{ group.group.name }}</label>
+                        </div>
                     </div>
+            
+                    <!-- Children Checkboxes -->
                     <div class="flex flex-column gap-3 justify-content-start" style="width: 50%">
                         <div v-for="child in group.children" :key="child.id" class="flex align-items-center">
-                            <Checkbox v-model="selectedPermissions" :inputId="child.id" :value="child.id" />
+                            <Checkbox v-model="selectedPerm" :inputId="child.id" :value="child.id" />
                             <label :for="child.id" class="ml-2">{{ child.name }}</label>
                         </div>
                     </div>
@@ -54,16 +57,51 @@ const permissionsList = ref(props.param.permissionsList);
 
 const groupPermissions = ref(props.param.groupPermissions);
 
-const selectedPermissions = ref(props.param.slctdPermissions);
 
+const selectedPerm = ref(props.param.slctdPermissions || []);  // Store selected permissions
 
-const selectedPerm = ref([]);
+const selectedGroupPerms  = ref([]);  // Store selected groups
 
 const errorHandler = ref(false);
 
 const employeeForm = ref(true);
 
 const emit = defineEmits(['closeEditModal']);
+
+
+const handleDefaultGroupSelection = () => {
+    groupPermissions.value.forEach(group => {
+        const allChildrenSelected = group.children.every(child => selectedPerm.value.includes(child.id));
+        if (allChildrenSelected) {
+            selectedGroupPerms.value.push(group.group.id);
+        }
+    });
+};
+
+// Handle child checkbox change
+const handleGroupChange = (group) => {
+    const allChildrenIds = group.children.map(child => child.id);
+
+    if (selectedGroupPerms.value.includes(group.group.id)) {
+        // Group selected, add all children to selectedPerm
+        selectedPerm.value = [...new Set([...selectedPerm.value, ...allChildrenIds])];
+    } else {
+        // Group deselected, remove all children from selectedPerm
+        selectedPerm.value = selectedPerm.value.filter(id => !allChildrenIds.includes(id));
+    }
+};
+
+
+watch(selectedPerm, () => {
+    groupPermissions.value.forEach(group => {
+        const allChildrenSelected = group.children.every(child => selectedPerm.value.includes(child.id));
+        if (allChildrenSelected && !selectedGroupPerms.value.includes(group.group.id)) {
+            selectedGroupPerms.value.push(group.group.id);
+        } else if (!allChildrenSelected && selectedGroupPerms.value.includes(group.group.id)) {
+            selectedGroupPerms.value = selectedGroupPerms.value.filter(id => id !== group.group.id);
+        }
+    });
+});
 
 const handleSubmitData = async () => {
     if (editName.value === '') {
@@ -80,7 +118,7 @@ const handleSubmitData = async () => {
                 },
                 body: {
                     name: editName.value,
-                    permissions: selectedPermissions.value
+                    permissions: selectedPerm.value
                 }
             });
 
@@ -96,6 +134,7 @@ const handleSubmitData = async () => {
 };
 
 onMounted(async() => {
+    handleDefaultGroupSelection();
     const editTeamName = document.getElementById('editTeamName');
     nextTick(() => {
         if (editTeamName){
@@ -143,5 +182,11 @@ onMounted(async() => {
 .grp-title {
     text-transform: capitalize;
     margin-bottom: 0.2rem !important;
+}
+
+@media (min-width: 768px) {
+    .group-selection{
+        margin-left: 60px;
+    }
 }
 </style>
