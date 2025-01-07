@@ -4,12 +4,14 @@
             <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText id="editTeamName" v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
-        <label>Permissions<i class="text-red-400 text-italic">*</i></label>
-        <div class="groupPer-container">
+        <div class="mb-3">
+            <label>Permissions<i class="text-red-400 text-italic">*</i></label>
+        </div>
+        <div class="groupPer-container mb-3">
             <div v-for="group in groupPermissions" :key="group.group.id">
                 <!-- Group Checkbox -->
                 <div class="flex align-items-start justify-content-between w-full mb-3">
-                    <div class="flex justify-content-center" style="width: 50%">
+                    <div class="flex justify-content-start" style="width: 50%">
                         <div class="group-selection">
                             <Checkbox v-model="selectedGroupPerms" :value="group.group.id" @change="handleGroupChange(group)" />
                             <label class="grp-title ml-2">{{ group.group.name }}</label>
@@ -33,7 +35,6 @@
             <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div> -->
 
-        <p v-if="errorHandler" style="color: red">Please enter tag name</p>
         <div class="create-btn-wrappe">
             <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
@@ -61,8 +62,6 @@ const groupPermissions = ref(props.param.groupPermissions);
 const selectedPerm = ref(props.param.slctdPermissions || []);  // Store selected permissions
 
 const selectedGroupPerms  = ref([]);  // Store selected groups
-
-const errorHandler = ref(false);
 
 const employeeForm = ref(true);
 
@@ -105,11 +104,15 @@ watch(selectedPerm, () => {
 
 const handleSubmitData = async () => {
     if (editName.value === '') {
-        errorHandler.value = true;
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name', group: 'br', life: 3000 });
+        return;
+    } else if (selectedPerm.value.length === 0) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please select roles', group: 'br', life: 3000 });
+        return;
+    } else if (editName.value === '' && selectedPerm.value.length === 0) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name and select role', group: 'br', life: 3000 });
         return;
     } else {
-        errorHandler.value = false;
-        if (!errorHandler.value) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/update/${id.value}`, {
                 method: 'POST',
@@ -130,7 +133,6 @@ const handleSubmitData = async () => {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role!', group: 'br', life: 3000 });
             }
         }
-    }
 };
 
 onMounted(async() => {
@@ -186,7 +188,7 @@ onMounted(async() => {
 
 @media (min-width: 768px) {
     .group-selection{
-        margin-left: 60px;
+        margin-left: 70px;
     }
 }
 </style>

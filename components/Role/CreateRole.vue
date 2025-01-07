@@ -5,8 +5,10 @@
             <InputText id="createRoleName" v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
-        <label>Permissions<i class="text-red-400 text-italic">*</i></label>
-        <div class="groupPer-container">
+        <div class="mb-3">
+            <label>Permissions<i class="text-red-400 text-italic">*</i></label>
+        </div>
+        <div class="groupPer-container mb-3">
             <div v-for="group in groupPermissions" :key="group.group.id">
                 <!-- Group Checkbox -->
                 <div class="flex align-items-start justify-content-between w-full mb-3">
@@ -28,7 +30,6 @@
             </div>
         </div>
 
-        <p v-if="errorHandler" style="color: red">Please enter role name</p>
         <div class="create-btn-wrapper mb-0">
             <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
         </div>
@@ -48,52 +49,46 @@ const props = defineProps({
 const toast = useToast();
 const name = ref('');
 const groupPermissions = ref(props.param.groupPermissions);
-const selectedPerm = ref([]);  // Store selected permissions
-const selectedGroups = ref([]);  // Store selected groups
-const errorHandler = ref(false);
+const selectedPerm = ref([]);
+const selectedGroups = ref([]);  
 const employeeForm = ref(true);
 const emit = defineEmits(['closeCreateModal']);
 
-// Handle group checkbox change
 const handleGroupChange = (group) => {
     const groupId = group.group.id;
     const allChildIds = group.children.map(child => child.id);
     
     if (selectedGroups.value.includes(groupId)) {
-        // Select all children if the group is selected
         selectedPerm.value = [...new Set([...selectedPerm.value, ...allChildIds])];
     } else {
-        // Deselect all children if the group is deselected
         selectedPerm.value = selectedPerm.value.filter(id => !allChildIds.includes(id));
     }
 };
 
-// Handle child checkbox change
 const handleChildChange = (group) => {
     const allChildIds = group.children.map(child => child.id);
-    
-    // Check if all children are selected
     const allSelected = allChildIds.every(id => selectedPerm.value.includes(id));
     
     if (allSelected) {
-        // Select the group if all children are selected
         if (!selectedGroups.value.includes(group.group.id)) {
             selectedGroups.value.push(group.group.id);
         }
     } else {
-        // Deselect the group if any child is deselected
         selectedGroups.value = selectedGroups.value.filter(id => id !== group.group.id);
     }
 };
 
-// Handle form submission
 const handleSubmitData = async () => {
-    if (name.value === '' || selectedPerm.value.length === 0) {
-        errorHandler.value = true;
+    if (name.value === '') {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name', group: 'br', life: 3000 });
+        return;
+    } else if (selectedPerm.value.length === 0) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please select roles', group: 'br', life: 3000 });
+        return;
+    } else if (name.value === '' && selectedPerm.value.length === 0) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name and select role', group: 'br', life: 3000 });
         return;
     } else {
-        errorHandler.value = false;
-        if (!errorHandler.value) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/create`, {
                 method: 'POST',
@@ -115,10 +110,9 @@ const handleSubmitData = async () => {
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Role Creation Failed!', group: 'br', life: 3000 });
             }
         }
-    }
 };
 
-// Auto-focus the role name input
+
 onMounted(() => {
     const createRoleName = document.getElementById('createRoleName');
     nextTick(() => {
@@ -171,7 +165,7 @@ onMounted(() => {
 
 @media (min-width: 768px) {
     .group-selection{
-        margin-left: 60px;
+        margin-left: 70px;
     }
 }
 </style>
