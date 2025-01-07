@@ -1,43 +1,31 @@
 <template>
     <div>
         <div class="field">
-            <label for="company"
-                >Role Name<i class="text-red-400 text-italic">*</i>
-                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-            </label>
+            <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
             <InputText id="createRoleName" v-model="name" class="w-full" placeholder="Enter role name" />
         </div>
 
-        <label
-            >Permissions<i class="text-red-400 text-italic">*</i>
-            <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-        </label>
+        <label>Permissions<i class="text-red-400 text-italic">*</i></label>
         <div class="groupPer-container">
-            <div v-for="group in groupPermissions" :key="group">
+            <div v-for="group in groupPermissions" :key="group.group.id">
+                <!-- Group Checkbox -->
                 <div class="flex align-items-start justify-content-between w-full mb-3">
-                    <div class="flex justify-content-center" style="width: 50%">
-                        <p class="grp-title">{{ group.group }}</p>
+                    <div class="flex justify-content-start" style="width: 50%">
+                        <div class="group-selection">
+                            <Checkbox v-model="selectedGroups" :inputId="'group-' + group.group.id" :value="group.group.id" @change="handleGroupChange(group)" />
+                            <label class="grp-title ml-2" :for="'group-' + group.group.id">{{ group.group.name }}</label>
+                        </div>
                     </div>
+                    <!-- Children Checkboxes -->
                     <div class="flex flex-column gap-3 justify-content-start" style="width: 50%">
                         <div v-for="child in group.children" :key="child.id" class="flex align-items-center">
-                            <Checkbox v-model="selectedPerm" :inputId="child.id" :value="child.id" />
+                            <Checkbox v-model="selectedPerm" :inputId="child.id" :value="child.id" @change="handleChildChange(group)" />
                             <label :for="child.id" class="ml-2">{{ child.name }}</label>
                         </div>
                     </div>
                 </div>
                 <Divider />
             </div>
-        </div>
-        <!-- <pre>
-            new {{ selectedPerm }}
-        </pre>
-        <pre>old{{selectedPermissions}}</pre> -->
-        <div class="field permission_selection">
-            <label
-                >Permissions<i class="text-red-400 text-italic">*</i>
-                <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-            </label>
-            <MultiSelect display="chip" v-model="selectedPermissions" :options="permissionsList" filter resetFilterOnHide optionLabel="name" placeholder="Select Permissions" :maxSelectedLabels="40" class="w-full" />
         </div>
 
         <p v-if="errorHandler" style="color: red">Please enter role name</p>
@@ -46,6 +34,8 @@
         </div>
     </div>
 </template>
+
+
 <script setup>
 const url = useRuntimeConfig();
 const props = defineProps({
@@ -56,25 +46,49 @@ const props = defineProps({
 });
 
 const toast = useToast();
-
 const name = ref('');
-
 const groupPermissions = ref(props.param.groupPermissions);
-
-const permissionsList = ref(props.param.permissionsList);
-
-const selectedPermissions = ref([]);
-
-const selectedPerm = ref([]);
-
+const selectedPerm = ref([]);  // Store selected permissions
+const selectedGroups = ref([]);  // Store selected groups
 const errorHandler = ref(false);
-
 const employeeForm = ref(true);
-
 const emit = defineEmits(['closeCreateModal']);
 
+// Handle group checkbox change
+const handleGroupChange = (group) => {
+    const groupId = group.group.id;
+    const allChildIds = group.children.map(child => child.id);
+    
+    if (selectedGroups.value.includes(groupId)) {
+        // Select all children if the group is selected
+        selectedPerm.value = [...new Set([...selectedPerm.value, ...allChildIds])];
+    } else {
+        // Deselect all children if the group is deselected
+        selectedPerm.value = selectedPerm.value.filter(id => !allChildIds.includes(id));
+    }
+};
+
+// Handle child checkbox change
+const handleChildChange = (group) => {
+    const allChildIds = group.children.map(child => child.id);
+    
+    // Check if all children are selected
+    const allSelected = allChildIds.every(id => selectedPerm.value.includes(id));
+    
+    if (allSelected) {
+        // Select the group if all children are selected
+        if (!selectedGroups.value.includes(group.group.id)) {
+            selectedGroups.value.push(group.group.id);
+        }
+    } else {
+        // Deselect the group if any child is deselected
+        selectedGroups.value = selectedGroups.value.filter(id => id !== group.group.id);
+    }
+};
+
+// Handle form submission
 const handleSubmitData = async () => {
-    if (name.value === '') {
+    if (name.value === '' || selectedPerm.value.length === 0) {
         errorHandler.value = true;
         return;
     } else {
@@ -88,7 +102,7 @@ const handleSubmitData = async () => {
                 },
                 body: {
                     name: name.value,
-                    permissions: selectedPermissions.value.map((item) => item.id)
+                    permissions: selectedPerm.value
                 }
             });
 
@@ -104,6 +118,7 @@ const handleSubmitData = async () => {
     }
 };
 
+// Auto-focus the role name input
 onMounted(() => {
     const createRoleName = document.getElementById('createRoleName');
     nextTick(() => {
@@ -113,6 +128,7 @@ onMounted(() => {
     });
 });
 </script>
+
 
 <style lang="scss">
 .text-danger {
@@ -151,5 +167,11 @@ onMounted(() => {
 .grp-title {
     text-transform: capitalize;
     margin-bottom: 0.2rem !important;
+}
+
+@media (min-width: 768px) {
+    .group-selection{
+        margin-left: 60px;
+    }
 }
 </style>
