@@ -359,6 +359,11 @@ watchEffect(async () => {
 });
 
 const visibleTop = ref(false);
+
+const closeSearch = (evn) => {
+    console.log('closeSearch', evn);
+    visibleTop.value = false;
+};
 </script>
 
 <template>
@@ -459,7 +464,7 @@ const visibleTop = ref(false);
             <Profile :userProfile="userProfile" />
         </Dialog>
         <Sidebar v-model:visible="visibleTop" header=" " position="top" class="search-container" style="height: auto">
-            <Search />
+            <Search @closeSearch="closeSearch($event)" />
         </Sidebar>
     </div>
 </template>

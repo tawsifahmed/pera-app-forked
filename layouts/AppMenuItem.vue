@@ -215,6 +215,6 @@ const toggle = (event) => {
 
 .space-items {
     text-wrap: nowrap;
-    padding-left: 1px !important;
+    padding-left: 2px !important;
 }
 </style>
