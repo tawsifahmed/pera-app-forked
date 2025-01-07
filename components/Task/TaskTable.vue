@@ -119,9 +119,11 @@ const hoveredRowKey = ref(null);
 
 watch(hoveredRowKey, (newVal, oldVal) => {
     if (newVal !== oldVal) {
-        inlineAssignees.value = [];
+        // inlineAssignees.value = [];
     }
 });
+
+
 
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
@@ -425,7 +427,13 @@ async function handleTaskStatus(status, task_id) {
 }
 
 const inlineAssignees = ref([]);
+const inlineAssigTId = ref(null);
+const handleAssigneeSelection = (task_id) => {
+    console.log('inlineAssignees', inlineAssignees.value);
+    inlineAssigTId.value = task_id;
+        inlineAssignees.value = [];
 
+};
 // const handleAssigneeChanges = () => {
 //     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
 //     handleTaskChanges(inlineAssigneesIds.value, )
@@ -936,13 +944,15 @@ function removeChild(node = toRaw(tableData.value)) {
                     </span>
                     <span v-else>
                         <div class="s-assignee">
-                            <div class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
-                                <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
-                                <i class="pi pi-angle-down text-sm mt-1"></i>
+                            <div @click="handleAssigneeSelection(slotProps.node.key)" class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
+                           
+                                    <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
+                                    <i class="pi pi-angle-down text-sm mt-1"></i>
+                            
                                 <Button
                                     @click="handleAssigneeChanges('add', 0, slotProps.node.key)"
                                     v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
-                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
+                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && inlineAssigTId === slotProps.node.key"
                                     severity="secondary"
                                     icon="pi pi-check"
                                     class="w-fit h-fit p-1"
