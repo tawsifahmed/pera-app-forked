@@ -51,12 +51,12 @@ const deletingProject = async () => {
     await deleteProject(refProjectId.value, spaces);
 
     if (isProjectDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Project Deleted Successfully', group: 'br', life: 3000 });
         deleteProjectDialog.value = false;
         console.log('space deleted');
         deleteLoader.value = false;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete project', group: 'br', life: 3000 });
         console.log('space not deleted');
         deleteLoader.value = false;
     }

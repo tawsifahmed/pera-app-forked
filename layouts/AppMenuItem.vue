@@ -195,7 +195,7 @@ const toggle = (event) => {
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
-            <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1">
+            <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1" style="margin-left: 1px;" >
                 <app-menu-item v-for="(child, i) in item.items" :key="child" :index="i" :item="child" :parentItemKey="itemKey" :root="false"></app-menu-item>
                 <!-- <CreateSpace /> -->
             </ul>
@@ -215,5 +215,6 @@ const toggle = (event) => {
 
 .space-items {
     text-wrap: nowrap;
+    padding-left: 1px !important;
 }
 </style>
