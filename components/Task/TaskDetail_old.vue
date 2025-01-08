@@ -6,11 +6,8 @@ import { useFileUploaderStore } from '~/store/fileUpload';
 import accessPermission from '~/composables/usePermission';
 import Editor from 'primevue/editor';
 import Calendar from 'primevue/calendar';
-import { onMounted, toRaw } from 'vue';
+import { onMounted } from 'vue';
 import Inplace from 'primevue/inplace';
-import Quill from 'quill';
-import QuillMention from 'quill-mention';
-
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -246,11 +243,8 @@ const handleTaskComment = async () => {
         toast.add({ severity: 'warn', summary: 'Warn', detail: 'Comment required', group: 'br', life: 3000 });
         return;
     }
-
-    const userIds = await getMentionedIds()
-    
     btnLoading.value = true;
-    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value, userIds);
+    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
     if (isTaskCommentCreated.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
@@ -541,51 +535,6 @@ const handleShareTaskId = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
     }
 };
-
-
-const getMentionedIds = async() => {
-    const mentions = document.querySelectorAll('.task-comment .ql-editor .mention');
-
-    const dataIds = Array.from(mentions).map(mention => mention.getAttribute('data-id'));
-
-    const uniqueDataIds = [...new Set(dataIds)];
-
-    return uniqueDataIds
-}
-
-
-
-// Quill.register('modules/mention', QuillMention);
-
-const list = toRaw(usersLists);
-
-const mentionList = list.map(item => {
-    const { name, ...rest } = item;
-    return { ...rest, value: name };
-});
-
-
-const modules = {
-  mention: {
-    source: function (searchTerm, renderList) {
-      const matches = mentionList.filter(item =>
-        item.value.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      renderList(matches);
-    },
-    renderItem: function (item) {
-      return `${item.value}`;
-    },
-    onSelect: function (item, insertItem) {
-      insertItem(item);
-    //   if (!mentionedUsers.value.find(user => user.id === item.id)) {
-    //     mentionedUsers.value.push(item);
-    //     mentionedUserIds.value.push(item.id);
-    //   }
-    },
-  },
-};
-
 </script>
 
 <template>
@@ -987,7 +936,7 @@ const modules = {
                                         </div>
                                     </a>
                                 </div>
-                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1 commentedText" style="font-size: 0.9rem;">
+                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1" style="font-size: 0.9rem;">
                                     
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time)
@@ -1005,14 +954,8 @@ const modules = {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div class="relative task-comment">
-                            <Editor 
-                                class="mb-2" 
-                                placeholder="Add comment" 
-                                v-model="taskCommentInput" 
-                                :modules="modules"
-                                editorStyle="height: 150px"
-                            >
+                        <div>
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" editorStyle="height: 76px">
                                 <template v-slot:toolbar>
                                     <span class="ql-formats flex justify-content-end mr-0">
                                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -1485,39 +1428,5 @@ a {
     border-radius: 5px;
 }
 
-/* Css for mention container */
-.ql-mention-list-container {
-  max-height: 150px;
-  max-width: 250px;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  z-index: 1000;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
-.ql-mention-list{
-    margin: 10px 0;
-    padding: 0 5px;
-    list-style: none;
-}
-.ql-mention-list-item{
-    cursor: pointer;
-    padding: 5px 12px;
-}
-.ql-mention-list-item:hover {
-    cursor: pointer;
-    background: #EEF2FF;
-    border-radius: 3px;
-}
-.mention{
-    font-weight: 700;
-    color: #6366F1;
-}
 
-.commentedText .ql-mention-denotation-char {
-    display: none;
-}
 </style>
