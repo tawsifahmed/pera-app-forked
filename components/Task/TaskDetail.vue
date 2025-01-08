@@ -535,6 +535,17 @@ const handleShareTaskId = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
     }
 };
+
+
+const handleCommentChange = (value) => {
+console.log('object ==>', value);
+console.log('Editor content:', taskCommentInput.value);
+
+const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = taskCommentInput.value; // Set the HTML content
+  plainText = tempDiv.textContent || tempDiv.innerText || ''; // Extract plain text
+  console.log('Extracted text:', plainText);
+}
 </script>
 
 <template>
@@ -955,7 +966,7 @@ const handleShareTaskId = () => {
                             </div>
                         </div>
                         <div>
-                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" editorStyle="height: 76px">
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" @input="handleCommentChange" editorStyle="height: 76px">
                                 <template v-slot:toolbar>
                                     <span class="ql-formats flex justify-content-end mr-0">
                                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
