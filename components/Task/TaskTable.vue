@@ -829,6 +829,40 @@ const applyColumnWidths = () => {
     </div>
 
     <!-- Tree table -->
+     <!-- old=> -->
+    <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        scrollable
+        scrollDirection="both"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        style="overflow: auto"
+        :tableProps="{ style: { minWidth: '1024px' } }"
+    >
+
+    <!-- issues -->
+    <!-- scrollable
+    scrollDirection="both"
+    style="overflow: auto" -->
+    <!-- issues -->
+
+    <!-- <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        :resizableColumns="true"
+        :tableProps="{ style: { minWidth: '1024px' } }"
+> -->
     <!-- <TreeTable
         v-if="viewMode === 'list'"
         class="table-st"
@@ -842,29 +876,10 @@ const applyColumnWidths = () => {
         filterDisplay="menu"
         style="overflow: auto"
         :resizableColumns="true"
-        :tableProps="{ style: { minWidth: '1024px' } }"
-    > -->
-    <!-- <TreeTable
-    v-if="viewMode === 'list'"
-        :value="tableData" :resizableColumns="true" showGridlines :tableProps="{ style: { minWidth: '50rem' } }" 
->-->
-    <TreeTable
-    v-if="viewMode === 'list'"
-        class="table-sts"
-        stripedRows
-        :value="tableData"
-        scrollable
-        scrollDirection="both"
-        v-model:expandedKeys="expandedKeys"
-        :lazy="true"
-        :loading="tableLoader"
-        filterDisplay="menu"
-        style="overflow: auto"
-        :resizableColumns="true"
         showGridlines 
         :tableProps="{ style: { minWidth: '1024px' } }"
         @columnResizeEnd="onColumnResizeEnd"
->
+    > -->
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
@@ -928,7 +943,7 @@ const applyColumnWidths = () => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
+        <Column field=""  header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
             <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key">
@@ -1406,9 +1421,9 @@ const applyColumnWidths = () => {
 // }
 
 .table-st thead th:hover {
-    border: 1px solid #e2e8f0;
-    border-top: none;
-    border-bottom: 1px solid #e2e8f0;
+    // border: 1px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
 
     // border: 2px solid #e2e8f0;
     // border-top: none;
