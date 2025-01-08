@@ -31,7 +31,7 @@
         </div>
 
         <div class="create-btn-wrapper mb-0">
-            <Button label="Save" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button label="Save" icon="pi pi-check" text="" :loading="submitLoader" @click="handleSubmitData" />
         </div>
     </div>
 </template>
@@ -53,6 +53,7 @@ const selectedPerm = ref([]);
 const selectedGroups = ref([]);  
 const employeeForm = ref(true);
 const emit = defineEmits(['closeCreateModal']);
+const submitLoader = ref(false);
 
 const handleGroupChange = (group) => {
     const groupId = group.group.id;
@@ -89,6 +90,7 @@ const handleSubmitData = async () => {
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name and select role', group: 'br', life: 3000 });
         return;
     } else {
+            submitLoader.value = true;
             const token = useCookie('token');
             const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/create`, {
                 method: 'POST',
@@ -104,9 +106,11 @@ const handleSubmitData = async () => {
             if (data.value?.code === 201) {
                 name.value = null;
                 employeeForm.value = false;
+                submitLoader.value = false;
                 emit('closeCreateModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Role Created successfully!', group: 'br', life: 3000 });
             } else {
+                submitLoader.value = false;
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Role Creation Failed!', group: 'br', life: 3000 });
             }
         }
