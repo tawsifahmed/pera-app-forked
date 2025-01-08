@@ -29,6 +29,9 @@ const filters = ref();
 const loading = ref(true);
 const loading1 = ref(false);
 
+const isLoading = ref(false);
+const totalRecords = ref(0);
+
 const toast = useToast();
 
 import Dialog from 'primevue/dialog';
@@ -143,7 +146,9 @@ const init = async (userTypes) => {
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        usersLists.value = data.value?.data;
+        // usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+        totalRecords.value = data.value?.total;
     }
 };
 
@@ -208,6 +213,24 @@ const downloadTaskSheet = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
     }
 };
+
+const onPage = async(e) =>{
+    console.log('object');
+    const token = useCookie('token');
+    isLoading.value = true;
+    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
+        $fetch(`${url.public.apiUrl}/users/list?page=${e.page+1}&limit=${e.rows}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        usersLists.value = data.value?.data;
+        // usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+    }
+    return (isLoading.value = false);
+}
 </script>
 
 <template>
@@ -238,10 +261,26 @@ const downloadTaskSheet = () => {
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <!-- <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading"> -->
+        <DataTable 
+            v-model:filters="filters" 
+            class="table-st" 
+            :value="usersLists" 
+            stripedRows 
+            tableStyle="min-width: 50rem" 
+            :rows="10" 
+            dataKey="id" 
+            filterDisplay="menu" 
+            :loading="loading || isLoading"
+
+            :paginator="true"
+            :totalRecords="totalRecords"
+            :rowsPerPageOptions="[5, 10, 20, 50]"
+            @page="onPage"
+        >
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <Column field="index" header="Serial" sortable></Column>
+            <!-- <Column field="index" header="Serial" sortable></Column> -->
             <Column field="name" header="Employee Name"></Column>
             <Column field="email" header="Email Address"></Column>
             <Column field="phone" header="Phone"></Column>
@@ -254,7 +293,7 @@ const downloadTaskSheet = () => {
                     <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
-            <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
+            <!-- <template #footer> In total there are {{ usersLists ? totalRecords : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
