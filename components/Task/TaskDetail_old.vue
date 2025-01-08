@@ -8,9 +8,6 @@ import Editor from 'primevue/editor';
 import Calendar from 'primevue/calendar';
 import { onMounted } from 'vue';
 import Inplace from 'primevue/inplace';
-import Quill from 'quill';
-import QuillMention from 'quill-mention';
-
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -538,58 +535,6 @@ const handleShareTaskId = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
     }
 };
-
-
-// const handleCommentChange = (value) => {
-// console.log('object ==>', value);
-// console.log('Editor content:', taskCommentInput.value);
-
-// const tempDiv = document.createElement('div');
-//   tempDiv.innerHTML = taskCommentInput.value; // Set the HTML content
-//   const plainText = tempDiv.textContent || tempDiv.innerText || ''; // Extract plain text
-//   console.log('Extracted text:', plainText);
-// }
-
-
-
-
-Quill.register('modules/mention', QuillMention);
-
-
-const mentionList = [
-  { id: 1, value: 'Mustafizur Rahman' },
-  { id: 2, value: 'Rafe' },
-  { id: 3, value: 'Md Jahid Hasan Anik 11111111111111111111111111111111' },
-];
-
-// Reactive variables
-const plainText = ref('');
-
-// Modules configuration for the Editor
-const modules = {
-  mention: {
-    source: function (searchTerm, renderList) {
-      const matches = mentionList.filter(item =>
-        item.value.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      renderList(matches);
-    },
-    renderItem: function (item) {
-      return `${item.value}`;
-    },
-    onSelect: function (item, insertItem) {
-      insertItem(item);
-      console.log('Mentioned:', item);
-    },
-  },
-};
-
-const onInputChange = () => {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = taskCommentInput.value;
-  plainText.value = tempDiv.textContent || tempDiv.innerText || '';
-};
-
 </script>
 
 <template>
@@ -1009,15 +954,8 @@ const onInputChange = () => {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div :style="{}" class="relative">
-                            <Editor 
-                                class="mb-2" 
-                                placeholder="Add comment" 
-                                v-model="taskCommentInput" 
-                                @input="onInputChange" 
-                                :modules="modules"
-                                editorStyle="height: 150px"
-                            >
+                        <div>
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" editorStyle="height: 76px">
                                 <template v-slot:toolbar>
                                     <span class="ql-formats flex justify-content-end mr-0">
                                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -1490,27 +1428,5 @@ a {
     border-radius: 5px;
 }
 
-/* Css for mention container */
-.ql-mention-list-container {
-  max-height: 150px;
-  max-width: 250px;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  z-index: 1000;
-}
-.ql-mention-list{
-    padding: 0 5px;
-    list-style: none;
-}
-.ql-mention-list-item{
-    cursor: pointer;
-    padding: 3px 12px;
-}
-.ql-mention-list-item:hover {
-    cursor: pointer;
-    background: #EEF2FF;
-    border-radius: 3px;
-}
+
 </style>

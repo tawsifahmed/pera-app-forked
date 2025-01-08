@@ -25,6 +25,7 @@
         "primeicons": "^6.0.1",
         "primevue": "^3.49.1",
         "quill": "^1.3.7",
+        "quill-mention": "^2.2.7",
         "uuid": "^10.0.0",
         "v-tooltip": "^2.1.3",
         "vue-cal": "^4.10.0",
