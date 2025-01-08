@@ -12,6 +12,8 @@ import DataTable from 'primevue/datatable';
 
 import accessPermission from '~/composables/usePermission';
 
+import Dialog from 'primevue/dialog';
+
 const readRole = ref(accessPermission('read_role'));
 const createRoleP = ref(accessPermission('create_role'));
 const updateRoleP = ref(accessPermission('update_role'));
@@ -22,7 +24,6 @@ const loading = ref(true);
 
 const toast = useToast();
 
-import Dialog from 'primevue/dialog';
 
 const visibleCreateRole = ref(false);
 
