@@ -317,16 +317,16 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
             taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
             loadMoreLoading.value = false; // Reset loading flag after fetch
         } else {
-            taskList.value = []; // Clear taskList if no data or pagination info
-            loadMoreLoading.value = false; // Reset loading flag after fetch
+            taskList.value = []; 
+            loadMoreLoading.value = false; 
         }
 
-        console.log('Task list: ', taskList.value);
+        // console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
-        loadMoreLoading.value = false; // Reset loading flag after fetch
+        loadMoreLoading.value = false; 
     } finally {
-        taskLoading.value = false; // Reset loading flag after fetch
+        taskLoading.value = false;
     }
 };
 
@@ -369,22 +369,21 @@ watch(
 <template>
     <!-- <pre>{{ totalProjects }}</pre> -->
     <div class="grid">
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <!-- <pre>{{totalCompanies}}</pre> -->
                         <div class="text-900 font-medium text-xl">{{ totalCompanies ? totalCompanies : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">24 new </span> -->
-                <!-- <span class="text-500">since last visit</span> -->
+                 <span class="text-green-500 font-medium">24 new </span>
+                 <span class="text-500">since last visit</span> 
             </div>
-        </div>
+        </div> -->
 
         <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
@@ -417,7 +416,7 @@ watch(
             </div>
         </div> -->
 
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
                     <div>
@@ -437,11 +436,12 @@ watch(
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readRole" to="/roles" class="flex justify-content-between mb-3">
                     <div>
@@ -461,11 +461,11 @@ watch(
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readTags" to="/tags" class="flex justify-content-between mb-3">
                     <div>
@@ -485,10 +485,11 @@ watch(
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
+        </div> -->
+        
         <!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
@@ -660,16 +661,16 @@ watch(
         </div>
         <div class="col-12 h-full">
             <div class="card dashChart">
-                <div class="flex justify-content-between align-items-center ">
-                    <div class="flex align-items-center gap-3">
+                <div class="flex justify-content-between align-items-start dash-inf">
+                    <div class="flex align-items-center gap-3 dash-inf-left">
                         <h5 class="mb-0">Projects Overview</h5>
-                        <Button :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
+                        <Button class="nwrp" :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
                     </div>
-                    <div class="flex gap-2" >
+                    <div class="flex gap-2 flex-wrap dash-inf-right">
                         <!-- {{ cM }} -->
-                        <Button :label="`In Progress: ${inProgressTasksChartData}`" class="" severity="info" outlined  />
-                        <Button :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
-                        <Button :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
+                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined  />
+                        <Button class="nwrp" :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
+                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
                     </div>
                 </div>
                 <div class="chartWrapper">
@@ -767,5 +768,32 @@ watch(
     cursor: default !important;
 }
 
+.nwrp{
+    text-wrap: nowrap;
+}
+
+.dash-inf{
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: flex-start;
+        .dash-inf-left{
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            width: 100%;
+            @media(max-width: 500px){
+              flex-direction: column;
+              align-items: start !important;
+            }
+        }
+        .dash-inf-right{
+            justify-content: flex-end;
+            width: 100%;
+            @media(max-width: 500px){
+                justify-content: center;
+            }
+            
+        }
+    }
+}
 
 </style>
