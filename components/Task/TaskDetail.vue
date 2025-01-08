@@ -6,7 +6,7 @@ import { useFileUploaderStore } from '~/store/fileUpload';
 import accessPermission from '~/composables/usePermission';
 import Editor from 'primevue/editor';
 import Calendar from 'primevue/calendar';
-import { onMounted } from 'vue';
+import { onMounted, toRaw } from 'vue';
 import Inplace from 'primevue/inplace';
 import Quill from 'quill';
 import QuillMention from 'quill-mention';
@@ -246,8 +246,11 @@ const handleTaskComment = async () => {
         toast.add({ severity: 'warn', summary: 'Warn', detail: 'Comment required', group: 'br', life: 3000 });
         return;
     }
+
+    const userIds = await getMentionedIds()
+    
     btnLoading.value = true;
-    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value);
+    await addTaskComment(taskDetails.value?.id, taskCommentInput.value, commentFile.value, userIds);
     if (isTaskCommentCreated.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Comment added Successfully', group: 'br', life: 3000 });
         taskCommentInput.value = null;
@@ -540,32 +543,28 @@ const handleShareTaskId = () => {
 };
 
 
-// const handleCommentChange = (value) => {
-// console.log('object ==>', value);
-// console.log('Editor content:', taskCommentInput.value);
+const getMentionedIds = async() => {
+    const mentions = document.querySelectorAll('.task-comment .ql-editor .mention');
 
-// const tempDiv = document.createElement('div');
-//   tempDiv.innerHTML = taskCommentInput.value; // Set the HTML content
-//   const plainText = tempDiv.textContent || tempDiv.innerText || ''; // Extract plain text
-//   console.log('Extracted text:', plainText);
-// }
+    const dataIds = Array.from(mentions).map(mention => mention.getAttribute('data-id'));
 
+    const uniqueDataIds = [...new Set(dataIds)];
 
+    return uniqueDataIds
+}
 
 
-Quill.register('modules/mention', QuillMention);
+
+// Quill.register('modules/mention', QuillMention);
+
+const list = toRaw(usersLists);
+
+const mentionList = list.map(item => {
+    const { name, ...rest } = item;
+    return { ...rest, value: name };
+});
 
 
-const mentionList = [
-  { id: 1, value: 'Mustafizur Rahman' },
-  { id: 2, value: 'Rafe' },
-  { id: 3, value: 'Md Jahid Hasan Anik 11111111111111111111111111111111' },
-];
-
-// Reactive variables
-const plainText = ref('');
-
-// Modules configuration for the Editor
 const modules = {
   mention: {
     source: function (searchTerm, renderList) {
@@ -579,15 +578,12 @@ const modules = {
     },
     onSelect: function (item, insertItem) {
       insertItem(item);
-      console.log('Mentioned:', item);
+    //   if (!mentionedUsers.value.find(user => user.id === item.id)) {
+    //     mentionedUsers.value.push(item);
+    //     mentionedUserIds.value.push(item.id);
+    //   }
     },
   },
-};
-
-const onInputChange = () => {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = taskCommentInput.value;
-  plainText.value = tempDiv.textContent || tempDiv.innerText || '';
 };
 
 </script>
@@ -991,7 +987,7 @@ const onInputChange = () => {
                                         </div>
                                     </a>
                                 </div>
-                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1" style="font-size: 0.9rem;">
+                                <p v-html="val?.comment ? val?.comment : ''" class="m-0 ml-1 commentedText" style="font-size: 0.9rem;">
                                     
                                 </p>
                                 <i style="line-height: 0" class="pb-1 float-right mt-3 mb-2">{{ formattedTime(val.time)
@@ -1009,12 +1005,11 @@ const onInputChange = () => {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div :style="{}" class="relative">
+                        <div class="relative task-comment">
                             <Editor 
                                 class="mb-2" 
                                 placeholder="Add comment" 
                                 v-model="taskCommentInput" 
-                                @input="onInputChange" 
                                 :modules="modules"
                                 editorStyle="height: 150px"
                             >
@@ -1499,18 +1494,30 @@ a {
   border: 1px solid #ccc;
   border-radius: 4px;
   z-index: 1000;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 .ql-mention-list{
+    margin: 10px 0;
     padding: 0 5px;
     list-style: none;
 }
 .ql-mention-list-item{
     cursor: pointer;
-    padding: 3px 12px;
+    padding: 5px 12px;
 }
 .ql-mention-list-item:hover {
     cursor: pointer;
     background: #EEF2FF;
     border-radius: 3px;
+}
+.mention{
+    font-weight: 700;
+    color: #6366F1;
+}
+
+.commentedText .ql-mention-denotation-char {
+    display: none;
 }
 </style>

@@ -718,12 +718,16 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
 
-        async addTaskComment(id, comment, file) {
+        async addTaskComment(id, comment, file, users=[]) {
             const formData = new FormData();
 
             formData.append('comment', comment);
             formData.append('commentable_id', id);
             formData.append('file', file);
+
+            if (users?.length > 0) {
+                users.forEach((user, index) => formData.append(`user_id[${index}]`, user))
+            }
 
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/comments/create`, {
