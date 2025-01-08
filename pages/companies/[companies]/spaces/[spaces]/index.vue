@@ -18,6 +18,7 @@ definePageMeta({
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import { onMounted } from 'vue';
 const filters = ref();
 const loading = ref(true);
 const toast = useToast();
@@ -62,10 +63,15 @@ const deletingProject = async () => {
     }
 };
 
-watchEffect(() => {
-    getSingleSpace(spaces);
+onMounted(() => {
+    const spaceId = spaces;
+    getSingleSpace(spaceId);
     loading.value = false;
 });
+// getSingleSpace(spaces);
+// watchEffect(() => {
+//     loading.value = false;
+// });
 
 const initFilters = () => {
     filters.value = {
@@ -114,7 +120,7 @@ const isPage = ref(true);
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[ 10, 20, 30, 40, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>
