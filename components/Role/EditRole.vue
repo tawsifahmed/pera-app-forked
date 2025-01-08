@@ -2,7 +2,7 @@
     <div>
         <div class="field">
             <label for="company">Role Name<i class="text-red-400 text-italic">*</i> </label>
-            <InputText id="editTeamName" v-model="editName" class="w-full" placeholder="Edit role name" />
+            <InputText id="editTeamName" :disabled="editName === 'Admin'" v-model="editName" class="w-full" placeholder="Edit role name" />
         </div>
         <div class="mb-3">
             <label>Permissions<i class="text-red-400 text-italic">*</i></label>
@@ -36,7 +36,7 @@
         </div> -->
 
         <div class="create-btn-wrappe">
-            <Button label="Update" icon="pi pi-check" text="" @click="handleSubmitData" />
+            <Button :disabled="editName === 'Admin'" label="Update" icon="pi pi-check" :loading="submitLoader" text="" @click="handleSubmitData" />
         </div>
     </div>
 </template>
@@ -64,6 +64,8 @@ const selectedPerm = ref(props.param.slctdPermissions || []);  // Store selected
 const selectedGroupPerms  = ref([]);  // Store selected groups
 
 const employeeForm = ref(true);
+
+const submitLoader = ref(false);
 
 const emit = defineEmits(['closeEditModal']);
 
@@ -113,6 +115,7 @@ const handleSubmitData = async () => {
         toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please enter role name and select role', group: 'br', life: 3000 });
         return;
     } else {
+            submitLoader.value = true;
             const token = useCookie('token');
             const { data, pending } = await useFetch(`${url.public.apiUrl}/roles/update/${id.value}`, {
                 method: 'POST',
@@ -127,9 +130,11 @@ const handleSubmitData = async () => {
 
             if (data.value?.code === 200) {
                 employeeForm.value = false;
+                submitLoader.value = false;
                 emit('closeEditModal', false);
                 toast.add({ severity: 'success', summary: 'Success', detail: 'Role updated successfully!', group: 'br', life: 3000 });
             } else {
+                submitLoader.value = false;
                 toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update role!', group: 'br', life: 3000 });
             }
         }
