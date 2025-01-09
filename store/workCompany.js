@@ -41,7 +41,8 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
     },
     company(state) {
       if (state.compInLoclStrg) {
-        return state.compInLoclStrg?.label;
+        let cNI = { name: state.compInLoclStrg?.label, logo: state.compInLoclStrg?.logo };
+        return cNI;
       } else {
         return '';
       }
@@ -87,7 +88,33 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       return allProjects;
 
     },
+    totalProjectsforReport(state) {
+      let allProjects = [];
+      if (state.getSpaces) {
+        state.getSpaces?.spaces.forEach(element => {
+          if (element?.projects?.length > 0) {
+            element.projects.forEach(ele => {
+              allProjects.push({ id: ele.id, name: ele.name, });
+            });
+          }
+        });
+      } else return [];
+      return allProjects;
 
+    },
+    totalSpaces(state) {
+      let allSpaces = [];
+      if (state.getSpaces) {
+        state.getSpaces?.spaces.forEach(element => {
+            allSpaces.push({ 
+            name: element.name, 
+            id: element.id, 
+            projects: element.projects.map(project => ({ id: project.id, name: project.name })) 
+            });
+        });
+      } else return [];
+      return allSpaces;
+    }
   },
   actions: {
     async getCompany() {
@@ -107,8 +134,8 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
         const companyWSpaces = this.availableCompanies.find(company => company.id === storedCompanyId);
         this.getSpaces = companyWSpaces;
         if (companyWSpaces) {
-          const { id, name } = companyWSpaces;
-          this.compInLoclStrg = { 'id': id, 'label': name };
+          const { id, name, logo } = companyWSpaces;
+          this.compInLoclStrg = { 'id': id, 'label': name, 'logo': logo };
           return { name, id };
         }
       }

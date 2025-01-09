@@ -41,6 +41,7 @@ export const useCompanyStore = defineStore('workStation', {
         isTaskEdited: false,
         tasks: [],
         kanbanTasks: [],
+        calendarTasks: [],
         ganttChartData: [],
         recentTaskData: [],
         tasksAttachments: [],
@@ -66,7 +67,11 @@ export const useCompanyStore = defineStore('workStation', {
         statuslist: [],
         modStatusList: [],
         chartProjectInfo: null,
-        chartTaskInfo: null,
+        totalDashboardProjects: null,
+        completedTasksChartData: null,
+        inProgressTasksChartData: null,
+        unAssignedTasksChartData: null,
+        inProgressCnt: null,
         chartClosedTaskInfo: null,
         rolesLists: null
     }),
@@ -98,20 +103,24 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async createCompany({ name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
 
             if (data.value?.app_message === 'success') {
@@ -126,21 +135,26 @@ export const useCompanyStore = defineStore('workStation', {
         },
         async editCompany({ id, name, email, address, contact_number, number_of_employees, company_type, logo }) {
             const token = useCookie('token');
+            const formdata = new FormData()
+            formdata.append('name', name);
+            formdata.append('email', email);
+            formdata.append('address', address);
+            formdata.append('contact_number', contact_number);
+            formdata.append('number_of_employees', number_of_employees);
+            formdata.append('company_type', company_type);
+            if (logo != null) {
+                formdata.append('image', logo);
+            }
+            else{
+                formdata.append('image', null);
+            }
+
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 },
-                body: {
-                    id: id,
-                    name: name,
-                    email: email,
-                    address: address,
-                    contact_number: contact_number,
-                    number_of_employees: number_of_employees,
-                    company_type: company_type,
-                    logo: logo
-                }
+                body: formdata
             });
             if (data.value?.app_message === 'success') {
                 this.isCompanyEdited = true;
@@ -160,7 +174,6 @@ export const useCompanyStore = defineStore('workStation', {
                 }
             });
             if (data.value?.code === 200) {
-                // console.log('data', data);
                 const userType = useCookie('userType');
                 userType.value = data?.value?.user_type;
                 const rolePermission = useCookie('rolePermission');
@@ -332,12 +345,28 @@ export const useCompanyStore = defineStore('workStation', {
             this.tasks = data.value?.tasks;
             this.statuslist = data.value?.taskStatus;
 
-            const updatedData = this.statuslist.map((val) => {
+            const kanbanData = this.statuslist.map((val) => {
                 const content = this.tasks.filter((item) => item.data.status.name === val.name);
                 return { name: val.name, statusColor: val.color_code, status: val, content: content };
             });
 
-            this.kanbanTasks = updatedData;
+            this.kanbanTasks = kanbanData;
+            const calendarData = this.tasks.map((val) => {
+                const formatDate = (isoDate) => {
+                    const date = new Date(isoDate);
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+                    return `${year}-${month}-${day} ${hours}:${minutes}`;
+                };
+
+                return { key: val.key, title: val.data.name, start: formatDate(val.data.created_at), end: val.data.dueDate ? formatDate(val.data.dueDate) : formatDate(val.data.created_at), color: val.data?.status?.color_code };
+            });
+            this.calendarTasks = calendarData;
+
             this.modStatusList = [{ name: 'All', code: '' }, ...this.statuslist];
             function formatTaskData(tasks) {
                 let formattedData = [];
@@ -451,7 +480,6 @@ export const useCompanyStore = defineStore('workStation', {
             this.tasks.forEach((task) => countTasksByStatus(task));
 
             this.countTasksByStatus = taskCountsByStat;
-            console.log('this.countTasksByStatus', this.countTasksByStatus);
 
             let result = extractAttchTaskData(this.tasks);
             this.recentTaskData = formatRecentTaskData(this.tasks);
@@ -481,8 +509,7 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getChartData();
             }
         },
-        async editProject({ id, name, description, space_id, statuses }) {
-            console.log('statuses Pinia', statuses);
+        async editProject({ id, name, description, space_id, statuses, git_project_id }) {
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
@@ -494,7 +521,8 @@ export const useCompanyStore = defineStore('workStation', {
                     name: name,
                     description: description,
                     space_id: space_id,
-                    statuses: statuses
+                    statuses: statuses,
+                    git_project_id: git_project_id
                 }
             });
 
@@ -550,7 +578,6 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
         async createTask({ name, description, project_id, parent_task_id, dueDate, priority, assignees, tags }) {
-            console.log('dueDate formatted', dueDate);
             // return
             const token = useCookie('token');
             const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/create`, {
@@ -608,7 +635,6 @@ export const useCompanyStore = defineStore('workStation', {
                     // 'attachments' : attachments,
                 }
             });
-            console.log('data', data);
 
             if (error.value) {
                 if (error.value.data.code === 400) {
@@ -692,12 +718,16 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
 
-        async addTaskComment(id, comment, file) {
+        async addTaskComment(id, comment, file, users=[]) {
             const formData = new FormData();
 
             formData.append('comment', comment);
             formData.append('commentable_id', id);
             formData.append('file', file);
+
+            if (users?.length > 0) {
+                users.forEach((user, index) => formData.append(`user_id[${index}]`, user))
+            }
 
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/comments/create`, {
@@ -718,21 +748,33 @@ export const useCompanyStore = defineStore('workStation', {
         async getChartData() {
             const token = useCookie('token');
             const { data, pending, error } = await useAsyncData('chartData', () =>
-                $fetch(`https://pbe.singularitybd.net/api/v1/chart-data`, {
+                $fetch(`https://pbe.singularitybd.net/api/v1/dashboard/task-status`, {
                     headers: {
                         Authorization: `Bearer ${token.value}`
                     }
                 })
             );
-            console.log('chartData', data.value);
             if (data?.value?.code === 200) {
-                this.chartProjectInfo = data?.value?.data?.projects;
-                console.log('chartProjectInfo', this.chartProjectInfo);
-                this.chartTaskInfo = data?.value?.data?.total_task_count;
-                this.chartClosedTaskInfo = data?.value?.data?.close_task_count;
+
+                this.chartProjectInfo = data?.value?.data?.projectCounts.map(project => {
+                    let projectName = project.project_name;
+                    if (projectName.length > 7) {
+                        projectName = projectName.substring(0, 7) + '...';
+                    }
+                    return projectName;
+                });
+                this.inProgressCnt = data?.value?.data?.projectCounts.map(project => project.inProgressCounts);
+                this.chartClosedTaskInfo = data?.value?.data?.projectCounts.map(project => project.completedCounts);
+                this.totalDashboardProjects = data?.value?.data?.projectCounts.length;
+                this.completedTasksChartData = data?.value?.data?.completed;
+                localStorage.setItem('completedTasksChartData', JSON.stringify(data?.value?.data?.completed));
+                this.inProgressTasksChartData = data?.value?.data?.inProgress;
+                localStorage.setItem('inProgressTasksChartData', JSON.stringify(data?.value?.data?.inProgress));
+                this.unAssignedTasksChartData = data?.value?.data?.unAssigneeCount;
+                localStorage.setItem('unAssignedTasksChartData', JSON.stringify(data?.value?.data?.unAssigneeCount));
             } else {
                 this.chartProjectInfo = [];
-                this.chartTaskInfo = [];
+                this.inProgressCnt = [];
             }
         },
         async getRoles() {
@@ -744,7 +786,6 @@ export const useCompanyStore = defineStore('workStation', {
                     }
                 })
             );
-            console.log('rolesData', data);
             if (data.value?.data?.length > 0) {
                 this.rolesLists = data.value?.data;
             } else {

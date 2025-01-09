@@ -18,6 +18,7 @@ definePageMeta({
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import { onMounted } from 'vue';
 const filters = ref();
 const loading = ref(true);
 const toast = useToast();
@@ -51,21 +52,26 @@ const deletingProject = async () => {
     await deleteProject(refProjectId.value, spaces);
 
     if (isProjectDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Space Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Project Deleted Successfully', group: 'br', life: 3000 });
         deleteProjectDialog.value = false;
         console.log('space deleted');
         deleteLoader.value = false;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete space', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete project', group: 'br', life: 3000 });
         console.log('space not deleted');
         deleteLoader.value = false;
     }
 };
 
-watchEffect(() => {
-    getSingleSpace(spaces);
+onMounted(() => {
+    const spaceId = spaces;
+    getSingleSpace(spaceId);
     loading.value = false;
 });
+// getSingleSpace(spaces);
+// watchEffect(() => {
+//     loading.value = false;
+// });
 
 const initFilters = () => {
     filters.value = {
@@ -114,7 +120,7 @@ const isPage = ref(true);
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[ 10, 20, 30, 40, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>

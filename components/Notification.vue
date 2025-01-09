@@ -108,7 +108,7 @@ const handleNavigate = async (type) => {
     <div  class="bg-white card1">
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
-            <div @click="handleClick(notify)" v-html="notify.title" :class="`title ${notify.is_read === 0 ? 'unread' : ''}`"></div>
+            <div @click="handleClick(notify)" v-html="notify.title" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`"></div>
         </div>
         <div class="bg-white text-center text-lg" v-else>
             No notifications!
@@ -143,7 +143,7 @@ const handleNavigate = async (type) => {
     padding-bottom: 30px;
 }
 
-.title {
+.notifyTitle {
     padding: 10px;
     margin: 5px 0px;
     border: 1px solid rgba(218, 218, 218, 0.425);

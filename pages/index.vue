@@ -6,12 +6,14 @@ import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pini
 import { useAuthStore } from '~/store/auth'; // import the auth store we just created
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
+import Chart from 'primevue/chart';
+
 const companies = useActiveCompanyStore();
 // companies.getCompany();
 const { totalCompanies, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
 const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
-const { chartProjectInfo, chartTaskInfo, chartClosedTaskInfo, users, rolesLists, tags } = storeToRefs(useCompanyStore());
+const { chartProjectInfo, inProgressCnt, chartClosedTaskInfo, totalDashboardProjects, completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData, users, rolesLists, tags } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore());
 
@@ -29,19 +31,21 @@ definePageMeta({
 
 const { isDarkTheme } = useLayout();
 const products = ref(null);
+
+
 const lineData = ref({
     labels: chartProjectInfo,
     datasets: [
         {
-            label: 'Total Tasks',
-            data: chartTaskInfo,
+            label: 'In Progress',
+            data: inProgressCnt,
             fill: false,
             backgroundColor: '#6366f1',
             borderColor: '#6366f1',
             tension: 0.4
         },
         {
-            label: 'Closed Tasks',
+            label: 'Completed',
             data: chartClosedTaskInfo,
             fill: false,
             backgroundColor: '#2f4860',
@@ -50,24 +54,51 @@ const lineData = ref({
         }
     ]
 });
-const taskList = ref([]);
 
-// const lineOptions = ref({
-//     scales: {
-//         x: {
-//             title: {
-//                 display: true,
-//                 text: 'X Axis Title'
-//             }
-//         },
-//         y: {
-//             title: {
-//                 display: true,
-//                 text: 'Y Axis Title'
-//             }
-//         }
-//     }
-// });
+
+onMounted(() => {
+    pieChartData.value = setPieChartData();
+    pieChartOptions.value = setPieChartOptions();
+});
+
+const pieChartData = ref();
+const pieChartOptions = ref();
+
+let cc = localStorage.getItem('completedTasksChartData');
+    let ic = localStorage.getItem('inProgressTasksChartData');
+    let uc = localStorage.getItem('unAssignedTasksChartData');
+const setPieChartData = () => {
+    const documentStyle = getComputedStyle(document.body);
+ 
+    return {
+        labels: ['Completed', 'In Progress', 'Unassigned'],
+        datasets: [
+            {
+                data: [cc, ic, uc],
+                backgroundColor: [documentStyle.getPropertyValue('--cyan-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
+                hoverBackgroundColor: [documentStyle.getPropertyValue('--cyan-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
+            }
+        ]
+    };
+};
+
+const setPieChartOptions = () => {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+
+    return {
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    color: textColor
+                }
+            }
+        }
+    };
+};
+
+const taskList = ref([]);
 
 const items = ref([
     { label: 'Add New', icon: 'pi pi-fw pi-plus' },
@@ -93,21 +124,15 @@ const checkUser = () => {
     }
 };
 
-onMounted(() => {
-    getRoles();
-    getTaskAssignModalData();
-    getTagsAssignModalData();
-    getChartData();
-    checkUser();
-    // ProductService.getProductsSmall().then((data) => (products.value = data));
-});
-
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
 
 const applyLightTheme = () => {
     lineOptions.value = {
+        // indexAxis: 'y',
+        // maintainAspectRatio: false,
+        // aspectRatio: 1,
         plugins: {
             legend: {
                 labels: {
@@ -123,10 +148,10 @@ const applyLightTheme = () => {
                 grid: {
                     color: '#ebedef'
                 },
-                title: {
-                    display: true,
-                    text: 'Projects'
-                }
+                // title: {
+                //     display: true,
+                //     text: 'Projects'
+                // }
             },
             y: {
                 ticks: {
@@ -134,11 +159,11 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
-                },
-                title: {
-                    display: true,
-                    text: 'Numbers  of  Tasks'
                 }
+                // title: {
+                //     display: true,
+                //     text: 'Numbers  of  Tasks'
+                // }
             }
         }
     };
@@ -182,7 +207,6 @@ const filterDueDate = ref();
 const isCalendarSelected = ref(false);
 const taskLoading = ref(false); // Add loading state
 
-
 watch(selectedProject, (newVal) => {
     statuses.value = [{ name: 'All', id: '' }, ...(selectedProject.value?.statuses?.map((status) => ({ name: status.name, id: status.id })) || [])];
 });
@@ -195,21 +219,20 @@ const enD = ref();
 const crrPage = ref(1);
 let currentPage = ref(1); // New variable for current page
 
-
 const filterTasks = async () => {
-  projectId.value = selectedProject.value ? selectedProject.value.id : '';
-  sta.value = selectedStatus.value ? selectedStatus.value.id : '';
-  enD.value = filterDueDate.value;
+    projectId.value = selectedProject.value ? selectedProject.value.id : '';
+    sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+    enD.value = filterDueDate.value;
 
-  if (isLoadMoreClicked) { 
-    currentPage.value++; 
-  } else {
-    currentPage.value = 1; 
-  }
-  crrPage.value = currentPage.value;
-  totalPages.value = 0;
-  fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
-  isLoadMoreClicked = false; 
+    if (isLoadMoreClicked) {
+        currentPage.value++;
+    } else {
+        currentPage.value = 1;
+    }
+    crrPage.value = currentPage.value;
+    totalPages.value = 0;
+    fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
+    isLoadMoreClicked = false;
 };
 
 const selectFilterDate = (newDate) => {
@@ -227,7 +250,7 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if(selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
+    if (selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
         filterDueDate.value = '';
@@ -236,7 +259,7 @@ const handleFilterReset = () => {
         selectedStatus.value = '';
         isCalendarSelected.value = false;
         filterTasks();
-    }else{
+    } else {
         return;
     }
 };
@@ -259,69 +282,74 @@ const dateFormatter = (data) => {
     return `${day}-${month}-${year}`;
 };
 
-const totalPages = ref(0); 
+const totalPages = ref(0);
 
 const hideLoading = ref(false);
 const loadMoreLoading = ref(false);
 const loadMoreTasks = async (vl) => {
-    if(vl === 'hide-loader'){
+    if (vl === 'hide-loader') {
         hideLoading.value = true;
     }
-  loadMoreLoading.value = true;   
-  currentPage.value++;
-  await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
+    loadMoreLoading.value = true;
+    currentPage.value++;
+    await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
 };
 
 const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
-  const limit = 15;
-  if(!hideLoading.value){
-      taskLoading.value = true;
-  } 
-  console.log('status', status);
-
-  
-  try {
-    const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
-    });
-
-    // Update taskList only if data is valid and total pages are available
-    if (data.value && data.value.data && data.value.counts?.total_tasks) {
-    totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
-      taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
-      loadMoreLoading.value = false; // Reset loading flag after fetch
-    } else {
-      taskList.value = []; // Clear taskList if no data or pagination info
-      loadMoreLoading.value = false; // Reset loading flag after fetch
+    const limit = 30;
+    if (!hideLoading.value) {
+        taskLoading.value = true;
     }
+    console.log('status', status);
 
-    console.log('Task list: ', taskList.value);
-  } catch (e) {
-    console.log(e);
-    loadMoreLoading.value = false; // Reset loading flag after fetch
-  } finally {
-    taskLoading.value = false; // Reset loading flag after fetch
-  }
+    try {
+        const token = useCookie('token');
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value && data.value.data && data.value.counts?.total_tasks) {
+            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); 
+            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; 
+            loadMoreLoading.value = false; 
+        } else {
+            taskList.value = []; 
+            loadMoreLoading.value = false; 
+        }
+
+    } catch (e) {
+        console.log(e);
+        loadMoreLoading.value = false; 
+    } finally {
+        taskLoading.value = false;
+    }
 };
 
 let isLoadMoreClicked = false; // Flag to track 'see more' button click
 
 window.addEventListener('scroll', () => {
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
-  // Check if near the bottom of the page and there are more pages
-  if (scrollTop + clientHeight >= scrollHeight - 50 && currentPage.value < totalPages) {
-    isLoadMoreClicked = true; // Set flag for next fetchTasks call
-    filterTasks(); // Trigger fetch with incremented page
-  }
+    // Check if near the bottom of the page and there are more pages
+    if (scrollTop + clientHeight >= scrollHeight - 50 && currentPage.value < totalPages) {
+        isLoadMoreClicked = true; // Set flag for next fetchTasks call
+        filterTasks(); // Trigger fetch with incremented page
+    }
 });
 
-
 fetchTasks();
+
+onMounted(() => {
+    getRoles();
+    getTaskAssignModalData();
+    getTagsAssignModalData();
+    getChartData();
+    checkUser();
+    // ProductService.getProductsSmall().then((data) => (products.value = data));
+});
 
 watch(
     isDarkTheme,
@@ -339,23 +367,21 @@ watch(
 <template>
     <!-- <pre>{{ totalProjects }}</pre> -->
     <div class="grid">
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <!-- <pre>{{totalCompanies}}</pre> -->
                         <div class="text-900 font-medium text-xl">{{ totalCompanies ? totalCompanies : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">24 new </span> -->
-                <!-- <span class="text-500">since last visit</span> -->
+                 <span class="text-green-500 font-medium">24 new </span>
+                 <span class="text-500">since last visit</span> 
             </div>
-        </div>
+        </div> -->
 
         <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
@@ -388,15 +414,14 @@ watch(
             </div>
         </div> -->
 
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Employees</span>
                         <div class="text-900 font-medium text-xl" style="visibility: visible">{{ users.length }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -405,24 +430,23 @@ watch(
                         <span class="block text-500 font-medium mb-3">Employees</span>
                         <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-purple-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readRole" to="/roles" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Roles</span>
                         <div class="text-900 font-medium text-xl">{{ rolesLists ? rolesLists.length : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-red-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -431,24 +455,22 @@ watch(
                         <span class="block text-500 font-medium mb-3">Roles</span>
                         <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-red-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-red-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readTags" to="/tags" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Tags</span>
                         <div class="text-900 font-medium text-xl">{{ tags ? tags.length : '0' }}</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
@@ -457,15 +479,15 @@ watch(
                         <span class="block text-500 font-medium mb-3">Tags</span>
                         <div class="text-900 font-medium text-xl role-hide">0</div>
                     </div>
-                    <div class="flex align-items-center justify-content-center bg-green-100 border-round"
-                        style="width: 2.5rem; height: 2.5rem">
+                    <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
+        </div> -->
+
         <!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
@@ -578,125 +600,95 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px;">
-                  <h5 class="mb-2">Tasks</h5>
-                  <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                    <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                    <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
-                    <div class="mb-2 relative w-full md:w-12rem">
-                      <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
-                      <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
+                    <h5 class="mb-2">Tasks</h5>
+                    <div class="flex gap-2 flex-wrap justify-content-end filter-container">
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
+                        <div class="mb-2 relative w-full md:w-12rem">
+                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                            <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                        </div>
+                        <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
                     </div>
-                    <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
-                  </div>
                 </div>
-          
+
                 <div class="task-container">
-                  <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 22rem;">
-                    <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
-                  </div>
-          
-                  <div v-else-if="taskList.length > 0"> <!-- Show task list when not loading and tasks are available -->
-                    <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card">
-                      <div class="title-group">
-                        <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
-                        <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
-                        <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                        <p>{{ task?.project_name }}</p>
-                      </div>
-                      <div>
-                        <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
-                      </div>
+                    <div v-if="taskLoading" class="flex justify-content-center align-items-center" style="height: 22rem">
+                        <i class="pi pi-spin pi-spinner" style="font-size: 2.25rem"></i>
                     </div>
-                  </div>
-          
-                  <div v-else> <!-- Show No Tasks Found when task list is empty -->
-                    <p class="text-black text-lg text-center">No Tasks found!</p>
-                  </div>
-          
-                  <div class="w-full flex justify-content-center">
-                    <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
-                  </div>
+
+                    <div v-else-if="taskList.length > 0">
+                        <!-- Show task list when not loading and tasks are available -->
+                        <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card">
+                            <div class="title-group">
+                                <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
+                                <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
+                                <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                                <p class="title-project line-clamp-1">{{ task?.project_name }}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else>
+                        <!-- Show No Tasks Found when task list is empty -->
+                        <p class="text-black text-lg text-center">No Tasks found!</p>
+                    </div>
+
+                    <div class="w-full flex justify-content-center">
+                        <Button v-if="currentPage < totalPages" @click="loadMoreTasks('hide-loader')" :loading="loadMoreLoading" label="Load More" severity="secondary" />
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
         <div class="col-12 xl:col-6">
-            <div class="card">
-                <h5>Overview</h5>
-                <Chart type="line" :data="lineData" :options="lineOptions" />
-            </div>
+            <div class="card h-full">
+                <h5>Tasks Statistics</h5>
+                <div class="w-full flex justify-content-center">
 
-            <!-- <div class="card">
-                <div class="flex align-items-center justify-content-between mb-4">
-                    <h5>Notifications</h5>
-                    <div>
-                        <Button icon="pi pi-ellipsis-v" class="p-button-text p-button-plain p-button-rounded" @click="$refs.menu1.toggle($event)"></Button>
-                        <Menu ref="menu1" :popup="true" :model="items"></Menu>
+                    <Chart  type="pie" :data="pieChartData" :options="pieChartOptions" class="w-full md:w-30rem" />
+                </div>
+
+                <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
+
+            </div>
+            
+        </div>
+        <div class="col-12 h-full">
+            <div class="card dashChart">
+                <div class="flex justify-content-between align-items-start dash-inf">
+                    <div class="flex align-items-center gap-3 dash-inf-left">
+                        <h5 class="mb-0">Projects Overview</h5>
+                        <Button class="nwrp" :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
+                    </div>
+                    <div class="flex gap-2 flex-wrap dash-inf-right">
+                        <!-- {{ cM }} -->
+                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined  />
+                        <Button class="nwrp" :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
+                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
                     </div>
                 </div>
-
-                <span class="block text-600 font-medium mb-3">TODAY</span>
-                <ul class="p-0 mx-0 mt-0 mb-4 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Richard Jones
-                            <span class="text-700">has purchased a blue t-shirt for <span class="text-blue-500">79$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-orange-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-download text-xl text-orange-500"></i>
-                        </div>
-                        <span class="text-700 line-height-3">Your request for withdrawal of <span class="text-blue-500 font-medium">2500$</span> has been initiated.</span>
-                    </li>
-                </ul>
-
-                <span class="block text-600 font-medium mb-3">YESTERDAY</span>
-                <ul class="p-0 m-0 list-none">
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-dollar text-xl text-blue-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Keyser Wick
-                            <span class="text-700">has purchased a black jacket for <span class="text-blue-500">59$</span></span>
-                        </span>
-                    </li>
-                    <li class="flex align-items-center py-2 border-bottom-1 surface-border">
-                        <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-pink-100 border-circle mr-3 flex-shrink-0">
-                            <i class="pi pi-question text-xl text-pink-500"></i>
-                        </div>
-                        <span class="text-900 line-height-3"
-                            >Jane Davis
-                            <span class="text-700">has posted a new questions about your product.</span>
-                        </span>
-                    </li>
-                </ul>
-            </div> -->
-
-            <!-- <div
-                class="px-4 py-5 shadow-2 flex flex-column md:flex-row md:align-items-center justify-content-between mb-3"
-                style="border-radius: 1rem; background: linear-gradient(0deg, rgba(0, 123, 255, 0.5), rgba(0, 123, 255, 0.5)), linear-gradient(92.54deg, #1c80cf 47.88%, #ffffff 100.01%)"
-            >
-                <div>
-                    <div class="text-blue-100 font-medium text-xl mt-2 mb-3">TAKE THE NEXT STEP</div>
-                    <div class="text-white font-medium text-5xl">Try PrimeBlocks</div>
-                </div>
-                <div class="mt-4 mr-auto md:mt-0 md:mr-0">
-                    <a href="https://www.primefaces.org/primeblocks-vue" class="p-button font-bold px-5 py-3 p-button-warning p-button-rounded p-button-raised"> Get Started </a>
-                </div>
-            </div> -->
+                <div class="chartWrapper">
+                    <div class="chartAreaWrapper">
+                      <!-- <canvas id="chart" height="400" width="15000"></canvas> -->
+                      <Chart type="bar" :data="lineData" :options="lineOptions" />
+                    </div>
+                  </div>
+                <!-- <div class="chart-container">
+                  </div> -->
+            </div>
         </div>
+   
         <div v-if="visibleCreateCompany">
             <CreateCompany />
         </div>
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .filter-container {
     padding: 0 10px;
 }
@@ -737,6 +729,13 @@ watch(
     max-width: 300px;
 }
 
+.title-project {
+    margin: auto 0;
+   
+        max-width: 200px;
+   
+}
+
 .title-group {
     display: flex;
     align-items: center;
@@ -769,4 +768,37 @@ watch(
 .role-hide {
     visibility: hidden;
 }
+
+.dashChart button {
+    cursor: default !important;
+}
+
+.nwrp{
+    text-wrap: nowrap;
+}
+
+.dash-inf{
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: flex-start;
+        .dash-inf-left{
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            width: 100%;
+            @media(max-width: 500px){
+              flex-direction: column;
+              align-items: start !important;
+            }
+        }
+        .dash-inf-right{
+            justify-content: flex-end;
+            width: 100%;
+            @media(max-width: 500px){
+                justify-content: center;
+            }
+            
+        }
+    }
+}
+
 </style>

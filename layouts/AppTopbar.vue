@@ -21,6 +21,7 @@ const topbarMenuActive = ref(false);
 const router = useRouter();
 
 import { useAuthStore } from '~/store/auth';
+import Search from '../components/Search.vue';
 const url = useRuntimeConfig();
 
 const name = ref('name');
@@ -88,8 +89,6 @@ const isOutsideClicked = (event) => {
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
 
-
-
 const handleOutsideClick = () => {
     if (showNotify.value) {
         // fetchNotifyData();
@@ -102,7 +101,6 @@ const closeNotification = (evn) => {
     showNotify.value = evn;
     // fetchNotifyData();
     // notifiData.value = false;
-
 };
 
 // Register directive
@@ -171,9 +169,9 @@ const fetchNotifyData = async () => {
         if (data.value) {
             console.log('notification data =>', data.value);
             if (data.value.data.find((item) => item.is_read === 0)) {
-                notifiData.value = true
+                notifiData.value = true;
             } else {
-                notifiData.value = false
+                notifiData.value = false;
             }
             console.log('notification data =>', notifiData.value);
             // totalPage.value = Math.ceil(data.value.total / 5);
@@ -185,17 +183,15 @@ const fetchNotifyData = async () => {
 
 fetchNotifyData();
 
-
-
 const handleNotificationComp = () => {
-   
+    console.log('handleNotificationComp');
     showNotify.value = !showNotify.value;
-    if(notifiData.value) {
+    if (notifiData.value) {
         notifiData.value = false;
     }
 };
 
-const setter = ref(false)
+const setter = ref(false);
 
 // watch(showNotify, (newValue, oldValue) => {
 //     // console.log('old', oldValue);
@@ -222,7 +218,6 @@ const setter = ref(false)
 //     }
 // });
 
-
 const timerCompanyID = ref();
 const timerSpaceId = ref();
 const timerProjectId = ref();
@@ -232,7 +227,6 @@ const storeTaskCompanyID = localStorage.getItem('storeTaskCompanyID');
 const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
 const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
 const storedTaskID = localStorage.getItem('storeTaskID');
-
 
 console.log('timerTaskId', timerTaskId.value);
 const fetchedTimerData = ref();
@@ -252,13 +246,13 @@ const fetchActiveTimer = async () => {
         if (data.value) {
             console.log('active timer data =>', data.value);
             // return;
-            fetchedTimerData.value = data.value.data.is_timer_start;
-            if(data.value.data.is_timer_start === "true"){
-                timerCompanyID.value = data.value.data.company_id;
-                timerSpaceId.value = data.value.data.space_id;
-                timerProjectId.value = data.value.data.project_id;
-                timerTaskId.value = data.value.data.task_id;
-                timerStartTime.value = data.value.data.start_time;
+            fetchedTimerData.value = data.value?.data?.is_timer_start;
+            if (data.value?.data?.is_timer_start === 'true') {
+                timerCompanyID.value = data.value?.data.company_id;
+                timerSpaceId.value = data.value?.data?.space_id;
+                timerProjectId.value = data.value?.data?.project_id;
+                timerTaskId.value = data.value?.data?.task_id;
+                timerStartTime.value = data.value?.data?.start_time;
             }
             console.log('fetchedTimerData', data.value.data);
             console.log('timerTaskId', timerTaskId.value);
@@ -266,12 +260,12 @@ const fetchActiveTimer = async () => {
     } catch (e) {
         console.log(e);
     }
-}
+};
 
 fetchActiveTimer();
 
 const piniaTID = ref();
-if(timerData.value) {
+if (timerData.value) {
     console.log('from Pinia');
     piniaTID.value = timerData.value?.task_id;
 }
@@ -282,7 +276,7 @@ console.log('timerDatPPPa', timerData.value?.task_id);
 //     timerTaskId.value = storedTaskID;
 // }
 
-if(storeTaskCompanyID) {
+if (storeTaskCompanyID) {
     timerCompanyID.value = storeTaskCompanyID;
 }
 
@@ -313,12 +307,11 @@ function startTimer(timerSTime) {
         }
         return;
     } else {
-
         const startTime = new Date(timerSTime);
 
         function updateTimer() {
             const currentTime = new Date();
-            const elapsedTime = currentTime - startTime; 
+            const elapsedTime = currentTime - startTime;
             const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
             const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
@@ -326,8 +319,8 @@ function startTimer(timerSTime) {
             return formattedTime;
         }
 
-                // Hide the timer element for the first 2 seconds
-                if (timerElement) {
+        // Hide the timer element for the first 2 seconds
+        if (timerElement) {
             timerElement.style.visibility = 'hidden';
         }
 
@@ -342,7 +335,6 @@ function startTimer(timerSTime) {
             clearInterval(timerInterval);
         }
         timerInterval = setInterval(() => {
-            
             if (timerElement) {
                 timerElement.textContent = updateTimer();
             }
@@ -355,7 +347,7 @@ getStoreTimer();
 watchEffect(async () => {
     if (isTImerStopped.value === true) {
         timerTaskId.value = null;
-        startTimer('stop')
+        startTimer('stop');
         console.log('timerTaskIdFOLO', timerTaskId.value);
     }
     if (timerData.value || timerTaskId.value) {
@@ -365,21 +357,30 @@ watchEffect(async () => {
         showTimer.value = false;
     }
 });
+
+const visibleTop = ref(false);
+
+const closeSearch = (evn) => {
+    console.log('closeSearch', evn);
+    visibleTop.value = false;
+};
 </script>
 
 <template>
     <div class="layout-topbar">
-        
         <Toast position="bottom-right" group="br" />
-        <router-link to="/" class="layout-topbar-logo absolute" style="left: 73px;">
+        <router-link to="/" class="layout-topbar-logo absolute">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" style="margin-left: 0 !important;" @click="onMenuToggle()">
+        <button class="p-link layout-menu-button layout-topbar-button" style="margin-left: 0 !important" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
         </button>
         <div class="p-link layout-topbar-menu-button layout-topbar-button">
-            <button class="nav-btn" @click="onTopBarMenuButton()">
+            <button class="nav-btn" @click="handleNotificationComp">
+                <div v-if="showNotify" class="notification">
+                    <Notification @closeNotification="closeNotification($event)" />
+                </div>
                 <i class="pi pi-bell"></i>
             </button>
             <button class="nav-btn" @click="onTopBarMenuButton()">
@@ -401,33 +402,20 @@ watchEffect(async () => {
             </section> -->
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
-             <!-- <pre>{{ showNotify}}</pre> -->
-            
-            
+            <!-- <pre>{{ showNotify}}</pre> -->
 
-
-            <button @click="openProfile" class="p-link layout-topbar-button">
-                <div v-tooltip.bottom="{ value: 'Profile' }" v-if="userProfile?.data?.image"
-                    class="flex align-items-center gap-2">
-                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
-                    <div class="userImage">
-                        <img :src="`${userProfile?.data?.image}`" class=""
-                            style="height: 100%; width: 100%; object-fit: cover" />
-                    </div>
-                </div>
-                <img v-tooltip.bottom="{ value: 'Profile' }" v-else src='../assets/dummy_profile.png' alt=""
-                    style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover">
-                <span class="ml-4">Profile</span>
-            </button>
             <!-- <pre>valueID{{timerTaskId}}</pre> -->
+            <button class="p-link layout-topbar-button mr-1" @click="visibleTop = true" style="padding-top: 0.1rem">
+                <i class="pi pi-search"></i>
+                <span>Search</span>
+            </button>
 
             <div class="relative">
                 <div v-if="notifiData" class="ping-container">
                     <span class="ping-outer"></span>
                     <span class="ping-inner"></span>
                 </div>
-                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn">
-
+                <button @click="handleNotificationComp" class="p-link layout-topbar-button notify-btn ml-0">
                     <i class="pi pi-bell"></i>
                     <span class="ml-4">Notification</span>
                 </button>
@@ -437,14 +425,25 @@ watchEffect(async () => {
                 </div>
             </div>
 
+            <button @click="openProfile" class="p-link layout-topbar-button">
+                <div v-tooltip.bottom="{ value: 'Profile' }" v-if="userProfile?.data?.image" class="flex align-items-center gap-2">
+                    <!-- <p class="text-black m-0" style="text-wrap: nowrap">{{ name.split(' ')[0] }}</p> -->
+                    <div class="userImage">
+                        <img :src="`${userProfile?.data?.image}`" class="" style="height: 100%; width: 100%; object-fit: cover" />
+                    </div>
+                </div>
+                <img v-tooltip.bottom="{ value: 'Profile' }" v-else src="../assets/dummy_profile.png" alt="" style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover" />
+                <span class="ml-4">Profile</span>
+            </button>
+
             <NuxtLink
                 v-if="showTimer"
                 v-tooltip.left="{ value: 'Active Task' }"
                 :to="{ path: `/companies/${timerCompanyID}/spaces/${timerData ? timerData?.space_id : timerSpaceId}/projects/${timerData ? timerData?.project_id : timerProjectId}`, query: { task_key: timerData ? timerData?.task_id : timerTaskId } }"
-                class="flex absolute gap-2 align-items-center task-timer-wrapper mr-2"
+                class="flex absolute gap-2 align-items-center ntask-timer-wrapper mr-2"
             >
-                <div class="clock-wrapper relative ml-2">
-                    <div :class="`clock-btn bg-pink-300`" @click="handleClickClock">
+                <div class="nclock-wrapper relative ml-2">
+                    <div :class="`nclock-btn bg-pink-300`" @click="handleClickClock">
                         <i :class="`pi pi-stop text-white`" style="font-size: 11px; font-weight: 700"></i>
                     </div>
                     <div class="text-sm absolute text-black time-int" id="timer-interval">
@@ -461,14 +460,16 @@ watchEffect(async () => {
             <!-- <pre>{{piniaTID}}</pre> -->
         </div>
 
-        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }"
-            :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
+        <Sidebar v-model:visible="visibleTop" header=" " position="top" class="search-container" style="height: auto">
+            <Search @closeSearch="closeSearch($event)" />
+        </Sidebar>
     </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .notify-btn {
     @media (max-width: 991px) {
         display: none !important;
@@ -540,7 +541,7 @@ watchEffect(async () => {
     display: inline-flex;
     height: 12px;
     width: 12px;
-    left: 36px;
+    left: 21px;
     top: 5px;
     z-index: 1000;
 }
@@ -565,7 +566,6 @@ watchEffect(async () => {
 }
 
 @keyframes ping {
-
     75%,
     100% {
         transform: scale(2);
@@ -573,10 +573,10 @@ watchEffect(async () => {
     }
 }
 
-.task-timer-wrapper {
+.ntask-timer-wrapper {
     height: 40px;
     width: 120px;
-    right: 197px;
+    right: 244px;
     top: 15px;
     border: 2px solid #9596e4;
     /* Project theme color */
@@ -607,14 +607,13 @@ watchEffect(async () => {
     }
 }
 
-.clock-wrapper {
+.nclock-wrapper {
     display: flex;
     align-items: center;
     gap: 7px;
-    
 }
 
-.clock-btn {
+.nclock-btn {
     width: 25px;
     height: 25px;
     border-radius: 100%;
@@ -642,7 +641,6 @@ watchEffect(async () => {
 
 @keyframes blink-animation {
     0% {
-        
         opacity: 0;
     }
     50% {
@@ -651,5 +649,20 @@ watchEffect(async () => {
     100% {
         opacity: 1;
     }
+}
+
+.search-container {
+    top: 70px;
+    width: 50%;
+    border-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.search-container .p-sidebar-header {
+    padding-bottom: 0 !important;
+}
+.p-sidebar-top{
+    backdrop-filter: blur(1px);
 }
 </style>

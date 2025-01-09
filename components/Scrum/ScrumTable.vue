@@ -90,13 +90,17 @@ watch(description, (newValue) => {
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
     <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem">
-        <Column style="width: 2%" field="id" header="id"></Column>
-        <Column style="width: 10%" field="meeting_date" header="Date"></Column>
-        <Column style="width: 10%" field="space_id" header="Space">
+        <Column style="width: 2%" field="id" header="Serial"></Column>
+        <Column style="width: 10%" field="meeting_date" header="Date">
+          <template #body="slotProps">
+                <div class="cursor-pointer" @click="() => handleRowClick(toRaw(slotProps.data))">{{ slotProps.data.meeting_date }}</div>
+          </template>
+        </Column>
+        <!-- <Column style="width: 10%" field="space_id" header="Space">
             <template #body="slotProps">
                 <div @click="() => handleRowClick(toRaw(slotProps.data))">{{ slotProps.data.space_id.name }}</div>
             </template>
-        </Column>
+        </Column> -->
         <!-- <Column style="width: 30%" field="description" header="Description">
             <template #body="slotProps">
                 <div class="description" v-html="slotProps.data.description"></div>
@@ -121,7 +125,7 @@ watch(description, (newValue) => {
     </DataTable>
 
     <!-- View Modal -->
-    <Dialog lazy="true" v-model:visible="scrumModal" modal :header="selectedScrum?.space_id?.name" :style="{ minWidth: '35vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ minWidth: '35vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <div class="title">
             <p class="">Participants:</p>
             <p class="">{{ selectedScrum.meeting_date }}</p>
@@ -140,11 +144,11 @@ watch(description, (newValue) => {
     <Dialog lazy="true" v-model:visible="editModal" modal header="Update Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleUpdate" class="form" action="">
             <!-- <pre>{{ selectedScrum }}</pre> -->
-            <div class="flex-auto">
+            <!-- <div class="flex-auto">
                 <label for="space" class="font-bold block mb-2">Space: </label>
-                <!-- <Dropdown v-model="selectedSpace" id="space" :options="menu"  optionLabel="name" placeholder="Select Space" class="w-full" /> -->
+                
                 <MultiSelect id="spaces" display="chip" v-model="spaces" :options="menu" filter resetFilterOnHide optionLabel="name" placeholder="Select Spaces" class="w-full" :maxSelectedLabels="2" />
-            </div>
+            </div> -->
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>
                 <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
