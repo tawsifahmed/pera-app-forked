@@ -1,7 +1,7 @@
 <script setup>
 import { useActiveCompanyStore } from '~/store/workCompany';
 import Editor from 'primevue/editor';
-const { scrumData, fetchData, employees } = defineProps(['scrumData', 'fetchData', 'employees']);
+const { scrumData, fetchData, employees, totalRecords } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords']);
 const { menu } = storeToRefs(useActiveCompanyStore());
 const toast = useToast();
 const scrumModal = ref(false);
@@ -12,6 +12,7 @@ const selectedScrum = ref(null);
 const description = ref(' ');
 const employee = ref('');
 const url = useRuntimeConfig();
+const isLoading = ref(false);
 const handleRowClick = (data) => {
     console.log(data);
     selectedScrum.value = data;
@@ -86,10 +87,41 @@ watch(description, (newValue) => {
         description.value = ' ';
     }
 });
+
+const onPage = async(e) =>{
+    const token = useCookie('token');
+    isLoading.value = true;
+    const { data, pending, error } = await useAsyncData('scrumData', () =>
+        $fetch(`${url.public.apiUrl}/scrum-meeting/list?page=${e.page+1}&limit=${e.rows}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        scrumData.value = data.value?.data;
+    }
+    return (isLoading.value = false);
+}
+
 </script>
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
-    <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem">
+    <!-- <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem"> -->
+    <DataTable 
+        class="table-st" 
+        :value="scrumData"
+        :rowHover="true"
+        :paginator="true"
+        :rows="10"
+        v-if="scrumData && scrumData.length > 0"
+        stripedRows
+        tableStyle="min-width: 50rem"
+        :totalRecords="totalRecords"
+        :loading="isLoading"
+        :rowsPerPageOptions="[5, 10, 20, 50]"
+        @page="onPage"
+    >   
         <Column style="width: 2%" field="id" header="Serial"></Column>
         <Column style="width: 10%" field="meeting_date" header="Date">
           <template #body="slotProps">

@@ -10,6 +10,8 @@ definePageMeta({
 const url = useRuntimeConfig();
 const toast = useToast();
 
+const totalRecords = ref(0);
+
 const scrumData = ref([]);
 const createModal = ref(false);
 const employees = ref([]);
@@ -61,6 +63,7 @@ const fetchScrum = async () => {
     );
     if (data.value?.data?.length > 0) {
         scrumData.value = data.value?.data;
+        totalRecords.value = data.value?.totalRecords;
     }
     return (isLoading.value = false);
 };
@@ -91,7 +94,13 @@ onMounted(() => {
             <h3>Meeting Minutes</h3>
             <Button @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
         </header>
-        <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" />
+        <!-- <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" /> -->
+        <ScrumTable 
+            :scrumData="scrumData" 
+            :fetchData="fetchScrum" 
+            :employees="employees" 
+            :totalRecords="totalRecords"
+        />
     </div>
 
     <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

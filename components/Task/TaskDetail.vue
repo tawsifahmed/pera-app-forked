@@ -1005,7 +1005,7 @@ const modules = {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div class="relative task-comment">
+                        <div class="task-comment">
                             <Editor 
                                 class="mb-2" 
                                 placeholder="Add comment" 
