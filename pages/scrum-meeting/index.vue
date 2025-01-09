@@ -96,10 +96,10 @@ onMounted(() => {
         </header>
         <!-- <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" /> -->
         <ScrumTable 
-        :scrumData="scrumData" 
-        :fetchData="fetchScrum" 
-        :employees="employees" 
-        :totalRecords="totalRecords"
+            :scrumData="scrumData" 
+            :fetchData="fetchScrum" 
+            :employees="employees" 
+            :totalRecords="totalRecords"
         />
     </div>
 

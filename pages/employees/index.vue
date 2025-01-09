@@ -29,9 +29,6 @@ const filters = ref();
 const loading = ref(true);
 const loading1 = ref(false);
 
-const isLoading = ref(false);
-const totalRecords = ref(0);
-
 const toast = useToast();
 
 import Dialog from 'primevue/dialog';
@@ -146,9 +143,7 @@ const init = async (userTypes) => {
         })
     );
     if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data;
-        // usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        totalRecords.value = data.value?.total;
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
     }
 };
 
@@ -214,23 +209,6 @@ const downloadTaskSheet = () => {
     }
 };
 
-const onPage = async(e) =>{
-    console.log('object');
-    const token = useCookie('token');
-    isLoading.value = true;
-    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
-        $fetch(`${url.public.apiUrl}/users/list?page=${e.page+1}&limit=${e.rows}`, {
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
-        })
-    );
-    if (data.value?.data?.length > 0) {
-        usersLists.value = data.value?.data;
-        // usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-    }
-    return (isLoading.value = false);
-}
 </script>
 
 <template>
@@ -261,8 +239,8 @@ const onPage = async(e) =>{
             </template>
         </Toolbar>
 
-        <!-- <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading"> -->
-        <DataTable 
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+        <!-- <DataTable 
             v-model:filters="filters" 
             class="table-st" 
             :value="usersLists" 
@@ -277,10 +255,10 @@ const onPage = async(e) =>{
             :totalRecords="totalRecords"
             :rowsPerPageOptions="[5, 10, 20, 50]"
             @page="onPage"
-        >
+        > -->
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
-            <!-- <Column field="index" header="Serial" sortable></Column> -->
+            <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Employee Name"></Column>
             <Column field="email" header="Email Address"></Column>
             <Column field="phone" header="Phone"></Column>

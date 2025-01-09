@@ -120,7 +120,7 @@ const spacePage = ref(true);
             </IconField>
         </div>
         <DataTable v-model:filters="filters" class="table-dco" :value="singleCompanySpaces" stripedRows paginator
-            tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+            tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>
