@@ -152,96 +152,92 @@ onMounted(() => {
 </template>
 
 <style lang="scss">
-.not-found {
-    font-size: 12px;
-    font-weight: 400;
-}
 .search-body {
     height: 90%;
-}
-.search-title {
-    padding: 10px 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 1fr;
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    text-align: center;
-    border-bottom: 1px solid #ededed;
-}
-.search-title p {
-    margin: 0;
-    font-weight: 500;
-    color: #727272;
-    text-transform: uppercase;
-}
-.result-wrapper {
-    height: 100%;
-    width: 100% !important;
-    min-height: 5.5rem;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 1fr;
-    grid-column-gap: 10px;
-    grid-row-gap: 0px;
-}
-.search-task-container {
-    padding: 10px;
-    overflow-y: auto;
-    height: 100%;
-}
+    .search-title {
+        padding: 10px 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: 1fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+        text-align: center;
+        border-bottom: 1px solid #ededed;
+    }
+    .search-title p {
+        margin: 0;
+        font-weight: 500;
+        color: #727272;
+        text-transform: uppercase;
+    }
+    .result-wrapper {
+        height: 100%;
+        width: 100% !important;
+        min-height: 5.5rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: 1fr;
+        grid-column-gap: 10px;
+        grid-row-gap: 0px;
+    }
+    .search-task-container {
+        padding: 10px;
+        overflow-y: auto;
+        height: 100%;
+    }
 
-.search-project-container {
-    padding: 10px;
-    overflow-y: auto;
-    // border-left: 1px solid #ededed;
-    // border-right: 1px solid #ededed;
-    height: 100%;
-}
+    .search-project-container {
+        padding: 10px;
+        overflow-y: auto;
+        // border-left: 1px solid #ededed;
+        // border-right: 1px solid #ededed;
+        height: 100%;
+    }
 
-.search-space-container {
-    padding: 10px;
-    overflow-y: auto;
-    height: 100%;
-}
+    .search-space-container {
+        padding: 10px;
+        overflow-y: auto;
+        height: 100%;
+    }
 
-.staskstatus {
-    height: 12px;
-    width: 12px;
-    border-radius: 25px;
-    background: #000;
-}
+    .staskstatus {
+        height: 12px;
+        width: 12px;
+        border-radius: 25px;
+        background: #000;
+    }
 
-.stitle {
-    margin: auto 0;
-    max-width: 300px;
-    font-size: 0.9rem;
-}
+    .stitle {
+        margin: auto 0;
+        max-width: 300px;
+        font-size: 0.9rem;
+    }
 
-.task-card {
-    border-radius: 5px;
-    padding: 10px 10px;
-    margin: 8px 0;
-    box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
-    cursor: pointer;
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    flex-wrap: wrap;
-    height: 45px !important;
-}
+    .task-card {
+        border-radius: 5px;
+        padding: 10px 10px;
+        margin: 8px 0;
+        box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
+        cursor: pointer;
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        flex-wrap: wrap;
+        height: 45px !important;
+    }
 
-.task-card:hover {
-    box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
-}
+    .task-card:hover {
+        box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+    }
 
-.result-title {
-    font-size: 1rem !important;
-}
+    .result-title {
+        font-size: 1rem !important;
+    }
 
-.spinnner {
-    top: 42% !important;
+    .spinnner {
+        top: 42% !important;
+    }
 }
 </style>
