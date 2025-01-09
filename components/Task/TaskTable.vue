@@ -18,8 +18,6 @@ const toast = useToast();
 const emit = defineEmits(['openCreateSpace', 'handleTaskEdit', 'handleTaskDetailView', 'confirmDeleteTask']);
 const { kanbanTasks } = defineProps(['kanbanTasks']);
 const tableData = ref(tasks || []);
-const { kanbanTasks } = defineProps(['kanbanTasks']);
-const tableData = ref(tasks || []);
 const route = useRoute();
 const id = route.params?.projects;
 
@@ -124,8 +122,6 @@ watch(hoveredRowKey, (newVal, oldVal) => {
         // inlineAssignees.value = [];
     }
 });
-
-
 
 const handleMouseEnter = (key) => {
     hoveredRowKey.value = key;
@@ -362,7 +358,7 @@ const downloadTaskSheet = (taskLists) => {
                     const serialNo = index + 1;
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
-                    const assignees = task.data.assigneeObj.map(assignee => assignee.name).join('; ');
+                    const assignees = task.data.assigneeObj.map((assignee) => assignee.name).join('; ');
                     const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
@@ -433,8 +429,7 @@ const inlineAssigTId = ref(null);
 const handleAssigneeSelection = (task_id) => {
     console.log('inlineAssignees', inlineAssignees.value);
     inlineAssigTId.value = task_id;
-        inlineAssignees.value = [];
-
+    inlineAssignees.value = [];
 };
 // const handleAssigneeChanges = () => {
 //     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
@@ -520,12 +515,12 @@ const handleAssigneeChanges = async (type, values, key) => {
             inlineAssigL.value = false;
         }
     }
-    if(type === 'edit'){
+    if (type === 'edit') {
         const editTaskData = {
             id: key,
             assignees: values?.map((assignee) => assignee.id),
             project_id: id
-        }
+        };
         await editTask(editTaskData);
         if (isTaskEdited.value === true) {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
@@ -947,10 +942,9 @@ function removeChild(node = toRaw(tableData.value)) {
                     <span v-else>
                         <div class="s-assignee">
                             <div @click="handleAssigneeSelection(slotProps.node.key)" class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
-                           
-                                    <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
-                                    <i class="pi pi-angle-down text-sm mt-1"></i>
-                            
+                                <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
+                                <i class="pi pi-angle-down text-sm mt-1"></i>
+
                                 <Button
                                     @click="handleAssigneeChanges('add', 0, slotProps.node.key)"
                                     v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
