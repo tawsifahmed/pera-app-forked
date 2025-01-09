@@ -18,6 +18,7 @@ definePageMeta({
 import { FilterMatchMode } from 'primevue/api';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
+import { onMounted } from 'vue';
 const filters = ref();
 const loading = ref(true);
 const toast = useToast();
@@ -62,10 +63,15 @@ const deletingProject = async () => {
     }
 };
 
-watchEffect(() => {
-    getSingleSpace(spaces);
+onMounted(() => {
+    const spaceId = spaces;
+    getSingleSpace(spaceId);
     loading.value = false;
 });
+// getSingleSpace(spaces);
+// watchEffect(() => {
+//     loading.value = false;
+// });
 
 const initFilters = () => {
     filters.value = {

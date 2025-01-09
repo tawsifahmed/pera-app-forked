@@ -296,7 +296,7 @@ const loadMoreTasks = async (vl) => {
 };
 
 const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
-    const limit = 15;
+    const limit = 30;
     if (!hideLoading.value) {
         taskLoading.value = true;
     }
@@ -311,17 +311,15 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
             }
         });
 
-        // Update taskList only if data is valid and total pages are available
         if (data.value && data.value.data && data.value.counts?.total_tasks) {
-            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
-            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
-            loadMoreLoading.value = false; // Reset loading flag after fetch
+            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); 
+            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; 
+            loadMoreLoading.value = false; 
         } else {
             taskList.value = []; 
             loadMoreLoading.value = false; 
         }
 
-        // console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
         loadMoreLoading.value = false; 
@@ -489,7 +487,7 @@ watch(
                 <span class="text-500">responded</span>
             </div>
         </div> -->
-        
+
         <!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
@@ -602,7 +600,7 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px">
+                <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
@@ -627,7 +625,7 @@ watch(
                                 <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
                                 <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                                <p>{{ task?.project_name }}</p>
+                                <p class="title-project line-clamp-1">{{ task?.project_name }}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
@@ -690,7 +688,7 @@ watch(
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .filter-container {
     padding: 0 10px;
 }
@@ -729,6 +727,13 @@ watch(
 .title {
     margin: auto 0;
     max-width: 300px;
+}
+
+.title-project {
+    margin: auto 0;
+   
+        max-width: 200px;
+   
 }
 
 .title-group {
