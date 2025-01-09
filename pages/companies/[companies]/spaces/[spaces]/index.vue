@@ -120,7 +120,7 @@ const isPage = ref(true);
                 <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
             </IconField>
         </div>
-        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[ 10, 20, 30, 40, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-dsp" :value="singleSpaceProjects" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>
