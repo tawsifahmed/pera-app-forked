@@ -1,3 +1,77 @@
+<template>
+    <div class="w-full">
+        <div class="flex justify-content-center" style="position: sticky; top: 0px; background-color: white; width: 100%">
+            <IconField style="width: 50%">
+                <InputIcon :class="`${taskLoading ? `pi-spin pi-spinner text-2xl spinnner` : 'pi-search text-xl'} pi  font-me`"> </InputIcon>
+                <InputText id="searchField" class="w-full" v-model="searchText" placeholder="Search..." size="large" />
+            </IconField>
+        </div>
+        <br />
+        <div class="result-wrapper" :class="hasResult === 'no' ? 'flex justify-content-center align-items-center' : ''">
+            <div v-if="tasksResult.length > 0 || projectsResult.length > 0 || spacesResult.length > 0" class="result-container">
+                <Card v-if="tasksResult.length > 0" class="h-full">
+                    <template class="result-title" #title>Tasks</template>
+                    <template #content>
+                        <div class="task-container">
+                            <div>
+                                <div v-for="task in tasksResult" :key="task" @click="handleRedirect('task', task)" class="task-card">
+                                    <div class="title-group flex justify-content-start align-items-center gap-2">
+                                        <div :class="`staskstatus`" :style="`background-color: ${task.task_status_color};`"></div>
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ task.task_name }}</p>
+                                    </div>
+                                    <div>
+                                        <i>
+                                            <p style="font-size: 12px"><strong>Project:</strong> {{ task?.project_name }}</p></i
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+                <br v-if="tasksResult.length > 0" />
+                <Card v-if="projectsResult.length > 0" class="h-full">
+                    <template class="result-title" #title>Projects</template>
+                    <template #content>
+                        <div class="project-container">
+                            <div>
+                                <div v-for="project in projectsResult" :key="project" @click="handleRedirect('project', project)" class="task-card">
+                                    <div class="title-group flex justify-content-start gap-2 align-items-center">
+                                        <span class="pi pi-bars"></span>
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ project.project_name }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+                <br v-if="projectsResult.length > 0" />
+                <Card v-if="spacesResult.length > 0" class="h-full">
+                    <template class="result-title" #title>Spaces</template>
+                    <template #content>
+                        <div class="space-container">
+                            <div>
+                                <div v-for="space in spacesResult" :key="space" @click="handleRedirect('space', space)" class="task-card">
+                                    <span class="title-group flex justify-content-start gap-2 align-items-center">
+                                        <div id="dynamic-div" :style="`background-color: ${space?.space_color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-1 px-2 w-fit text-white">
+                                            {{ space?.space_name.charAt(0).toUpperCase() }}
+                                        </div>
+
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ space.space_name }}</p>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
+            <div v-else class="flex justify-content-center">
+                <i :style="hasResult === 'no' ? 'display: block;' : 'display: none;'"> Nothing found </i>
+            </div>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { nextTick, onMounted } from 'vue';
 import { watch, ref } from 'vue';
@@ -92,152 +166,62 @@ onMounted(() => {
 });
 </script>
 
-<template>
-    <div class="w-full search-body">
-        <div class="flex justify-content-center">
-            <IconField style="width: 50%">
-                <InputIcon :class="`${taskLoading ? `pi-spin pi-spinner text-2xl spinnner` : 'pi-search text-xl'} pi  font-me`"> </InputIcon>
-                <InputText id="searchField" class="w-full" v-model="searchText" placeholder="Keywords..." size="large" aria-autocomplete="none" />
-            </IconField>
-        </div>
-        <div class="search-title">
-            <p class="">tasks</p>
-            <p class="">projects</p>
-            <p class="">spaces</p>
-        </div>
-        <div class="result-wrapper">
-            <div class="search-task-container">
-                <div v-if="tasksResult.length > 0">
-                    <div v-for="task in tasksResult" :key="task" @click="handleRedirect('task', task)" class="task-card">
-                        <div class="title-group flex justify-content-start align-items-center gap-2">
-                            <div :class="`staskstatus`" :style="`background-color: ${task.task_status_color};`"></div>
-                            <p class="stitle line-clamp-1" style="font-weight: 600">{{ task.task_name }}</p>
-                        </div>
-                        <div>
-                            <i>
-                                <p style="font-size: 12px"><strong>Project:</strong> {{ task?.project_name }}</p></i
-                            >
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="not-found" style="text-align: center">Tasks not found</div>
-            </div>
-            <div class="search-project-container">
-                <div v-if="projectsResult?.length > 0">
-                    <div v-for="project in projectsResult" :key="project" @click="handleRedirect('project', project)" class="task-card">
-                        <div class="flex justify-content-start gap-2 align-items-center">
-                            <span class="pi pi-bars"></span>
-                            <p class="stitle line-clamp-1" style="font-weight: 600">{{ project.project_name }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="not-found" style="text-align: center">Projects not found</div>
-            </div>
-            <div class="search-space-container">
-                <div v-if="spacesResult?.length > 0">
-                    <div v-for="space in spacesResult" :key="space" @click="handleRedirect('space', space)" class="task-card">
-                        <span class="flex justify-content-start gap-2 align-items-center">
-                            <div id="dynamic-div" :style="`background-color: ${space?.space_color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-1 px-2 w-fit text-white">
-                                {{ space?.space_name.charAt(0).toUpperCase() }}
-                            </div>
-
-                            <p class="stitle line-clamp-1" style="font-weight: 600">{{ space.space_name }}</p>
-                        </span>
-                    </div>
-                </div>
-                <div v-else class="not-found" style="text-align: center">Spaces not found</div>
-            </div>
-        </div>
-    </div>
-</template>
-
 <style lang="scss">
-.search-body {
-    height: 90%;
-    .search-title {
-        padding: 10px 0;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: 1fr;
-        grid-column-gap: 0px;
-        grid-row-gap: 0px;
-        text-align: center;
-        border-bottom: 1px solid #ededed;
-    }
-    .search-title p {
-        margin: 0;
-        font-weight: 500;
-        color: #727272;
-        text-transform: uppercase;
-    }
-    .result-wrapper {
-        height: 100%;
-        width: 100% !important;
-        min-height: 5.5rem;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: 1fr;
-        grid-column-gap: 10px;
-        grid-row-gap: 0px;
-    }
-    .search-task-container {
-        padding: 10px;
-        overflow-y: auto;
-        height: 100%;
-    }
+.result-wrapper {
+    height: auto;
+    min-height: 5.5rem;
+}
+.result-container {
+    margin: 0 20px;
+}
+.task-container {
+    padding: 0px 8px 0px 1px;
+}
 
-    .search-project-container {
-        padding: 10px;
-        overflow-y: auto;
-        // border-left: 1px solid #ededed;
-        // border-right: 1px solid #ededed;
-        height: 100%;
-    }
+.project-container {
+    padding: 0px 8px 0px 1px;
+}
 
-    .search-space-container {
-        padding: 10px;
-        overflow-y: auto;
-        height: 100%;
-    }
+.space-container {
+    padding: 0px 8px 0px 1px;
+}
 
-    .staskstatus {
-        height: 12px;
-        width: 12px;
-        border-radius: 25px;
-        background: #000;
-    }
+.staskstatus {
+    height: 12px;
+    width: 12px;
+    border-radius: 25px;
+    background: #000;
+}
 
-    .stitle {
-        margin: auto 0;
-        max-width: 300px;
-        font-size: 0.9rem;
-    }
+.stitle {
+    margin: auto 0;
+    max-width: 300px;
+    font-size: 0.9rem;
+}
 
-    .task-card {
-        border-radius: 5px;
-        padding: 10px 10px;
-        margin: 8px 0;
-        box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
-        cursor: pointer;
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        flex-wrap: wrap;
-        height: 45px !important;
-    }
+.task-card {
+    border-radius: 5px;
+    padding: 10px 10px;
+    margin: 8px 0;
+    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+}
 
-    .task-card:hover {
-        box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
-    }
+.task-card:hover {
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
 
-    .result-title {
-        font-size: 1rem !important;
-    }
+.result-title {
+    font-size: 1rem !important;
+}
 
-    .spinnner {
-        top: 42% !important;
-    }
+.spinnner {
+    top: 42% !important;
 }
 </style>
