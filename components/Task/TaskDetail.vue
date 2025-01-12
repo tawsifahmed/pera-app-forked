@@ -891,7 +891,15 @@ const modules = {
                                         
                                         </template>
                                     </Column>
-                                    <Column field="assignee" header="Assignee" :style="{ width: '25%' }"></Column>
+                                    <Column field="assignee" header="Assignee" :style="{ width: '25%' }">
+                                        <template #body="slotProps">
+                                            <div class="flex justify-content-start  align-items-start">
+                                                <span v-for="(assigne, index) in slotProps.node.data.assignee" class="text-xs" >
+                                                    {{ assigne.name }}<span v-if="index < slotProps.node.data.assignee.length - 1">, </span>
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </Column>
                                     <Column field="dueDateValue" header="Due Date" :style="{ width: '11.5%' }"
                                         style="text-wrap: nowrap;">
                                     </Column>
@@ -1005,7 +1013,7 @@ const modules = {
                                 <i class="pi pi-times"></i>
                             </div>
                         </div>
-                        <div class="relative task-comment">
+                        <div class="task-comment">
                             <Editor 
                                 class="mb-2" 
                                 placeholder="Add comment" 

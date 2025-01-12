@@ -208,6 +208,7 @@ const downloadTaskSheet = () => {
         toast.add({ severity: 'error', summary: 'Error', detail: 'No data found to download', group: 'br', life: 3000 });
     }
 };
+
 </script>
 
 <template>
@@ -238,7 +239,23 @@ const downloadTaskSheet = () => {
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="usersLists" stripedRows paginator :rowsPerPageOptions="[5, 10, 20, 50]" tableStyle="min-width: 50rem" :rows="10" dataKey="id" filterDisplay="menu" :loading="loading">
+        <!-- <DataTable 
+            v-model:filters="filters" 
+            class="table-st" 
+            :value="usersLists" 
+            stripedRows 
+            tableStyle="min-width: 50rem" 
+            :rows="10" 
+            dataKey="id" 
+            filterDisplay="menu" 
+            :loading="loading || isLoading"
+
+            :paginator="true"
+            :totalRecords="totalRecords"
+            :rowsPerPageOptions="[5, 10, 20, 50]"
+            @page="onPage"
+        > -->
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -254,27 +271,27 @@ const downloadTaskSheet = () => {
                     <Button v-if="!deleteUserP" icon="pi pi-trash" text class="" severity="warning" rounded style="visibility: hidden" />
                 </template>
             </Column>
-            <template #footer> In total there are {{ usersLists ? usersLists.length : 0 }} rows. </template>
+            <!-- <template #footer> In total there are {{ usersLists ? totalRecords : 0 }} rows. </template> -->
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateEmployee" modal header="Create Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateEmployee" modal header="Create Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <CreateEmployee :param="{ rolesLists }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <EditEmployee :param="{ id, name, address, phone, email, user_type, rolesLists }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }" dismissableMask="true">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteEmployee = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" :loading="loading1"/>
         </Dialog>
 
         <!-- Invite User -->
-        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <InviteGuest :param="{ rolesLists }" @closeInviteModal="closeInviteModal($event)" />
         </Dialog>
     </div>

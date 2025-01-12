@@ -158,7 +158,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-stR" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-stR" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" :rowsPerPageOptions="[10, 15, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -183,12 +183,12 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoleCreateRole :param="{ permissionsList, groupPermissions }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoleEditRole :param="{ id, name, permissionsList, groupPermissions, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
     </div>
