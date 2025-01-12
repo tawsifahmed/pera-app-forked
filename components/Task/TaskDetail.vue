@@ -578,7 +578,7 @@ const users = ["Alice", "Bob", "Charlie", "David"];
 // Filter users based on input
 const filteredUsers = computed(() => {
     console.log('called filteredUsers');
-    const lastWord = taskCommentInput.value.split(" ").pop();
+    const lastWord = taskCommentInput.value?.split(" ").pop();
     console.log('called filteredUsers lastWord', lastWord);
     console.log('called filteredUsers list', users.filter(user => user.toLowerCase().includes(lastWord.toLowerCase())));
     return users.filter(user => user.toLowerCase().includes(lastWord.toLowerCase()));
@@ -587,9 +587,9 @@ const filteredUsers = computed(() => {
 // Handle input to show/hide mention dropdown
 const handleInput = () => {
     console.log('called handleInput');
-    const lastWord = taskCommentInput.value.split(" ").pop();
+    const lastWord = taskCommentInput.value?.split(" ").pop();
     console.log('lastWord ==>', lastWord);
-    showMentionDropdown.value = lastWord.startsWith(mentionTrigger);
+    showMentionDropdown.value = lastWord?.startsWith(mentionTrigger);
     console.log('showMentionDropdown ==>', showMentionDropdown.value);
 };
 
