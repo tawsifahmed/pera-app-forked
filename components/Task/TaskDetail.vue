@@ -11,6 +11,11 @@ import Inplace from 'primevue/inplace';
 import Quill from 'quill';
 import QuillMention from 'quill-mention';
 
+import MdEditor from 'md-editor-v3';
+  import 'md-editor-v3/lib/style.css';
+  
+  const content = ref('');
+
 
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
@@ -745,7 +750,7 @@ const modules = {
                                 <!-- <pre>description {{ description.length}}</pre> -->
                                 <!-- <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" /> -->
                                 <!-- <Editor v-if="description" v-model="description" editorStyle="height: 200px"/> -->
-                                <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
+                                <!-- <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
                                     <template v-slot:toolbar>
                                         <span class="ql-formats flex justify-content-end mr-0">
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -764,7 +769,16 @@ const modules = {
                                             <button class="ql-link" type="button" data-pc-section="link"></button>
                                         </span>
                                     </template>
-                                </Editor>
+                                </Editor> -->
+
+                                <MdEditor 
+                                     v-model="description" editorStyle="height: 150px"
+                                    :preview="true"
+                                    placeholder= 'Write here...'
+                                    height="500px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
