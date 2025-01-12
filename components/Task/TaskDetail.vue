@@ -12,9 +12,9 @@ import Quill from 'quill';
 import QuillMention from 'quill-mention';
 
 import MdEditor from 'md-editor-v3';
-  import 'md-editor-v3/lib/style.css';
+import 'md-editor-v3/lib/style.css';
   
-  const content = ref('');
+const editorViewMode = ref('preview');
 
 
 const url = useRuntimeConfig();
@@ -559,6 +559,11 @@ const getMentionedIds = async() => {
 }
 
 
+const handleViews = (data) => {
+    console.log('view ==>', data);
+    editorViewMode.value = data;
+}
+
 
 // Quill.register('modules/mention', QuillMention);
 
@@ -742,11 +747,31 @@ const modules = {
 
                             <!-- {{manualTime}} -->
                             <div class="field mt-3 flex flex-column">
-                                <div
-                                    class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
-                                    <span class="pi pi-sliders-h"></span>
-                                    <p>Description:</p>
+                                <div class="flex gap-2 justify-content-between mb-2">
+                                    <div
+                                        class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                        <span class="pi pi-sliders-h"></span>
+                                        <p>Description:</p>
+                                    </div>
+
+                                    <ButtonGroup>
+                                        <Button 
+                                            label="" 
+                                            icon="pi pi-pencil"
+                                            severity="secondary" 
+                                            @click="handleViews('edit')" 
+                                            :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" 
+                                            />
+                                        <Button 
+                                            label="" 
+                                            icon="pi pi-eye"
+                                            severity="secondary" 
+                                            @click="handleViews('preview')" 
+                                            :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" 
+                                            />
+                                    </ButtonGroup>
                                 </div>
+
                                 <!-- <pre>description {{ description.length}}</pre> -->
                                 <!-- <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" /> -->
                                 <!-- <Editor v-if="description" v-model="description" editorStyle="height: 200px"/> -->
@@ -771,14 +796,26 @@ const modules = {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor 
-                                     v-model="description" editorStyle="height: 150px"
-                                    :preview="true"
-                                    placeholder= 'Write here...'
-                                    height="500px" 
-                                    theme="light" 
-                                    language="en-US" 
-                                />
+                                    <MdEditor 
+                                        v-if="editorViewMode == 'edit'"
+                                        v-model="description" editorStyle="height: 150px"
+                                        :preview="false"
+                                        placeholder= 'Write here...'
+                                        height="300px" 
+                                        theme="light" 
+                                        language="en-US" 
+                                    />
+
+                                    <MdEditor 
+                                        v-else
+                                        v-model="description" editorStyle="height: 150px"
+                                        previewOnly
+                                        class="custom-preview"
+                                        placeholder= 'Write here...'
+                                        height="300px" 
+                                        theme="light" 
+                                        language="en-US" 
+                                    />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1533,5 +1570,10 @@ a {
 
 .commentedText .ql-mention-denotation-char {
     display: none;
+}
+.custom-preview{
+    border: 1px solid #e6e6e6;
+    padding: 0 0.5rem;
+    height: 300px;
 }
 </style>
