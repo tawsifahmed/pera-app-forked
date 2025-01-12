@@ -134,6 +134,7 @@ const handleMouseEnter = (key) => {
     }
 };
 
+
 const editClikedRowKey = ref(null);
 
 const checkMarkInput = ref({});
@@ -919,7 +920,7 @@ function removeChild(node = toRaw(tableData.value)) {
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
-                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
                     <span class="flex justify-content-center assignee-wrapper" v-if="slotProps.node.data?.assigneeObj.length > 0">
                         <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
                             <img
