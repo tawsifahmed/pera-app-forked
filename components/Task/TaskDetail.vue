@@ -15,6 +15,7 @@ import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
   
 const editorViewMode = ref('preview');
+const commentEditorViewMode = ref('edit');
 
 
 const url = useRuntimeConfig();
@@ -560,9 +561,47 @@ const getMentionedIds = async() => {
 
 
 const handleViews = (data) => {
-    console.log('view ==>', data);
     editorViewMode.value = data;
 }
+
+const handleCommentViews = (data) => {
+    commentEditorViewMode.value = data;
+}
+
+// State and references
+const mentionTrigger = "@"; // Character to trigger mention
+const showMentionDropdown = ref(false); // Toggle dropdown visibility
+
+// Example users for mentions
+const users = ["Alice", "Bob", "Charlie", "David"]; 
+
+// Filter users based on input
+const filteredUsers = computed(() => {
+    console.log('called filteredUsers');
+    const lastWord = taskCommentInput.value.split(" ").pop();
+    console.log('called filteredUsers lastWord', lastWord);
+    console.log('called filteredUsers list', users.filter(user => user.toLowerCase().includes(lastWord.toLowerCase())));
+    return users.filter(user => user.toLowerCase().includes(lastWord.toLowerCase()));
+});
+
+// Handle input to show/hide mention dropdown
+const handleInput = () => {
+    console.log('called handleInput');
+    const lastWord = taskCommentInput.value.split(" ").pop();
+    console.log('lastWord ==>', lastWord);
+    showMentionDropdown.value = lastWord.startsWith(mentionTrigger);
+    console.log('showMentionDropdown ==>', showMentionDropdown.value);
+};
+
+// Insert mention into the editor and hide the dropdown
+const insertMention = (user) => {
+    console.log('selected user', user);
+  taskCommentInput.value += user.value + " ";  // Add mention to input
+  showMentionDropdown.value = false;  // Close dropdown
+};
+
+// Watch for changes to input and trigger mention handling
+watch(taskCommentInput, handleInput);
 
 
 // Quill.register('modules/mention', QuillMention);
@@ -746,7 +785,7 @@ const modules = {
                             
 
                             <!-- {{manualTime}} -->
-                            <div class="field mt-3 flex flex-column">
+                            <div class="field mt-3 flex flex-column md-description">
                                 <div class="flex gap-2 justify-content-between mb-2">
                                     <div
                                         class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
@@ -758,12 +797,14 @@ const modules = {
                                         <Button 
                                             label="" 
                                             icon="pi pi-pencil"
+                                            size="small"
                                             severity="secondary" 
                                             @click="handleViews('edit')" 
                                             :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" 
                                             />
                                         <Button 
                                             label="" 
+                                            size="small"
                                             icon="pi pi-eye"
                                             severity="secondary" 
                                             @click="handleViews('preview')" 
@@ -796,26 +837,27 @@ const modules = {
                                     </template>
                                 </Editor> -->
 
-                                    <MdEditor 
-                                        v-if="editorViewMode == 'edit'"
-                                        v-model="description" editorStyle="height: 150px"
-                                        :preview="false"
-                                        placeholder= 'Write here...'
-                                        height="300px" 
-                                        theme="light" 
-                                        language="en-US" 
-                                    />
+                                <MdEditor 
+                                    v-if="editorViewMode == 'edit'"
+                                    v-model="description" editorStyle="height: 150px"
+                                    :preview="false"
+                                    :toolbars="[]"
+                                    placeholder= 'Write here...'
+                                    height="300px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                />
 
-                                    <MdEditor 
-                                        v-else
-                                        v-model="description" editorStyle="height: 150px"
-                                        previewOnly
-                                        class="custom-preview"
-                                        placeholder= 'Write here...'
-                                        height="300px" 
-                                        theme="light" 
-                                        language="en-US" 
-                                    />
+                                <MdEditor 
+                                    v-else
+                                    v-model="description" editorStyle="height: 150px"
+                                    previewOnly
+                                    class="custom-preview"
+                                    placeholder= 'Write here...'
+                                    height="300px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1062,7 +1104,7 @@ const modules = {
                                 placeholder="Add comment" 
                                 v-model="taskCommentInput" 
                                 :modules="modules"
-                                editorStyle="height: 150px"
+                                editorStyle="height: 100px"
                             >
                                 <template v-slot:toolbar>
                                     <span class="ql-formats flex justify-content-end mr-0">
@@ -1081,6 +1123,62 @@ const modules = {
                                     </span>
                                 </template>
                             </Editor>
+
+
+                            <!-- <div class="flex gap-2 justify-content-end mb-2">
+                                <ButtonGroup>
+                                    <Button 
+                                        label="" 
+                                        icon="pi pi-pencil"
+                                        severity="secondary" 
+                                        @click="handleCommentViews('edit')" 
+                                        :class="{ 'bg-indigo-400 text-white': commentEditorViewMode == 'edit' }" 
+                                        />
+                                    <Button 
+                                        label="" 
+                                        icon="pi pi-eye"
+                                        severity="secondary" 
+                                        @click="handleCommentViews('preview')" 
+                                        :class="{ 'bg-indigo-400 text-white': commentEditorViewMode == 'preview' }" 
+                                        />
+                                </ButtonGroup>
+                            </div> -->
+
+                            <!-- <div class="mb-3 comment-editor relative">
+                                <MdEditor 
+                                    v-if="commentEditorViewMode == 'edit'"
+                                    v-model="taskCommentInput" 
+                                    @input="handleInput"
+                                    :preview="false"
+                                    placeholder= 'Add comment'
+                                    height="150px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                    noFooters
+                                />
+
+                                <MdEditor 
+                                    v-else
+                                    v-model="taskCommentInput" 
+                                    previewOnly
+                                    class="custom-preview-comment"
+                                    height="200px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                    noFooters
+                                />
+                                Mention Dropdown
+                                <div v-if="showMentionDropdown" class="mention-dropdown">
+                                <ul>
+                                    <li v-for="user in mentionList" :key="user" @click="insertMention(user)">
+                                    {{ user.value }}
+                                    </li>
+                                </ul>
+                                </div>
+                            </div> -->
+
+
+
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
 
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
@@ -1575,5 +1673,53 @@ a {
     border: 1px solid #e6e6e6;
     padding: 0 0.5rem;
     height: 300px;
+}
+.custom-preview-comment{
+    border: 1px solid #e6e6e6;
+    padding: 0 0.5rem;
+    height: 200px;
+    margin-bottom: 15px;
+}
+.md-editor-footer{
+    display: none;
+}
+
+.md-description .md-editor{
+    height: 200px;
+}
+
+.comment-editor .md-editor{
+    height: 200px;
+}
+.md-editor-content .md-editor-autocomplete {
+  z-index: 9999 !important;
+  display: block !important;
+}
+
+/* Dropdown styles */
+.mention-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 9999;
+  top: 65px;
+  left: 50px;
+}
+
+.mention-dropdown ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.mention-dropdown li {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.mention-dropdown li:hover {
+  background-color: #f0f0f0;
 }
 </style>
