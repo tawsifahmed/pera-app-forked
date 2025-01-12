@@ -68,9 +68,9 @@ export const useCompanyStore = defineStore('workStation', {
         modStatusList: [],
         chartProjectInfo: null,
         totalDashboardProjects: null,
-        completedTasksChartData: null,
-        inProgressTasksChartData: null,
-        unAssignedTasksChartData: null,
+        completedTasksChartData: 0,
+        inProgressTasksChartData: 0,
+        unAssignedTasksChartData: 0,
         inProgressCnt: null,
         chartClosedTaskInfo: null,
         rolesLists: null
@@ -114,7 +114,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (logo != null) {
                 formdata.append('image', logo);
             }
-            
+
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/company/create`, {
                 method: 'POST',
                 headers: {
@@ -145,7 +145,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (logo != null) {
                 formdata.append('image', logo);
             }
-            else{
+            else {
                 formdata.append('image', null);
             }
 
@@ -718,7 +718,7 @@ export const useCompanyStore = defineStore('workStation', {
             }
         },
 
-        async addTaskComment(id, comment, file, users=[]) {
+        async addTaskComment(id, comment, file, users = []) {
             const formData = new FormData();
 
             formData.append('comment', comment);
