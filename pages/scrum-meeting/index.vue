@@ -103,7 +103,7 @@ onMounted(() => {
         />
     </div>
 
-    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" dismissableMask="true" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleSubmit" class="form" action="">
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>

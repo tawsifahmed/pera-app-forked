@@ -313,7 +313,7 @@ onMounted(() => {
             </div>
 
             <!-- create section modal -->
-            <Dialog v-model:visible="sectionModal" modal header="Create Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="sectionModal" modal header="Create Section" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
                 <form class="" action="" @submit.prevent="handleSectionCreation">
                     <div class="card">
@@ -345,7 +345,7 @@ onMounted(() => {
             </Dialog>
 
             <!-- edit section modal -->
-            <Dialog v-model:visible="visibleEditSection" modal header="Edit Section" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="visibleEditSection" modal header="Edit Section" dismissableMask="true" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <form class="" action="" @submit.prevent="handleEditSection">
                     <div class="card">
                         <div class="kpi-form grid">
@@ -414,7 +414,7 @@ onMounted(() => {
             </div>
 
             <!-- sub section modal -->
-            <Dialog v-model:visible="subModal" modal header="Create Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="subModal" modal header="Create Sub Section" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
                 <form class="" action="" @submit.prevent="handleSubSectionCreation">
                     <div class="card">
@@ -469,7 +469,7 @@ onMounted(() => {
             </Dialog>
 
             <!-- edit sub section modal -->
-            <Dialog v-model:visible="visibleEditSubModal" modal header="Edit Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Dialog v-model:visible="visibleEditSubModal" modal header="Edit Sub Section" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
                 <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
                 <form class="" action="" @submit.prevent="handleEditSubSection">
                     <div class="card">

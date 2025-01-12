@@ -224,10 +224,13 @@ const handleChange = (field, event) => {
                 </div>
                 <div v-if="previewData || previewProjectWiseCount || previewSprintTask" class="card">
                     <div class="flex align-items-center justify-content-between gap-2 mb-5">
-                        <h5 class="m-0">Preview</h5>
+                        <h5 class="m-0" style="visibility: hidden;">Overview</h5>
                         <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
                     </div>
                     <div class="card">
+                        <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                            <h5 class="m-0">Overview</h5>
+                        </div>
                         <DataTable v-if="previewData" :value="previewData" tableStyle="min-width: 50rem">
                             <template #empty>
                                 <p class="text-center">No Data found...</p>
@@ -267,11 +270,9 @@ const handleChange = (field, event) => {
                                 <p class="text-center">No Data found...</p>
                             </template>
                             <Column field="index" header="Serial" sortable></Column>
-                            <Column field="unit_name" style="width: 40%" header="Task Name"></Column>
+                            <Column field="task_name" style="width: 40%" header="Task Name"></Column>
                             <Column field="project_name" header="Project Name"></Column>
-                            <Column field="status" header="Status">
-                                
-                            </Column>
+                            <Column field="status" header="Status"></Column>
                             <Column field="due_date" header="Due Date"></Column>
                             <Column field="end_date" header="End Date"></Column>
                             <Column field="duration" header="Duration"></Column>

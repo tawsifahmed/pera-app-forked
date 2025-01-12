@@ -158,12 +158,12 @@ const spacePage = ref(true);
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="deleteSpaceDialog" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingSpace" />
         </Dialog>
-        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }"
+        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" dismissableMask="true" :style="{ width: '32rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"
                 @closeEditSpace="closeEditSpace($event)" />
