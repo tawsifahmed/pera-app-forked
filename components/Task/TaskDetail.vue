@@ -10,7 +10,13 @@ import { onMounted, toRaw, watch } from 'vue';
 import Inplace from 'primevue/inplace';
 import Quill from 'quill';
 import QuillMention from 'quill-mention';
-const op = ref();
+
+import MdEditor from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
+
+const editorViewMode = ref('preview');
+const commentEditorViewMode = ref('edit');
+
 const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
@@ -540,6 +546,52 @@ const getMentionedIds = async () => {
     return uniqueDataIds;
 };
 
+const handleViews = (data) => {
+    editorViewMode.value = data;
+};
+
+const handleCommentViews = (data) => {
+    commentEditorViewMode.value = data;
+};
+
+// State and references
+const mentionTrigger = '@'; // Character to trigger mention
+const showMentionDropdown = ref(false); // Toggle dropdown visibility
+
+// Example users for mentions
+const users = ['Alice', 'Bob', 'Charlie', 'David'];
+
+// Filter users based on input
+const filteredUsers = computed(() => {
+    console.log('called filteredUsers');
+    const lastWord = taskCommentInput.value?.split(' ').pop();
+    console.log('called filteredUsers lastWord', lastWord);
+    console.log(
+        'called filteredUsers list',
+        users.filter((user) => user.toLowerCase().includes(lastWord.toLowerCase()))
+    );
+    return users.filter((user) => user.toLowerCase().includes(lastWord.toLowerCase()));
+});
+
+// Handle input to show/hide mention dropdown
+const handleInput = () => {
+    console.log('called handleInput');
+    const lastWord = taskCommentInput.value?.split(' ').pop();
+    console.log('lastWord ==>', lastWord);
+    showMentionDropdown.value = lastWord?.startsWith(mentionTrigger);
+    console.log('showMentionDropdown ==>', showMentionDropdown.value);
+};
+
+// Insert mention into the editor and hide the dropdown
+const insertMention = (user) => {
+    console.log('selected user', user);
+    taskCommentInput.value += user.value + ' '; // Add mention to input
+    showMentionDropdown.value = false; // Close dropdown
+};
+
+// Watch for changes to input and trigger mention handling
+watch(taskCommentInput, handleInput);
+
 // Quill.register('modules/mention', QuillMention);
 
 const list = toRaw(usersLists);
@@ -569,6 +621,7 @@ const modules = {
 };
 
 // Move Task
+const op = ref('');
 const moveTaskData = ref([]);
 const moveSearch = ref('');
 const handleMoveTask = (event) => {
@@ -614,7 +667,7 @@ watch(moveSearch, () => {
                 {{ taskDetails.name }}
             </h5>
             <div class="flex gap-1">
-                <span @click="handleMoveTask" v-tooltip.top="{ value: 'Move Task' }" class="pi pi-eject my-auto cursor-pointer ml-2 share-btn"></span>
+                <span @click="handleMoveTask" v-tooltip.top="{ value: 'Move Task' }" class="pi pi-eject my-auto cursor-pointer share-btn pl-2"></span>
                 <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
                     <span class="ml-1 text-lg pi pi-copy my-auto cursor-pointer" style="padding-top: 1px"> </span>
                     <span>
@@ -743,15 +796,23 @@ watch(moveSearch, () => {
                             </div>
 
                             <!-- {{manualTime}} -->
-                            <div class="field mt-3 flex flex-column">
-                                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
-                                    <span class="pi pi-sliders-h"></span>
-                                    <p>Description:</p>
+                            <div class="field mt-3 flex flex-column md-description">
+                                <div class="flex gap-2 justify-content-between mb-2">
+                                    <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                                        <span class="pi pi-sliders-h"></span>
+                                        <p>Description:</p>
+                                    </div>
+
+                                    <ButtonGroup>
+                                        <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
+                                        <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
+                                    </ButtonGroup>
                                 </div>
+
                                 <!-- <pre>description {{ description.length}}</pre> -->
                                 <!-- <Textarea id="description" class="border-gray-300" v-model="description" rows="4" cols="20" /> -->
                                 <!-- <Editor v-if="description" v-model="description" editorStyle="height: 200px"/> -->
-                                <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
+                                <!-- <Editor v-model="description" editorStyle="height: 150px" :readonly="!updateTaskP">
                                     <template v-slot:toolbar>
                                         <span class="ql-formats flex justify-content-end mr-0">
                                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -768,7 +829,11 @@ watch(moveSearch, () => {
                                             <button class="ql-link" type="button" data-pc-section="link"></button>
                                         </span>
                                     </template>
-                                </Editor>
+                                </Editor> -->
+
+                                <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+
+                                <MdEditor v-else v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -990,7 +1055,7 @@ watch(moveSearch, () => {
                             </div>
                         </div>
                         <div class="task-comment">
-                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" :modules="modules" editorStyle="height: 150px">
+                            <Editor class="mb-2" placeholder="Add comment" v-model="taskCommentInput" :modules="modules" editorStyle="height: 100px">
                                 <template v-slot:toolbar>
                                     <span class="ql-formats flex justify-content-end mr-0">
                                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -1008,6 +1073,59 @@ watch(moveSearch, () => {
                                     </span>
                                 </template>
                             </Editor>
+
+                            <!-- <div class="flex gap-2 justify-content-end mb-2">
+                                <ButtonGroup>
+                                    <Button 
+                                        label="" 
+                                        icon="pi pi-pencil"
+                                        severity="secondary" 
+                                        @click="handleCommentViews('edit')" 
+                                        :class="{ 'bg-indigo-400 text-white': commentEditorViewMode == 'edit' }" 
+                                        />
+                                    <Button 
+                                        label="" 
+                                        icon="pi pi-eye"
+                                        severity="secondary" 
+                                        @click="handleCommentViews('preview')" 
+                                        :class="{ 'bg-indigo-400 text-white': commentEditorViewMode == 'preview' }" 
+                                        />
+                                </ButtonGroup>
+                            </div> -->
+
+                            <!-- <div class="mb-3 comment-editor relative">
+                                <MdEditor 
+                                    v-if="commentEditorViewMode == 'edit'"
+                                    v-model="taskCommentInput" 
+                                    @input="handleInput"
+                                    :preview="false"
+                                    placeholder= 'Add comment'
+                                    height="150px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                    noFooters
+                                />
+
+                                <MdEditor 
+                                    v-else
+                                    v-model="taskCommentInput" 
+                                    previewOnly
+                                    class="custom-preview-comment"
+                                    height="200px" 
+                                    theme="light" 
+                                    language="en-US" 
+                                    noFooters
+                                />
+                                Mention Dropdown
+                                <div v-if="showMentionDropdown" class="mention-dropdown">
+                                <ul>
+                                    <li v-for="user in mentionList" :key="user" @click="insertMention(user)">
+                                    {{ user.value }}
+                                    </li>
+                                </ul>
+                                </div>
+                            </div> -->
+
                             <input class="hidden" type="file" ref="fileInput" @change="handleFileChange" />
 
                             <Button icon="pi pi-cloud-upload" @click="handleFileUpload" aria-label="Filter" />
@@ -1519,5 +1637,58 @@ a {
 
 .commentedText .ql-mention-denotation-char {
     display: none;
+}
+.custom-preview {
+    border: 1px solid #e6e6e6;
+    padding: 0 0.5rem;
+    height: 300px;
+}
+.custom-preview-comment {
+    border: 1px solid #e6e6e6;
+    padding: 0 0.5rem;
+    height: 200px;
+    margin-bottom: 15px;
+}
+.md-editor-footer {
+    display: none;
+}
+
+.md-description .md-editor {
+    height: 200px;
+}
+
+.comment-editor .md-editor {
+    height: 200px;
+}
+.md-editor-content .md-editor-autocomplete {
+    z-index: 9999 !important;
+    display: block !important;
+}
+
+/* Dropdown styles */
+.mention-dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 9999;
+    top: 65px;
+    left: 50px;
+}
+
+.mention-dropdown ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.mention-dropdown li {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.mention-dropdown li:hover {
+    background-color: #f0f0f0;
 }
 </style>
