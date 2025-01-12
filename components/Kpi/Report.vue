@@ -238,7 +238,7 @@ const feedbackSubmit = async () => {
             </div>
         </div>
         <!-- Feedback Modal -->
-        <Dialog v-model:visible="feedbackModal" modal header="Feedback" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="feedbackModal" modal header="Feedback" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <form @submit.prevent="feedbackSubmit">
                 <div class="col-12">
                     <label for="icondisplay" class="font-bold block mb-2">Line Manager Feedback:</label>

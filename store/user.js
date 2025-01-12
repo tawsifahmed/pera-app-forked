@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
             // }
         )
         userProfile.value = data.value;
+        localStorage.setItem('userCompany', data.value.data.company_id)
     }
 
     async function updateUser(id, name, phone, email, address, image) {
@@ -58,5 +59,5 @@ export const useUserStore = defineStore('user', () => {
             isLoading.value = false
         }
     }
-    return { getUserData, updateUser, userProfile } 
+    return { getUserData, updateUser, userProfile }
 })

@@ -115,7 +115,7 @@ const switchCompanyHandler = async (switchCompId) => {
     } else {
         await switchCompany(switchCompId);
         if (isCompanySwitched.value === true) {
-            localStorage.setItem('userCompany', JSON.stringify(switchCompId));
+            // localStorage.setItem('userCompany', JSON.stringify(switchCompId));
             // await companies.getCompany();
             toast.add({ severity: 'success', summary: 'Success', detail: companySwitchToast, group: 'br', life: 3000 });
             if (window.location.pathname !== '/' && window.location.pathname !== '/companies') {
@@ -166,11 +166,14 @@ const handleCreateCompanyModal = () => {
             <!-- <pre>pre2: {{selectedComp}}</pre> -->
             <!-- <pre>selC{{selectedCompany}}</pre> -->
             <div v-if="companyList.length > 0" class="flex align-items-center">
-                <span v-if="!company.logo" v-tooltip.right="{ value: `${company.name}` }" class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green">{{
-                    company.name?.charAt(0)
-                }}</span>
+                <span
+                    v-if="!company.logo"
+                    v-tooltip.right="{ value: `${company.name}` }"
+                    class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green"
+                    >{{ company.name?.charAt(0) }}</span
+                >
                 <span v-tooltip.right="{ value: `${company.name}` }" class="cLogo mr-2" v-else>
-                    <img :src="company.logo" alt="">
+                    <img :src="company.logo" alt="" />
                 </span>
                 <div class="comp-switch" v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
                     <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList" optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
@@ -218,12 +221,10 @@ const handleCreateCompanyModal = () => {
     height: 2.7rem;
 }
 
-.cLogo{
-    
-   
-    img{
+.cLogo {
+    img {
         width: 2.7rem;
-    height: 2.7rem;
+        height: 2.7rem;
         border-radius: 5px;
     }
 }
