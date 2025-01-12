@@ -60,7 +60,6 @@ const handleUpdate = async (e) => {
             body: payload
         });
 
-        console.log('Submission successful:', response);
         createModal.value = false; // Close modal on success
         // Optionally, refresh data or notify the user
         toast.add({ severity: 'success', summary: 'Meeting Minutes', detail: 'Created successfully!', group: 'br', life: 3000 });
@@ -88,11 +87,11 @@ watch(description, (newValue) => {
     }
 });
 
-const onPage = async(e) =>{
+const onPage = async (e) => {
     const token = useCookie('token');
     isLoading.value = true;
     const { data, pending, error } = await useAsyncData('scrumData', () =>
-        $fetch(`${url.public.apiUrl}/scrum-meeting/list?page=${e.page+1}&limit=${e.rows}`, {
+        $fetch(`${url.public.apiUrl}/scrum-meeting/list?page=${e.page + 1}&limit=${e.rows}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
@@ -102,31 +101,35 @@ const onPage = async(e) =>{
         scrumData.value = data.value?.data;
     }
     return (isLoading.value = false);
-}
-
+};
 </script>
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
     <!-- <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem"> -->
-    <DataTable 
-        class="table-st" 
+    <DataTable
+        class="table-st"
         :value="scrumData"
         :rowHover="true"
         :paginator="true"
         :rows="10"
         v-if="scrumData && scrumData.length > 0"
         stripedRows
+        scrollable
         tableStyle="min-width: 50rem"
         :totalRecords="totalRecords"
         :loading="isLoading"
         :rowsPerPageOptions="[5, 10, 20, 50]"
         @page="onPage"
-    >   
-        <Column style="width: 2%" field="id" header="Serial"></Column>
-        <Column style="width: 10%" field="meeting_date" header="Date">
-          <template #body="slotProps">
+    >
+        <!-- <Column style="width: 2%" field="id" header="Serial">
+            <template #body="slotProps">
+                <div class="">{{ slotProps?.data }}</div>
+            </template>
+        </Column> -->
+        <Column style="width: 12%" field="meeting_date" header="Date">
+            <template #body="slotProps">
                 <div class="cursor-pointer" @click="() => handleRowClick(toRaw(slotProps.data))">{{ slotProps.data.meeting_date }}</div>
-          </template>
+            </template>
         </Column>
         <!-- <Column style="width: 10%" field="space_id" header="Space">
             <template #body="slotProps">
@@ -148,22 +151,22 @@ const onPage = async(e) =>{
                 </div>
             </template>
         </Column>
-        <Column style="width: 3%" field="actions" header="Actions">
+        <!-- <Column style="width: 3%" field="actions" header="Actions">
             <template #body="slotProps">
                 <Button severity="info" rounded text type="button" @click="handleEdit(slotProps)" icon="pi pi-pencil" class=""></Button>
                 <Button severity="danger" rounded text type="button" @click="handleDelete(slotProps?.data?.id)" icon="pi pi-trash" class=""></Button>
             </template>
-        </Column>
+        </Column> -->
     </DataTable>
 
     <!-- View Modal -->
-    <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ minWidth: '35vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
         <div class="title">
             <p class="">Participants:</p>
             <p class="">{{ selectedScrum.meeting_date }}</p>
         </div>
         <div class="perticipants">
-            <div class="flex gap-1">
+            <div class="flex gap-1 flex-wrap">
                 <div class="border rounded" v-for="child in selectedScrum.user_ids" :key="child.id" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
                     <div class="">{{ child.name }}</div>
                 </div>
