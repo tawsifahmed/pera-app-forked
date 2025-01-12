@@ -460,10 +460,10 @@ const closeSearch = (evn) => {
             <!-- <pre>{{piniaTID}}</pre> -->
         </div>
 
-        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
-        <Dialog v-model:visible="visibleTop" modal header="Search " position="top" class="search-container">
+        <Dialog v-model:visible="visibleTop" modal header="Search" dismissableMask="true" position="top" class="search-container">
             <Search @closeSearch="closeSearch($event)" />
         </Dialog>
     </div>

@@ -216,7 +216,7 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <Dialog v-model:visible="modal" modal header="Create Quarter" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog v-model:visible="modal" modal header="Create Quarter" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
         <form class="" action="" @submit.prevent="handleKpiCreation">
             <div class="card">

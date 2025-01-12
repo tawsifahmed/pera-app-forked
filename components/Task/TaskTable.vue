@@ -721,7 +721,10 @@ function removeChild(node = toRaw(tableData.value)) {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP && viewMode !== 'list'" icon="pi pi-plus" label="Create Task"
+                @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+           
+                <Button v-if="createTaskP && viewMode === 'list'" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
                 <div class="view-btns">
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />

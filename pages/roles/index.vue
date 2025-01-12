@@ -183,12 +183,12 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoleCreateRole :param="{ permissionsList, groupPermissions }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <RoleEditRole :param="{ id, name, permissionsList, groupPermissions, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
     </div>

@@ -157,7 +157,7 @@ const onPage = async(e) =>{
     </DataTable>
 
     <!-- View Modal -->
-    <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ minWidth: '35vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" dismissableMask="true" :style="{ minWidth: '35vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <div class="title">
             <p class="">Participants:</p>
             <p class="">{{ selectedScrum.meeting_date }}</p>
@@ -173,7 +173,7 @@ const onPage = async(e) =>{
     </Dialog>
 
     <!-- Edit Modal -->
-    <Dialog lazy="true" v-model:visible="editModal" modal header="Update Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" v-model:visible="editModal" modal header="Update Scrum" dismissableMask="true" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleUpdate" class="form" action="">
             <!-- <pre>{{ selectedScrum }}</pre> -->
             <!-- <div class="flex-auto">

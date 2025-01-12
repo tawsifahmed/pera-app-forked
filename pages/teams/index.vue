@@ -212,16 +212,16 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateTeam" modal header="Create Team" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateTeam" modal header="Create Team" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <CreateTeam :param="{ usersLists }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditTeam" modal header="Edit Team" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditTeam" modal header="Edit Team" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <EditTeam :param="{ id, editName, editDescription, editLineManager, editTeamLead, editMembers }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteTeam" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteTeam" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTeam = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTeam" :loading="loading2" />
