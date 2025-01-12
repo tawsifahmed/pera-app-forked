@@ -275,23 +275,23 @@ const downloadTaskSheet = () => {
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateEmployee" modal header="Create Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateEmployee" modal header="Create Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <CreateEmployee :param="{ rolesLists }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <EditEmployee :param="{ id, name, address, phone, email, user_type, rolesLists }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }" dismissableMask="true">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteEmployee = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteEmployee" :loading="loading1"/>
         </Dialog>
 
         <!-- Invite User -->
-        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleInviteUser" modal header="Invite Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <InviteGuest :param="{ rolesLists }" @closeInviteModal="closeInviteModal($event)" />
         </Dialog>
     </div>

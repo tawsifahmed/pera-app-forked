@@ -203,7 +203,9 @@ const selectedProject = ref();
 const statuses = ref();
 
 const filterStatus = ref();
+const filterStartDate = ref();
 const filterDueDate = ref();
+const isCalendarStartSelected = ref(false);
 const isCalendarSelected = ref(false);
 const taskLoading = ref(false); // Add loading state
 
@@ -215,6 +217,7 @@ const selectedStatus = ref();
 
 const projectId = ref();
 const sta = ref();
+const startD = ref();
 const enD = ref();
 const crrPage = ref(1);
 let currentPage = ref(1); // New variable for current page
@@ -222,6 +225,7 @@ let currentPage = ref(1); // New variable for current page
 const filterTasks = async () => {
     projectId.value = selectedProject.value ? selectedProject.value.id : '';
     sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+    startD.value = filterStartDate.value;
     enD.value = filterDueDate.value;
 
     if (isLoadMoreClicked) {
@@ -231,14 +235,27 @@ const filterTasks = async () => {
     }
     crrPage.value = currentPage.value;
     totalPages.value = 0;
-    fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
+    fetchTasks(projectId.value, sta.value, startD.value, enD.value, crrPage.value);
     isLoadMoreClicked = false;
 };
 
+const selectStartFilterDate = (newDate) => {
+    isCalendarStartSelected.value = true;
+    const date = new Date(newDate);
+    filterStartDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    filterTasks();
+};
 const selectFilterDate = (newDate) => {
     isCalendarSelected.value = true;
     const date = new Date(newDate);
     filterDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    filterTasks();
+};
+
+const handleStartDateDelete = () => {
+    isCalendarStartSelected.value = false;
+    filterStartDate.value = '';
+    enD.value = '';
     filterTasks();
 };
 
@@ -250,14 +267,17 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if (selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
+    if (selectedProject.value || filterStatus.value || filterStartDate.value || filterDueDate.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
+        filterStartDate.value = '';
         filterDueDate.value = '';
         projectId.value = '';
+        
         sta.value = '';
         selectedStatus.value = '';
         isCalendarSelected.value = false;
+        isCalendarStartSelected.value = false;
         filterTasks();
     } else {
         return;
@@ -292,10 +312,10 @@ const loadMoreTasks = async (vl) => {
     }
     loadMoreLoading.value = true;
     currentPage.value++;
-    await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
+    await fetchTasks(projectId.value, sta.value, startD.value , enD.value, currentPage.value);
 };
 
-const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
+const fetchTasks = async (projectId = '', status = '', startDate = '', dueDate = '', page = 1) => {
     const limit = 30;
     if (!hideLoading.value) {
         taskLoading.value = true;
@@ -304,7 +324,7 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
 
     try {
         const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?start_due_date=${startDate}&end_due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -603,10 +623,14 @@ watch(
                 <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative w-full md:w-12rem">
-                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-10rem mb-2" />
+                        <div class="mb-2 relative w-full md:w-8rem">
+                            <Calendar @date-select="selectStartFilterDate($event)" v-model="filterStartDate" placeholder="Start Date" class="w-full md:w-8rem" />
+                            <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                        </div>
+                        <div class="mb-2 relative w-full md:w-8rem">
+                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Due Date" class="w-full md:w-8rem" />
                             <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
                         <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />

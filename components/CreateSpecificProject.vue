@@ -270,7 +270,7 @@ const handleClose = () => {
             :class="isPage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'"
             :label="isPage ? 'Create +' : ''" @click="showDialog" :severity="isPage ? 'primary' : 'secondary'"
             aria-label="Bookmark" :text="!isPage" />
-        <Dialog v-model:visible="companyFormInputs" :style="{ width: '450px' }" header="Create Project" :modal="true"
+        <Dialog v-model:visible="companyFormInputs" dismissableMask="true" :style="{ width: '450px' }" header="Create Project" :modal="true"
             class="p-fluid" @update:visible="handleClose">
             <div class="field">
                 <label for="name">Create project for <strong>{{ singleSpace?.name }}</strong> space</label>

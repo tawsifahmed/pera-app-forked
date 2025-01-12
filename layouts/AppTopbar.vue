@@ -460,12 +460,12 @@ const closeSearch = (evn) => {
             <!-- <pre>{{piniaTID}}</pre> -->
         </div>
 
-        <Dialog v-model:visible="visibleProfile" modal header="Profile" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
-        <Sidebar v-model:visible="visibleTop" header=" " position="top" class="search-container" style="height: auto">
+        <Dialog v-model:visible="visibleTop" modal header="Search" dismissableMask="true" position="top" class="search-container">
             <Search @closeSearch="closeSearch($event)" />
-        </Sidebar>
+        </Dialog>
     </div>
 </template>
 
@@ -475,7 +475,9 @@ const closeSearch = (evn) => {
         display: none !important;
     }
 }
-
+.p-dialog-content {
+    height: 100%;
+}
 .userImage {
     height: 42px;
     width: 42px;
@@ -653,7 +655,8 @@ const closeSearch = (evn) => {
 
 .search-container {
     top: 70px;
-    width: 50%;
+    width: 70%;
+    height: 100%;
     border-radius: 10px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -662,7 +665,7 @@ const closeSearch = (evn) => {
 .search-container .p-sidebar-header {
     padding-bottom: 0 !important;
 }
-.p-sidebar-top{
+.p-sidebar-top {
     backdrop-filter: blur(1px);
 }
 </style>

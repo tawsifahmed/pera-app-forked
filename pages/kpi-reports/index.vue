@@ -349,7 +349,7 @@ quaterYear.value = date.getFullYear();
         </TabView>
     </div>
     <!-- sub section modal -->
-    <Dialog v-model:visible="subModal" modal header="Create Sub Section" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog v-model:visible="subModal" modal header="Create Sub Section" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
         <form class="" action="" @submit.prevent="handleSubSectionCreation">
             <div class="">
