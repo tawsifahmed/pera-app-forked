@@ -621,6 +621,7 @@ const modules = {
         item.value.toLowerCase().includes(searchTerm.toLowerCase())
       );
       renderList(matches);
+      adjustMentionListPosition();
     },
     renderItem: function (item) {
       return `${item.value}`;
@@ -635,6 +636,26 @@ const modules = {
   },
 };
 
+
+const adjustMentionListPosition = () => {
+  const mentionList = document.querySelector('.ql-mention-list-container'); 
+  const editor = document.querySelector('.ql-editor'); 
+
+  if (!mentionList || !editor) return;
+
+  const editorRect = editor.getBoundingClientRect();
+  const mentionRect = mentionList.getBoundingClientRect();
+
+  if (mentionRect.right > editorRect.right) {
+    mentionList.style.left = `227px`;
+    // mentionList.style.left = `${editorRect.width - mentionRect.width}px`;
+  }
+
+//   For top ==>
+//   if (mentionRect.bottom > editorRect.bottom) {
+//     mentionList.style.top = `${editorRect.bottom - mentionRect.height}px`;
+//   }
+}
 </script>
 
 <template>
@@ -1645,7 +1666,7 @@ a {
 /* Css for mention container */
 .ql-mention-list-container {
   max-height: 150px;
-  max-width: 250px;
+  max-width: 200px;
   overflow-y: auto;
   background: #fff;
   border: 1px solid #ccc;
