@@ -606,6 +606,7 @@ const modules = {
         source: function (searchTerm, renderList) {
             const matches = mentionList.filter((item) => item.value.toLowerCase().includes(searchTerm.toLowerCase()));
             renderList(matches);
+            adjustMentionListPosition();
         },
         renderItem: function (item) {
             return `${item.value}`;
@@ -619,6 +620,26 @@ const modules = {
         }
     }
 };
+
+const adjustMentionListPosition = () => {
+  const mentionList = document.querySelector('.ql-mention-list-container'); 
+  const editor = document.querySelector('.ql-editor'); 
+
+  if (!mentionList || !editor) return;
+
+  const editorRect = editor.getBoundingClientRect();
+  const mentionRect = mentionList.getBoundingClientRect();
+
+  if (mentionRect.right > editorRect.right) {
+    mentionList.style.left = `227px`;
+    // mentionList.style.left = `${editorRect.width - mentionRect.width}px`;
+  }
+
+//   For top ==>
+//   if (mentionRect.bottom > editorRect.bottom) {
+//     mentionList.style.top = `${editorRect.bottom - mentionRect.height}px`;
+//   }
+}
 
 // Move Task
 const op = ref('');
@@ -1605,16 +1626,16 @@ a {
 
 /* Css for mention container */
 .ql-mention-list-container {
-    max-height: 150px;
-    max-width: 250px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    z-index: 1000;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  max-height: 150px;
+  max-width: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1000;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 .ql-mention-list {
     margin: 10px 0;
