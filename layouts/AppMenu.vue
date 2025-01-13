@@ -63,7 +63,8 @@ if (readDashboard.value) {
         option: 'home_option',
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home text-lg', to: '/' },
-            { label: 'Scrum', icon: 'pi pi-fw pi-comments text-lg', to: '/scrum-meeting' }
+            { label: 'Scrum', icon: 'pi pi-fw pi-comments text-lg', to: '/scrum-meeting' },
+            { label: 'Attendance', icon: 'pi pi-fw  pi-clock text-lg', to: '/attendance' }
         ]
     });
 }
