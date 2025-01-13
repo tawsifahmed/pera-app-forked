@@ -142,6 +142,9 @@ const closeCreateModal = (evn) => {
 const closeEditModal = (evn) => {
     visibleEdit.value = evn;
 };
+const closeDetailModal = (evn) => {
+    visibleTaskDetailView.value = false;
+};
 
 const updateTaskTable = () => {
     getSingleProject(projects);
@@ -216,6 +219,7 @@ watchEffect(() => {
                 @handleTaskDetailView="handleTaskDetailView($event)"
                 @confirmDeleteTask="confirmDeleteTask($event)"
                 @updateTaskTable="updateTaskTable"
+                @closeDetailModal="closeDetailModal"
             />
         </Dialog>
 
