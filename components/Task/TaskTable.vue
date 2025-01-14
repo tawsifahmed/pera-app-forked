@@ -926,20 +926,21 @@ function removeChild(node = toRaw(tableData.value)) {
                     </span>
                     <div>
                         <div class="assigneeSelect">
-                            <div class="relative h-full " >
-                                <span class="flex" v-if="slotProps.node.data?.assigneeObj.length > 0">
+                            <div class="relative" >
+                                <span class="flex " v-if="slotProps.node.data?.assigneeObj.length > 0">
                                     <!-- Show the first three assignees -->
                                     <span
                                       v-for="(assignee, index) in slotProps.node.data.assigneeObj.slice(0, 3)"
                                       :key="index"
-                                      :style=" { marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }"
+                                      :style=" { marginLeft: index > 0 ? '-19.5px' : '0', zIndex: 10 - index }"
+                                      class="flex align-items-center"
                                     >
                                       <img
                                         v-tooltip.top="{ value: `${assignee.name}` }"
                                         class="mr-2 capitalize cursor-pointer"
                                         v-if="assignee.image"
                                         :src="assignee.image"
-                                        style="height: 28px; width: 28px; border-radius: 32px; border: 2px solid white"
+                                        style="height: 23px; width: 23px; border-radius: 50%; border: 1px solid white"
                                         alt=""
                                         srcset=""
                                       />
@@ -949,11 +950,11 @@ function removeChild(node = toRaw(tableData.value)) {
                                         :label="assignee.name.charAt(0)"
                                         class="mr-2 capitalize cursor-pointer"
                                         size="small"
-                                        style="background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                        style="height: 25px; width: 25px; background-color: black; color: white; border-radius: 50%; border: 2px solid white"
                                         :style="avatarStyle(index)"
                                       />
                                     </span>
-                                    <Avatar v-if="slotProps.node.data.assigneeObj.length > 3" :label="`+${slotProps.node.data.assigneeObj.length - 3}`" class="mr-2 cursor-pointer absolute" size="small" style="background-color: #f1f5f9; color: black; border-radius: 50%; border: 2px solid white; left: 49px;" />
+                                    <Avatar v-if="slotProps.node.data.assigneeObj.length > 3" :label="`+${slotProps.node.data.assigneeObj.length - 3}`" class="mr-2 cursor-pointer absolute" size="small" style="height: 25px; width: 25px; background-color: #f1f5f9; color: black; border-radius: 50%; border: 2px solid white; left: 39px;" />
                                   
                                     <!-- Show the remaining count if there are more than three assignees -->
                                     
