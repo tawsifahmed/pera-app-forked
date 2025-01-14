@@ -2,9 +2,9 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
 import { useClockStore } from '~/store/clock';
+import { setNotification } from '~/composables/firebase';
 
 import Password from 'primevue/password';
-
 // import clickOutside from '../composables/clickOutside';
 const { getStoreTimer } = useClockStore();
 const { timerData, isTImerStopped } = storeToRefs(useClockStore());
@@ -22,7 +22,9 @@ const router = useRouter();
 
 import { useAuthStore } from '~/store/auth';
 import Search from '../components/Search.vue';
+import { usePrimeVue } from 'primevue/config';
 const url = useRuntimeConfig();
+setNotification();
 
 const name = ref('name');
 const userImage = ref(null);

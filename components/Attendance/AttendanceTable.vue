@@ -1,10 +1,17 @@
 <script setup>
+import { storeToRefs } from 'pinia';
+import { attendanceStore } from '~/store/attendance';
+const { getAttendance, googleAttendance } = attendanceStore();
+const { attendance } = storeToRefs(attendanceStore());
 import { ref } from 'vue';
 const statusColor = ref({
     present: 'green',
     absent: 'red',
     late: 'orange'
 });
+console.log(attendance);
+const date = ref(null);
+watch(date, () => console.log(date));
 const attendanceData = ref([
     {
         id: 1,
@@ -13,8 +20,8 @@ const attendanceData = ref([
         status: 'late',
         date: '01 Jan 2024',
         day: 'Saturday',
-        start_time: '2025-01-13 05:41:59',
-        end_time: '2025-01-13 14:41:59',
+        start_time: '05:41:59',
+        end_time: '14:41:59',
         type: 'Working Day',
         company_id: 3,
         created_by: 5,
@@ -25,8 +32,8 @@ const attendanceData = ref([
         user_id: 24,
         user_name: 'Md. Yeasir Arafat',
         status: 'present',
-        start_time: '2025-01-13 10:41:59',
-        end_time: '2025-01-13 18:41:59',
+        start_time: '10:41:59',
+        end_time: '18:41:59',
         company_id: 3,
         created_by: 4,
         create_time: '2025-01-13 13:41:59'
@@ -36,8 +43,8 @@ const attendanceData = ref([
         user_id: 49,
         user_name: 'Md. Hashmi Shihab',
         status: 'absent',
-        start_time: '2025-01-13 05:41:59',
-        end_time: '2025-01-13 16:41:59',
+        start_time: ' 05:41:59',
+        end_time: '16:41:59',
         company_id: 3,
         created_by: 1,
         create_time: '2025-01-13 13:41:59'
@@ -1113,12 +1120,18 @@ const attendanceData = ref([
 </script>
 <template>
     <div>
+        <div class="flex justify-content-between py-2">
+            <!-- <Button label="Google Attendance" severity="primary" /> -->
+            <div class="">
+                <Calendar v-model="date" view="month" dateFormat="mm/yy" placeholder="Selec Month" />
+            </div>
+        </div>
         <!-- Add your table and other components here -->
         <DataTable
             class="table-st"
-            :value="attendanceData"
+            :value="attendance"
             :rowHover="true"
-            :paginator="true"
+            :paginator="false"
             :rows="30"
             v-if="attendanceData && attendanceData.length > 0"
             stripedRows
@@ -1127,6 +1140,8 @@ const attendanceData = ref([
             tableStyle="min-width: 50rem"
             :rowsPerPageOptions="[5, 10, 20, 50]"
         >
+            <template #empty> <p class="text-center">No Data found.</p> </template>
+            <template #loading> Loading. Please wait... </template>
             <Column style="width: 2%" field="id" header="#" :body="(_, { rowIndex }) => rowIndex + 1"> </Column>
             <Column style="width: 12%" field="user_name" header="Name"> </Column>
             <Column style="width: 12%" field="date" header="Date"></Column>
