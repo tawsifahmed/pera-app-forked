@@ -701,6 +701,11 @@ function removeChild(node = toRaw(tableData.value)) {
     });
     return (tableData.value = structuredClone(filtered));
 }
+
+const handleRefresh = async () => {
+    await getSingleProject(id);
+    getUserlist();
+};
 </script>
 
 <template>
@@ -744,6 +749,7 @@ function removeChild(node = toRaw(tableData.value)) {
         </template>
 
         <template #end>
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />

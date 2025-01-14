@@ -136,6 +136,13 @@ const handleChange = (field, event) => {
 onMounted(() => {
     // init();
 });
+
+const handleReset = () => {
+    startDate.value = '';
+    endDate.value = '';
+    selectedProject.value = [];
+    previewData.value = null;
+};
 </script>
 <template>
     <div class="card">
@@ -169,7 +176,8 @@ onMounted(() => {
             </template>
 
             <template #end>
-                <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
+                <Button @click="handleReset" icon="pi pi-undo" rounded raised class="mr-2" />
+                <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
             </template>
         </Toolbar>
     </div>
