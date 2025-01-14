@@ -692,11 +692,26 @@ const editname = () => {
         }
     });
 };
+
+const handletaskNameUpdate = async () => {
+    const taskDetailData = {
+        id: taskDetails.value?.id,
+        name: taskNameInput.value,
+        project_id: projID
+    };
+    await editTask(taskDetailData);
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task name updated', group: 'br', life: 3000 });
+        editCliked.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task name', group: 'br', life: 3000 });
+    }
+};
 </script>
 
 <template>
     <div class="grid">
-        <div class="col-12 lg:col-7 flex justify-content-start align-items-center gap-1">
+        <div class="col-12 lg:col-7 flex justify-content-start align-items-center" :class="editCliked === true ? 'gap-1' : 'gap-2'">
             <h5 class="m-0 detail-task-name cursor-pointer" :style="editCliked === true ? 'display: none;' : 'display: block;'" :title="taskDetails.name">
                 {{ taskDetails.name }}
             </h5>
@@ -714,6 +729,7 @@ const editname = () => {
             />
             <Button
             v-if="editCliked === true"
+            @click="handletaskNameUpdate"
                 v-tooltip.top="`Update Name`"
                 severity="secondary"
                 icon="pi pi-check"
