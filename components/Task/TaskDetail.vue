@@ -622,24 +622,24 @@ const modules = {
 };
 
 const adjustMentionListPosition = () => {
-  const mentionList = document.querySelector('.ql-mention-list-container'); 
-  const editor = document.querySelector('.ql-editor'); 
+    const mentionList = document.querySelector('.ql-mention-list-container');
+    const editor = document.querySelector('.ql-editor');
 
-  if (!mentionList || !editor) return;
+    if (!mentionList || !editor) return;
 
-  const editorRect = editor.getBoundingClientRect();
-  const mentionRect = mentionList.getBoundingClientRect();
+    const editorRect = editor.getBoundingClientRect();
+    const mentionRect = mentionList.getBoundingClientRect();
 
-  if (mentionRect.right > editorRect.right) {
-    mentionList.style.left = `227px`;
-    // mentionList.style.left = `${editorRect.width - mentionRect.width}px`;
-  }
+    if (mentionRect.right > editorRect.right) {
+        mentionList.style.left = `227px`;
+        // mentionList.style.left = `${editorRect.width - mentionRect.width}px`;
+    }
 
-//   For top ==>
-//   if (mentionRect.bottom > editorRect.bottom) {
-//     mentionList.style.top = `${editorRect.bottom - mentionRect.height}px`;
-//   }
-}
+    //   For top ==>
+    //   if (mentionRect.bottom > editorRect.bottom) {
+    //     mentionList.style.top = `${editorRect.bottom - mentionRect.height}px`;
+    //   }
+};
 
 // Move Task
 const op = ref('');
@@ -679,26 +679,87 @@ const handleTaskMove = async (selectedTask) => {
 watch(moveSearch, () => {
     moveTaskFetch(moveSearch.value);
 });
+
+const editCliked = ref(false);
+const taskNameInput = ref('')
+const editname = () => {
+    editCliked.value = true;
+    taskNameInput.value = taskDetails.value.name;
+    const inputT = document.getElementById(`dTaskName`);
+    nextTick(() => {
+        if (inputT) {
+            inputT.focus();
+        }
+    });
+};
+
+const handletaskNameUpdate = async () => {
+    const taskDetailData = {
+        id: taskDetails.value?.id,
+        name: taskNameInput.value,
+        project_id: projID
+    };
+    await editTask(taskDetailData);
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task name updated', group: 'br', life: 3000 });
+        editCliked.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task name', group: 'br', life: 3000 });
+    }
+};
 </script>
 
 <template>
     <div class="grid">
-        <div class="col-12 flex justify-content-between">
-            <h5 class="m-0 detail-task-name cursor-pointer">
+        <div class="col-12 lg:col-7 flex justify-content-start align-items-center" :class="editCliked === true ? 'gap-1' : 'gap-2'">
+            <h5 class="m-0 detail-task-name cursor-pointer" :style="editCliked === true ? 'display: none;' : 'display: block;'" :title="taskDetails.name">
                 {{ taskDetails.name }}
             </h5>
-            <div class="flex gap-1">
+            <span style="min-width: auto; width: 95%;" :style="editCliked === true ? 'display: block;' : 'display: none;'">
+                <InputText :id="`dTaskName`"  class="w-full d-edit-name-input" v-model="taskNameInput" type="text" placeholder="Edit task name" />
+            </span>
+            <Button
+            v-if="editCliked === false"
+            @click="editname"
+                v-tooltip.top="`Edit Name`"
+                severity="secondary"
+            
+                icon="pi pi-pencil"
+                class="p-1 w-fit h-full"
+            />
+            <Button
+            v-if="editCliked === true"
+            @click="handletaskNameUpdate"
+                v-tooltip.top="`Update Name`"
+                severity="secondary"
+                icon="pi pi-check"
+                class="p-1 w-fit h-full"
+                :style="editCliked === true ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
+            />
+            <Button
+            v-if="editCliked === true"
+            @click="editCliked = false"
+                v-tooltip.top="`Cancel`"
+                severity="secondary"
+                icon="pi pi-minus"
+                class="p-1 w-fit h-full"
+                :style="editCliked === true ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
+            />
+        </div>
+        <div class="col-12 lg:col-5 flex justify-content-between align-items-center">
+            <h5 class="m-0 ml-2">Activity</h5>
+            <div class="flex gap-1 align-items-center">
                 <span @click="handleMoveTask" v-tooltip.top="{ value: 'Move Task' }" class="pi pi-eject my-auto cursor-pointer share-btn pl-2"></span>
+                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-1 mr-1 share-btn"></span>
                 <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
                     <span class="ml-1 text-lg pi pi-copy my-auto cursor-pointer" style="padding-top: 1px"> </span>
                     <span>
                         {{ truncatedUniqueId }}
                     </span>
                 </div>
-                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
-                <h5 class="m-0 ml-2">Activity</h5>
             </div>
         </div>
+
         <div class="col-12 lg:col-7">
             <div>
                 <!-- <pre>{{singleTask.key}}</pre> -->
@@ -1536,7 +1597,7 @@ input[type='file']::file-selector-button:hover {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
-    max-width: 85%;
+    max-width: 94%;
 }
 
 .text-danger {
@@ -1626,16 +1687,16 @@ a {
 
 /* Css for mention container */
 .ql-mention-list-container {
-  max-height: 150px;
-  max-width: 200px;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  z-index: 1000;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    max-height: 150px;
+    max-width: 200px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 .ql-mention-list {
     margin: 10px 0;
@@ -1711,5 +1772,9 @@ a {
 
 .mention-dropdown li:hover {
     background-color: #f0f0f0;
+}
+
+.d-edit-name-input{
+    padding: 0.25rem 0.75rem !important;
 }
 </style>
