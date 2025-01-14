@@ -702,10 +702,20 @@ function removeChild(node = toRaw(tableData.value)) {
     return (tableData.value = structuredClone(filtered));
 }
 
+const refreshLoader = ref(false);
+const refreshDisabled = ref(false);
 const handleRefresh = async () => {
+    refreshLoader.value = true;
+    refreshDisabled.value = true;
     await getSingleProject(id);
     getUserlist();
+    refreshLoader.value = false;
+    setTimeout(() => {
+        refreshDisabled.value = false;
+    }, 3500);
 };
+
+
 </script>
 
 <template>
@@ -749,7 +759,7 @@ const handleRefresh = async () => {
         </template>
 
         <template #end>
-            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" class="mr-2" rounded raised />
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />
