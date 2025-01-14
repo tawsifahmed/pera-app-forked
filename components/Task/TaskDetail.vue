@@ -751,16 +751,13 @@ const handletaskNameUpdate = async () => {
             <div class="flex gap-1 align-items-center">
                 <span @click="handleMoveTask" v-tooltip.top="{ value: 'Move Task' }" class="pi pi-eject my-auto cursor-pointer share-btn pl-2"></span>
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-1 mr-1 share-btn"></span>
-                <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
-                    <span class="ml-1 text-lg pi pi-copy my-auto cursor-pointer" style="padding-top: 1px"> </span>
-                    <span>
-                        {{ truncatedUniqueId }}
-                    </span>
-                </div>
+                <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
+                <span v-tooltip.top="{ value: `Created by ${taskDetails.created_by.name}` }" class="mr-2 ml-1 text-lg pi pi-user my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
+                
             </div>
         </div>
 
-        <div class="col-12 lg:col-7">
+        <div class="col-12 lg:col-7 pt-0">
             <div>
                 <!-- <pre>{{singleTask.key}}</pre> -->
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
@@ -1090,7 +1087,7 @@ const handletaskNameUpdate = async () => {
                 </div>
             </div>
         </div>
-        <div class="col-12 lg:col-5">
+        <div class="col-12 lg:col-5 pt-0">
             <div>
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">

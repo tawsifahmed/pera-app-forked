@@ -706,10 +706,11 @@ const refreshLoader = ref(false);
 const refreshDisabled = ref(false);
 const handleRefresh = async () => {
     refreshLoader.value = true;
-    refreshDisabled.value = true;
+    
     await getSingleProject(id);
     getUserlist();
     refreshLoader.value = false;
+    refreshDisabled.value = true;
     setTimeout(() => {
         refreshDisabled.value = false;
     }, 3500);
