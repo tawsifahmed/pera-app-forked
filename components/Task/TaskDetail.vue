@@ -228,14 +228,31 @@ const taskCommentInput = ref(null);
 const selectedfile = ref();
 
 const showActivitiyBtn = ref(true);
+const showJustificationBtn = ref(true);
 const activityDiv = ref(false);
+const justificationDiv = ref(false);
+
 const showActivitiy = () => {
     activityDiv.value = true;
     showActivitiyBtn.value = false;
+    showJustificationBtn.value = false;
+};
+
+const showJustification = () => {
+    justificationDiv.value = true;
+    showJustificationBtn.value = false;
+    showActivitiyBtn.value = false;
+};
+
+const hideJustification = () => {
+    justificationDiv.value = false;
+    showJustificationBtn.value = true;
+    showActivitiyBtn.value = true;
 };
 const hideActivity = () => {
     activityDiv.value = false;
     showActivitiyBtn.value = true;
+    showJustificationBtn.value = true;
 };
 
 const handleTaskComment = async () => {
@@ -1091,13 +1108,31 @@ const handletaskNameUpdate = async () => {
             <div>
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">
-                        <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                        <div class="flex gap-2">
+                            <div class="my-2 text-surface-800">
+                                <Button @click="showActivitiy" label="↓  History" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
+                            <div class="my-2 text-surface-800">
+                                <Button @click="showJustification" label="↓  Justification" v-if="showJustificationBtn && taskDetails.deadline_miss_details.length > 0" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
                                 <li v-html="act.title" style="font-size: smaller !important"></li>
                             </ul>
+                            <div class="my-2 text-surface-800">
+                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
+                        </div>
+                        <div v-if="justificationDiv">
+                        
+                           
+                                <p>Missed: {{taskDetails?.deadline_miss_count?.missed}}</p>
+                                <p>Extend: {{taskDetails?.deadline_miss_count?.extend}}</p>
+                        
+                            <!-- <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
+                                <li v-html="act.title" style="font-size: smaller !important"></li>
+                            </ul> -->
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
