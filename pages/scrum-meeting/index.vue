@@ -41,6 +41,8 @@ const handleSubmit = async (e) => {
         createModal.value = false; // Close modal on success
         // Optionally, refresh data or notify the user
         toast.add({ severity: 'success', summary: 'Meeting Minutes', detail: 'Created successfully!', group: 'br', life: 3000 });
+        description.value = '';
+        employee.value = '';
         fetchScrum();
     } catch (error) {
         console.error('Submission failed:', error);

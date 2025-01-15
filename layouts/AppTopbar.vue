@@ -7,7 +7,7 @@ import Password from 'primevue/password';
 
 // import clickOutside from '../composables/clickOutside';
 const { getStoreTimer } = useClockStore();
-const { timerData, isTImerStopped } = storeToRefs(useClockStore());
+const { timerData, isTImerStopped, deadlineMissModal, deadlineTaskId, deadlineProjectId, deadlineDueDate } = storeToRefs(useClockStore());
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
 
@@ -364,6 +364,11 @@ const closeSearch = (evn) => {
     console.log('closeSearch', evn);
     visibleTop.value = false;
 };
+
+
+const closeMissDeadlineModal =  () => {
+    deadlineMissModal.value = false
+}
 </script>
 
 <template>
@@ -372,6 +377,7 @@ const closeSearch = (evn) => {
         <router-link to="/" class="layout-topbar-logo absolute">
             <img src="/demo/images/login/avatar.svg" alt="logo" />
         </router-link>
+        <!-- <pre>dd {{deadlineMissModal}}</pre> -->
 
         <button class="p-link layout-menu-button layout-topbar-button" style="margin-left: 0 !important" @click="onMenuToggle()">
             <i class="pi pi-bars"></i>
@@ -462,6 +468,9 @@ const closeSearch = (evn) => {
 
         <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
+        </Dialog>
+        <Dialog v-model:visible="deadlineMissModal" modal header="Deadline Miss Justification" dismissableMask="true" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <TaskDeadlineMiss @closeMissDeadlineModal="closeMissDeadlineModal($event)" :deadlineTaskId="deadlineTaskId" :deadlineProjectId="deadlineProjectId" :deadlineDueDate="deadlineDueDate"  />
         </Dialog>
         <Dialog v-model:visible="visibleTop" modal header="Search" dismissableMask="true" position="top" class="search-container">
             <Search @closeSearch="closeSearch($event)" />
