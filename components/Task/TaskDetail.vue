@@ -1130,11 +1130,13 @@ const handletaskNameUpdate = async () => {
                                 <p>Missed: {{taskDetails?.deadline_miss_count?.missed}}</p>
                                 <p>Extend: {{taskDetails?.deadline_miss_count?.extend}}</p>
                         
-                            <!-- <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
-                                <li v-html="act.title" style="font-size: smaller !important"></li>
-                            </ul> -->
+                            <ul v-for="act in taskDetails.deadline_miss_details" :key="act" style="margin-left: -15px; margin-top: -6px">
+                                <li style="font-size: smaller !important">
+                                    {{act.reason}} <br> Type: {{act.type}} - {{formattedTime(act.created_at)}} 
+                                </li>
+                            </ul>
                             <div class="my-2 text-surface-800">
-                                <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                                <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
