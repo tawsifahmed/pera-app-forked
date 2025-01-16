@@ -21,8 +21,8 @@ const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData, setManualTime, storeTaskTimer } = useClockStore();
-const { trackedTime } = storeToRefs(useClockStore());
+const { getTaskTimerData, setManualTime, storeTaskTimer, handleMissDeadlineShowTimer } = useClockStore();
+const { trackedTime, deadlineJustifyProvided } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
 
@@ -81,8 +81,10 @@ watch(dueDate, (newVal, oldVal) => {
 });
 
 const checkDate = ref(dueDate.value);
+const isDateEdited = ref(false);
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
+        isDateEdited.value = true;
         checkDate.value = new Date(newValue).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase();
     }
 });
@@ -245,7 +247,7 @@ const showJustification = () => {
 };
 
 const formattedAct = (act) => {
-  return `${act.reason}<br>Type: ${act.type} - ${formattedTime(act.created_at)}`;
+    return `${act.reason}<br>Type: ${act.type} - ${formattedTime(act.created_at)}`;
 };
 
 const hideJustification = () => {
@@ -319,6 +321,14 @@ const handleTaskDetailSubmit = async () => {
         dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
     }
 
+    if (taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true) {
+        console.log('checkDate.value', checkDate.value);
+        handleMissDeadlineShowTimer(taskDetails.value?.id, projID, taskDetailData.dueDate); // Call the showDeadline function
+        delete taskDetailData.dueDate;
+    }
+
+    // Send data without due date if taskDetails.parent_task_id is null
+
     await editTask(taskDetailData);
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Task detail updated', group: 'br', life: 3000 });
@@ -336,10 +346,24 @@ const handleTaskDetailSubmit = async () => {
             isTagsEdited.value = false;
             console.log('isTagsEdited Flagged');
         }
+        if (isDateEdited.value === true) {
+            isDateEdited.value = false;
+            console.log('isDateEdited Flagged');
+        }
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
     }
 };
+
+watch(deadlineJustifyProvided, (newVal) => {
+        if (newVal === true) {
+
+        }
+        if (newVal === false) {
+            dueDate.value =taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null
+            // checkDate.value = dueDate.value;
+        }
+});
 
 const file = ref(null);
 
@@ -576,7 +600,7 @@ const editorPreview = ref(false);
 const handleEditorView = () => {
     editorViewMode.value = 'edit';
     editorPreview.value = true;
-}
+};
 
 const handleCommentViews = (data) => {
     commentEditorViewMode.value = data;
@@ -713,7 +737,7 @@ watch(moveSearch, () => {
 });
 
 const editCliked = ref(false);
-const taskNameInput = ref('')
+const taskNameInput = ref('');
 const editname = () => {
     editCliked.value = true;
     taskNameInput.value = taskDetails.value.name;
@@ -747,21 +771,13 @@ const handletaskNameUpdate = async () => {
             <h5 class="m-0 detail-task-name cursor-pointer" :style="editCliked === true ? 'display: none;' : 'display: block;'" :title="taskDetails.name">
                 {{ taskDetails.name }}
             </h5>
-            <span style="min-width: auto; width: 95%;" :style="editCliked === true ? 'display: block;' : 'display: none;'">
-                <InputText :id="`dTaskName`"  class="w-full d-edit-name-input" v-model="taskNameInput" type="text" placeholder="Edit task name" />
+            <span style="min-width: auto; width: 95%" :style="editCliked === true ? 'display: block;' : 'display: none;'">
+                <InputText :id="`dTaskName`" class="w-full d-edit-name-input" v-model="taskNameInput" type="text" placeholder="Edit task name" />
             </span>
+            <Button v-if="editCliked === false" @click="editname" v-tooltip.top="`Edit Name`" severity="secondary" icon="pi pi-pencil" class="p-1 w-fit h-full" />
             <Button
-            v-if="editCliked === false"
-            @click="editname"
-                v-tooltip.top="`Edit Name`"
-                severity="secondary"
-            
-                icon="pi pi-pencil"
-                class="p-1 w-fit h-full"
-            />
-            <Button
-            v-if="editCliked === true"
-            @click="handletaskNameUpdate"
+                v-if="editCliked === true"
+                @click="handletaskNameUpdate"
                 v-tooltip.top="`Update Name`"
                 severity="secondary"
                 icon="pi pi-check"
@@ -769,8 +785,8 @@ const handletaskNameUpdate = async () => {
                 :style="editCliked === true ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
             />
             <Button
-            v-if="editCliked === true"
-            @click="editCliked = false"
+                v-if="editCliked === true"
+                @click="editCliked = false"
                 v-tooltip.top="`Cancel`"
                 severity="secondary"
                 icon="pi pi-minus"
@@ -785,7 +801,6 @@ const handletaskNameUpdate = async () => {
                 <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-1 mr-1 share-btn"></span>
                 <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
                 <span v-tooltip.top="{ value: `Created by ${taskDetails.created_by.name}` }" class="mr-2 ml-1 text-lg pi pi-user my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
-                
             </div>
         </div>
 
@@ -807,7 +822,7 @@ const handletaskNameUpdate = async () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)" />
+                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)" />
                                         </FloatLabel>
                                     </div>
                                     <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3 mb-3">
@@ -942,9 +957,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor v-if="editorViewMode == 'edit'"    v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
 
-                                <MdEditor v-else  @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1123,7 +1138,7 @@ const handletaskNameUpdate = async () => {
             <div>
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">
-                        <div :class="showActivitiyBtn === true ? 'flex gap-2' : '' ">
+                        <div :class="showActivitiyBtn === true ? 'flex gap-2' : ''">
                             <div class="my-2 text-surface-800">
                                 <Button @click="showActivitiy" label="↓  History" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
@@ -1142,20 +1157,18 @@ const handletaskNameUpdate = async () => {
                         <div v-if="justificationDiv">
                             <p class="mb-0">Deadline Missed: {{ taskDetails?.deadline_miss_count?.missed }}</p>
                             <p>Deadline Extended: {{ taskDetails?.deadline_miss_count?.extend }}</p>
-                        
+
                             <ul v-for="act in taskDetails.deadline_miss_details" :key="act" style="margin-left: -15px; margin-top: -6px">
                                 <li style="font-size: smaller !important">
-                                    <div class="flex flex-column align-items-start justify-content-start" >
-                                        <span v-html="act.reason"></span> 
-                                    <span class="capitalize"> 
-                                        <i>
-                                            Type: {{ act.type }} - {{ formattedTime(act.created_at) }}
-                                        </i>
-                                    </span>
+                                    <div class="flex flex-column align-items-start justify-content-start">
+                                        <span v-html="act.reason"></span>
+                                        <span class="capitalize">
+                                            <i> Type: {{ act.type }} - {{ formattedTime(act.created_at) }} </i>
+                                        </span>
                                     </div>
                                 </li>
                             </ul>
-                            
+
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
@@ -1278,9 +1291,9 @@ const handletaskNameUpdate = async () => {
     <OverlayPanel ref="op">
         <div class="flex flex-column gap-3 w-25rem">
             <div>
-                <div class="flex justify-content-between align-items-center" >
+                <div class="flex justify-content-between align-items-center">
                     <span class="font-medium text-900 block mb-2">Move this Task</span>
-                    <Button style="border: none !important;" icon="pi pi-times" severity="danger" rounded outlined aria-label="Cancel" class="mCrossIcon" @click="hideMoveTask" />
+                    <Button style="border: none !important" icon="pi pi-times" severity="danger" rounded outlined aria-label="Cancel" class="mCrossIcon" @click="hideMoveTask" />
                 </div>
                 <!-- <pre>{{ moveTaskData }}</pre> -->
                 <InputGroup>
@@ -1832,15 +1845,15 @@ a {
     background-color: #f0f0f0;
 }
 
-.d-edit-name-input{
+.d-edit-name-input {
     padding: 0.25rem 0.75rem !important;
 }
 
-.mCrossIcon{
+.mCrossIcon {
     padding-top: 0 !important;
 }
 
-.mCrossIcon:hover{
+.mCrossIcon:hover {
     background: none !important;
 }
 </style>
