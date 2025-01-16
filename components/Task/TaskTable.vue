@@ -782,7 +782,7 @@ const handleRefresh = async () => {
         </template>
 
         <template #end>
-            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary"  v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />

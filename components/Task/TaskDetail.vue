@@ -244,6 +244,10 @@ const showJustification = () => {
     showActivitiyBtn.value = false;
 };
 
+const formattedAct = (act) => {
+  return `${act.reason}<br>Type: ${act.type} - ${formattedTime(act.created_at)}`;
+};
+
 const hideJustification = () => {
     justificationDiv.value = false;
     showJustificationBtn.value = true;
@@ -671,6 +675,10 @@ const moveTaskData = ref([]);
 const moveSearch = ref('');
 const handleMoveTask = (event) => {
     op.value.toggle(event);
+};
+
+const hideMoveTask = () => {
+    op.value.hide();
 };
 const moveTaskFetch = async (query) => {
     const token = useCookie('token');
@@ -1115,7 +1123,7 @@ const handletaskNameUpdate = async () => {
             <div>
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">
-                        <div class="flex gap-2">
+                        <div :class="showActivitiyBtn === true ? 'flex gap-2' : '' ">
                             <div class="my-2 text-surface-800">
                                 <Button @click="showActivitiy" label="↓  History" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
@@ -1132,16 +1140,22 @@ const handletaskNameUpdate = async () => {
                             </div>
                         </div>
                         <div v-if="justificationDiv">
-                        
-                           
-                                <p>Missed: {{taskDetails?.deadline_miss_count?.missed}}</p>
-                                <p>Extend: {{taskDetails?.deadline_miss_count?.extend}}</p>
+                            <p class="mb-0">Deadline Missed: {{ taskDetails?.deadline_miss_count?.missed }}</p>
+                            <p>Deadline Extended: {{ taskDetails?.deadline_miss_count?.extend }}</p>
                         
                             <ul v-for="act in taskDetails.deadline_miss_details" :key="act" style="margin-left: -15px; margin-top: -6px">
                                 <li style="font-size: smaller !important">
-                                    {{act.reason}} <br> Type: {{act.type}} - {{formattedTime(act.created_at)}} 
+                                    <div class="flex flex-column align-items-start justify-content-start" >
+                                        <span v-html="act.reason"></span> 
+                                    <span class="capitalize"> 
+                                        <i>
+                                            Type: {{ act.type }} - {{ formattedTime(act.created_at) }}
+                                        </i>
+                                    </span>
+                                    </div>
                                 </li>
                             </ul>
+                            
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
@@ -1264,7 +1278,10 @@ const handletaskNameUpdate = async () => {
     <OverlayPanel ref="op">
         <div class="flex flex-column gap-3 w-25rem">
             <div>
-                <span class="font-medium text-900 block mb-2">Move this Task</span>
+                <div class="flex justify-content-between align-items-center" >
+                    <span class="font-medium text-900 block mb-2">Move this Task</span>
+                    <Button style="border: none !important;" icon="pi pi-times" severity="danger" rounded outlined aria-label="Cancel" class="mCrossIcon" @click="hideMoveTask" />
+                </div>
                 <!-- <pre>{{ moveTaskData }}</pre> -->
                 <InputGroup>
                     <InputText v-model="moveSearch" placeholder="Search Task" class="w-25rem"></InputText>
@@ -1817,5 +1834,12 @@ a {
 
 .d-edit-name-input{
     padding: 0.25rem 0.75rem !important;
+}
+
+.mCrossIcon{
+    padding-top: 0 !important;
+}
+.mCrossIcon:hover{
+    background: none !important;
 }
 </style>

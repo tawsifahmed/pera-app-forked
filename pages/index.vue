@@ -75,8 +75,8 @@ const setPieChartData = () => {
         datasets: [
             {
                 data: [cc, ic, uc],
-                backgroundColor: [documentStyle.getPropertyValue('--cyan-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
-                hoverBackgroundColor: [documentStyle.getPropertyValue('--cyan-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
+                backgroundColor: ['#334155', '#0ea5e9', '#a855f7'],
+                hoverBackgroundColor: ['#202c3d', '#0087c3','#8130ce']
             }
         ]
     };

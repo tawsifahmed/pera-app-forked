@@ -12,8 +12,8 @@
         <div class="field">
             <label for="description" class="block mb-2">Description: </label>
             <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
-            <Textarea v-model="description" rows="5" cols="30" />
-            <!-- <Editor v-model="description" editorStyle="height: 120px">
+            <!-- <Textarea v-model="description" rows="5" cols="30" /> -->
+            <Editor v-model="description" editorStyle="height: 120px">
                 <template v-slot:toolbar>
                     <span class="ql-formats flex justify-content-end mr-0">
                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -30,7 +30,7 @@
                         <button class="ql-link" type="button" data-pc-section="link"></button>
                     </span>
                 </template>
-            </Editor> -->
+            </Editor>
         </div>
         <div class="flex flex-row align-items-end justify-content-end mt-3">
             <Button label="Cancel" icon="pi pi-times" text="" @click="hideDialog" />
