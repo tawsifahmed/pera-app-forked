@@ -1839,6 +1839,7 @@ a {
 .mCrossIcon{
     padding-top: 0 !important;
 }
+
 .mCrossIcon:hover{
     background: none !important;
 }

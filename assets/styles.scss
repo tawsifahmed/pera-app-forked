@@ -71,3 +71,9 @@ $gutter: 1rem; //for primeflex grid system
 .md-editor-content .md-editor-preview-wrapper {
     padding: 7px !important;
 }
+
+
+.p-datatable-loading-overlay{
+    background:  none;
+    backdrop-filter: blur(100px);
+}
