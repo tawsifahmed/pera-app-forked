@@ -64,3 +64,10 @@ $gutter: 1rem; //for primeflex grid system
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
+
+.md-editor-content .md-editor-input-wrapper textarea {
+    padding: 7px !important;
+}
+.md-editor-content .md-editor-preview-wrapper {
+    padding: 7px !important;
+}

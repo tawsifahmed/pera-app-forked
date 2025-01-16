@@ -7,9 +7,23 @@
                 <Textarea id="editTaskName" class="border-gray-300" v-model="taskNameEditInput" rows="3" cols="15" :invalid="spaceDescriptionError" />
             </div>
             <div class="field">
-                <label for="description" class="block mb-2">Description: </label>
+                <div class="flex gap-2 justify-content-between mb-2">
+                    <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                        <span class="pi pi-sliders-h"></span>
+                        <p>Description:</p>
+                    </div>
+
+                    <ButtonGroup>
+                        <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
+                        <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
+                    </ButtonGroup>
+                </div>
+                <MdEditor v-if="editorViewMode == 'edit'" v-model="taskDescripEdit" editorStyle="height: 80px" style="height: 120px !important" :preview="false" :toolbars="[]" height="300px" theme="light" language="en-US" />
+
+                <MdEditor v-else @click="handleEditorView()" v-model="taskDescripEdit" editorStyle="height: 80px" style="height: 120px !important" previewOnly class="custom-preview" height="300px" theme="light" language="en-US" />
+
                 <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
-                <Editor v-model="taskDescripEdit" editorStyle="height: 120px">
+                <!-- <Editor v-model="taskDescripEdit" editorStyle="height: 120px">
                     <template v-slot:toolbar>
                         <span class="ql-formats flex justify-content-end mr-0">
                             <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -26,7 +40,7 @@
                             <button class="ql-link" type="button" data-pc-section="link"></button>
                         </span>
                     </template>
-                </Editor>
+                </Editor> -->
             </div>
             <div class="field">
                 <label>Assignees</label>
@@ -58,6 +72,8 @@
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import Editor from 'primevue/editor';
+import MdEditor from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 const { editTask } = useCompanyStore();
 const { isTaskEdited, detectDuplicateTask } = storeToRefs(useCompanyStore());
@@ -104,6 +120,17 @@ const priorities = ref([
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
 ]);
+const editorViewMode = ref('preview');
+const handleViews = (data) => {
+    editorViewMode.value = data;
+};
+
+const editorPreview = ref(false);
+
+const handleEditorView = () => {
+    editorViewMode.value = 'edit';
+    editorPreview.value = true;
+};
 
 const EditErrorHandler = ref(false);
 
@@ -153,7 +180,7 @@ const handleUpdateTask = async () => {
             name: taskNameEditInput.value,
             ...(isDescriptionEdited.value === true ? { description: taskDescripEdit.value } : {}),
             priority: priority.value.name,
-            ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - (18 * 60 * 60 * 1000)).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
+            ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - 18 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
             ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
             ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {}),
             project_id: projects

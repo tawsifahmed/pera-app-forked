@@ -319,6 +319,7 @@ const handleTaskDetailSubmit = async () => {
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
+        editorViewMode.value = 'preview';
         if (isDescriptionEdited.value === true) {
             isDescriptionEdited.value = false;
             console.log('isDescriptionEdited Flagged');
@@ -566,6 +567,12 @@ const getMentionedIds = async () => {
 const handleViews = (data) => {
     editorViewMode.value = data;
 };
+
+const editorPreview = ref(false);
+const handleEditorView = () => {
+    editorViewMode.value = 'edit';
+    editorPreview.value = true;
+}
 
 const handleCommentViews = (data) => {
     commentEditorViewMode.value = data;
@@ -927,9 +934,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor v-if="editorViewMode == 'edit'"    v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
 
-                                <MdEditor v-else v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor v-else  @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
