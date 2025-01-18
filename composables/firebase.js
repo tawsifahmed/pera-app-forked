@@ -1,7 +1,7 @@
 // plugins/firebase.js
 
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 // import { onBackgroundMessage } from 'firebase/messaging'
 export const firebaseConfig = {
@@ -18,15 +18,22 @@ export const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
-
+signInAnonymously(auth)
+  .then(() => {
+    console.log('signed in')
+    // Signed in..
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // ...
+  });
 // for Notification
 const messaging = getMessaging(app);
-const setNotification = () => {
-
-}
 
 getToken(messaging, { vapidKey: 'BN77kNqVsILxQDNITFoTeCWehEDe13fCAEvwd933fSNMApLUHeD8xU85-3DxyEfMUxHp38FnICqBUAZ1qGDNcSI' }).then((currentToken) => {
     if (currentToken) {
+        console.log(currentToken)
         // Send the token to your server and update the UI if necessary
         // ...
     } else {
@@ -38,10 +45,7 @@ getToken(messaging, { vapidKey: 'BN77kNqVsILxQDNITFoTeCWehEDe13fCAEvwd933fSNMApL
     console.log('An error occurred while retrieving token. ', err);
     // ...
 });
-onMessage(messaging, (payload) => {
-    console.log('Message received. ', payload);
-    // ...
-});
+
 // onBackgroundMessage(messaging, (payload) => {
 //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
 // });
@@ -55,4 +59,4 @@ function requestPermission() {
 }
 requestPermission();
 const provider = new GoogleAuthProvider();
-export { auth, provider, setNotification };
+export { auth, provider, messaging };

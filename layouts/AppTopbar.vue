@@ -2,7 +2,8 @@
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
 import { useClockStore } from '~/store/clock';
-import { setNotification } from '~/composables/firebase';
+import { messaging } from '~/composables/firebase';
+import { onMessage } from "firebase/messaging";
 
 import Password from 'primevue/password';
 // import clickOutside from '../composables/clickOutside';
@@ -10,7 +11,7 @@ const { getStoreTimer } = useClockStore();
 const { timerData, isTImerStopped, deadlineMissModal, deadlineTaskId, deadlineProjectId, deadlineDueDate } = storeToRefs(useClockStore());
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
-
+const toast = useToast();
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from './composables/layout';
 import { useRouter } from 'vue-router';
@@ -24,7 +25,6 @@ import { useAuthStore } from '~/store/auth';
 import Search from '../components/Search.vue';
 import { usePrimeVue } from 'primevue/config';
 const url = useRuntimeConfig();
-setNotification();
 
 const name = ref('name');
 const userImage = ref(null);
@@ -132,11 +132,7 @@ onUnmounted(() => {
 });
 
 getUserData();
-// watch(userProfile, (oldValue, newValue) => {
-//     name.value = newValue.data.name;
-//     userImage.value = newValue.data.image;
-//     console.log('new Value:', newValue.data.image);
-// });
+
 const openProfile = () => {
     visibleProfile.value = !visibleProfile.value;
 };
@@ -169,13 +165,11 @@ const fetchNotifyData = async () => {
         });
 
         if (data.value) {
-            console.log('notification data =>', data.value);
             if (data.value.data.find((item) => item.is_read === 0)) {
                 notifiData.value = true;
             } else {
                 notifiData.value = false;
             }
-            console.log('notification data =>', notifiData.value);
             // totalPage.value = Math.ceil(data.value.total / 5);
         }
     } catch (e) {
@@ -186,7 +180,6 @@ const fetchNotifyData = async () => {
 fetchNotifyData();
 
 const handleNotificationComp = () => {
-    console.log('handleNotificationComp');
     showNotify.value = !showNotify.value;
     if (notifiData.value) {
         notifiData.value = false;
@@ -194,31 +187,6 @@ const handleNotificationComp = () => {
 };
 
 const setter = ref(false);
-
-// watch(showNotify, (newValue, oldValue) => {
-//     // console.log('old', oldValue);
-//     console.log('new', newValue);
-//     // if(newValue === true){
-//     //     showNotify.value = false;
-//     // }
-//     if(newValue === false){
-//         showNotify.value = true;
-//         setter.value = true
-//     }
-
-//     // if(setter.value){
-//     //     showNotify.value = false;
-//     //     setter.value = false
-//     // }
-// });
-
-// watch(setter, (newValue, oldValue) => {
-//     console.log('setter', newValue);
-//     if(newValue === true){
-//         showNotify.value = false;
-//         setter.value = false
-//     }
-// });
 
 const timerCompanyID = ref();
 const timerSpaceId = ref();
@@ -230,7 +198,6 @@ const storeTaskSpaceID = localStorage.getItem('storeTaskSpaceID');
 const storeTaskProjectID = localStorage.getItem('storeTaskProjectID');
 const storedTaskID = localStorage.getItem('storeTaskID');
 
-console.log('timerTaskId', timerTaskId.value);
 const fetchedTimerData = ref();
 
 const timerStartTime = ref();
@@ -246,7 +213,6 @@ const fetchActiveTimer = async () => {
         });
 
         if (data.value) {
-            console.log('active timer data =>', data.value);
             // return;
             fetchedTimerData.value = data.value?.data?.is_timer_start;
             if (data.value?.data?.is_timer_start === 'true') {
@@ -256,8 +222,6 @@ const fetchActiveTimer = async () => {
                 timerTaskId.value = data.value?.data?.task_id;
                 timerStartTime.value = data.value?.data?.start_time;
             }
-            console.log('fetchedTimerData', data.value.data);
-            console.log('timerTaskId', timerTaskId.value);
         }
     } catch (e) {
         console.log(e);
@@ -268,30 +232,15 @@ fetchActiveTimer();
 
 const piniaTID = ref();
 if (timerData.value) {
-    console.log('from Pinia');
     piniaTID.value = timerData.value?.task_id;
 }
-console.log('timerDatPPPa', timerData.value?.task_id);
 
-// if (storedTaskID) {
-//     console.log('from Store');
-//     timerTaskId.value = storedTaskID;
-// }
 
 if (storeTaskCompanyID) {
     timerCompanyID.value = storeTaskCompanyID;
 }
 
-// if(storeTaskSpaceID) {
-//     timerSpaceId.value = storeTaskSpaceID;
-// }
-
-// if(storeTaskProjectID) {
-//     timerProjectId.value = storeTaskProjectID;
-// }
-
 watch(timerData, (oldValue, newValue) => {
-    console.log('timerDataWW', newValue);
     if (newValue) {
         timerTaskId.value = newValue.task_id;
     }
@@ -302,7 +251,6 @@ let timerInterval = null;
 function startTimer(timerSTime) {
     const timerElement = document.getElementById('timer-interval');
     if (timerSTime === 'stop') {
-        console.log('timerSTime', timerSTime);
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
@@ -350,11 +298,9 @@ watchEffect(async () => {
     if (isTImerStopped.value === true) {
         timerTaskId.value = null;
         startTimer('stop');
-        console.log('timerTaskIdFOLO', timerTaskId.value);
     }
     if (timerData.value || timerTaskId.value) {
         showTimer.value = true;
-        console.log('timerData');
     } else {
         showTimer.value = false;
     }
@@ -363,7 +309,6 @@ watchEffect(async () => {
 const visibleTop = ref(false);
 
 const closeSearch = (evn) => {
-    console.log('closeSearch', evn);
     visibleTop.value = false;
 };
 
@@ -371,6 +316,13 @@ const closeSearch = (evn) => {
 const closeMissDeadlineModal =  () => {
     deadlineMissModal.value = false
 }
+
+// Notification
+onMessage(messaging,(message)=>{
+    console.log(message)
+    toast.add({ severity: 'contrast', summary: message.notification.title, detail: message.notification.body, life: 3000 })
+})
+
 </script>
 
 <template>
