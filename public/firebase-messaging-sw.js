@@ -9,13 +9,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-com
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
 firebase.initializeApp({
-    apiKey: "AIzaSyADi7tePvFHqmiMN70NfkJKm7DSBYFOThI",
-    authDomain: "the-pera-2f278.firebaseapp.com",
-    projectId: "the-pera-2f278",
-    storageBucket: "the-pera-2f278.firebasestorage.app",
-    messagingSenderId: "296010285017",
-    appId: "1:296010285017:web:cb6274faaaccba106563c8",
-    measurementId: "G-HKWQK0JK5Z"
+    apiKey: "AIzaSyB3goXMmMcgeBv3DMYxiky-FON2yewTRu8",
+  authDomain: "peraa-app.firebaseapp.com",
+  projectId: "peraa-app",
+  storageBucket: "peraa-app.firebasestorage.app",
+  messagingSenderId: "240776140465",
+  appId: "1:240776140465:web:2c295d4d0d9c0317f5f490",
+  measurementId: "G-MB77HDRSMQ"
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
@@ -23,19 +23,16 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // Forground
-messaging.onMessage((payload) => {
-    console.log('Message received. ', payload);
-    toast.add({ severity: 'success', summary: payload.notification.title, detail: payload.notification.body, group: 'br', life: 3000 })
-    // ...
-  });
+// messaging.onMessage((payload) => {
+//     console.log('Message received. ', payload);
+//     toast.add({ severity: 'success', summary: payload.notification.title, detail: payload.notification.body, group: 'br', life: 3000 })
+//     // ...
+//   });
 
 
 //   Background 
 messaging.onBackgroundMessage((payload) => {
-    console.log(
-      '[firebase-messaging-sw.js] Received background message ',
-      payload
-    );
+
     // Customize notification here
     const notificationTitle = payload.notification.title || '';
     const notificationOptions = {
