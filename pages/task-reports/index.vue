@@ -176,7 +176,7 @@ const handleReset = () => {
             </template>
 
             <template #end>
-                <Button @click="handleReset" icon="pi pi-undo" rounded raised class="mr-2" />
+                <Button @click="handleReset" label='Reset' class="mr-2" />
                 <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
             </template>
         </Toolbar>

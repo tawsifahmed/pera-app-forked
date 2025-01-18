@@ -73,8 +73,8 @@ const setPieChartData = () => {
         datasets: [
             {
                 data: [cc, ic, uc],
-                backgroundColor: [documentStyle.getPropertyValue('--cyan-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
-                hoverBackgroundColor: [documentStyle.getPropertyValue('--cyan-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
+                backgroundColor: ['#33bd7c', '#0ea5e9', '#475569'],
+                hoverBackgroundColor: ['#1a8251', '#0087c3','#2c3644']
             }
         ]
     };
@@ -620,8 +620,8 @@ watch(
                 <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-10rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Project" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Status" class="w-full md:w-10rem mb-2" />
                         <div class="mb-2 relative w-full md:w-8rem">
                             <Calendar @date-select="selectStartFilterDate($event)" v-model="filterStartDate" placeholder="Start Date" class="w-full md:w-8rem" />
                             <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>

@@ -2,6 +2,7 @@
 import draggable from 'vuedraggable';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
+import { useClockStore } from '~/store/clock';
 import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
 import VueCal from 'vue-cal';
@@ -10,6 +11,8 @@ const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
 const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks } = storeToRefs(useCompanyStore());
+const { handleMissDeadlineShowTimer } = useClockStore();
+const { deadlineJustifyProvided } = storeToRefs(useClockStore());
 const createTaskP = ref(accessPermission('create_task'));
 const updateTaskP = ref(accessPermission('update_task'));
 const deleteTaskP = ref(accessPermission('delete_task'));
@@ -133,7 +136,6 @@ const handleMouseEnter = (key) => {
         editClikedRowKey.value = null;
     }
 };
-
 
 const editClikedRowKey = ref(null);
 
@@ -536,15 +538,38 @@ const handleAssigneeChanges = async (type, values, key) => {
 
 const inlineDueDate = ref();
 
+watch(deadlineJustifyProvided, (newVal) => {
+        if (newVal === true) {
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 5000 });
+        }
+        if (newVal === false) {
+            toast.add({ severity: 'warn', summary: 'Unsuccessful!', detail: 'Deadline justification is not provided.', group: 'br', life: 5000 });
+        }
+});
 const handleDateChange = async (newDate, slotKey) => {
-    let oldDate = slotKey.node.data.dueDateValue;
+    console.log('slotKey', slotKey);
 
-    const selectedDate = new Date(newDate);
-    selectedDate.setHours(23, 59, 0, 0);
-    inlineDueDate.value = selectedDate;
-    let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-    slotKey.node.data.dueDateValue = placeHolderValue;
-    await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
+    if (slotKey.node.data.dueDateValue !== '' && slotKey.node.data.parent_task_id === null) {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);
+        inlineDueDate.value = selectedDate;
+        await handleMissDeadlineShowTimer(slotKey.node.key, id, inlineDueDate.value);
+
+        // toast.add({ severity: 'warn', summary: 'Provide Justification!', detail: 'Since you are trying to change the deadline of the parent task.', group: 'br', life: 3000 });
+    } else {
+        const selectedDate = new Date(newDate);
+        selectedDate.setHours(23, 59, 0, 0);
+        inlineDueDate.value = selectedDate;
+        let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+        slotKey.node.data.dueDateValue = placeHolderValue;
+        await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
+    }
+    // const selectedDate = new Date(newDate);
+    // selectedDate.setHours(23, 59, 0, 0);
+    // inlineDueDate.value = selectedDate;
+    // let placeHolderValue = new Date(inlineDueDate.value).toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+    // slotKey.node.data.dueDateValue = placeHolderValue;
+    // await handleTaskChanges(inlineDueDate.value, slotKey.node.key);
 };
 
 function getRandomDeepColor() {
@@ -706,16 +731,15 @@ const refreshLoader = ref(false);
 const refreshDisabled = ref(false);
 const handleRefresh = async () => {
     refreshLoader.value = true;
-    refreshDisabled.value = true;
+
     await getSingleProject(id);
     getUserlist();
     refreshLoader.value = false;
+    refreshDisabled.value = true;
     setTimeout(() => {
         refreshDisabled.value = false;
     }, 3500);
 };
-
-
 </script>
 
 <template>
@@ -737,9 +761,8 @@ const handleRefresh = async () => {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP && viewMode !== 'list'" icon="pi pi-plus" label="Create Task"
-                @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
-           
+                <Button v-if="createTaskP && viewMode !== 'list'" icon="pi pi-plus" label="Create Task" @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+
                 <Button v-if="createTaskP && viewMode === 'list'" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
                 <div class="view-btns">
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
@@ -759,7 +782,7 @@ const handleRefresh = async () => {
         </template>
 
         <template #end>
-            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary"  v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />
@@ -937,57 +960,49 @@ const handleRefresh = async () => {
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
                 <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
-                    <span class="flex justify-content-center assignee-wrapper">
-                        
-                    </span>
+                    <span class="flex justify-content-center assignee-wrapper"> </span>
                     <div>
                         <div class="assigneeSelect">
-                            <div class="relative" >
-                                <span class="flex " v-if="slotProps.node.data?.assigneeObj.length > 0">
+                            <div class="relative">
+                                <span class="flex" v-if="slotProps.node.data?.assigneeObj.length > 0">
                                     <!-- Show the first three assignees -->
-                                    <span
-                                      v-for="(assignee, index) in slotProps.node.data.assigneeObj.slice(0, 3)"
-                                      :key="index"
-                                      :style=" { marginLeft: index > 0 ? '-19.5px' : '0', zIndex: 10 - index }"
-                                      class="flex align-items-center"
-                                    >
-                                      <img
-                                        v-tooltip.top="{ value: `${assignee.name}` }"
-                                        class="mr-2 capitalize cursor-pointer"
-                                        v-if="assignee.image"
-                                        :src="assignee.image"
-                                        style="height: 23px; width: 23px; border-radius: 50%; border: 1px solid white"
-                                        alt=""
-                                        srcset=""
-                                      />
-                                      <Avatar
-                                        v-else
-                                        v-tooltip.top="{ value: `${assignee.name}` }"
-                                        :label="assignee.name.charAt(0)"
-                                        class="mr-2 capitalize cursor-pointer"
-                                        size="small"
-                                        style="height: 25px; width: 25px; background-color: black; color: white; border-radius: 50%; border: 2px solid white"
-                                        :style="avatarStyle(index)"
-                                      />
+                                    <span v-for="(assignee, index) in slotProps.node.data.assigneeObj.slice(0, 3)" :key="index" :style="{ marginLeft: index > 0 ? '-19.5px' : '0', zIndex: 10 - index }" class="flex align-items-center">
+                                        <img
+                                            v-tooltip.top="{ value: `${assignee.name}` }"
+                                            class="mr-2 capitalize cursor-pointer"
+                                            v-if="assignee.image"
+                                            :src="assignee.image"
+                                            style="height: 23px; width: 23px; border-radius: 50%; border: 1px solid white"
+                                            alt=""
+                                            srcset=""
+                                        />
+                                        <Avatar
+                                            v-else
+                                            v-tooltip.top="{ value: `${assignee.name}` }"
+                                            :label="assignee.name.charAt(0)"
+                                            class="mr-2 capitalize cursor-pointer"
+                                            size="small"
+                                            style="height: 25px; width: 25px; background-color: black; color: white; border-radius: 50%; border: 2px solid white"
+                                            :style="avatarStyle(index)"
+                                        />
                                     </span>
-                                    <Avatar v-if="slotProps.node.data.assigneeObj.length > 3" :label="`+${slotProps.node.data.assigneeObj.length - 3}`" class="mr-2 cursor-pointer absolute" size="small" style="height: 25px; width: 25px; background-color: #f1f5f9; color: black; border-radius: 50%; border: 2px solid white; left: 39px;" />
-                                  
+                                    <Avatar
+                                        v-if="slotProps.node.data.assigneeObj.length > 3"
+                                        :label="`+${slotProps.node.data.assigneeObj.length - 3}`"
+                                        class="mr-2 cursor-pointer absolute"
+                                        size="small"
+                                        style="height: 25px; width: 25px; background-color: #f1f5f9; color: black; border-radius: 50%; border: 2px solid white; left: 39px"
+                                    />
+
                                     <!-- Show the remaining count if there are more than three assignees -->
-                                    
-                                   
-                                    
-                                    
-                          
-                                    
-                                  </span>
+                                </span>
                                 <Button
                                     v-else
                                     v-tooltip.top="{ value: `Edit Assignee`, showDelay: 500 }"
                                     severity="secondary"
-                                    :icon="slotProps.node.data?.assigneeObj.length > 0 ? 'pi pi-user-edit' : 'pi pi-user-plus' "
+                                    :icon="slotProps.node.data?.assigneeObj.length > 0 ? 'pi pi-user-edit' : 'pi pi-user-plus'"
                                     class="w-fit h-fit p-1"
                                     style="font-size: 0.8rem !important"
-                                    
                                 />
                                 <MultiSelect
                                     v-model="slotProps.node.data.assignee"
@@ -999,7 +1014,7 @@ const handleRefresh = async () => {
                                     placeholder="Assignees"
                                     :maxSelectedLabels="3"
                                     class="w-full absolute cursor-default"
-                                    style="opacity: 0; left: 0; top: 0;"
+                                    style="opacity: 0; left: 0; top: 0"
                                     :style="slotProps.node.data?.assigneeObj.length > 0 ? 'z-index: 10;' : ''"
                                 />
                             </div>
@@ -2165,5 +2180,4 @@ textarea {
 .vuecal__event--focus {
     box-shadow: none !important;
 }
-
 </style>
