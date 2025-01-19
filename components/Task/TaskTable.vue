@@ -7,6 +7,7 @@ import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import { toRaw } from 'vue';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
@@ -539,12 +540,12 @@ const handleAssigneeChanges = async (type, values, key) => {
 const inlineDueDate = ref();
 
 watch(deadlineJustifyProvided, (newVal) => {
-        if (newVal === true) {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 5000 });
-        }
-        if (newVal === false) {
-            toast.add({ severity: 'warn', summary: 'Unsuccessful!', detail: 'Deadline justification is not provided.', group: 'br', life: 5000 });
-        }
+    if (newVal === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 5000 });
+    }
+    if (newVal === false) {
+        toast.add({ severity: 'warn', summary: 'Unsuccessful!', detail: 'Deadline justification is not provided.', group: 'br', life: 5000 });
+    }
 });
 const handleDateChange = async (newDate, slotKey) => {
     console.log('slotKey', slotKey);
@@ -718,12 +719,17 @@ function addChild(parentKey, newChild, node) {
 
 // Recursive function to remove a child
 function removeChild(node = toRaw(tableData.value)) {
-    const filtered = node.filter((item) => item.key !== 'new');
+    const filtered = node.filter((item) => {
+        if (item.key !== 'new') {
+            return toRaw(item);
+        }
+    });
     filtered.forEach((item) => {
         if (item.children && item.children.length > 0) {
             item.children = removeChild(item.children);
         }
     });
+    console.log(filtered);
     return (tableData.value = structuredClone(filtered));
 }
 
@@ -782,7 +788,7 @@ const handleRefresh = async () => {
         </template>
 
         <template #end>
-            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary"  v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />
