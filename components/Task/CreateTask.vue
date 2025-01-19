@@ -7,10 +7,25 @@
             </label>
             <Textarea id="createTaskName" class="border-gray-300" v-model="name"  :invalid="spaceDescriptionError" />
         </div>
-        <div class="field">
-            <label for="description" class="block mb-2">Description: </label>
+        <div class="field c-editor-wrapper">
+            <div class="flex gap-2 justify-content-between mb-2">
+                <div class="flex justify-content-start gap-2 align-items-center mb-1 task-detail-property">
+                    <span class="pi pi-sliders-h"></span>
+                    <p>Description:</p>
+                </div>
+
+                <ButtonGroup>
+                    <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
+                    <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
+                </ButtonGroup>
+            </div>
+            <!-- <MdEditor   v-model="description" editorStyle="height: 80px" style="height: 120px !important;" :preview="editorPreview" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" /> -->
+            <MdEditor v-if="editorViewMode == 'edit'"    v-model="description" editorStyle="height: 80px" style="height: 120px !important;" :preview="false" :toolbars="[]"  height="300px" theme="light" language="en-US" />
+
+            <MdEditor v-else @click="handleEditorView()"  v-model="description" editorStyle="height: 80px" style="height: 120px !important;" previewOnly class="custom-preview" height="300px" theme="light" language="en-US" />
+        
             <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
-            <Editor v-model="description" editorStyle="height: 120px">
+            <!-- <Editor v-model="description" editorStyle="height: 120px">
                 <template v-slot:toolbar>
                     <span class="ql-formats flex justify-content-end mr-0">
                         <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
@@ -27,7 +42,7 @@
                         <button class="ql-link" type="button" data-pc-section="link"></button>
                     </span>
                 </template>
-            </Editor>
+            </Editor> -->
         </div>
         <!-- <div class="field">
             <label for="company">Set Task Name</label>
@@ -62,7 +77,7 @@
         </div>
         <br />
         <p class="text-center" v-if="errorHandler" style="color: red">Please add task name</p>
-        <div class="create-btn-wrapper mb-0">
+        <div class="c-create-btn-wrapper mb-0">
             <Button label="Save" icon="pi pi-check" text="" @click="handleCreateTask" :loading="btnLoading" />
         </div>
     </div>
@@ -73,6 +88,8 @@ import { storeToRefs } from 'pinia';
 import { nextTick, onBeforeMount, onMounted } from 'vue';
 import { useCompanyStore } from '~/store/company';
 import Editor from 'primevue/editor';
+import MdEditor from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 
 const { createTask } = useCompanyStore();
 const { isTaskCreated, detectDuplicateTask } = storeToRefs(useCompanyStore());
@@ -106,6 +123,17 @@ const priorities = ref([
     { name: 'Normal', code: 'Normal' },
     { name: 'Low', code: 'Low' }
 ]);
+const editorViewMode = ref('edit');
+
+const handleViews = (data) => {
+    editorViewMode.value = data;
+};
+
+const editorPreview = ref(false);
+const handleEditorView = () => {
+    editorViewMode.value = 'edit';
+    editorPreview.value = true;
+}
 
 const emit = defineEmits(['closeCreateModal']);
 
@@ -190,8 +218,8 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.create-btn-wrapper {
+<style lang="scss" >
+.c-create-btn-wrapper {
     display: flex;
     justify-content: end;
 }
@@ -202,5 +230,14 @@ onMounted(() => {
 
 #createTaskName{
     height: 75px !important;
+}
+
+.c-editor-wrapper{
+    .md-editor-content .md-editor-input-wrapper textarea {
+        padding: 7px !important;
+    }
+    .md-editor-content .md-editor-preview-wrapper {
+        padding: 7px !important;
+    }
 }
 </style>

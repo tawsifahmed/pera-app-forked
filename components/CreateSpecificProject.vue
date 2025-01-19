@@ -68,6 +68,7 @@ const addTaskSTatusError = ref(false);
 const closeStatusError = ref(false);
 const projectNameInput = ref(null);
 const gitLabProjectId = ref(null);
+const gitlabProjectToken = ref(null);
 const projectDescriptionInput = ref('');
 
 const addTaskStatus = () => {
@@ -138,6 +139,7 @@ const handleCreateProject = async () => {
             space_id: spaces,
             statuses: taskStatusList.value,
             git_project_id: gitLabProjectId.value,
+            git_token: gitlabProjectToken.value,
         };
         console.log('statuses', taskStatusList.value);
         await project.createProjects(createProjectData);
@@ -380,11 +382,21 @@ const handleClose = () => {
                     <p v-if="closeStatusError" class="text-red-600 text-small">Please set close status!</p>
                 </div>
             </div>
-            <div class="field">
-                <label for="name">Gitlab ID
-                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+            <div class="flex w-full gap-2">
+                <div class="field flex flex-column mb-3" style="width: 50%;">
+                    <label for="name"
+                        >Gitlab ID
+                        <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                     </label>
-                <InputText  v-model="gitLabProjectId" required="true" />
+                    <InputText v-model="gitLabProjectId" required="true" />
+                </div>
+                <div class="field flex flex-column mb-3" style="width: 50%;">
+                    <label for="name"
+                        >Gitlab Token
+                        <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                    </label>
+                    <InputText v-model="gitlabProjectToken" required="true" />
+                </div>
             </div>
             <p class="text-center" v-if="errorHandler" style="color: red">Please add/fill/check up all the fields</p>
             <template #footer>

@@ -41,6 +41,8 @@ const handleSubmit = async (e) => {
         createModal.value = false; // Close modal on success
         // Optionally, refresh data or notify the user
         toast.add({ severity: 'success', summary: 'Meeting Minutes', detail: 'Created successfully!', group: 'br', life: 3000 });
+        description.value = '';
+        employee.value = '';
         fetchScrum();
     } catch (error) {
         console.error('Submission failed:', error);
@@ -81,11 +83,17 @@ const init = async () => {
         employees.value = data.value?.data.map((e) => ({ name: e.name, id: e.id }));
     }
 };
+fetchScrum();
 onMounted(() => {
     init();
-    fetchScrum();
     // console.log('call');
 });
+
+const handleClose = () => {
+    createModal.value = false;
+    description.value = '';
+    employee.value = '';
+};
 </script>
 
 <template>
@@ -103,7 +111,7 @@ onMounted(() => {
         />
     </div>
 
-    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" dismissableMask="true" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" @update:visible="handleClose" :style="{ minWidth: '45vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleSubmit" class="form" action="">
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>
