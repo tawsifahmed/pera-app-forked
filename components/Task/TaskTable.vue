@@ -729,8 +729,10 @@ function removeChild(node = toRaw(tableData.value)) {
             item.children = removeChild(item.children);
         }
     });
-    console.log(filtered);
-    return (tableData.value = structuredClone(filtered));
+
+    tableData.value = JSON.parse(JSON.stringify(filtered));
+    return tableData.value;
+    // return (tableData.value = structuredClone(filtered));
 }
 
 const refreshLoader = ref(false);
@@ -847,6 +849,7 @@ const handleRefresh = async () => {
     </div>
 
     <!-- Tree table -->
+    <!-- old=> -->
     <TreeTable
         v-if="viewMode === 'list'"
         class="table-st"
@@ -865,7 +868,7 @@ const handleRefresh = async () => {
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
+        <Column field="name" header="Name" class="" expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -910,6 +913,14 @@ const handleRefresh = async () => {
 
                         <form
                             v-if="slotProps.node.key == 'new'"
+                            @keydown="
+                                (e) => {
+                                    if (e.key === 'Enter' && e.ctrlKey) {
+                                        e.preventDefault();
+                                        updateTaskName(slotProps.node, true);
+                                    }
+                                }
+                            "
                             :onsubmit="
                                 (e) => {
                                     e.preventDefault();
@@ -1408,10 +1419,22 @@ const handleRefresh = async () => {
     align-items: center;
 }
 
+.col-1 {
+    width: 45%;
+}
+
+// .p-resizable-column {
+//     width: 45%;
+// }
+
 .table-st thead th:hover {
-    /*border: 2px solid #e2e8f0;
-    border-top: none;
-    border-bottom: 1px solid #e2e8f0;*/
+    // border: 1px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
+
+    // border: 2px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
 }
 
 .table-st table {
