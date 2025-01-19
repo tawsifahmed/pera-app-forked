@@ -5,7 +5,11 @@ export const useClockStore = defineStore('clock', () => {
     const trackedTime = ref(null)
     const timerData = ref(null)
     const isTImerStopped = ref()
-
+    const deadlineMissModal = ref(false)
+    const deadlineTaskId = ref(null)
+    const deadlineProjectId = ref(null)
+    const deadlineDueDate = ref(null)
+    const deadlineJustifyProvided = ref(null)
     async function getTaskTimerData(action, taskId, timerId) {
 
         const token = useCookie('token')
@@ -106,5 +110,27 @@ export const useClockStore = defineStore('clock', () => {
         
     }
 
-    return { getTaskTimerData, storeTaskTimer, getStoreTimer, setManualTime, timerData, trackedTime, isTImerStopped }
+    async function handleMissDeadlineShowTimer (taskId, projId, dueDate) {
+        deadlineMissModal.value = true;
+        deadlineTaskId.value = taskId;
+        deadlineProjectId.value = projId;
+        deadlineDueDate.value = dueDate;
+        deadlineJustifyProvided.value = null;
+        
+    }
+    async function closeDeadlineShowModal () {
+        deadlineMissModal.value = false;
+        deadlineTaskId.value = null;
+        deadlineDueDate.value = null;
+        deadlineJustifyProvided.value = true;
+    }
+    async function handleCloseDeadlineJustify() {
+        deadlineJustifyProvided.value = false;
+        deadlineMissModal.value = false;
+        deadlineTaskId.value = null;
+        deadlineProjectId.value = null;
+        deadlineDueDate.value = null
+    }
+
+    return { getTaskTimerData, storeTaskTimer, getStoreTimer, setManualTime, handleMissDeadlineShowTimer, closeDeadlineShowModal, handleCloseDeadlineJustify, timerData, trackedTime, isTImerStopped, deadlineMissModal, deadlineTaskId, deadlineProjectId, deadlineDueDate, deadlineJustifyProvided }
 })

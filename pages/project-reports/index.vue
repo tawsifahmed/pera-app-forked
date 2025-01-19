@@ -170,6 +170,16 @@ const handleChange = (field, event) => {
         endDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     }
 };
+
+const handleReset = () => {
+    startDate.value = '';
+    endDate.value = '';
+    selectedSpaces.value = [];
+    selectedProjects.value = [];
+    previewData.value = null;
+    previewProjectWiseCount.value = null;
+    previewSprintTask.value = null;
+};
 </script>
 <template>
     <div class="card">
@@ -218,7 +228,8 @@ const handleChange = (field, event) => {
                         </template>
 
                         <template #end>
-                            <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
+                            <Button @click="handleReset" label='Reset' class="mr-2" />
+                            <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
                         </template>
                     </Toolbar>
                 </div>

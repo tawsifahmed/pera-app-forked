@@ -7,8 +7,8 @@ import { useAuthStore } from '~/store/auth'; // import the auth store we just cr
 import { useCompanyStore } from '~/store/company';
 import { useActiveCompanyStore } from '~/store/workCompany';
 import Chart from 'primevue/chart';
-
 const companies = useActiveCompanyStore();
+
 // companies.getCompany();
 const { totalCompanies, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
@@ -32,7 +32,6 @@ definePageMeta({
 const { isDarkTheme } = useLayout();
 const products = ref(null);
 
-
 const lineData = ref({
     labels: chartProjectInfo,
     datasets: [
@@ -55,28 +54,30 @@ const lineData = ref({
     ]
 });
 
-
 onMounted(() => {
-    pieChartData.value = setPieChartData();
-    pieChartOptions.value = setPieChartOptions();
+    pieChartOptions.value = setPieChartOptions();  
+
+    watch([completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData], ([cc, ic, uc]) => {
+        if (cc && ic && uc) {
+            pieChartData.value = setPieChartData(cc, ic, uc);
+        }
+    }, { immediate: true }); 
 });
 
 const pieChartData = ref();
 const pieChartOptions = ref();
 
-let cc = localStorage.getItem('completedTasksChartData');
-    let ic = localStorage.getItem('inProgressTasksChartData');
-    let uc = localStorage.getItem('unAssignedTasksChartData');
-const setPieChartData = () => {
+
+const setPieChartData = (cc, ic, uc) => {
     const documentStyle = getComputedStyle(document.body);
- 
+
     return {
         labels: ['Completed', 'In Progress', 'Unassigned'],
         datasets: [
             {
                 data: [cc, ic, uc],
-                backgroundColor: [documentStyle.getPropertyValue('--cyan-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
-                hoverBackgroundColor: [documentStyle.getPropertyValue('--cyan-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
+                backgroundColor: ['#33bd7c', '#0ea5e9', '#475569'],
+                hoverBackgroundColor: ['#1a8251', '#0087c3','#2c3644']
             }
         ]
     };
@@ -147,7 +148,7 @@ const applyLightTheme = () => {
                 },
                 grid: {
                     color: '#ebedef'
-                },
+                }
                 // title: {
                 //     display: true,
                 //     text: 'Projects'
@@ -273,7 +274,7 @@ const handleFilterReset = () => {
         filterStartDate.value = '';
         filterDueDate.value = '';
         projectId.value = '';
-        
+
         sta.value = '';
         selectedStatus.value = '';
         isCalendarSelected.value = false;
@@ -312,7 +313,7 @@ const loadMoreTasks = async (vl) => {
     }
     loadMoreLoading.value = true;
     currentPage.value++;
-    await fetchTasks(projectId.value, sta.value, startD.value , enD.value, currentPage.value);
+    await fetchTasks(projectId.value, sta.value, startD.value, enD.value, currentPage.value);
 };
 
 const fetchTasks = async (projectId = '', status = '', startDate = '', dueDate = '', page = 1) => {
@@ -332,17 +333,16 @@ const fetchTasks = async (projectId = '', status = '', startDate = '', dueDate =
         });
 
         if (data.value && data.value.data && data.value.counts?.total_tasks) {
-            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); 
-            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; 
-            loadMoreLoading.value = false; 
+            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit);
+            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data];
+            loadMoreLoading.value = false;
         } else {
-            taskList.value = []; 
-            loadMoreLoading.value = false; 
+            taskList.value = [];
+            loadMoreLoading.value = false;
         }
-
     } catch (e) {
         console.log(e);
-        loadMoreLoading.value = false; 
+        loadMoreLoading.value = false;
     } finally {
         taskLoading.value = false;
     }
@@ -623,8 +623,8 @@ watch(
                 <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-10rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Project" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Status" class="w-full md:w-10rem mb-2" />
                         <div class="mb-2 relative w-full md:w-8rem">
                             <Calendar @date-select="selectStartFilterDate($event)" v-model="filterStartDate" placeholder="Start Date" class="w-full md:w-8rem" />
                             <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
@@ -672,14 +672,11 @@ watch(
             <div class="card h-full">
                 <h5>Tasks Statistics</h5>
                 <div class="w-full flex justify-content-center">
-
-                    <Chart  type="pie" :data="pieChartData" :options="pieChartOptions" class="w-full md:w-30rem" />
+                    <Chart type="pie" :data="pieChartData" :options="pieChartOptions" class="w-full md:w-30rem" />
                 </div>
 
                 <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
-
             </div>
-            
         </div>
         <div class="col-12 h-full">
             <div class="card dashChart">
@@ -690,22 +687,22 @@ watch(
                     </div>
                     <div class="flex gap-2 flex-wrap dash-inf-right">
                         <!-- {{ cM }} -->
-                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined  />
+                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined />
                         <Button class="nwrp" :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
-                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
+                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined />
                     </div>
                 </div>
                 <div class="chartWrapper">
                     <div class="chartAreaWrapper">
-                      <!-- <canvas id="chart" height="400" width="15000"></canvas> -->
-                      <Chart type="bar" :data="lineData" :options="lineOptions" />
+                        <!-- <canvas id="chart" height="400" width="15000"></canvas> -->
+                        <Chart type="bar" :data="lineData" :options="lineOptions" />
                     </div>
-                  </div>
+                </div>
                 <!-- <div class="chart-container">
                   </div> -->
             </div>
         </div>
-   
+
         <div v-if="visibleCreateCompany">
             <CreateCompany />
         </div>
@@ -755,9 +752,8 @@ watch(
 
 .title-project {
     margin: auto 0;
-   
-        max-width: 200px;
-   
+
+    max-width: 200px;
 }
 
 .title-group {
@@ -797,32 +793,30 @@ watch(
     cursor: default !important;
 }
 
-.nwrp{
+.nwrp {
     text-wrap: nowrap;
 }
 
-.dash-inf{
+.dash-inf {
     @media (max-width: 1024px) {
         flex-direction: column;
         align-items: flex-start;
-        .dash-inf-left{
+        .dash-inf-left {
             justify-content: space-between;
             margin-bottom: 1rem;
             width: 100%;
-            @media(max-width: 500px){
-              flex-direction: column;
-              align-items: start !important;
+            @media (max-width: 500px) {
+                flex-direction: column;
+                align-items: start !important;
             }
         }
-        .dash-inf-right{
+        .dash-inf-right {
             justify-content: flex-end;
             width: 100%;
-            @media(max-width: 500px){
+            @media (max-width: 500px) {
                 justify-content: center;
             }
-            
         }
     }
 }
-
 </style>
