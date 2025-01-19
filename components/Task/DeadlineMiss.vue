@@ -45,7 +45,7 @@ import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 const { getSingleProject, getTaskDetails } = useCompanyStore();
 import { useClockStore } from '~/store/clock';
-const { closeDeadlineShowModal, handleCloseDeadlineJustify } = useClockStore();
+const { closeDeadlineShowModal } = useClockStore();
 const url = useRuntimeConfig();
 const { deadlineTaskId, deadlineProjectId, deadlineDueDate } = defineProps(['deadlineTaskId', 'deadlineProjectId', 'deadlineDueDate']);
 const emit = defineEmits(['closeMissDeadlineModal']);
@@ -60,7 +60,7 @@ const description = ref('');
 
 const hideDialog = () => {
     emit('closeMissDeadlineModal', false);
-    handleCloseDeadlineJustify();
+
 };
 
 const submitJustification = async () => {

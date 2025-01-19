@@ -200,7 +200,28 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (node) => {
+const updateTaskName = async (node, isCtrlKeyPressed = false) => {
+    if (isCtrlKeyPressed) {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
+        };
+        const data = await createTask(newTask);
+        // console.log('data ==>', data?.data);
+        const obj = {
+            ...data?.data,
+            key: data?.data?.id,
+            unique_id: data?.data?.unique_id,
+        }
+        emit('handleTaskDetailView', obj)
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    }
+
     if (node.key === 'new') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
@@ -724,9 +745,44 @@ function removeChild(node = toRaw(tableData.value)) {
             item.children = removeChild(item.children);
         }
     });
-    return (tableData.value = structuredClone(filtered));
+
+    tableData.value = JSON.parse(JSON.stringify(filtered));
+    return tableData.value;
+    // return (tableData.value = structuredClone(filtered));
 }
 
+
+// This will store the column widths
+const columnWidths = ref({});
+
+
+const onColumnResizeEnd = (event) => {
+    const { element, delta } = event; // Get the element and delta (resize change)
+    
+    const columnField = element.getAttribute('data-field'); // Get the column field name
+    let currentWidth = element.offsetWidth; // Get the current width after resizing
+
+    // Calculate the new width by adding delta to the previous width
+    if (columnWidths.value[columnField]) {
+        currentWidth = columnWidths.value[columnField] + delta;
+    }
+
+    columnWidths.value[columnField] = currentWidth; // Store the updated width
+    applyColumnWidths(); // Apply updated widths to the table
+};
+
+const applyColumnWidths = () => {
+    // Loop through all columns and apply the new width
+    const columns = document.querySelectorAll('.p-column'); // Select all column elements
+    columns.forEach((column) => {
+        const columnField = column.getAttribute('data-field'); // Get the column field name
+        const columnWidth = columnWidths.value[columnField];
+
+        if (columnWidth) {
+            column.style.width = `${columnWidth}px`; // Apply the width to each column
+        }
+    });
+    }
 const refreshLoader = ref(false);
 const refreshDisabled = ref(false);
 const handleRefresh = async () => {
@@ -841,6 +897,7 @@ const handleRefresh = async () => {
     </div>
 
     <!-- Tree table -->
+     <!-- old=> -->
     <TreeTable
         v-if="viewMode === 'list'"
         class="table-st"
@@ -855,11 +912,47 @@ const handleRefresh = async () => {
         style="overflow: auto"
         :tableProps="{ style: { minWidth: '1024px' } }"
     >
+
+    <!-- issues -->
+    <!-- scrollable
+    scrollDirection="both"
+    style="overflow: auto" -->
+    <!-- issues -->
+
+    <!-- <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        :resizableColumns="true"
+        :tableProps="{ style: { minWidth: '1024px' } }"
+> -->
+    <!-- <TreeTable
+        v-if="viewMode === 'list'"
+        class="table-st"
+        stripedRows
+        :value="tableData"
+        scrollable
+        scrollDirection="both"
+        v-model:expandedKeys="expandedKeys"
+        :lazy="true"
+        :loading="tableLoader"
+        filterDisplay="menu"
+        style="overflow: auto"
+        :resizableColumns="true"
+        showGridlines 
+        :tableProps="{ style: { minWidth: '1024px' } }"
+        @columnResizeEnd="onColumnResizeEnd"
+    > -->
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class=" " expander :style="{ width: '45%' }" :showAddButton="true">
+        <Column field="name" header="Name" class="" expander :style="{ width: '45%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -904,6 +997,14 @@ const handleRefresh = async () => {
 
                         <form
                             v-if="slotProps.node.key == 'new'"
+                            @keydown="
+                                (e) => {
+                                    if (e.key === 'Enter' && e.ctrlKey) {
+                                        e.preventDefault();
+                                        updateTaskName(slotProps.node, true);
+                                    }
+                                }
+                            "
                             :onsubmit="
                                 (e) => {
                                     e.preventDefault();
@@ -918,7 +1019,7 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
+        <Column field=""  header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
             <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key">
@@ -1402,10 +1503,22 @@ const handleRefresh = async () => {
     align-items: center;
 }
 
+.col-1 {
+    width: 45%;
+}
+
+// .p-resizable-column {
+//     width: 45%;
+// }
+
 .table-st thead th:hover {
-    /*border: 2px solid #e2e8f0;
-    border-top: none;
-    border-bottom: 1px solid #e2e8f0;*/
+    // border: 1px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
+
+    // border: 2px solid #e2e8f0;
+    // border-top: none;
+    // border-bottom: 1px solid #e2e8f0;
 }
 
 .table-st table {
