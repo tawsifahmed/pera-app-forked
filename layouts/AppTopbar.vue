@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useUserStore } from '~/store/user';
 import { useClockStore } from '~/store/clock';
 import { messaging } from '~/composables/firebase';
-import { onMessage } from "firebase/messaging";
+import { onMessage } from 'firebase/messaging';
 
 import Password from 'primevue/password';
 // import clickOutside from '../composables/clickOutside';
@@ -121,10 +121,6 @@ const vClickOutside = {
 };
 
 // Add directive to DOM element
-onMounted(() => {
-    const element = document.querySelector('.relative');
-    vClickOutside?.beforeMount(element, { value: handleOutsideClick });
-});
 
 onUnmounted(() => {
     const element = document.querySelector('.relative');
@@ -148,10 +144,26 @@ const onChangeTheme = (theme, mode) => {
 
 const onDarkModeChange = (value) => {
     const newThemeName = value ? layoutConfig.theme.value.replace('light', 'dark') : layoutConfig.theme.value.replace('dark', 'light');
-
+    console.log('New Theme: ==>', newThemeName);
+    if (value) {
+        localStorage.setItem('mode', 'dark');
+    } else {
+        localStorage.setItem('mode', 'light');
+    }
     layoutConfig.darkTheme.value = value;
     onChangeTheme(newThemeName, value);
 };
+
+onMounted(() => {
+    const element = document.querySelector('.relative');
+    vClickOutside?.beforeMount(element, { value: handleOutsideClick });
+    const mode = localStorage.getItem('mode');
+    if (mode === 'dark') {
+        onDarkModeChange(true);
+    } else {
+        onDarkModeChange(false);
+    }
+});
 
 const notifiData = ref(false);
 const fetchNotifyData = async () => {
@@ -235,7 +247,6 @@ if (timerData.value) {
     piniaTID.value = timerData.value?.task_id;
 }
 
-
 if (storeTaskCompanyID) {
     timerCompanyID.value = storeTaskCompanyID;
 }
@@ -312,23 +323,21 @@ const closeSearch = (evn) => {
     visibleTop.value = false;
 };
 
-
-const closeMissDeadlineModal =  () => {
+const closeMissDeadlineModal = () => {
     deadlineMissModal.value = false;
     handleCloseDeadlineJustify();
-}
+};
 
 const handleCloseDeadline = () => {
     deadlineMissModal.value = false;
     handleCloseDeadlineJustify();
-}
+};
 
 // Notification
-onMessage(messaging,(message)=>{
-    console.log(message)
-    toast.add({ severity: 'contrast', summary: message.notification.title, detail: message.notification.body, life: 3000 })
-})
-
+onMessage(messaging, (message) => {
+    console.log(message);
+    toast.add({ severity: 'contrast', summary: message.notification.title, detail: message.notification.body, life: 3000 });
+});
 </script>
 
 <template>
@@ -362,16 +371,19 @@ onMessage(messaging,(message)=>{
             <!-- <pre>{{ userProfile }}</pre> -->
 
             <!-- darkmode -->
-            <!-- <section v-tooltip.left="{ value: layoutConfig.darkTheme.value ? 'Turn Off Dark Mode' : 'Dark Mode' }" class="flex align-items-center pr-2 justify-content-between surface-border">
-           
-                <InputSwitch :modelValue="layoutConfig.darkTheme.value" @update:modelValue="onDarkModeChange" />
-            </section> -->
+            <!-- <Button @click="() => onDarkModeChange(false)" class="p-link layout-topbar-button" v-if="layoutConfig.darkTheme.value" text rounded aria-label="Filter">
+                <i class="pi pi-moon"></i>
+            </Button>
+            <Button @click="() => onDarkModeChange(true)" class="p-link layout-topbar-button" v-else text rounded aria-label="Filter">
+                <i class="pi pi-sun"></i>
+            </Button> -->
+
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
             <!-- <pre>{{ showNotify}}</pre> -->
 
             <!-- <pre>valueID{{timerTaskId}}</pre> -->
-            <button class="p-link layout-topbar-button mr-1" @click="visibleTop = true" style="padding-top: 0.1rem">
+            <button class="p-link layout-topbar-button ml-0" @click="visibleTop = true" style="padding-top: 0.1rem">
                 <i class="pi pi-search"></i>
                 <span>Search</span>
             </button>
@@ -430,7 +442,7 @@ onMessage(messaging,(message)=>{
             <Profile :userProfile="userProfile" />
         </Dialog>
         <Dialog v-model:visible="deadlineMissModal" modal header="Deadline Miss Justification" @update:visible="handleCloseDeadline" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <TaskDeadlineMiss @closeMissDeadlineModal="closeMissDeadlineModal($event)" :deadlineTaskId="deadlineTaskId" :deadlineProjectId="deadlineProjectId" :deadlineDueDate="deadlineDueDate"  />
+            <TaskDeadlineMiss @closeMissDeadlineModal="closeMissDeadlineModal($event)" :deadlineTaskId="deadlineTaskId" :deadlineProjectId="deadlineProjectId" :deadlineDueDate="deadlineDueDate" />
         </Dialog>
         <Dialog v-model:visible="visibleTop" modal header="Search" dismissableMask="true" position="top" class="search-container">
             <Search @closeSearch="closeSearch($event)" />
