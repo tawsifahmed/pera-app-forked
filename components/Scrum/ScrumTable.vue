@@ -151,12 +151,11 @@ const onPage = async (e) => {
                 </div>
             </template>
         </Column>
-        <!-- <Column style="width: 3%" field="actions" header="Actions">
+        <Column style="width: 3%" field="actions" header="Actions">
             <template #body="slotProps">
-                <Button severity="info" rounded text type="button" @click="handleEdit(slotProps)" icon="pi pi-pencil" class=""></Button>
-                <Button severity="danger" rounded text type="button" @click="handleDelete(slotProps?.data?.id)" icon="pi pi-trash" class=""></Button>
+                <Button severity="info" rounded text type="button" @click="() => handleRowClick(toRaw(slotProps.data))" icon="pi pi-pencil" class="">View</Button>
             </template>
-        </Column> -->
+        </Column>
     </DataTable>
 
     <!-- View Modal -->

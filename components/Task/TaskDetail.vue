@@ -21,8 +21,8 @@ const url = useRuntimeConfig();
 const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
-const { getTaskTimerData, setManualTime, storeTaskTimer } = useClockStore();
-const { trackedTime } = storeToRefs(useClockStore());
+const { getTaskTimerData, setManualTime, storeTaskTimer, handleMissDeadlineShowTimer } = useClockStore();
+const { trackedTime, deadlineJustifyProvided } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
 
@@ -81,8 +81,10 @@ watch(dueDate, (newVal, oldVal) => {
 });
 
 const checkDate = ref(dueDate.value);
+const isDateEdited = ref(false);
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
+        isDateEdited.value = true;
         checkDate.value = new Date(newValue).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase();
     }
 });
@@ -228,14 +230,35 @@ const taskCommentInput = ref(null);
 const selectedfile = ref();
 
 const showActivitiyBtn = ref(true);
+const showJustificationBtn = ref(true);
 const activityDiv = ref(false);
+const justificationDiv = ref(false);
+
 const showActivitiy = () => {
     activityDiv.value = true;
     showActivitiyBtn.value = false;
+    showJustificationBtn.value = false;
+};
+
+const showJustification = () => {
+    justificationDiv.value = true;
+    showJustificationBtn.value = false;
+    showActivitiyBtn.value = false;
+};
+
+const formattedAct = (act) => {
+    return `${act.reason}<br>Type: ${act.type} - ${formattedTime(act.created_at)}`;
+};
+
+const hideJustification = () => {
+    justificationDiv.value = false;
+    showJustificationBtn.value = true;
+    showActivitiyBtn.value = true;
 };
 const hideActivity = () => {
     activityDiv.value = false;
     showActivitiyBtn.value = true;
+    showJustificationBtn.value = true;
 };
 
 const handleTaskComment = async () => {
@@ -298,10 +321,19 @@ const handleTaskDetailSubmit = async () => {
         dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
     }
 
+    if (taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true) {
+        console.log('checkDate.value', checkDate.value);
+        handleMissDeadlineShowTimer(taskDetails.value?.id, projID, taskDetailData.dueDate); // Call the showDeadline function
+        delete taskDetailData.dueDate;
+    }
+
+    // Send data without due date if taskDetails.parent_task_id is null
+
     await editTask(taskDetailData);
     if (isTaskEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Task detail updated', group: 'br', life: 3000 });
         selectedfile.value = null;
+        editorViewMode.value = 'preview';
         if (isDescriptionEdited.value === true) {
             isDescriptionEdited.value = false;
             console.log('isDescriptionEdited Flagged');
@@ -314,10 +346,24 @@ const handleTaskDetailSubmit = async () => {
             isTagsEdited.value = false;
             console.log('isTagsEdited Flagged');
         }
+        if (isDateEdited.value === true) {
+            isDateEdited.value = false;
+            console.log('isDateEdited Flagged');
+        }
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
     }
 };
+
+watch(deadlineJustifyProvided, (newVal) => {
+        if (newVal === true) {
+
+        }
+        if (newVal === false) {
+            dueDate.value =taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null
+            // checkDate.value = dueDate.value;
+        }
+});
 
 const file = ref(null);
 
@@ -550,6 +596,12 @@ const handleViews = (data) => {
     editorViewMode.value = data;
 };
 
+const editorPreview = ref(false);
+const handleEditorView = () => {
+    editorViewMode.value = 'edit';
+    editorPreview.value = true;
+};
+
 const handleCommentViews = (data) => {
     commentEditorViewMode.value = data;
 };
@@ -606,6 +658,7 @@ const modules = {
         source: function (searchTerm, renderList) {
             const matches = mentionList.filter((item) => item.value.toLowerCase().includes(searchTerm.toLowerCase()));
             renderList(matches);
+            adjustMentionListPosition();
         },
         renderItem: function (item) {
             return `${item.value}`;
@@ -620,12 +673,36 @@ const modules = {
     }
 };
 
+const adjustMentionListPosition = () => {
+    const mentionList = document.querySelector('.ql-mention-list-container');
+    const editor = document.querySelector('.ql-editor');
+
+    if (!mentionList || !editor) return;
+
+    const editorRect = editor.getBoundingClientRect();
+    const mentionRect = mentionList.getBoundingClientRect();
+
+    if (mentionRect.right > editorRect.right) {
+        mentionList.style.left = `227px`;
+        // mentionList.style.left = `${editorRect.width - mentionRect.width}px`;
+    }
+
+    //   For top ==>
+    //   if (mentionRect.bottom > editorRect.bottom) {
+    //     mentionList.style.top = `${editorRect.bottom - mentionRect.height}px`;
+    //   }
+};
+
 // Move Task
 const op = ref('');
 const moveTaskData = ref([]);
 const moveSearch = ref('');
 const handleMoveTask = (event) => {
     op.value.toggle(event);
+};
+
+const hideMoveTask = () => {
+    op.value.hide();
 };
 const moveTaskFetch = async (query) => {
     const token = useCookie('token');
@@ -658,27 +735,76 @@ const handleTaskMove = async (selectedTask) => {
 watch(moveSearch, () => {
     moveTaskFetch(moveSearch.value);
 });
+
+const editCliked = ref(false);
+const taskNameInput = ref('');
+const editname = () => {
+    editCliked.value = true;
+    taskNameInput.value = taskDetails.value.name;
+    const inputT = document.getElementById(`dTaskName`);
+    nextTick(() => {
+        if (inputT) {
+            inputT.focus();
+        }
+    });
+};
+
+const handletaskNameUpdate = async () => {
+    const taskDetailData = {
+        id: taskDetails.value?.id,
+        name: taskNameInput.value,
+        project_id: projID
+    };
+    await editTask(taskDetailData);
+    if (isTaskEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task name updated', group: 'br', life: 3000 });
+        editCliked.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task name', group: 'br', life: 3000 });
+    }
+};
 </script>
 
 <template>
     <div class="grid">
-        <div class="col-12 flex justify-content-between">
-            <h5 class="m-0 detail-task-name cursor-pointer">
+        <div class="col-12 lg:col-7 flex justify-content-start align-items-center" :class="editCliked === true ? 'gap-1' : 'gap-2'">
+            <h5 class="m-0 detail-task-name cursor-pointer" :style="editCliked === true ? 'display: none;' : 'display: block;'" :title="taskDetails.name">
                 {{ taskDetails.name }}
             </h5>
-            <div class="flex gap-1">
+            <span style="min-width: auto; width: 95%" :style="editCliked === true ? 'display: block;' : 'display: none;'">
+                <InputText :id="`dTaskName`" class="w-full d-edit-name-input" v-model="taskNameInput" type="text" placeholder="Edit task name" />
+            </span>
+            <Button v-if="editCliked === false" @click="editname" v-tooltip.top="`Edit Name`" severity="secondary" icon="pi pi-pencil" class="p-1 w-fit h-full" />
+            <Button
+                v-if="editCliked === true"
+                @click="handletaskNameUpdate"
+                v-tooltip.top="`Update Name`"
+                severity="secondary"
+                icon="pi pi-check"
+                class="p-1 w-fit h-full"
+                :style="editCliked === true ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
+            />
+            <Button
+                v-if="editCliked === true"
+                @click="editCliked = false"
+                v-tooltip.top="`Cancel`"
+                severity="secondary"
+                icon="pi pi-minus"
+                class="p-1 w-fit h-full"
+                :style="editCliked === true ? 'font-size: 0.8rem !important; height: fit-content !important;' : ''"
+            />
+        </div>
+        <div class="col-12 lg:col-5 flex justify-content-between align-items-center">
+            <h5 class="m-0 ml-2">Activity</h5>
+            <div class="flex gap-1 align-items-center">
                 <span @click="handleMoveTask" v-tooltip.top="{ value: 'Move Task' }" class="pi pi-eject my-auto cursor-pointer share-btn pl-2"></span>
-                <div @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="flex justify-content-start gap-2 align-items-center cursor-pointer uniq-id-wrapper share-btn">
-                    <span class="ml-1 text-lg pi pi-copy my-auto cursor-pointer" style="padding-top: 1px"> </span>
-                    <span>
-                        {{ truncatedUniqueId }}
-                    </span>
-                </div>
-                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-2 share-btn"></span>
-                <h5 class="m-0 ml-2">Activity</h5>
+                <span @click="handleShare" v-tooltip.top="{ value: 'Share Task' }" class="pi pi-share-alt my-auto cursor-pointer ml-1 mr-1 share-btn"></span>
+                <span @click="handleShareTaskId" v-tooltip.top="{ value: 'Copy Task ID' }" class="ml-1 text-lg pi pi-copy my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
+                <span v-tooltip.top="{ value: `Created by ${taskDetails.created_by.name}` }" class="mr-2 ml-1 text-lg pi pi-user my-auto cursor-pointer share-btn" style="padding-top: 1px"> </span>
             </div>
         </div>
-        <div class="col-12 lg:col-7">
+
+        <div class="col-12 lg:col-7 pt-0">
             <div>
                 <!-- <pre>{{singleTask.key}}</pre> -->
                 <!-- <pre>api task detail => {{taskDetails}}</pre> -->
@@ -696,7 +822,7 @@ watch(moveSearch, () => {
                                             <p class="text-nowrap">Due Date:</p>
                                         </div>
                                         <FloatLabel class="input-fields">
-                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate" placeholder="Set Due Date" showTime hourFormat="12" @date-select="handleDateChange($event)" />
+                                            <Calendar :style="`width: 164.94px; border-radius:7px;height:36px`" v-model="dueDate" placeholder="Set Due Date" showTime hideOnDateTimeSelect hourFormat="12" @date-select="handleDateChange($event)" />
                                         </FloatLabel>
                                     </div>
                                     <div class="flex justify-content-between gap-2 align-items-centertask-detail-wrapper mt-3 mb-3">
@@ -833,7 +959,7 @@ watch(moveSearch, () => {
 
                                 <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
 
-                                <MdEditor v-else v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1008,12 +1134,17 @@ watch(moveSearch, () => {
                 </div>
             </div>
         </div>
-        <div class="col-12 lg:col-5">
+        <div class="col-12 lg:col-5 pt-0">
             <div>
                 <div class="comment-wrapper card no-scrollbar">
                     <div class="comments no-scrollbar">
-                        <div class="my-2 text-surface-800">
-                            <Button @click="showActivitiy" label="↓  Show More" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                        <div :class="showActivitiyBtn === true ? 'flex gap-2' : ''">
+                            <div class="my-2 text-surface-800">
+                                <Button @click="showActivitiy" label="↓  History" v-if="showActivitiyBtn" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
+                            <div class="my-2 text-surface-800">
+                                <Button @click="showJustification" label="↓  Justification" v-if="showJustificationBtn && taskDetails.deadline_miss_details.length > 0" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
                         </div>
                         <div v-if="activityDiv">
                             <ul v-for="act in taskActivity" :key="act" style="margin-left: -15px; margin-top: -6px">
@@ -1021,6 +1152,25 @@ watch(moveSearch, () => {
                             </ul>
                             <div class="my-2 text-surface-800">
                                 <Button @click="hideActivity" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
+                            </div>
+                        </div>
+                        <div v-if="justificationDiv">
+                            <p class="mb-0">Deadline Missed: {{ taskDetails?.deadline_miss_count?.missed }}</p>
+                            <p>Deadline Extended: {{ taskDetails?.deadline_miss_count?.extend }}</p>
+
+                            <ul v-for="act in taskDetails.deadline_miss_details" :key="act" style="margin-left: -15px; margin-top: -6px">
+                                <li style="font-size: smaller !important">
+                                    <div class="flex flex-column align-items-start justify-content-start">
+                                        <span v-html="act.reason"></span>
+                                        <span class="capitalize">
+                                            <i> Type: {{ act.type }} - {{ formattedTime(act.created_at) }} </i>
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <div class="my-2 text-surface-800">
+                                <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
                         <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
@@ -1141,7 +1291,10 @@ watch(moveSearch, () => {
     <OverlayPanel ref="op">
         <div class="flex flex-column gap-3 w-25rem">
             <div>
-                <span class="font-medium text-900 block mb-2">Move this Task</span>
+                <div class="flex justify-content-between align-items-center">
+                    <span class="font-medium text-900 block mb-2">Move this Task</span>
+                    <Button style="border: none !important" icon="pi pi-times" severity="danger" rounded outlined aria-label="Cancel" class="mCrossIcon" @click="hideMoveTask" />
+                </div>
                 <!-- <pre>{{ moveTaskData }}</pre> -->
                 <InputGroup>
                     <InputText v-model="moveSearch" placeholder="Search Task" class="w-25rem"></InputText>
@@ -1515,7 +1668,7 @@ input[type='file']::file-selector-button:hover {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
-    max-width: 85%;
+    max-width: 94%;
 }
 
 .text-danger {
@@ -1606,7 +1759,7 @@ a {
 /* Css for mention container */
 .ql-mention-list-container {
     max-height: 150px;
-    max-width: 250px;
+    max-width: 200px;
     overflow-y: auto;
     background: #fff;
     border: 1px solid #ccc;
@@ -1690,5 +1843,17 @@ a {
 
 .mention-dropdown li:hover {
     background-color: #f0f0f0;
+}
+
+.d-edit-name-input {
+    padding: 0.25rem 0.75rem !important;
+}
+
+.mCrossIcon {
+    padding-top: 0 !important;
+}
+
+.mCrossIcon:hover {
+    background: none !important;
 }
 </style>

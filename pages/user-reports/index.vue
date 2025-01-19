@@ -188,6 +188,14 @@ const init = async () => {
 onMounted(() => {
     init();
 });
+
+const handleReset = () => {
+    employee.value = '';
+    selectedProject.value = [];
+    startDate.value = '';
+    endDate.value = '';
+    previewData.value = null;
+};
 </script>
 <template>
     <div class="card">
@@ -236,7 +244,8 @@ onMounted(() => {
             </template>
 
             <template #end>
-                <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
+                <Button @click="handleReset" label='Reset' class="mr-2" />
+                <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
             </template>
         </Toolbar>
     </div>
