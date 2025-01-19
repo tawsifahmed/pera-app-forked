@@ -55,17 +55,20 @@ const lineData = ref({
 });
 
 onMounted(() => {
-    pieChartData.value = setPieChartData();
-    pieChartOptions.value = setPieChartOptions();
+    pieChartOptions.value = setPieChartOptions();  
+
+    watch([completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData], ([cc, ic, uc]) => {
+        if (cc && ic && uc) {
+            pieChartData.value = setPieChartData(cc, ic, uc);
+        }
+    }, { immediate: true }); 
 });
 
 const pieChartData = ref();
 const pieChartOptions = ref();
 
-let cc = localStorage.getItem('completedTasksChartData');
-let ic = localStorage.getItem('inProgressTasksChartData');
-let uc = localStorage.getItem('unAssignedTasksChartData');
-const setPieChartData = () => {
+
+const setPieChartData = (cc, ic, uc) => {
     const documentStyle = getComputedStyle(document.body);
 
     return {
