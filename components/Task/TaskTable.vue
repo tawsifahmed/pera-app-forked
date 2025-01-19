@@ -200,7 +200,28 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (node) => {
+const updateTaskName = async (node, isCtrlKeyPressed = false) => {
+    if (isCtrlKeyPressed) {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
+        };
+        const data = await createTask(newTask);
+        // console.log('data ==>', data?.data);
+        const obj = {
+            ...data?.data,
+            key: data?.data?.id,
+            unique_id: data?.data?.unique_id,
+        }
+        emit('handleTaskDetailView', obj)
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    }
+
     if (node.key === 'new') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
@@ -724,7 +745,10 @@ function removeChild(node = toRaw(tableData.value)) {
             item.children = removeChild(item.children);
         }
     });
-    return (tableData.value = structuredClone(filtered));
+
+    tableData.value = JSON.parse(JSON.stringify(filtered));
+    return tableData.value;
+    // return (tableData.value = structuredClone(filtered));
 }
 
 
@@ -734,9 +758,6 @@ const columnWidths = ref({});
 
 const onColumnResizeEnd = (event) => {
     const { element, delta } = event; // Get the element and delta (resize change)
-    console.log('event ==>', event);
-    console.log('delta', delta);
-    console.log('element', element);
     
     const columnField = element.getAttribute('data-field'); // Get the column field name
     let currentWidth = element.offsetWidth; // Get the current width after resizing
@@ -976,6 +997,14 @@ const handleRefresh = async () => {
 
                         <form
                             v-if="slotProps.node.key == 'new'"
+                            @keydown="
+                                (e) => {
+                                    if (e.key === 'Enter' && e.ctrlKey) {
+                                        e.preventDefault();
+                                        updateTaskName(slotProps.node, true);
+                                    }
+                                }
+                            "
                             :onsubmit="
                                 (e) => {
                                     e.preventDefault();

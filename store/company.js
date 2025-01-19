@@ -613,6 +613,7 @@ export const useCompanyStore = defineStore('workStation', {
                     if (taskIdInLclStrg) {
                         this.getTaskDetails(taskIdInLclStrg);
                     }
+                    return data.value
                 }
             }
         },
