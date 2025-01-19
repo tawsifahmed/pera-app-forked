@@ -163,13 +163,13 @@ const switchCompanyHandler = async (switchCompId) => {
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="deleteCompanyDialog" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="deleteCompanyDialog" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteCompanyDialog = false" />
             <Button label="Yes" icon="pi pi-check" text @click="deletingCompany" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleEditCompany" modal header="Edit Company" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditCompany" modal header="Edit Company" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <EditCompany :refCompanyId="refCompanyId" @closeEditModal="closeEditModal($event)" />
         </Dialog>
     </div>

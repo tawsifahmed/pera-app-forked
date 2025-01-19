@@ -203,7 +203,9 @@ const selectedProject = ref();
 const statuses = ref();
 
 const filterStatus = ref();
+const filterStartDate = ref();
 const filterDueDate = ref();
+const isCalendarStartSelected = ref(false);
 const isCalendarSelected = ref(false);
 const taskLoading = ref(false); // Add loading state
 
@@ -215,6 +217,7 @@ const selectedStatus = ref();
 
 const projectId = ref();
 const sta = ref();
+const startD = ref();
 const enD = ref();
 const crrPage = ref(1);
 let currentPage = ref(1); // New variable for current page
@@ -222,6 +225,7 @@ let currentPage = ref(1); // New variable for current page
 const filterTasks = async () => {
     projectId.value = selectedProject.value ? selectedProject.value.id : '';
     sta.value = selectedStatus.value ? selectedStatus.value.id : '';
+    startD.value = filterStartDate.value;
     enD.value = filterDueDate.value;
 
     if (isLoadMoreClicked) {
@@ -231,14 +235,27 @@ const filterTasks = async () => {
     }
     crrPage.value = currentPage.value;
     totalPages.value = 0;
-    fetchTasks(projectId.value, sta.value, enD.value, crrPage.value);
+    fetchTasks(projectId.value, sta.value, startD.value, enD.value, crrPage.value);
     isLoadMoreClicked = false;
 };
 
+const selectStartFilterDate = (newDate) => {
+    isCalendarStartSelected.value = true;
+    const date = new Date(newDate);
+    filterStartDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    filterTasks();
+};
 const selectFilterDate = (newDate) => {
     isCalendarSelected.value = true;
     const date = new Date(newDate);
     filterDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    filterTasks();
+};
+
+const handleStartDateDelete = () => {
+    isCalendarStartSelected.value = false;
+    filterStartDate.value = '';
+    enD.value = '';
     filterTasks();
 };
 
@@ -250,14 +267,17 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if (selectedProject.value || filterStatus.value || filterDueDate.value || currentPage.value > 1) {
+    if (selectedProject.value || filterStatus.value || filterStartDate.value || filterDueDate.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
+        filterStartDate.value = '';
         filterDueDate.value = '';
         projectId.value = '';
+        
         sta.value = '';
         selectedStatus.value = '';
         isCalendarSelected.value = false;
+        isCalendarStartSelected.value = false;
         filterTasks();
     } else {
         return;
@@ -292,11 +312,11 @@ const loadMoreTasks = async (vl) => {
     }
     loadMoreLoading.value = true;
     currentPage.value++;
-    await fetchTasks(projectId.value, sta.value, enD.value, currentPage.value);
+    await fetchTasks(projectId.value, sta.value, startD.value , enD.value, currentPage.value);
 };
 
-const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) => {
-    const limit = 15;
+const fetchTasks = async (projectId = '', status = '', startDate = '', dueDate = '', page = 1) => {
+    const limit = 30;
     if (!hideLoading.value) {
         taskLoading.value = true;
     }
@@ -304,29 +324,27 @@ const fetchTasks = async (projectId = '', status = '', dueDate = '', page = 1) =
 
     try {
         const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
+        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/list?start_due_date=${startDate}&end_due_date=${dueDate}&status=${status}&project_id=${projectId}&limit=${limit}&page=${page}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         });
 
-        // Update taskList only if data is valid and total pages are available
         if (data.value && data.value.data && data.value.counts?.total_tasks) {
-            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); // Calculate total pages
-            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; // Concat for subsequent pages
-            loadMoreLoading.value = false; // Reset loading flag after fetch
+            totalPages.value = Math.ceil(data.value.counts.total_tasks / limit); 
+            taskList.value = page === 1 ? data.value.data : [...taskList.value, ...data.value.data]; 
+            loadMoreLoading.value = false; 
         } else {
-            taskList.value = []; // Clear taskList if no data or pagination info
-            loadMoreLoading.value = false; // Reset loading flag after fetch
+            taskList.value = []; 
+            loadMoreLoading.value = false; 
         }
 
-        console.log('Task list: ', taskList.value);
     } catch (e) {
         console.log(e);
-        loadMoreLoading.value = false; // Reset loading flag after fetch
+        loadMoreLoading.value = false; 
     } finally {
-        taskLoading.value = false; // Reset loading flag after fetch
+        taskLoading.value = false;
     }
 };
 
@@ -369,22 +387,21 @@ watch(
 <template>
     <!-- <pre>{{ totalProjects }}</pre> -->
     <div class="grid">
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink to="/companies" class="flex justify-content-between mb-3">
                     <div>
                         <span class="block text-500 font-medium mb-3">Company</span>
-                        <!-- <pre>{{totalCompanies}}</pre> -->
                         <div class="text-900 font-medium text-xl">{{ totalCompanies ? totalCompanies : '0' }}</div>
                     </div>
                     <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 2.5rem; height: 2.5rem">
                         <i class="pi pi-microsoft text-blue-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">24 new </span> -->
-                <!-- <span class="text-500">since last visit</span> -->
+                 <span class="text-green-500 font-medium">24 new </span>
+                 <span class="text-500">since last visit</span> 
             </div>
-        </div>
+        </div> -->
 
         <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
@@ -417,7 +434,7 @@ watch(
             </div>
         </div> -->
 
-        <div class="col-12 lg:col-6 xl:col-3">
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readEmployee" to="/employees" class="flex justify-content-between mb-3">
                     <div>
@@ -437,11 +454,12 @@ watch(
                         <i class="pi pi-user text-purple-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readRole" to="/roles" class="flex justify-content-between mb-3">
                     <div>
@@ -461,11 +479,11 @@ watch(
                         <i class="pi pi-user-edit text-red-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
-        <div class="col-12 lg:col-6 xl:col-3">
+        </div> -->
+        <!-- <div class="col-12 lg:col-6 xl:col-3">
             <div class="card mb-0">
                 <NuxtLink v-if="readTags" to="/tags" class="flex justify-content-between mb-3">
                     <div>
@@ -485,10 +503,11 @@ watch(
                         <i class="pi pi-tags text-green-500 text-xl"></i>
                     </div>
                 </NuxtLink>
-                <!-- <span class="text-green-500 font-medium">85 </span>
-                <span class="text-500">responded</span> -->
+                <span class="text-green-500 font-medium">85 </span>
+                <span class="text-500">responded</span>
             </div>
-        </div>
+        </div> -->
+
         <!-- 
         <div class="col-12 xl:col-6">
             <div class="card">
@@ -601,13 +620,17 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <div class="flex gap-2 align-items-center flex-wrap" style="padding: 10px">
+                <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-12rem mb-2" />
-                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-12rem mb-2" />
-                        <div class="mb-2 relative w-full md:w-12rem">
-                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Select Date" class="w-full md:w-12rem" />
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full md:w-10rem mb-2" />
+                        <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Select Status" class="w-full md:w-10rem mb-2" />
+                        <div class="mb-2 relative w-full md:w-8rem">
+                            <Calendar @date-select="selectStartFilterDate($event)" v-model="filterStartDate" placeholder="Start Date" class="w-full md:w-8rem" />
+                            <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                        </div>
+                        <div class="mb-2 relative w-full md:w-8rem">
+                            <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Due Date" class="w-full md:w-8rem" />
                             <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
                         </div>
                         <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
@@ -626,7 +649,7 @@ watch(
                                 <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
                                 <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                                <p>{{ task?.project_name }}</p>
+                                <p class="title-project line-clamp-1">{{ task?.project_name }}</p>
                             </div>
                             <div>
                                 <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
@@ -660,16 +683,16 @@ watch(
         </div>
         <div class="col-12 h-full">
             <div class="card dashChart">
-                <div class="flex justify-content-between align-items-center ">
-                    <div class="flex align-items-center gap-3">
+                <div class="flex justify-content-between align-items-start dash-inf">
+                    <div class="flex align-items-center gap-3 dash-inf-left">
                         <h5 class="mb-0">Projects Overview</h5>
-                        <Button :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
+                        <Button class="nwrp" :label="`Total Projects: ${totalDashboardProjects}`" severity="secondary" />
                     </div>
-                    <div class="flex gap-2" >
+                    <div class="flex gap-2 flex-wrap dash-inf-right">
                         <!-- {{ cM }} -->
-                        <Button :label="`In Progress: ${inProgressTasksChartData}`" class="" severity="info" outlined  />
-                        <Button :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
-                        <Button :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
+                        <Button class="nwrp" :label="`In Progress: ${inProgressTasksChartData}`" severity="info" outlined  />
+                        <Button class="nwrp" :label="`Unassigned: ${unAssignedTasksChartData}`" severity="help" outlined />
+                        <Button class="nwrp" :label="`Completed: ${completedTasksChartData}`" severity="contrast" outlined  />
                     </div>
                 </div>
                 <div class="chartWrapper">
@@ -689,7 +712,7 @@ watch(
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .filter-container {
     padding: 0 10px;
 }
@@ -730,6 +753,13 @@ watch(
     max-width: 300px;
 }
 
+.title-project {
+    margin: auto 0;
+   
+        max-width: 200px;
+   
+}
+
 .title-group {
     display: flex;
     align-items: center;
@@ -767,5 +797,32 @@ watch(
     cursor: default !important;
 }
 
+.nwrp{
+    text-wrap: nowrap;
+}
+
+.dash-inf{
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: flex-start;
+        .dash-inf-left{
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            width: 100%;
+            @media(max-width: 500px){
+              flex-direction: column;
+              align-items: start !important;
+            }
+        }
+        .dash-inf-right{
+            justify-content: flex-end;
+            width: 100%;
+            @media(max-width: 500px){
+                justify-content: center;
+            }
+            
+        }
+    }
+}
 
 </style>

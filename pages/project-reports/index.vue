@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
 import RadioButton from 'primevue/radiobutton';
 
-const { totalProjects } = storeToRefs(useActiveCompanyStore());
+const { totalProjectsforReport, totalSpaces } = storeToRefs(useActiveCompanyStore());
 
 const url = useRuntimeConfig();
 definePageMeta({
@@ -13,11 +13,41 @@ definePageMeta({
 const startDate = ref('');
 
 const endDate = ref('');
-const selectedProject = ref();
+const selectedSpaces = ref();
+const projectList = ref([])
+const selectedProjects = ref(); 
 const previewData = ref(null);
+const previewProjectWiseCount = ref(null);
+const previewSprintTask = ref(null);
 const loading = ref(false);
 const loading1 = ref(false);
 const toast = useToast();
+
+onMounted(() => {
+    if (!selectedSpaces.value || selectedSpaces.value.length === 0) {
+        // Make sure the totalProjectsforReport has data before assigning
+        if (totalProjectsforReport.value && totalProjectsforReport.value.length > 0) {
+            projectList.value = [...totalProjectsforReport.value];  // Use spread to ensure reactivity
+        } else {
+            projectList.value = [];
+        }
+    }
+});
+
+watch(selectedSpaces, (newVal) => {
+    if (newVal && newVal.length > 0) {
+        // Concatenate all projects from selectedSpaces
+        const concatenatedProjects = newVal.flatMap(space => space.projects);
+        projectList.value = concatenatedProjects;
+    } else {
+        // Reset projectList to totalProjectsforReport if no spaces are selected
+        if (totalProjectsforReport.value && totalProjectsforReport.value.length > 0) {
+            projectList.value = [...totalProjectsforReport.value];  // Ensure reactivity by using spread operator
+        } else {
+            projectList.value = [];
+        }
+    }
+});
 
 // Date Formatter
 const dateFormatter = (data) => {
@@ -40,12 +70,16 @@ const handleGenerate = async () => {
     loading.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    // const formData = new FormData();
-    // formData.append('user_id[]', userIds);
+    let spaceIds 
+    if(selectedSpaces.value && selectedSpaces.value.length > 0) {
+        spaceIds = selectedSpaces.value?.map((item) => item.id);
+        console.log('Space ID', spaceIds);
+    }
+
     let projectIds
     // Only append project IDs if there are valid projects selected
-    if (selectedProject.value && selectedProject.value.length > 0) {
-        projectIds = selectedProject.value?.map((item) => item.id);
+    if (selectedProjects.value && selectedProjects.value.length > 0) {
+        projectIds = selectedProjects.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
         // formData.append('project_id', projectIds);
         // if (projectIds.length > 0) {
@@ -55,12 +89,12 @@ const handleGenerate = async () => {
         // }
     }
 
-    if (startDate.value && endDate.value) {
-        formData.append('start_date', formattedStartDate);
-        formData.append('end_date', formattedEndDate);
-    }
+    // if (startDate.value && endDate.value) {
+    //     formData.append('start_date', formattedStartDate);
+    //     formData.append('end_date', formattedEndDate);
+    // }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/projects/report-view?project_ids=${projectIds ? projectIds : ''}?start_date=${startDate.value ? formattedStartDate : ''}?end_date=${endDate.value ? formattedEndDate : ''}`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/project-report/view?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -69,7 +103,9 @@ const handleGenerate = async () => {
     }); 
 
     if (data.value?.code == 200) {
-        previewData.value = data.value.data.map((item, index) => ({ ...item, index: index + 1 }));
+        previewData.value = data.value.data?.overView.map((item, index) => ({ ...item, index: index + 1 }));
+        previewProjectWiseCount.value = data.value.data?.projectWiseCount.map((item, index) => ({ ...item, index: index + 1 }));
+        previewSprintTask.value = data.value.data?.sprintTask.map((item, index) => ({ ...item, index: index + 1 }));
         return (loading.value = false);
     } else {
         loading.value = false;
@@ -85,29 +121,30 @@ const handleReportDownload = async () => {
     }
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    const formData = new FormData();
+    let spaceIds 
+    if(selectedSpaces.value && selectedSpaces.value.length > 0) {
+        spaceIds = selectedSpaces.value?.map((item) => item.id);
+        console.log('Space ID', spaceIds);
+    }
 
-    if (selectedProject.value && selectedProject.value.length > 0) {
-        const projectIds = selectedProject.value?.map((item) => item.id);
+    let projectIds
+    // Only append project IDs if there are valid projects selected
+    if (selectedProjects.value && selectedProjects.value.length > 0) {
+        projectIds = selectedProjects.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
-        if (projectIds.length > 0) {
-            projectIds.forEach((id) => {
-                formData.append('project_id[]', id);
-            });
-        }
+        // formData.append('project_id', projectIds);
+        // if (projectIds.length > 0) {
+        //     projectIds.forEach((id) => {
+        //         formData.append('project_id[]', id);
+        //     });
+        // }
     }
 
-    if (startDate.value && endDate.value) {
-        formData.append('start_due_date', formattedStartDate);
-        formData.append('end_due_date', formattedEndDate);
-    }
-
-    const { data, error } = await useFetch(`${url.public.apiUrl}/project-wise-task-report-download`, {
-        method: 'POST',
+    const { data, error } = await useFetch(`${url.public.apiUrl}/project-report/download?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
         },
-        body: formData
     });
     if (error.value) {
         console.log(error);
@@ -154,20 +191,28 @@ const handleChange = (field, event) => {
                     </div>
                     <Toolbar class="border-0 px-0">
                         <template #start>
+                            <!-- <pre>{{totalProjectsforReport}}</pre>
+                            <pre>{{selectedSpaces}}</pre> -->
                             <div class="flex gap-2 flex-wrap align-items-center">
                                 <div class="user-selection w-full md:w-14rem w-full">
-                                    <label class="font-bold block mb-2">Project:</label>
+                                    <label class="font-bold block mb-2">Spaces:</label>
                                     <div class="flex justify-content-center">
-                                        <MultiSelect display="chip" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Select Project" class="w-full" />
+                                        <MultiSelect display="chip" v-model="selectedSpaces" :options="totalSpaces" filter resetFilterOnHide optionLabel="name" placeholder="Select Spaces" class="w-full" />
+                                    </div>
+                                </div>
+                                <div class="user-selection w-full md:w-14rem w-full">
+                                    <label class="font-bold block mb-2">Projects:</label>
+                                    <div class="flex justify-content-center">
+                                        <MultiSelect display="chip" v-model="selectedProjects" :options="projectList" filter resetFilterOnHide optionLabel="name" placeholder="Select Projects" class="w-full" />
                                     </div>
                                 </div>
                                 <div class="flex-auto">
                                     <label for="icondisplay" class="font-bold block mb-2">From: </label>
-                                    <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                                    <Calendar v-model="startDate" showIcon iconDisplay="input" inputId="icondisplay" />
                                 </div>
                                 <div class="flex-auto">
                                     <label for="icondisplay" class="font-bold block mb-2">To: </label>
-                                    <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                                    <Calendar v-model="endDate" showIcon iconDisplay="input" inputId="icondisplay" />
                                 </div>
                             </div>
                         </template>
@@ -177,44 +222,74 @@ const handleChange = (field, event) => {
                         </template>
                     </Toolbar>
                 </div>
-                <div v-if="previewData" class="card">
-                    <div>
+                <div v-if="previewData || previewProjectWiseCount || previewSprintTask" class="card">
+                    <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                        <h5 class="m-0" style="visibility: hidden;">Overview</h5>
+                        <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+                    </div>
+                    <div class="card">
                         <div class="flex align-items-center justify-content-between gap-2 mb-5">
-                            <h5 class="m-0">Preview</h5>
-                            <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
+                            <h5 class="m-0">Overview</h5>
                         </div>
-                        <DataTable :value="previewData" tableStyle="min-width: 50rem">
+                        <DataTable v-if="previewData" :value="previewData" tableStyle="min-width: 50rem">
+                            <template #empty>
+                                <p class="text-center">No Data found...</p>
+                            </template>
+                            <Column field="index" header="Serial" sortable></Column>
+                            <Column field="unit_name" header="Unit Name"></Column>
+                            <Column field="total_iteration" header="Total Number of Iteration"></Column>
+                            <Column field="total_missed_deadline" header="No. of Missed Deadlines"></Column>
+                            
+                            <Column field="missed_deadline_percentage" header="% of Missed Deadlines"></Column>
+                        </DataTable>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                            <h5 class="m-0">Project Wise Count</h5>
+                            
+                        </div>
+                        <DataTable v-if="previewProjectWiseCount" :value="previewProjectWiseCount" tableStyle="min-width: 50rem">
+                            <template #empty>
+                                <p class="text-center">No Data found...</p>
+                            </template>
+                            <Column field="index" header="Serial" sortable></Column>
+                            <Column field="project_name" header="Project Name"></Column>
+                            <Column field="unit_name" header="Unit Name"></Column>
+                            <Column field="total_iteration" header="No. of Iteration"></Column>
+                            <Column field="total_missed_deadline" header="No.of Missed Deadlines"></Column>
+                        </DataTable>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                            <h5 class="m-0">Sprint</h5>
+                        </div>
+                        <DataTable v-if="previewSprintTask" :value="previewSprintTask" tableStyle="min-width: 50rem">
                             <template #empty>
                                 <p class="text-center">No Data found...</p>
                             </template>
                             <Column field="index" header="Serial" sortable></Column>
                             <Column field="task_name" style="width: 40%" header="Task Name"></Column>
                             <Column field="project_name" header="Project Name"></Column>
-                            <Column field="task_status" header="Status">
-                                <!-- <template #body="slotProps">
-                                <div v-for="(assignee, index) in slotProps.data.assignee_name">
-                                  {{ assignee.name }}<span class="font-bold" v-if="index < slotProps.data.assignee_name.length - 1">, </span>
-                                </div>
-                              </template> -->
-                            </Column>
-                            <Column field="task_due_date" header="Due Date"></Column>
-                            <Column field="task_date_done" header="Date Done"></Column>
+                            <Column field="status" header="Status"></Column>
+                            <Column field="due_date" header="Due Date"></Column>
+                            <Column field="end_date" header="End Date"></Column>
                             <Column field="duration" header="Duration"></Column>
-                            <Column field="unit" header="Unit"></Column>
-                            <Column field="overdue" header="Missed Deadlines"></Column>
-                            <!-- <Column field="bounce" header="Bounce"></Column> -->
+                            <Column field="unit_name" header="Unit Name"></Column>
+                            <Column field="missed_deadline" header="Missed Deadlines"></Column>
                         </DataTable>
                     </div>
                 </div>
             </TabPanel>
-            <TabPanel header="Specific Monthly Summary">
+            <!-- <TabPanel header="Specific Monthly Summary">
                 
-            </TabPanel>
-            <TabPanel header="Executive Summary">
+            </TabPanel> -->
+            <!-- <TabPanel header="Executive Summary">
                 <Toolbar class="border-0 px-0">
                   
                 </Toolbar>
-            </TabPanel>
+            </TabPanel> -->
         </TabView>
     </div>
 </template>

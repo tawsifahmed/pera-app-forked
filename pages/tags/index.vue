@@ -143,7 +143,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-st" :value="tagsLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -163,16 +163,16 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleCreateTag" modal header="Create Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TagsCreateTag @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditTag" modal header="Edit Tag" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="visibleEditTag" modal header="Edit Tag" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TagsEditTag :param="{ id, name }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
-        <Dialog v-model:visible="visibleDeleteTag" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="visibleDeleteTag" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="visibleDeleteTag = false" />
             <Button label="Yes" icon="pi pi-check" text @click="confirmDeleteTag" :loading="loading1" />

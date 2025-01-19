@@ -88,7 +88,33 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       return allProjects;
 
     },
+    totalProjectsforReport(state) {
+      let allProjects = [];
+      if (state.getSpaces) {
+        state.getSpaces?.spaces.forEach(element => {
+          if (element?.projects?.length > 0) {
+            element.projects.forEach(ele => {
+              allProjects.push({ id: ele.id, name: ele.name, });
+            });
+          }
+        });
+      } else return [];
+      return allProjects;
 
+    },
+    totalSpaces(state) {
+      let allSpaces = [];
+      if (state.getSpaces) {
+        state.getSpaces?.spaces.forEach(element => {
+            allSpaces.push({ 
+            name: element.name, 
+            id: element.id, 
+            projects: element.projects.map(project => ({ id: project.id, name: project.name })) 
+            });
+        });
+      } else return [];
+      return allSpaces;
+    }
   },
   actions: {
     async getCompany() {

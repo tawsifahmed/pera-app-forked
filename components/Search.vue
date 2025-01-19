@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <div class="flex justify-content-center">
+        <div class="flex justify-content-center" style="position: sticky; top: 0px; background-color: white; width: 100%">
             <IconField style="width: 50%">
                 <InputIcon :class="`${taskLoading ? `pi-spin pi-spinner text-2xl spinnner` : 'pi-search text-xl'} pi  font-me`"> </InputIcon>
                 <InputText id="searchField" class="w-full" v-model="searchText" placeholder="Search..." size="large" />
@@ -14,48 +14,50 @@
                     <template #content>
                         <div class="task-container">
                             <div>
-                                <NuxtLink v-for="task in tasksResult" :key="task" :to="{path: `/companies/${task.company_id}/spaces/${task.space_id}/projects/${task.project_id}`, query: {task_key: task.task_id} }" class="task-card">
+                                <div v-for="task in tasksResult" :key="task" @click="handleRedirect('task', task)" class="task-card">
                                     <div class="title-group flex justify-content-start align-items-center gap-2">
                                         <div :class="`staskstatus`" :style="`background-color: ${task.task_status_color};`"></div>
-                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{task.task_name}}</p>
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ task.task_name }}</p>
                                     </div>
                                     <div>
                                         <i>
-                                            <p style="font-size: 12px"><strong>Project:</strong> {{task?.project_name}}</p></i
+                                            <p style="font-size: 12px"><strong>Project:</strong> {{ task?.project_name }}</p></i
                                         >
-                                    </div>
-                                </NuxtLink>
-                            </div>
-                        </div>
-                    </template>
-                </Card>
-                <br />
-                <Card v-if="projectsResult.length > 0" class="h-full">
-                    <template class="result-title" #title>Projects</template>
-                    <template #content>
-                        <div class="project-container">
-                            <div>
-                                <div v-for="project in projectsResult" :key="project" class="task-card">
-                                    <div class="title-group flex justify-content-start gap-2 align-items-center">
-                                        <span class="pi pi-bars"></span>
-                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{project.project_name}}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </template>
                 </Card>
-                <br />
+                <br v-if="tasksResult.length > 0" />
+                <Card v-if="projectsResult.length > 0" class="h-full">
+                    <template class="result-title" #title>Projects</template>
+                    <template #content>
+                        <div class="project-container">
+                            <div>
+                                <div v-for="project in projectsResult" :key="project" @click="handleRedirect('project', project)" class="task-card">
+                                    <div class="title-group flex justify-content-start gap-2 align-items-center">
+                                        <span class="pi pi-bars"></span>
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ project.project_name }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+                <br v-if="projectsResult.length > 0" />
                 <Card v-if="spacesResult.length > 0" class="h-full">
                     <template class="result-title" #title>Spaces</template>
                     <template #content>
                         <div class="space-container">
                             <div>
-                                <div v-for="space in spacesResult" :key="space" class="task-card">
+                                <div v-for="space in spacesResult" :key="space" @click="handleRedirect('space', space)" class="task-card">
                                     <span class="title-group flex justify-content-start gap-2 align-items-center">
-                                        <div id="dynamic-div" :style="`background-color: ${space?.space_color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-1 px-2 w-fit text-white">{{space?.space_name.charAt(0).toUpperCase()}}</div>
+                                        <div id="dynamic-div" :style="`background-color: ${space?.space_color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-1 px-2 w-fit text-white">
+                                            {{ space?.space_name.charAt(0).toUpperCase() }}
+                                        </div>
 
-                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{space.space_name}}</p>
+                                        <p class="stitle line-clamp-1" style="font-weight: 600">{{ space.space_name }}</p>
                                     </span>
                                 </div>
                             </div>
@@ -72,17 +74,17 @@
 
 <script setup>
 import { nextTick, onMounted } from 'vue';
+import { watch, ref } from 'vue';
+import { debounce } from 'lodash';
 const url = useRuntimeConfig();
 
-const searchText = ref('');
+const emit = defineEmits(['closeSearch']);
 
+const searchText = ref('');
 const tasksResult = ref([]);
 const projectsResult = ref([]);
 const spacesResult = ref([]);
 const hasResult = ref('not_typing');
-
-import { watch, ref } from 'vue';
-import { debounce } from 'lodash';
 
 const debouncedFetchResult = debounce((input) => {
     if (input.trim().length >= 2) {
@@ -129,14 +131,30 @@ const fetchResult = async (input) => {
             hasResult.value = 'yes';
         }
 
-        if(data.value.data?.tasks.length === 0 && data.value.data?.projects.length === 0 && data.value.data?.spaces.length === 0){
+        if (data.value.data?.tasks.length === 0 && data.value.data?.projects.length === 0 && data.value.data?.spaces.length === 0) {
             hasResult.value = 'no';
         }
-
     } catch (e) {
         console.log(e);
     } finally {
         taskLoading.value = false;
+    }
+};
+
+const handleRedirect = (type, vals) => {
+    if (type === 'task') {
+        navigateTo({ path: `/companies/${vals.company_id}/spaces/${vals.space_id}/projects/${vals.project_id}`, query: { task_key: vals.task_id } });
+        emit('closeSearch', true);
+    }
+
+    if (type === 'project') {
+        navigateTo({ path: `/companies/${vals.company_id}/spaces/${vals.space_id}/projects/${vals.project_id}` });
+        emit('closeSearch', true);
+    }
+
+    if (type === 'space') {
+        navigateTo({ path: `/companies/${vals.company_id}/spaces/${vals.space_id}` });
+        emit('closeSearch', true);
     }
 };
 
@@ -153,21 +171,18 @@ onMounted(() => {
     height: auto;
     min-height: 5.5rem;
 }
+.result-container {
+    margin: 0 20px;
+}
 .task-container {
-    max-height: 20rem;
-    overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }
 
 .project-container {
-    max-height: 10rem;
-    overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }
 
 .space-container {
-    max-height: 8rem;
-    overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }
 
@@ -196,7 +211,6 @@ onMounted(() => {
     justify-content: space-between;
     width: 100%;
     flex-wrap: wrap;
-    color: #000;
 }
 
 .task-card:hover {
@@ -207,7 +221,7 @@ onMounted(() => {
     font-size: 1rem !important;
 }
 
-.spinnner{
+.spinnner {
     top: 42% !important;
 }
 </style>

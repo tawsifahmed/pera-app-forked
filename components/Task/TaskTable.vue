@@ -119,7 +119,7 @@ const hoveredRowKey = ref(null);
 
 watch(hoveredRowKey, (newVal, oldVal) => {
     if (newVal !== oldVal) {
-        inlineAssignees.value = [];
+        // inlineAssignees.value = [];
     }
 });
 
@@ -133,6 +133,7 @@ const handleMouseEnter = (key) => {
         editClikedRowKey.value = null;
     }
 };
+
 
 const editClikedRowKey = ref(null);
 
@@ -358,7 +359,7 @@ const downloadTaskSheet = (taskLists) => {
                     const serialNo = index + 1;
                     const taskName = task.data.name;
                     const projectName = singleProject.value.name;
-                    const assignees = task.data.assigneeObj.map(assignee => assignee.name).join('; ');
+                    const assignees = task.data.assigneeObj.map((assignee) => assignee.name).join('; ');
                     const priority = task.data.priority?.name ? task.data.priority?.name : '';
                     const status = task.data.status.name;
                     let timeTracked = task.data.total_duration;
@@ -425,7 +426,12 @@ async function handleTaskStatus(status, task_id) {
 }
 
 const inlineAssignees = ref([]);
-
+const inlineAssigTId = ref(null);
+const handleAssigneeSelection = (task_id) => {
+    console.log('inlineAssignees', inlineAssignees.value);
+    inlineAssigTId.value = task_id;
+    inlineAssignees.value = [];
+};
 // const handleAssigneeChanges = () => {
 //     inlineAssigneesIds.value = inlineAssigneesIds.value ? inlineAssigneesIds.value.map((item) => item.id) : '';
 //     handleTaskChanges(inlineAssigneesIds.value, )
@@ -510,12 +516,12 @@ const handleAssigneeChanges = async (type, values, key) => {
             inlineAssigL.value = false;
         }
     }
-    if(type === 'edit'){
+    if (type === 'edit') {
         const editTaskData = {
             id: key,
             assignees: values?.map((assignee) => assignee.id),
             project_id: id
-        }
+        };
         await editTask(editTaskData);
         if (isTaskEdited.value === true) {
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Assignees updated ', group: 'br', life: 3000 });
@@ -752,7 +758,10 @@ const applyColumnWidths = () => {
         <template #start>
             <!-- <pre>{{tasks}}</pre> -->
             <div class="flex flex-wrap gap-1">
-                <Button v-if="createTaskP" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
+                <Button v-if="createTaskP && viewMode !== 'list'" icon="pi pi-plus" label="Create Task"
+                @click="emit('openCreateSpace', '', 'task')" class="mr-2" severity="secondary" />
+           
+                <Button v-if="createTaskP && viewMode === 'list'" icon="pi pi-plus" label="Create Task" @click="createNewTask()" class="mr-2" severity="secondary" />
                 <div class="view-btns">
                     <Button icon="pi pi-box" label="Overview" @click="handleViews('overview')" class="board-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'overview' }" />
                     <Button icon="pi pi-list" label="List" @click="handleViews('list')" class="table-btn view-btn" severity="secondary" :class="{ 'bg-indigo-400 text-white': viewMode === 'list' }" />
@@ -779,7 +788,7 @@ const applyColumnWidths = () => {
             </IconField>
         </template>
     </Toolbar>
-
+    <!-- <pre>{{ tableData[0] }}</pre> -->
     <!-- project overview -->
     <div v-if="viewMode === 'overview'">
         <div class="grid mt-2">
@@ -984,7 +993,7 @@ const applyColumnWidths = () => {
         </Column>
         <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
             <template #body="slotProps">
-                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL" @mouseenter="handleMouseEnter(slotProps.node.key)">
+                <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
                     <span class="flex justify-content-center assignee-wrapper" v-if="slotProps.node.data?.assigneeObj.length > 0">
                         <span v-for="(assignee, index) in slotProps.node.data.assigneeObj" :key="index" :style="{ marginLeft: index > 0 ? '-20px' : '0', zIndex: 10 - index }">
                             <img
@@ -1009,13 +1018,14 @@ const applyColumnWidths = () => {
                     </span>
                     <span v-else>
                         <div class="s-assignee">
-                            <div class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
+                            <div @click="handleAssigneeSelection(slotProps.node.key)" class="flex justify-content-center align-items-center gap-2 cursor-pointer relative">
                                 <i class="pi pi-user-plus pl-1 text-xl" style="padding-top: 0.1rem"></i>
                                 <i class="pi pi-angle-down text-sm mt-1"></i>
+
                                 <Button
                                     @click="handleAssigneeChanges('add', 0, slotProps.node.key)"
                                     v-tooltip.top="{ value: `Set Assigness`, showDelay: 500 }"
-                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && hoveredRowKey === slotProps.node.key"
+                                    v-if="inlineAssignees.length > 0 && slotProps.node.key !== 'new' && inlineAssigTId === slotProps.node.key"
                                     severity="secondary"
                                     icon="pi pi-check"
                                     class="w-fit h-fit p-1"

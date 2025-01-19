@@ -117,14 +117,14 @@ const handleTaskDetailView = async (task) => {
     visibleTaskDetailView.value = true;
     document.documentElement.style.cursor = 'auto';
     document.documentElement.removeChild(overlayD);
-    console.log(taskDetails?.value?.project?.name,'taskDetails')
+    console.log(taskDetails?.value?.project?.name, 'taskDetails');
 };
 
 watch(visibleTaskDetailView, (value) => {
-    if(value === true) {
+    if (value === true) {
         return 0;
-    }else{
-        localStorage.removeItem('taskDetailID')
+    } else {
+        localStorage.removeItem('taskDetailID');
     }
 });
 
@@ -142,17 +142,23 @@ const closeCreateModal = (evn) => {
 const closeEditModal = (evn) => {
     visibleEdit.value = evn;
 };
+const closeDetailModal = (evn) => {
+    visibleTaskDetailView.value = false;
+};
 
 const updateTaskTable = () => {
     getSingleProject(projects);
 };
 
 // getSingleProject(projects);
-watch(() => useRoute().query.task_key, (newTaskKey) => {
-    if (newTaskKey) {
-        handleTaskDetailView({ key: newTaskKey });
+watch(
+    () => useRoute().query.task_key,
+    (newTaskKey) => {
+        if (newTaskKey) {
+            handleTaskDetailView({ key: newTaskKey });
+        }
     }
-});
+);
 
 if (task_key) {
     handleTaskDetailView({ key: task_key });
@@ -181,34 +187,27 @@ watchEffect(() => {
         </div>
 
         <!-- Datatable -->
-        <TaskTable
-            v-if="readTask"
-            
-            :kanbanTasks="kanbanTasks"
-            :tasks="tasks"
-            @openCreateSpace="openCreateSpace"
-            @handleTaskEdit="handleTaskEdit($event)"
-            @handleTaskDetailView="handleTaskDetailView($event)"
-            @confirmDeleteTask="confirmDeleteTask($event)"
-        >
+        <TaskTable v-if="readTask" :kanbanTasks="kanbanTasks" @openCreateSpace="openCreateSpace" @handleTaskEdit="handleTaskEdit($event)" @handleTaskDetailView="handleTaskDetailView($event)" @confirmDeleteTask="confirmDeleteTask($event)">
         </TaskTable>
 
         <!-- Create Task Modal -->
-        <Dialog v-model:visible="visible" modal :header="createTaskTitle" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw', '330px': '98vw' }">
+        <Dialog v-model:visible="visible" modal :header="createTaskTitle" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw', '330px': '98vw' }">
             <TaskCreateTask :usersLists="usersLists" :tagsLists="tagsLists" :taskId="taskId" :projects="projects" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit Task Modal -->
-        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+        <Dialog v-model:visible="visibleEdit" modal header="Edit Task" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <TaskEditTask :singleTask="singleTask" :usersLists="usersLists" :tagsLists="tagsLists" :projects="projects" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <!-- Task Detail Modal -->
-        <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+        <Dialog v-model:visible="visibleTaskDetailView" modal header="Task Details" dismissableMask="true" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
             <template #header>
                 <div class="inline-flex align-items-center justify-content-center gap-2">
-                    <Avatar :label="taskDetails?.project?.space_name?.charAt(0)" class=" capitalize p-0" size="small" :style="{ 'background-color': ['#ededed'], color: ['#000'],width:['1.4rem'],height:['1.4rem'],text:['12px'] }" />
-                    <span class="white-space-nowrap">{{taskDetails?.project?.space_name}} / <strong>{{taskDetails?.project?.name}}</strong></span>
+                    <Avatar :label="taskDetails?.project?.space_name?.charAt(0)" class="capitalize p-0" size="small" :style="{ 'background-color': ['#ededed'], color: ['#000'], width: ['1.4rem'], height: ['1.4rem'], text: ['12px'] }" />
+                    <span class="white-space-nowrap"
+                        >{{ taskDetails?.project?.space_name }} / <strong>{{ taskDetails?.project?.name }}</strong></span
+                    >
                 </div>
             </template>
             <TaskDetail
@@ -220,11 +219,12 @@ watchEffect(() => {
                 @handleTaskDetailView="handleTaskDetailView($event)"
                 @confirmDeleteTask="confirmDeleteTask($event)"
                 @updateTaskTable="updateTaskTable"
+                @closeDetailModal="closeDetailModal"
             />
         </Dialog>
 
         <!-- Delete Task Modal -->
-        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="deleteTaskDialog" header=" " :style="{ width: '25rem' }" dismissableMask="true">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteTaskDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="deletingTask" />

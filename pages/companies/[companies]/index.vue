@@ -120,7 +120,7 @@ const spacePage = ref(true);
             </IconField>
         </div>
         <DataTable v-model:filters="filters" class="table-dco" :value="singleCompanySpaces" stripedRows paginator
-            tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+            tableStyle="min-width: 50rem" :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty>
                 <p class="py-2 text-center">No Data found...</p>
             </template>
@@ -158,12 +158,12 @@ const spacePage = ref(true);
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="deleteSpaceDialog" header=" " :style="{ width: '25rem' }">
+        <Dialog v-model:visible="deleteSpaceDialog" header=" " dismissableMask="true" :style="{ width: '25rem' }">
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteSpaceDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingSpace" />
         </Dialog>
-        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" :style="{ width: '32rem' }"
+        <Dialog v-model:visible="visibleEditSpace" modal header="Edit Space" dismissableMask="true" :style="{ width: '32rem' }"
             :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <SpaceEditSpace :refSpaceId="refSpaceId" :singleCompany="singleCompany"
                 @closeEditSpace="closeEditSpace($event)" />

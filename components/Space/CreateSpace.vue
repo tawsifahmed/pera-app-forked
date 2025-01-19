@@ -124,7 +124,7 @@ const handleClose = () => {
 <template>
     <div>
         <Button :icon="spacePage ? '' : 'pi pi-plus'" :class="spacePage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'" :label="spacePage ? 'Create +' : ''" @click="showDialog" :severity="spacePage ? 'primary' : 'secondary'" aria-label="Bookmark" :text="!spacePage" />
-        <Dialog v-model:visible="spaceFormInputs" :style="{ width: '32rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid"  @update:visible="handleClose">
+        <Dialog v-model:visible="spaceFormInputs" dismissableMask="true" :style="{ width: '32rem' }"  :breakpoints="{ '1199px': '75vw', '575px': '90vw' }" header="Create Space" :modal="true" class="p-fluid"  @update:visible="handleClose">
             <div class="field">
                 <!-- <pre>{{spacePage}}</pre> -->
                 <label for="createSpaceName">Space Name<i class="text-red-400 text-italic">*</i> 

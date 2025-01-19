@@ -1,16 +1,21 @@
 <script setup>
 import { ref } from 'vue';
 import Editor from 'primevue/editor';
-import { useActiveCompanyStore } from '~/store/workCompany';
-const toast = useToast();
-const { menu } = storeToRefs(useActiveCompanyStore());
+
+definePageMeta({
+    middleware: 'auth',
+    layout: 'default'
+});
+
 const url = useRuntimeConfig();
+const toast = useToast();
+
+const totalRecords = ref(0);
 
 const scrumData = ref([]);
 const createModal = ref(false);
 const employees = ref([]);
 const employee = ref('');
-const selectedSpace = ref('');
 const description = ref('');
 const isSubmitting = ref(false);
 const isLoading = ref(true);
@@ -21,7 +26,6 @@ const handleSubmit = async (e) => {
     try {
         const token = useCookie('token');
         const payload = new FormData();
-        // payload.append('space_id', selectedSpace.value.id);
         payload.append('description', description.value);
         employee.value.forEach((e) => payload.append('user_ids[]', e.id));
 
@@ -59,6 +63,7 @@ const fetchScrum = async () => {
     );
     if (data.value?.data?.length > 0) {
         scrumData.value = data.value?.data;
+        totalRecords.value = data.value?.totalRecords;
     }
     return (isLoading.value = false);
 };
@@ -79,29 +84,29 @@ const init = async () => {
 onMounted(() => {
     init();
     fetchScrum();
-    console.log('call');
+    // console.log('call');
 });
 </script>
 
 <template>
     <div class="card">
-        <!-- <pre>{{ selectedSpace }}</pre> -->
         <header class="header">
             <h3>Meeting Minutes</h3>
             <Button @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
         </header>
-        <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" />
+        <!-- <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" /> -->
+        <ScrumTable 
+            :scrumData="scrumData" 
+            :fetchData="fetchScrum" 
+            :employees="employees" 
+            :totalRecords="totalRecords"
+        />
     </div>
 
-    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <Dialog lazy="true" :loading="isLoading" v-model:visible="createModal" modal header="New Scrum" dismissableMask="true" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
         <form @submit="handleSubmit" class="form" action="">
-            <!-- <div class="flex-auto">
-                <label for="space" class="font-bold block mb-2">Space: </label>
-                <Dropdown v-model="selectedSpace" id="space" :options="menu" optionLabel="name" placeholder="Select Space" class="w-full" />
-            </div> -->
             <div class="flex-auto">
                 <label for="description" class="font-bold block mb-2">Description: </label>
-                <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
                 <Editor v-model="description" editorStyle="height: 200px">
                     <template v-slot:toolbar>
                         <span class="ql-formats flex justify-content-end mr-0">

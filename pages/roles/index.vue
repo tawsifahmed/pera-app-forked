@@ -12,6 +12,8 @@ import DataTable from 'primevue/datatable';
 
 import accessPermission from '~/composables/usePermission';
 
+import Dialog from 'primevue/dialog';
+
 const readRole = ref(accessPermission('read_role'));
 const createRoleP = ref(accessPermission('create_role'));
 const updateRoleP = ref(accessPermission('update_role'));
@@ -22,7 +24,6 @@ const loading = ref(true);
 
 const toast = useToast();
 
-import Dialog from 'primevue/dialog';
 
 const visibleCreateRole = ref(false);
 
@@ -58,16 +59,22 @@ const editRole = (data) => {
     id.value = data.id;
     name.value = data.name;
     permissionsList.value = permissionsList.value;
-    slctdPermissions.value = [];
+    let slctdPerm = [];
+    // slctdPermissions.value = [];
     if (data?.permissions?.length > 0) {
         data.permissions.map((item) => {
             permissionsList.value.map((pItem) => {
                 if (item.id === pItem.id) {
-                    slctdPermissions.value.push(pItem);
+                    slctdPerm.push({
+                      id:  pItem.id,
+                    //   name: pItem.name
+                    });
                 }
             });
         });
     }
+    slctdPermissions.value = slctdPerm.map((item) => item.id);
+    console.log('sPp',toRaw(slctdPermissions.value));
 };
 
 const init = async () => {
@@ -84,6 +91,7 @@ const init = async () => {
     }
 };
 
+const groupPermissions = ref([]);
 const permissionList = async () => {
     const token = useCookie('token');
     const { data, pending, error } = await useAsyncData('permissionList', () =>
@@ -93,8 +101,22 @@ const permissionList = async () => {
             }
         })
     );
+
     if (data.value?.data?.length > 0) {
         permissionsList.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+
+        groupPermissions.value = Object.entries(data.value.group).map(([groupName, permissions], index) => ({
+            group: {
+                name: groupName,
+                id: index + 1
+            },
+            children: permissions.map(permission => ({
+                id: permission.id,
+                name: permission.name
+            }))
+        }));
+
+        console.log(groupPermissions.value);
     }
 };
 
@@ -136,7 +158,7 @@ initFilters();
             </template>
         </Toolbar>
 
-        <DataTable v-model:filters="filters" class="table-stR" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" dataKey="id" filterDisplay="menu" :loading="loading">
+        <DataTable v-model:filters="filters" class="table-stR" :value="rolesLists" stripedRows paginator tableStyle="min-width: 50rem" :rows="15" :rowsPerPageOptions="[10, 15, 20, 50]" dataKey="id" filterDisplay="menu" :loading="loading">
             <template #empty> <p class="text-center">No Data found...</p> </template>
             <template #loading> <ProgressSpinner style="width: 50px; height: 50px" /> </template>
             <Column field="index" header="Serial" sortable></Column>
@@ -161,13 +183,13 @@ initFilters();
         </DataTable>
 
         <!-- Create -->
-        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoleCreateRole :param="{ permissionsList }" @closeCreateModal="closeCreateModal($event)" />
+        <Dialog v-model:visible="visibleCreateRole" modal header="Create Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoleCreateRole :param="{ permissionsList, groupPermissions }" @closeCreateModal="closeCreateModal($event)" />
         </Dialog>
 
         <!-- Edit -->
-        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" :style="{ width: '35rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <RoleEditRole :param="{ id, name, permissionsList, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
+        <Dialog v-model:visible="visibleEditRole" modal header="Edit Role" dismissableMask="true" :style="{ width: '38rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <RoleEditRole :param="{ id, name, permissionsList, groupPermissions, slctdPermissions }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
     </div>
 </template>
