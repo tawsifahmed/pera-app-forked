@@ -7,7 +7,7 @@ import { onMessage } from "firebase/messaging";
 
 import Password from 'primevue/password';
 // import clickOutside from '../composables/clickOutside';
-const { getStoreTimer } = useClockStore();
+const { getStoreTimer, handleCloseDeadlineJustify } = useClockStore();
 const { timerData, isTImerStopped, deadlineMissModal, deadlineTaskId, deadlineProjectId, deadlineDueDate } = storeToRefs(useClockStore());
 const { getUserData } = useUserStore();
 const { userProfile } = storeToRefs(useUserStore());
@@ -314,7 +314,13 @@ const closeSearch = (evn) => {
 
 
 const closeMissDeadlineModal =  () => {
-    deadlineMissModal.value = false
+    deadlineMissModal.value = false;
+    handleCloseDeadlineJustify();
+}
+
+const handleCloseDeadline = () => {
+    deadlineMissModal.value = false;
+    handleCloseDeadlineJustify();
 }
 
 // Notification
@@ -423,7 +429,7 @@ onMessage(messaging,(message)=>{
         <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <Profile :userProfile="userProfile" />
         </Dialog>
-        <Dialog v-model:visible="deadlineMissModal" modal header="Deadline Miss Justification" dismissableMask="true" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+        <Dialog v-model:visible="deadlineMissModal" modal header="Deadline Miss Justification" @update:visible="handleCloseDeadline" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <TaskDeadlineMiss @closeMissDeadlineModal="closeMissDeadlineModal($event)" :deadlineTaskId="deadlineTaskId" :deadlineProjectId="deadlineProjectId" :deadlineDueDate="deadlineDueDate"  />
         </Dialog>
         <Dialog v-model:visible="visibleTop" modal header="Search" dismissableMask="true" position="top" class="search-container">

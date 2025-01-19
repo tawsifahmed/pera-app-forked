@@ -613,6 +613,7 @@ export const useCompanyStore = defineStore('workStation', {
                     if (taskIdInLclStrg) {
                         this.getTaskDetails(taskIdInLclStrg);
                     }
+                    return data.value
                 }
             }
         },
@@ -768,11 +769,11 @@ export const useCompanyStore = defineStore('workStation', {
                 this.chartClosedTaskInfo = data?.value?.data?.projectCounts.map(project => project.completedCounts);
                 this.totalDashboardProjects = data?.value?.data?.projectCounts.length;
                 this.completedTasksChartData = data?.value?.data?.completed;
-                localStorage.setItem('completedTasksChartData', JSON.stringify(data?.value?.data?.completed));
+                // localStorage.setItem('completedTasksChartData', JSON.stringify(data?.value?.data?.completed));
                 this.inProgressTasksChartData = data?.value?.data?.inProgress;
-                localStorage.setItem('inProgressTasksChartData', JSON.stringify(data?.value?.data?.inProgress));
+                // localStorage.setItem('inProgressTasksChartData', JSON.stringify(data?.value?.data?.inProgress));
                 this.unAssignedTasksChartData = data?.value?.data?.unAssigneeCount;
-                localStorage.setItem('unAssignedTasksChartData', JSON.stringify(data?.value?.data?.unAssigneeCount));
+                // localStorage.setItem('unAssignedTasksChartData', JSON.stringify(data?.value?.data?.unAssigneeCount));
             } else {
                 this.chartProjectInfo = [];
                 this.inProgressCnt = [];
