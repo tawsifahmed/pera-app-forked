@@ -963,9 +963,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor class="card" style="padding: 0;" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
 
-                                <MdEditor v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor style="padding: 0;" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1179,7 +1179,7 @@ const handletaskNameUpdate = async () => {
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
-                        <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                        <Card class="mb-2 card" style="padding: 0;" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
@@ -1394,7 +1394,7 @@ const handletaskNameUpdate = async () => {
     overflow-y: auto;
     height: 76vh;
     padding: 5px !important;
-    background-color: #f7fafc;
+    background-color: inherit;
 }
 
 .comments {
@@ -1541,7 +1541,7 @@ input[type='file'] {
     max-width: 100%;
     color: #444;
     padding: 5px;
-    background: #fff;
+    background: inherit;
     border-radius: 5px;
     border: 0.5px solid #b8b8b8;
 }
@@ -1583,6 +1583,7 @@ input[type='file']::file-selector-button:hover {
 .p-card .p-card-body {
     gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
+    
 }
 
 .activity-btns {
@@ -1861,5 +1862,12 @@ a {
 
 .mCrossIcon:hover {
     background: none !important;
+}
+
+#md-editor-v3{
+    background-color: inherit !important;
+    color: inherit !important;
+    
+    border-radius: 10px;
 }
 </style>

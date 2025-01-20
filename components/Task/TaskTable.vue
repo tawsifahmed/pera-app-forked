@@ -1429,7 +1429,7 @@ const handleRefresh = async () => {
 }
 
 .table-st {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
     width: 100% !important;
@@ -1469,7 +1469,7 @@ const handleRefresh = async () => {
     align-items: center;
     justify-content: start;
     gap: 10px;
-    border-bottom: 0.5px solid rgb(230, 229, 229);
+    border-bottom: inherit;
 }
 
 .tone {
@@ -1534,7 +1534,6 @@ const handleRefresh = async () => {
 }
 
 .pi-times:hover {
-    color: rgb(27, 27, 27);
     font-weight: 500;
     animation: hover-animation 0.3s ease-in-out forwards;
 }
@@ -1559,12 +1558,12 @@ const handleRefresh = async () => {
     padding-right: 4px !important;
 }
 .task-status-2 .p-dropdown {
-    background: transparent;
+    background: none;
     border: none;
-    box-shadow: 0 0 #ffffff, 0 0 #ffffff, 0 1px 2px 0 #ffffff;
+    box-shadow: none;
 }
 .task-status-2 .p-dropdown:focus {
-    background: transparent;
+    background: none;
     border: none;
 }
 .task-status-2 .status-bg {
@@ -1910,8 +1909,8 @@ textarea {
 
 .view-btns .view-btn:not(:first-child):not(:last-child) {
     border-radius: 0px;
-    border-left: 2px solid #e2e8f0;
-    border-right: 2px solid #e2e8f0;
+    border-left: inherit;
+    border-right: inherit;
 }
 
 .webView-action {
@@ -2073,8 +2072,8 @@ textarea {
         padding: 0.25rem 0.4rem !important;
         cursor: pointer !important;
         caret-color: transparent !important;
-        border: 1px solid #fff;
-        box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
+        border: none;
+        box-shadow: none;
         font-weight: 400;
         outline: none !important;
         outline-offset: -1px !important;

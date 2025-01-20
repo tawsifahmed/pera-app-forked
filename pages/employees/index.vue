@@ -228,7 +228,7 @@ const downloadTaskSheet = () => {
 
             <template #end>
                 <Button @click="downloadTaskSheet(tasks)"
-                v-tooltip.right="{ value: `Download Tasks` }" :loading="loading" severity="secondary" class="px-4" icon="pi pi-file-excel" />
+                v-tooltip.left="{ value: `Download Employee List` }" :loading="loading" severity="secondary" class="px-4" icon="pi pi-file-excel" />
                 <MultiSelect @change="changeAttribute()" v-model="selectedRoles" :options="filterRoles" display="chip"  filter resetFilterOnHide :maxSelectedLabels="2" optionLabel="name" placeholder="Filter User Type" class="w-full mx-2 filtr" />
                 <IconField iconPosition="right" raised>
                     <InputIcon>
