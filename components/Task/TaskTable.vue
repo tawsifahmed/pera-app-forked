@@ -747,6 +747,7 @@ function removeChild(node = toRaw(tableData.value)) {
     });
 
     tableData.value = JSON.parse(JSON.stringify(filtered));
+    newTaskNameInput.value = '';
     return tableData.value;
     // return (tableData.value = structuredClone(filtered));
 }
@@ -911,7 +912,8 @@ const handleRefresh = async () => {
         filterDisplay="menu"
         style="overflow: auto"
         :tableProps="{ style: { minWidth: '1024px' } }"
-    >
+        >
+        <!-- scrollHeight="calc(100vh - 24rem)" -->
 
     <!-- issues -->
     <!-- scrollable
