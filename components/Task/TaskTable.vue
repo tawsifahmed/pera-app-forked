@@ -201,7 +201,28 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (node) => {
+const updateTaskName = async (node, isCtrlKeyPressed = false) => {
+    if (isCtrlKeyPressed) {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
+        };
+        const data = await createTask(newTask);
+        // console.log('data ==>', data?.data);
+        const obj = {
+            ...data?.data,
+            key: data?.data?.id,
+            unique_id: data?.data?.unique_id,
+        }
+        emit('handleTaskDetailView', obj)
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    }
+
     if (node.key === 'new') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
@@ -731,6 +752,7 @@ function removeChild(node = toRaw(tableData.value)) {
     });
 
     tableData.value = JSON.parse(JSON.stringify(filtered));
+    newTaskNameInput.value = '';
     return tableData.value;
     // return (tableData.value = structuredClone(filtered));
 }
