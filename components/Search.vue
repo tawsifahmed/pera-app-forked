@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <div class="flex justify-content-center" style="position: sticky; top: 0px; background-color: white; width: 100%">
+        <div class="flex justify-content-center" style="position: sticky; top: 0px; width: 100%">
             <IconField style="width: 50%">
                 <InputIcon :class="`${taskLoading ? `pi-spin pi-spinner text-2xl spinnner` : 'pi-search text-xl'} pi  font-me`"> </InputIcon>
                 <InputText id="searchField" class="w-full" v-model="searchText" placeholder="Search..." size="large" />

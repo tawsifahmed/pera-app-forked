@@ -196,7 +196,7 @@ initFilters();
 
 <style lang="scss">
 .table-stR {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
     .p-datatable-tbody {

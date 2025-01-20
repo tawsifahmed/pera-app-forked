@@ -154,14 +154,14 @@ const onDarkModeChange = (value) => {
     onChangeTheme(newThemeName, value);
 };
 
-onMounted(() => {
+onMounted(async() => {
     const element = document.querySelector('.relative');
     vClickOutside?.beforeMount(element, { value: handleOutsideClick });
-    const mode = localStorage.getItem('mode');
-    if (mode === 'dark') {
-        onDarkModeChange(true);
+    const storedMode = localStorage.getItem('mode');
+    if (storedMode === 'dark') {
+       await onDarkModeChange(true);
     } else {
-        onDarkModeChange(false);
+       await  onDarkModeChange(false);
     }
 });
 
@@ -371,12 +371,12 @@ onMessage(messaging, (message) => {
             <!-- <pre>{{ userProfile }}</pre> -->
 
             <!-- darkmode -->
-            <!-- <Button @click="() => onDarkModeChange(false)" class="p-link layout-topbar-button" v-if="layoutConfig.darkTheme.value" text rounded aria-label="Filter">
+            <Button @click="() => onDarkModeChange(false)" class="p-link layout-topbar-button" v-if="layoutConfig.darkTheme.value" text rounded aria-label="Filter">
                 <i class="pi pi-moon"></i>
             </Button>
             <Button @click="() => onDarkModeChange(true)" class="p-link layout-topbar-button" v-else text rounded aria-label="Filter">
                 <i class="pi pi-sun"></i>
-            </Button> -->
+            </Button>
 
             <!-- <pre>{{ isTImerStopped }}</pre> -->
             <!-- <pre>timerPinia{{timerData}}</pre> -->
@@ -559,7 +559,7 @@ onMessage(messaging, (message) => {
 .ntask-timer-wrapper {
     height: 40px;
     width: 120px;
-    right: 244px;
+    right: 265px;
     top: 15px;
     border: 2px solid #9596e4;
     /* Project theme color */

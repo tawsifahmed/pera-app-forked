@@ -198,7 +198,7 @@ const spacePage = ref(true);
 }
 
 .table-dco {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
 

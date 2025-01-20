@@ -1760,8 +1760,7 @@ textarea {
 }
 
 .task-card {
-    background-color: #fff;
-    box-shadow: 0px 3px 8px #e2e2e2;
+    
     cursor: grab;
     padding: 12px 10px;
     /* margin: 10px 0px; */
