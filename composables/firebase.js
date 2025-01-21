@@ -19,32 +19,35 @@ export const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 signInAnonymously(auth)
-  .then(() => {
-    console.log('signed in')
-    // Signed in..
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // ...
-  });
+    .then(() => {
+        console.log('signed in')
+        // Signed in..
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ...
+    });
 // for Notification
 const messaging = getMessaging(app);
-
-getToken(messaging, { vapidKey: 'BJD5YqS3ULH6ZNcDxiMwiJd3mibGIk03cNX5e6xqY_Y_nbZaDf7vcf6HEKLMEy_TjcFZn5qKtN4sjWHdwLG2X9A' }).then((currentToken) => {
-    if (currentToken) {
-        console.log(currentToken)
-        // Send the token to your server and update the UI if necessary
+const useFCMToken = async () => {
+    const token = await getToken(messaging, { vapidKey: 'BJD5YqS3ULH6ZNcDxiMwiJd3mibGIk03cNX5e6xqY_Y_nbZaDf7vcf6HEKLMEy_TjcFZn5qKtN4sjWHdwLG2X9A' }).then((currentToken) => {
+        if (currentToken) {
+            // console.log(currentToken)
+            return currentToken;
+            // Send the token to your server and update the UI if necessary
+            // ...
+        } else {
+            // Show permission request UI
+            console.log('No registration token available. Request permission to generate one.');
+            return null;
+        }
+    }).catch((err) => {
+        console.log('An error occurred while retrieving token. ', err);
         // ...
-    } else {
-        // Show permission request UI
-        console.log('No registration token available. Request permission to generate one.');
-        // ...
-    }
-}).catch((err) => {
-    console.log('An error occurred while retrieving token. ', err);
-    // ...
-});
+    });
+    return token;
+}
 
 // onBackgroundMessage(messaging, (payload) => {
 //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
@@ -59,4 +62,4 @@ function requestPermission() {
 }
 requestPermission();
 const provider = new GoogleAuthProvider();
-export { auth, provider, messaging };
+export { auth, provider, messaging, useFCMToken };

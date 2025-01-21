@@ -1174,7 +1174,7 @@ const attendanceData = ref([
     line-height: 1.5; /* Adjusts the line height for better readability */
 }
 .table-st {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
 }
