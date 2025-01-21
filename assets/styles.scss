@@ -7,6 +7,10 @@ $gutter: 1rem; //for primeflex grid system
 @import '@/assets/demo/styles/flags/flags.css';
 @import '@/assets/demo/styles/badges.scss';
 
+.container {
+    max-width: 1440px;
+    padding: 0 20px;
+}
 .close-btn {
     border-radius: 100%;
     top: -5px;
@@ -72,8 +76,7 @@ $gutter: 1rem; //for primeflex grid system
     padding: 7px !important;
 }
 
-
-.p-datatable-loading-overlay{
-    background:  none;
+.p-datatable-loading-overlay {
+    background: none;
     backdrop-filter: blur(100px);
 }
