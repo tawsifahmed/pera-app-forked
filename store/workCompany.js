@@ -106,11 +106,11 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       let allSpaces = [];
       if (state.getSpaces) {
         state.getSpaces?.spaces.forEach(element => {
-            allSpaces.push({ 
-            name: element.name, 
-            id: element.id, 
-            projects: element.projects.map(project => ({ id: project.id, name: project.name })) 
-            });
+          allSpaces.push({
+            name: element.name,
+            id: element.id,
+            projects: element.projects.map(project => ({ id: project.id, name: project.name }))
+          });
         });
       } else return [];
       return allSpaces;
@@ -127,7 +127,6 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
           },
         }),
       )
-      console.log('SideBar List', data.value)
       this.availableCompanies = data.value?.data;
       let storedCompanyId = Number(localStorage.getItem('userCompany'));
       if (this.availableCompanies) {

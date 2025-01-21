@@ -98,7 +98,7 @@ if (readTags.value) {
 }
 
 onMounted(() => {
-    console.log('readDashboard', accessPermission('read_dashboard'));
+    // console.log('readDashboard', accessPermission('read_dashboard'));
 });
 
 const selectedComp = ref(null);
