@@ -128,8 +128,8 @@ const isPage = ref(true);
             <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Project Name">
                 <template #body="slotProps">
-                    <NuxtLink :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
-                        <p class="cursor-pointer proj-name hover:text-primary font-semibold">{{ slotProps.data.name }}</p>
+                    <NuxtLink style="color: inherit;" :to="`/companies/${singleSpace.company_id}/spaces/${singleSpace.id}/projects/${slotProps.data.id}`">
+                        <p class="cursor-pointer hover:text-primary font-semibold">{{ slotProps.data.name }}</p>
                     </NuxtLink>
                 </template>
             </Column>
@@ -196,7 +196,7 @@ const isPage = ref(true);
 }
 
 .table-dsp {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
 

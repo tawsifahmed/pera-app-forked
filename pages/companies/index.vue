@@ -146,8 +146,8 @@ const switchCompanyHandler = async (switchCompId) => {
             <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Company Name">
                 <template #body="slotProps">
-                    <NuxtLink :to="`/companies/${slotProps?.data?.id}`">
-                        <p class="cursor-pointer com-name hover:text-primary font-semibold" @click="switchCompanyHandler(slotProps?.data?.id)">{{ slotProps?.data?.name }}</p>
+                    <NuxtLink style="color: inherit;" :to="`/companies/${slotProps?.data?.id}`">
+                        <p class="cursor-pointer  hover:text-primary font-semibold" @click="switchCompanyHandler(slotProps?.data?.id)">{{ slotProps?.data?.name }}</p>
                     </NuxtLink>
                 </template>
             </Column>
@@ -218,7 +218,7 @@ const switchCompanyHandler = async (switchCompId) => {
 }
 
 .table-st {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
     td {

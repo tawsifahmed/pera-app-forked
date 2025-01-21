@@ -105,7 +105,7 @@ const handleNavigate = async (type) => {
 };
 </script>
 <template>
-    <div  class="bg-white card1">
+    <div  class="card card1">
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
             <div @click="handleClick(notify)" v-html="notify.title" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`"></div>
@@ -119,7 +119,7 @@ const handleNavigate = async (type) => {
                 <Button @click="handleNavigate('prev')" :disabled="page === 1 ? true : false" icon="pi pi-chevron-left" outlined aria-label="Filter" />
                 <Button @click="handleNavigate('')" :disabled="totalPage === page || !notificationData.length > 0 ? true : false" icon="pi pi-chevron-right" outlined aria-label="Filter" />
             </div>
-            <Button class="bg-white hover:bg-gray-200  text-indigo-500 hover:text-indigo-600" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
+            <Button class="hover:bg-gray-200" label="Read All" @click="handleReadAll" :loading="loadingRead"/>
         </div>
     </div>
     

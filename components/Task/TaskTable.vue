@@ -7,6 +7,7 @@ import accessPermission from '~/composables/usePermission';
 import Column from 'primevue/column';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import { toRaw } from 'vue';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
@@ -560,12 +561,12 @@ const handleAssigneeChanges = async (type, values, key) => {
 const inlineDueDate = ref();
 
 watch(deadlineJustifyProvided, (newVal) => {
-        if (newVal === true) {
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 5000 });
-        }
-        if (newVal === false) {
-            toast.add({ severity: 'warn', summary: 'Unsuccessful!', detail: 'Deadline justification is not provided.', group: 'br', life: 5000 });
-        }
+    if (newVal === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Due date updated ', group: 'br', life: 5000 });
+    }
+    if (newVal === false) {
+        toast.add({ severity: 'warn', summary: 'Unsuccessful!', detail: 'Deadline justification is not provided.', group: 'br', life: 5000 });
+    }
 });
 const handleDateChange = async (newDate, slotKey) => {
     console.log('slotKey', slotKey);
@@ -739,7 +740,11 @@ function addChild(parentKey, newChild, node) {
 
 // Recursive function to remove a child
 function removeChild(node = toRaw(tableData.value)) {
-    const filtered = node.filter((item) => item.key !== 'new');
+    const filtered = node.filter((item) => {
+        if (item.key !== 'new') {
+            return toRaw(item);
+        }
+    });
     filtered.forEach((item) => {
         if (item.children && item.children.length > 0) {
             item.children = removeChild(item.children);
@@ -747,42 +752,11 @@ function removeChild(node = toRaw(tableData.value)) {
     });
 
     tableData.value = JSON.parse(JSON.stringify(filtered));
+    newTaskNameInput.value = '';
     return tableData.value;
     // return (tableData.value = structuredClone(filtered));
 }
 
-
-// This will store the column widths
-const columnWidths = ref({});
-
-
-const onColumnResizeEnd = (event) => {
-    const { element, delta } = event; // Get the element and delta (resize change)
-    
-    const columnField = element.getAttribute('data-field'); // Get the column field name
-    let currentWidth = element.offsetWidth; // Get the current width after resizing
-
-    // Calculate the new width by adding delta to the previous width
-    if (columnWidths.value[columnField]) {
-        currentWidth = columnWidths.value[columnField] + delta;
-    }
-
-    columnWidths.value[columnField] = currentWidth; // Store the updated width
-    applyColumnWidths(); // Apply updated widths to the table
-};
-
-const applyColumnWidths = () => {
-    // Loop through all columns and apply the new width
-    const columns = document.querySelectorAll('.p-column'); // Select all column elements
-    columns.forEach((column) => {
-        const columnField = column.getAttribute('data-field'); // Get the column field name
-        const columnWidth = columnWidths.value[columnField];
-
-        if (columnWidth) {
-            column.style.width = `${columnWidth}px`; // Apply the width to each column
-        }
-    });
-    }
 const refreshLoader = ref(false);
 const refreshDisabled = ref(false);
 const handleRefresh = async () => {
@@ -838,7 +812,7 @@ const handleRefresh = async () => {
         </template>
 
         <template #end>
-            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary"  v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
+            <Button @click="handleRefresh" icon="pi pi-refresh" severity="secondary" v-tooltip.left="{ value: `Refresh` }" :loading="refreshLoader" :disabled="refreshDisabled" class="mr-2" rounded raised />
             <IconField iconPosition="right" raised>
                 <InputIcon>
                     <i class="pi pi-search" />
@@ -897,7 +871,7 @@ const handleRefresh = async () => {
     </div>
 
     <!-- Tree table -->
-     <!-- old=> -->
+    <!-- old=> -->
     <TreeTable
         v-if="viewMode === 'list'"
         class="table-st"
@@ -912,42 +886,6 @@ const handleRefresh = async () => {
         style="overflow: auto"
         :tableProps="{ style: { minWidth: '1024px' } }"
     >
-
-    <!-- issues -->
-    <!-- scrollable
-    scrollDirection="both"
-    style="overflow: auto" -->
-    <!-- issues -->
-
-    <!-- <TreeTable
-        v-if="viewMode === 'list'"
-        class="table-st"
-        stripedRows
-        :value="tableData"
-        v-model:expandedKeys="expandedKeys"
-        :lazy="true"
-        :loading="tableLoader"
-        filterDisplay="menu"
-        :resizableColumns="true"
-        :tableProps="{ style: { minWidth: '1024px' } }"
-> -->
-    <!-- <TreeTable
-        v-if="viewMode === 'list'"
-        class="table-st"
-        stripedRows
-        :value="tableData"
-        scrollable
-        scrollDirection="both"
-        v-model:expandedKeys="expandedKeys"
-        :lazy="true"
-        :loading="tableLoader"
-        filterDisplay="menu"
-        style="overflow: auto"
-        :resizableColumns="true"
-        showGridlines 
-        :tableProps="{ style: { minWidth: '1024px' } }"
-        @columnResizeEnd="onColumnResizeEnd"
-    > -->
         <template #empty>
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
@@ -1019,7 +957,7 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column field=""  header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
+        <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
             <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key">
@@ -1491,7 +1429,7 @@ const handleRefresh = async () => {
 }
 
 .table-st {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
     width: 100% !important;
@@ -1531,7 +1469,7 @@ const handleRefresh = async () => {
     align-items: center;
     justify-content: start;
     gap: 10px;
-    border-bottom: 0.5px solid rgb(230, 229, 229);
+    border-bottom: inherit;
 }
 
 .tone {
@@ -1596,7 +1534,6 @@ const handleRefresh = async () => {
 }
 
 .pi-times:hover {
-    color: rgb(27, 27, 27);
     font-weight: 500;
     animation: hover-animation 0.3s ease-in-out forwards;
 }
@@ -1621,12 +1558,12 @@ const handleRefresh = async () => {
     padding-right: 4px !important;
 }
 .task-status-2 .p-dropdown {
-    background: transparent;
+    background: none;
     border: none;
-    box-shadow: 0 0 #ffffff, 0 0 #ffffff, 0 1px 2px 0 #ffffff;
+    box-shadow: none;
 }
 .task-status-2 .p-dropdown:focus {
-    background: transparent;
+    background: none;
     border: none;
 }
 .task-status-2 .status-bg {
@@ -1822,8 +1759,7 @@ textarea {
 }
 
 .task-card {
-    background-color: #fff;
-    box-shadow: 0px 3px 8px #e2e2e2;
+    
     cursor: grab;
     padding: 12px 10px;
     /* margin: 10px 0px; */
@@ -1973,8 +1909,8 @@ textarea {
 
 .view-btns .view-btn:not(:first-child):not(:last-child) {
     border-radius: 0px;
-    border-left: 2px solid #e2e8f0;
-    border-right: 2px solid #e2e8f0;
+    border-left: inherit;
+    border-right: inherit;
 }
 
 .webView-action {
@@ -2136,8 +2072,8 @@ textarea {
         padding: 0.25rem 0.4rem !important;
         cursor: pointer !important;
         caret-color: transparent !important;
-        border: 1px solid #fff;
-        box-shadow: 0 0 #fff, 0 0 #fff, 0 1px 2px 0 #fff;
+        border: none;
+        box-shadow: none;
         font-weight: 400;
         outline: none !important;
         outline-offset: -1px !important;

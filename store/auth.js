@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useFCMToken } from '~/composables/firebase';
 // import { useAsyncData } from '@nuxtjs/composition-api';
 
 export const useAuthStore = defineStore('auth', {
@@ -19,17 +20,18 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async authenticateUser({ email, password }) {
-
+      const fcm_token = await useFCMToken();
+      // return console.log(fcm_token);
       const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
           email,
           password,
+          fcm_token
         },
       });
-      console.log('loginData', data.value)
-      console.log('loginErrData', error.value?.data)
+
 
       if (error.value) {
         if (error.value?.data?.code === 403) {
