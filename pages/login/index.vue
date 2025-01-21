@@ -247,8 +247,8 @@ onMounted(() => {
             <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
             <!-- <h2 class="font-bold">Pera App</h2> -->
             <Toast position="bottom-right" group="br" />
-            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
+            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%); ">
+                <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px; padding-top: 28px !important; padding-bottom: 34px !important;">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign in to continue</div>
@@ -281,6 +281,18 @@ onMounted(() => {
                     <div class="flex flex-wrap items-center justify-between mt-4">
                         Don't have an account?&nbsp; <NuxtLink to="/register" class="forgot_pass md:mb-0"> Click Here.</NuxtLink>
                         <!-- <nuxt-link to="/" class="forgot_pass">Forgot password?</nuxt-link> -->
+                    </div>
+
+                    <div class="flex justify-content-center gap-2 mt-3">
+                        <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
+
+                            <img src="/appleBtn.webp" height="40" alt="Image" class="" />
+                        </a>
+                 
+                        <a href="https://apps.apple.com/us/app/the-pera/id6505035655" target="_blank">
+
+                            <img src="/googleBtn.webp" height="40" alt="Image" class="" />
+                        </a>
                     </div>
                 </div>
                 <div v-if="verifyOTPForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
