@@ -487,7 +487,7 @@ const setFileUrl = (url) => {
     const urlString = url;
     const partsOfString = urlString.split('/');
     const lastPartOfString = partsOfString[partsOfString.length - 1];
-    return lastPartOfString;
+    return lastPartOfString.slice(0, 10);
 };
 
 const setDateFormat = (dateUrl) => {

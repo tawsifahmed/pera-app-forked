@@ -216,9 +216,9 @@ const updateTaskName = async (node, isCtrlKeyPressed = false) => {
         const obj = {
             ...data?.data,
             key: data?.data?.id,
-            unique_id: data?.data?.unique_id,
-        }
-        emit('handleTaskDetailView', obj)
+            unique_id: data?.data?.unique_id
+        };
+        emit('handleTaskDetailView', obj);
         newTaskNameInput.value = '';
         return (showInput.value = false);
     }
@@ -957,7 +957,8 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="" header="" :style="{ width: '5%', padding: '0.75rem 0rem' }">
+
+        <Column field="" header="" :style="{ width: '4%', padding: '0.75rem 0rem' }">
             <template #body="slotProps">
                 <div class="w-full h-full flex align-items center" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div class="flex gap-1 w-full h-full justify-content-center align-items-center" v-if="hoveredRowKey === slotProps.node.key">
@@ -996,7 +997,15 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '16%' }">
+        <Column header="Tags" :style="{ width: '11%' }">
+            <template #body="slotProps">
+                <div class="flex gap-1 flex-nowrap overflow-hidden">
+                    <!-- <pre>{{ slotProps.node.data.tagsObj }}</pre> -->
+                    <Tag v-for="tags in slotProps.node.data.tagsObj" :key="tags" severity="secondary" :value="tags.name" class="text-nowrap" v-tooltip.top="{ value: `${tags.name}` }"></Tag>
+                </div>
+            </template>
+        </Column>
+        <Column field="assignee" header="Assignee" :style="{ width: '6%' }">
             <template #body="slotProps">
                 <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
                     <span class="flex justify-content-center assignee-wrapper"> </span>
@@ -1759,7 +1768,6 @@ textarea {
 }
 
 .task-card {
-    
     cursor: grab;
     padding: 12px 10px;
     /* margin: 10px 0px; */
