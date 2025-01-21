@@ -170,14 +170,14 @@ const handleCreateCompanyModal = () => {
                 <span
                     v-if="!company.logo"
                     v-tooltip.right="{ value: `${company.name}` }"
-                    class="cursor-pointer bg-orange-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green"
+                    class="cursor-pointer bg-indigo-100 border-round company-first-letter text-xl flex align-items-center justify-content-center mr-2 font-bold capitalize text-green"
                     >{{ company.name?.charAt(0) }}</span
                 >
                 <span v-tooltip.right="{ value: `${company.name}` }" class="cLogo mr-2" v-else>
                     <img :src="company.logo" alt="" />
                 </span>
                 <div class="comp-switch" v-tooltip.right="{ value: companyList.length === 1 ? '' : 'Switch Company' }">
-                    <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList" optionLabel="label" :disabled="companyList.length == 1" class="w-full bg-indigo-50" />
+                    <Dropdown v-model="selectedComp" @change="switchCompanyHandler(selectedComp.id)" checkmark variant="filled" :options="companyList" optionLabel="label" :disabled="companyList.length == 1" class="w-full" />
                 </div>
                 <Button v-tooltip.right="{ value: 'Manage Company' }" type="button" icon="pi pi-ellipsis-v" class="p-button-sm w-2rem h-2rem ml-1" @click="toggle" severity="secondary" aria-label="Bookmark" text />
                 <Menu ref="menu1" id="overlay_menu" @click="clickCompanyMenu(cItems)" :model="cItems" :popup="true" />
@@ -240,7 +240,7 @@ const handleCreateCompanyModal = () => {
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(100px);
-    background-color: white; /* Semi-transparent background */
+    background-color: transparent; /* Semi-transparent background */
     z-index: 10999 !important; /* Ensure it's on top of all other elements */
 }
 

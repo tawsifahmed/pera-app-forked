@@ -128,8 +128,8 @@ const spacePage = ref(true);
             <Column field="index" header="Serial" sortable></Column>
             <Column field="name" header="Space Name">
                 <template #body="slotProps">
-                    <NuxtLink :to="`/companies/${companies}/spaces/${slotProps.data.id}`">
-                        <p class="cursor-pointer com-name hover:text-primary font-semibold">{{ slotProps.data.name }}
+                    <NuxtLink style="color: inherit;" :to="`/companies/${companies}/spaces/${slotProps.data.id}`">
+                        <p class="cursor-pointer hover:text-primary font-semibold">{{ slotProps.data.name }}
                         </p>
                     </NuxtLink>
                 </template>
@@ -198,7 +198,7 @@ const spacePage = ref(true);
 }
 
 .table-dco {
-    border: 1px solid #ededed;
+    border: inherit;
     border-radius: 10px;
     overflow: hidden;
 

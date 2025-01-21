@@ -27,8 +27,7 @@ const signInWithGoogle = async () => {
                 token: authToken
             }
         });
-        console.log('loginData',data.value);
-        if(data.value){
+        if (data.value) {
             // console.log('login.value', data.value)
             const userCompany = data?.value?.company?.id;
             if (userCompany) {
@@ -37,14 +36,13 @@ const signInWithGoogle = async () => {
             toast.add({ severity: 'success', summary: 'Authorized', detail: 'Login Successful', group: 'br', life: 3000 });
             const token = useCookie('token');
             token.value = data.value.token;
-    
+
             setTimeout(() => {
                 router.push('/');
             }, 300);
             const rolePermission = useCookie('rolePermission');
             rolePermission.value = data?.value?.permissions;
         }
-
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Authorization Failed', detail: 'Something went wrong.', group: 'br', life: 3000 });
         console.log(error);
@@ -53,7 +51,7 @@ const signInWithGoogle = async () => {
 </script>
 <template>
     <button class="login-with-google-btn" @click="signInWithGoogle">
-        <Toast position="bottom-right" group="br"/>
+        <Toast position="bottom-right" group="br" />
         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 48 48">
             <path
                 fill="#FFC107"

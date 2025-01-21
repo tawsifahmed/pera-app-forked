@@ -297,72 +297,78 @@ const formattedTime = (time) => {
 };
 
 const handleTaskDetailSubmit = async () => {
-    let sendEditDate;
-    if (dueDate.value) {
-        const selectedDate = new Date(dueDate.value);
-        selectedDate.setDate(selectedDate.getDate() + 1);
-        sendEditDate = selectedDate.toISOString();
-    }
-
-    const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
-    const taskDetailData = {
-        id: taskDetails.value?.id,
-        // name: taskDetails.value?.name,
-        ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
-        project_id: projID,
-        ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - 18 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
-        ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
-        ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {})
-    };
-
-    if (sendEditDate) {
-        const postSubDate = new Date(sendEditDate);
-        postSubDate.setDate(postSubDate.getDate() - 1);
-        dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
-    }
-
-    if (taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true) {
-        console.log('checkDate.value', checkDate.value);
-        handleMissDeadlineShowTimer(taskDetails.value?.id, projID, taskDetailData.dueDate); // Call the showDeadline function
-        delete taskDetailData.dueDate;
-    }
-
-    // Send data without due date if taskDetails.parent_task_id is null
-
-    await editTask(taskDetailData);
-    if (isTaskEdited.value === true) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Task detail updated', group: 'br', life: 3000 });
-        selectedfile.value = null;
-        editorViewMode.value = 'preview';
-        if (isDescriptionEdited.value === true) {
-            isDescriptionEdited.value = false;
-            console.log('isDescriptionEdited Flagged');
-        }
-        if (isAsigneeEdited.value === true) {
-            isAsigneeEdited.value = false;
-            console.log('isAsigneeEdited Flagged');
-        }
-        if (isTagsEdited.value === true) {
-            isTagsEdited.value = false;
-            console.log('isTagsEdited Flagged');
-        }
-        if (isDateEdited.value === true) {
-            isDateEdited.value = false;
-            console.log('isDateEdited Flagged');
-        }
+    if (isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false && isDateEdited.value === false) {
+        toast.add({ severity: 'warn', summary: 'Warn', detail: 'No changes detected', group: 'br', life: 3000 });
+        return;
     } else {
-        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
+        let sendEditDate;
+        if (dueDate.value) {
+            const selectedDate = new Date(dueDate.value);
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            sendEditDate = selectedDate.toISOString();
+        }
+
+        const formattedDueDate = new Date(taskDetails.value?.due_date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        const taskDetailData = {
+            id: taskDetails.value?.id,
+            // name: taskDetails.value?.name,
+            ...(isDescriptionEdited.value === true ? { description: description.value } : {}),
+            project_id: projID,
+            ...(checkDate.value !== formattedDueDate ? { dueDate: sendEditDate ? new Date(new Date(sendEditDate).getTime() - 18 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ') : null } : {}),
+            ...(isAsigneeEdited.value === true ? { assignees: assignees.value.map((obj) => obj.id) } : {}),
+            ...(isTagsEdited.value === true ? { tags: tags.value.map((obj) => obj.id) } : {})
+        };
+
+        if (sendEditDate) {
+            const postSubDate = new Date(sendEditDate);
+            postSubDate.setDate(postSubDate.getDate() - 1);
+            dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
+        }
+
+        if (taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true) {
+            console.log('checkDate.value', checkDate.value);
+            handleMissDeadlineShowTimer(taskDetails.value?.id, projID, taskDetailData.dueDate);
+            delete taskDetailData.dueDate;
+        }
+
+        // Send data without due date if taskDetails.parent_task_id is null
+
+        await editTask(taskDetailData);
+        if (isTaskEdited.value === true) {
+            toast.add({ severity: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'warn' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'success' : 'success', summary: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Deadline Justification Required' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Updated' : 'Updated', detail: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Provide deadline justification' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Task details updated except due date' : 'Task details updated', group: 'br', life: 3000 });
+            selectedfile.value = null;
+            editorViewMode.value = 'preview';
+            if (isDescriptionEdited.value === true) {
+                isDescriptionEdited.value = false;
+                console.log('isDescriptionEdited Flagged');
+            }
+            if (isAsigneeEdited.value === true) {
+                isAsigneeEdited.value = false;
+                console.log('isAsigneeEdited Flagged');
+            }
+            if (isTagsEdited.value === true) {
+                isTagsEdited.value = false;
+                console.log('isTagsEdited Flagged');
+            }
+            if (isDateEdited.value === true) {
+                isDateEdited.value = false;
+                console.log('isDateEdited Flagged');
+            }
+        } else {
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to upadte task detail', group: 'br', life: 3000 });
+        }
     }
 };
 
 watch(deadlineJustifyProvided, (newVal) => {
-        if (newVal === true) {
-
-        }
-        if (newVal === false) {
-            dueDate.value =taskDetails.value?.due_date ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null
-            // checkDate.value = dueDate.value;
-        }
+    if (newVal === true) {
+    }
+    if (newVal === false) {
+        dueDate.value = taskDetails.value?.due_date
+            ? new Date(taskDetails.value.due_date).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase()
+            : null;
+        // checkDate.value = dueDate.value;
+    }
 });
 
 const file = ref(null);
@@ -957,9 +963,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor class="card" style="padding: 0;" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
 
-                                <MdEditor v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor style="padding: 0;" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" theme="light" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1173,7 +1179,7 @@ const handletaskNameUpdate = async () => {
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
-                        <Card class="mb-2" v-for="val in singleTaskComments" :key="val.id">
+                        <Card class="mb-2 card" style="padding: 0;" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
@@ -1388,7 +1394,7 @@ const handletaskNameUpdate = async () => {
     overflow-y: auto;
     height: 76vh;
     padding: 5px !important;
-    background-color: #f7fafc;
+    background-color: inherit;
 }
 
 .comments {
@@ -1535,7 +1541,7 @@ input[type='file'] {
     max-width: 100%;
     color: #444;
     padding: 5px;
-    background: #fff;
+    background: inherit;
     border-radius: 5px;
     border: 0.5px solid #b8b8b8;
 }
@@ -1577,6 +1583,7 @@ input[type='file']::file-selector-button:hover {
 .p-card .p-card-body {
     gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
+    
 }
 
 .activity-btns {
@@ -1855,5 +1862,12 @@ a {
 
 .mCrossIcon:hover {
     background: none !important;
+}
+
+#md-editor-v3{
+    background-color: inherit !important;
+    color: inherit !important;
+    
+    border-radius: 10px;
 }
 </style>
