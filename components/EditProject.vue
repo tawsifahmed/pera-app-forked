@@ -205,7 +205,7 @@ onMounted(() => {
             </div>
             <div class="mb-4">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status<i class="text-red-400 text-italic">*</i></p>
-                <div class="container">
+                <div class="">
                     <InputGroup>
                         <InputGroupAddon>
                             <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
@@ -272,7 +272,7 @@ onMounted(() => {
             <!-- <pre>{{dummyStatusList}}</pre> -->
             <div class="">
                 <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i class="text-red-400 text-italic">*</i></p>
-                <div class="container">
+                <div class="">
                     <div class="field">
                         <!-- {{selectedCloseStatus}} -->
                         <Dropdown v-model="selectedCloseStatus" :options="dummyStatusList" optionLabel="name" placeholder="Select Status" class="w-full" />
@@ -282,14 +282,14 @@ onMounted(() => {
                 </div>
             </div>
             <div class="flex w-full gap-2">
-                <div class="field flex flex-column mb-3" style="width: 50%;">
+                <div class="field flex flex-column mb-3" style="width: 49%;">
                     <label for="name"
                         >Gitlab ID
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                     </label>
                     <InputText v-model="gitLabProjectId" type="number" required="true" />
                 </div>
-                <div class="field flex flex-column mb-3" style="width: 50%;">
+                <div class="field flex flex-column mb-3" style="width: 49%;">
                     <label for="name"
                         >Gitlab Token
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->

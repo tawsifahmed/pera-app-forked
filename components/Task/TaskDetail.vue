@@ -956,10 +956,10 @@ const handletaskNameUpdate = async () => {
                                         <p>Description:</p>
                                     </div>
 
-                                    <!-- <ButtonGroup>
+                                    <ButtonGroup>
                                         <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
                                         <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
-                                    </ButtonGroup>  -->
+                                    </ButtonGroup> 
                                 </div>
 
                                 <!-- <pre>description {{ description.length}}</pre> -->
