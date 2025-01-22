@@ -207,8 +207,7 @@ const selectedProject = ref();
 const statuses = ref();
 
 const filterStatus = ref();
-const filterStartDate = ref();
-const filterDueDate = ref();
+const dateFilter = ref();
 const isCalendarStartSelected = ref(false);
 const isCalendarSelected = ref(false);
 const taskLoading = ref(false); // Add loading state
@@ -229,9 +228,9 @@ let currentPage = ref(1); // New variable for current page
 const filterTasks = async () => {
     projectId.value = selectedProject.value ? selectedProject.value.id : '';
     sta.value = selectedStatus.value ? selectedStatus.value.id : '';
-    startD.value = filterStartDate.value;
-    enD.value = filterDueDate.value;
-
+    startD.value = dateFilter.value[0] ? dateFormatter(dateFilter.value[0]) : '';
+    enD.value = dateFilter.value[1] ? dateFormatter(dateFilter.value[1]) : '';
+    // return console.log(dateFilter.value);
     if (isLoadMoreClicked) {
         currentPage.value++;
     } else {
@@ -243,10 +242,11 @@ const filterTasks = async () => {
     isLoadMoreClicked = false;
 };
 
-const selectStartFilterDate = (newDate) => {
-    isCalendarStartSelected.value = true;
-    const date = new Date(newDate);
-    filterStartDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+const handleDateFilter = () => {
+    // console.log(filterStartDate);
+    // isCalendarStartSelected.value = true;
+    // const date = new Date(newDate);
+    // filterStartDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     filterTasks();
 };
 const selectFilterDate = (newDate) => {
@@ -271,11 +271,10 @@ const handleDateDelete = () => {
 };
 
 const handleFilterReset = () => {
-    if (selectedProject.value || filterStatus.value || filterStartDate.value || filterDueDate.value || currentPage.value > 1) {
+    if (selectedProject.value || filterStatus.value || dateFilter.value || currentPage.value > 1) {
         selectedProject.value = '';
         filterStatus.value = '';
-        filterStartDate.value = '';
-        filterDueDate.value = '';
+        dateFilter.value = [];
         projectId.value = '';
 
         sta.value = '';
@@ -622,19 +621,20 @@ watch(
 </div> -->
         <div class="col-12 xl:col-6" v-if="readTask">
             <div class="card h-full">
-                <div class="flex gap-2 align-items-center flex-wrap" style="padding-bottom: 10px">
+                <div class="flex gap-2 align-items-center flex-wrap md:flex-nowrap" style="padding-bottom: 10px">
                     <h5 class="mb-2">Tasks</h5>
                     <div class="flex gap-2 flex-wrap justify-content-end filter-container">
                         <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects" filter resetFilterOnHide optionLabel="name" placeholder="Project" class="w-full md:w-10rem mb-2" />
                         <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Status" class="w-full md:w-10rem mb-2" />
-                        <div class="mb-2 relative w-full md:w-8rem">
-                            <Calendar @date-select="selectStartFilterDate($event)" v-model="filterStartDate" placeholder="Start Date" class="w-full md:w-8rem" />
-                            <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
+                        <div class="mb-2 relative w-full md:w-16rem">
+                            <!-- <Calendar v-model="dates" selectionMode="range" :manualInput="false" placeholder="Select Date" /> -->
+                            <Calendar @hide="handleDateFilter" dateFormat="dd/mm/yy" :manualInput="false" selectionMode="range" v-model="dateFilter" placeholder="Select Date" class="w-full text-sm" />
+                            <!-- <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p> -->
                         </div>
-                        <div class="mb-2 relative w-full md:w-8rem">
+                        <!-- <div class="mb-2 relative w-full md:w-8rem">
                             <Calendar @date-select="selectFilterDate($event)" v-model="filterDueDate" placeholder="Due Date" class="w-full md:w-8rem" />
                             <p v-if="isCalendarSelected" @click="handleDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p>
-                        </div>
+                        </div> -->
                         <Button @click="handleFilterReset" label="Reset" class="mb-2" severity="secondary" />
                     </div>
                 </div>
@@ -714,6 +714,7 @@ watch(
 <style lang="scss" scoped>
 .filter-container {
     padding: 0 10px;
+    width: 100%;
 }
 
 .task-container {

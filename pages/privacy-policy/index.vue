@@ -264,6 +264,7 @@ definePageMeta({
 .privacy {
     padding: 80px 0;
     max-width: 60%;
+    text-align: justify;
 }
 h1,
 h2,
