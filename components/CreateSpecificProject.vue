@@ -15,7 +15,6 @@ const enabled = ref(true);
 const dragging = ref(false);
 const hoveredItemIndex = ref(null); // Index of the hovered item
 
-
 // Computed
 const editable = ref(true);
 const dragOptions = computed(() => ({
@@ -93,7 +92,7 @@ const addTaskStatus = () => {
 
 const handleDeleteTask = (index) => {
     taskStatusList.value.splice(index, 1);
-    if(selectedCloseStatus.value?.is_closed_status === taskStatusList.value[index]?.is_closed_status) {
+    if (selectedCloseStatus.value?.is_closed_status === taskStatusList.value[index]?.is_closed_status) {
         selectedCloseStatus.value = null;
     }
     if (taskStatusList.value.length == 0) {
@@ -115,8 +114,8 @@ watch(selectedCloseStatus, (newStatus) => {
 watch(taskStatusList, (newList) => {
     newList.forEach((status, index) => {
         status.serial_no = index + 1;
-    })
-})
+    });
+});
 
 const loading = ref(false);
 const handleCreateProject = async () => {
@@ -126,7 +125,7 @@ const handleCreateProject = async () => {
         loading.value = false;
     } else {
         errorHandler.value = false;
-        taskStatusList.value = taskStatusList.value.map(status => {
+        taskStatusList.value = taskStatusList.value.map((status) => {
             if (!status.taskStatusColor.startsWith('#')) {
                 status.taskStatusColor = `#${status.taskStatusColor}`;
             }
@@ -139,9 +138,8 @@ const handleCreateProject = async () => {
             space_id: spaces,
             statuses: taskStatusList.value,
             git_project_id: gitLabProjectId.value,
-            git_token: gitlabProjectToken.value,
+            git_token: gitlabProjectToken.value
         };
-        console.log('statuses', taskStatusList.value);
         await project.createProjects(createProjectData);
         if (save.value === true) {
             companyFormInputs.value = false;
@@ -170,7 +168,6 @@ const handleCreateProject = async () => {
             selectedCloseStatus.value = null;
             loading.value = false;
             toast.add({ severity: 'success', summary: 'Success!', detail: 'Project created successfully!', group: 'br', life: 3000 });
-
         } else {
             toast.add({ severity: 'error', summary: 'Failed', detail: 'Project creation Failed!', group: 'br', life: 3000 });
             loading.value = false;
@@ -178,7 +175,6 @@ const handleCreateProject = async () => {
         }
     }
 };
-
 
 const showDialog = async () => {
     companyFormInputs.value = true;
@@ -194,11 +190,11 @@ const showDialog = async () => {
 
 const hideDialog = () => {
     companyFormInputs.value = false;
-    if(projectNameInput.value){
+    if (projectNameInput.value) {
         projectNameInput.value = null;
     }
 
-    if(projectDescriptionInput.value){
+    if (projectDescriptionInput.value) {
         projectDescriptionInput.value = null;
     }
     taskStatusList.value = [
@@ -221,19 +217,19 @@ const hideDialog = () => {
             serial_no: 3
         }
     ];
-    
-    if(selectedCloseStatus.value){
+
+    if (selectedCloseStatus.value) {
         selectedCloseStatus.value = null;
     }
     taskStatusName.value = '';
 };
 
 const handleClose = () => {
-    if(projectNameInput.value){
+    if (projectNameInput.value) {
         projectNameInput.value = null;
     }
 
-    if(projectDescriptionInput.value){
+    if (projectDescriptionInput.value) {
         projectDescriptionInput.value = null;
     }
     taskStatusList.value = [
@@ -256,50 +252,54 @@ const handleClose = () => {
             serial_no: 3
         }
     ];
-    
-    if(selectedCloseStatus.value){
+
+    if (selectedCloseStatus.value) {
         selectedCloseStatus.value = null;
     }
     taskStatusName.value = '';
-
 };
-
 </script>
 
 <template>
     <div>
-        <Button :icon="isPage ? '' : 'pi pi-plus'"
+        <Button
+            :icon="isPage ? '' : 'pi pi-plus'"
             :class="isPage ? 'btn-primary cursor-pointer text-white px-5 py-2' : 'p-button-sm'"
-            :label="isPage ? 'Create +' : ''" @click="showDialog" :severity="isPage ? 'primary' : 'secondary'"
-            aria-label="Bookmark" :text="!isPage" />
-        <Dialog v-model:visible="companyFormInputs" dismissableMask="true" :style="{ width: '450px' }" header="Create Project" :modal="true"
-            class="p-fluid" @update:visible="handleClose">
+            :label="isPage ? 'Create +' : ''"
+            @click="showDialog"
+            :severity="isPage ? 'primary' : 'secondary'"
+            aria-label="Bookmark"
+            :text="!isPage"
+        />
+        <Dialog v-model:visible="companyFormInputs" dismissableMask="true" :style="{ width: '450px' }" header="Create Project" :modal="true" class="p-fluid" @update:visible="handleClose">
             <div class="field">
-                <label for="name">Create project for <strong>{{ singleSpace?.name }}</strong> space</label>
+                <label for="name"
+                    >Create project for <strong>{{ singleSpace?.name }}</strong> space</label
+                >
             </div>
             <div class="field">
-                <label for="name">Project Name<i class="text-red-400 text-italic">*</i>
+                <label for="name"
+                    >Project Name<i class="text-red-400 text-italic">*</i>
                     <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-                    </label>
+                </label>
                 <InputText id="createProjectName" v-model="projectNameInput" required="true" />
             </div>
             <div class="field">
-                <label for="name">Project Description 
+                <label for="name"
+                    >Project Description
                     <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                 </label>
-                <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput" rows="3"
-                    cols="20" />
+                <Textarea id="description" class="border-gray-300" v-model="projectDescriptionInput" rows="3" cols="20" />
             </div>
             <div class="mb-4">
-                <p class="text-slate-700 mb-2 tracking-wide left-3">Setup Task Status<i
-                        class="text-red-400 text-italic">*</i>
-                        <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
-                    </p>
+                <p class="text-slate-700 mb-2 tracking-wide left-3">
+                    Setup Task Status<i class="text-red-400 text-italic">*</i>
+                    <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
+                </p>
                 <div class="container">
                     <InputGroup>
                         <InputGroupAddon>
-                            <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem;" v-model="colorHEX" inputId="cp-hex"
-                                format="hex" />
+                            <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
                         </InputGroupAddon>
                         <InputText class="form-control" v-tooltip.top="{ value: 'Type Status Name' }" v-model="taskStatusName" placeholder="e.g., TO-DO, DOING" />
                         <InputGroupAddon @click="addTaskStatus" class="btn btn-outline-secondary cursor-pointer">
@@ -310,33 +310,33 @@ const handleClose = () => {
                     <p v-if="addTaskSTatusError" class="text-red-600 text-small">Please type status name!</p>
                     <div class="row mt-2">
                         <div class="col-12 d-flex flex-column p-0">
-                            <draggable v-model="taskStatusList" :options="dragOptions" :disabled="!enabled"
-                                class="list-group" ghost-class="ghost" :move="checkMove" @start="dragging = true"
-                                @end="dragging = false">
+                            <draggable v-model="taskStatusList" :options="dragOptions" :disabled="!enabled" class="list-group" ghost-class="ghost" :move="checkMove" @start="dragging = true" @end="dragging = false">
                                 <template v-slot:item="{ element, index }">
-                                    <div class="flex delete-task justify-content-between" :style="hoveredItemIndex === index ? taskCardHoverStyle : taskCardStyle" @mouseenter="hoveredItemIndex = index" @mouseleave="hoveredItemIndex = null" :key="element.id">
-                                        <svg style="margin-right: -4px;" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
+                                    <div
+                                        class="flex delete-task justify-content-between"
+                                        :style="hoveredItemIndex === index ? taskCardHoverStyle : taskCardStyle"
+                                        @mouseenter="hoveredItemIndex = index"
+                                        @mouseleave="hoveredItemIndex = null"
+                                        :key="element.id"
+                                    >
+                                        <svg style="margin-right: -4px" width="15" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" class="cu-status-manager-status-list-item__drag-handler-icon">
                                             <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                              <circle cx="5" cy="5" r="1"/>
-                                              <circle cx="5" cy="12" r="1"/>
-                                              <circle cx="5" cy="19" r="1"/>
-                                              <circle cx="12" cy="5" r="1"/>
-                                              <circle cx="12" cy="12" r="1"/>
-                                              <circle cx="12" cy="19" r="1"/>
-                                             
+                                                <circle cx="5" cy="5" r="1" />
+                                                <circle cx="5" cy="12" r="1" />
+                                                <circle cx="5" cy="19" r="1" />
+                                                <circle cx="12" cy="5" r="1" />
+                                                <circle cx="12" cy="12" r="1" />
+                                                <circle cx="12" cy="19" r="1" />
                                             </g>
-                                          </svg>
+                                        </svg>
                                         <div class="flex align-items-center" style="width: 89%">
-                                            <ColorPicker v-tooltip.left="{ value: 'Change Color' }" class="color-pick mr-2 status-colors border-none"
-                                                v-model="element.taskStatusColor" inputId="cp-hex" format="hex" />
-        
+                                            <ColorPicker v-tooltip.left="{ value: 'Change Color' }" class="color-pick mr-2 status-colors border-none" v-model="element.taskStatusColor" inputId="cp-hex" format="hex" />
+
                                             <!-- <div class="status-colors" :style="{ backgroundColor: task.taskStatusColor }"></div> -->
                                             <!-- <p class="text-uppercase text-muteds">
                                                 {{ task.taskStatusName }}
                                             </p> -->
-                                            <InputText v-tooltip.left="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full" id="name"
-                                                v-model="element.taskStatusName" required="true" />
-        
+                                            <InputText v-tooltip.left="{ value: 'Change Status Name' }" class="text-uppercase text-muteds w-full" id="name" v-model="element.taskStatusName" required="true" />
                                         </div>
                                         <div @click="handleDeleteTask(index)" class="cursor-pointer cross-icon ms-1 flex justify-content-center align-items-center">
                                             <p class="pi pi-times"></p>
@@ -368,29 +368,28 @@ const handleClose = () => {
             </div>
             <!-- <pre>{{taskStatusList}}</pre> -->
             <div class="">
-                <p class="text-slate-700 mb-2 tracking-wide left-3">Set Task Close Status<i
-                        class="text-red-400 text-italic">*</i>
+                <p class="text-slate-700 mb-2 tracking-wide left-3">
+                    Set Task Close Status<i class="text-red-400 text-italic">*</i>
                     <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                 </p>
                 <div class="container">
                     <div class="field">
                         <!-- {{ selectedCloseStatus }} -->
-                        <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName"
-                            placeholder="Select Status" class="w-full" />
+                        <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName" placeholder="Select Status" class="w-full" />
                     </div>
 
                     <p v-if="closeStatusError" class="text-red-600 text-small">Please set close status!</p>
                 </div>
             </div>
             <div class="flex w-full gap-2">
-                <div class="field flex flex-column mb-3" style="width: 50%;">
+                <div class="field flex flex-column mb-3" style="width: 50%">
                     <label for="name"
                         >Gitlab ID
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                     </label>
                     <InputText v-model="gitLabProjectId" required="true" />
                 </div>
-                <div class="field flex flex-column mb-3" style="width: 50%;">
+                <div class="field flex flex-column mb-3" style="width: 50%">
                     <label for="name"
                         >Gitlab Token
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
@@ -438,7 +437,6 @@ const handleClose = () => {
     margin: 0;
     border-radius: 5px;
 }
-
 
 .buttons {
     margin-top: 35px;
