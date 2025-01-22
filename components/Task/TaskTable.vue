@@ -503,6 +503,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
             const selectedDate = new Date(taskValue);
             selectedDate.setDate(selectedDate.getDate() + 1);
             sendEditDate = selectedDate.toISOString();
+            console.log("selectedDate ==>", selectedDate);
         }
         const editTaskData = {
             id: task_id,
@@ -2281,5 +2282,10 @@ textarea {
 }
 .vuecal__event--focus {
     box-shadow: none !important;
+}
+.custom-footer{
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
 }
 </style>
