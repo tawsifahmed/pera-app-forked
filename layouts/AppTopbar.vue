@@ -28,6 +28,7 @@ const url = useRuntimeConfig();
 
 const name = ref('name');
 const userImage = ref(null);
+const logoutDialogShow = ref(false);
 const { logUserOut } = useAuthStore();
 const { authenticated } = storeToRefs(useAuthStore());
 const visibleProfile = ref(false);
@@ -431,11 +432,18 @@ onMessage(messaging, (message) => {
             </NuxtLink>
 
             <!-- <pre>{{fetchedTimerData}}</pre> -->
-            <button @click="logout" class="p-link layout-topbar-button">
+            <button @click="logoutDialogShow = true" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign Out</span>
             </button>
             <!-- <pre>{{piniaTID}}</pre> -->
+
+            <!-- Logout Modal -->
+            <Dialog v-model:visible="logoutDialogShow" modal header="Signing out?" :style="{ width: '25rem' }" dismissableMask="true">
+                <p>Are you sure you want to sign out?</p>
+                <Button label="No" icon="pi pi-times" text @click="logoutDialogShow = false" />
+                <Button label="Yes" icon="pi pi-check" :loading="btnLoading" text @click="logout" />
+            </Dialog>
         </div>
 
         <Dialog v-model:visible="visibleProfile" modal header="Profile" dismissableMask="true" :style="{ width: '65rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

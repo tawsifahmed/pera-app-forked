@@ -536,10 +536,6 @@ const handleTaskChanges = async (taskValue, task_id) => {
             project_id: id
         };
 
-        console.log("sendEditDate ==>", sendEditDate);
-        console.log("dueDate ==>", editTaskData.dueDate);
-        return
-
         await editTask(editTaskData);
 
         if (isTaskEdited.value === true) {
@@ -1201,32 +1197,13 @@ const handleRefresh = async () => {
         <Column field="dueDateValue" header="Due Date" :style="{ textWrap: 'nowrap', width: '9%', padding: '0.75rem 0.5rem' }">
             <template #body="slotProps">
                 <i v-if="slotProps.node.key !== 'new'" class="pi pi-calendar" style="padding-top: 0.1rem"></i>
-                <!-- @date-select="handleDateChange($event, slotProps)" -->
                 <Calendar
-                    showTime
-                    hourFormat="12"
                     v-if="slotProps.node.key !== 'new'"
+                    @date-select="handleDateChange($event, slotProps)"
                     class="inline-calendar cursor-pointer"
                     :class="slotProps.node.data.dueDateColor === '#087641' && slotProps.node.data.dueDateValue ? 'green-calendar' : slotProps.node.data.dueDateColor === '#b13a41' && slotProps.node.data.dueDateValue ? 'red-calendar' : ''"
                     :placeholder="slotProps.node.data.dueDateValue ? slotProps.node.data.dueDateValue : '--:--'"
-                >
-                    <template #footer>
-                        <div class="custom-footer">
-                            <Button
-                                label="Clear"
-                                icon="pi pi-times"
-                                class="p-button-text p-button-danger"
-                                @click="clearDate"
-                            />
-                            <Button
-                                label="Now"
-                                icon="pi pi-check"
-                                class="p-button-text p-button-primary"
-                                @click=""
-                            />
-                        </div>
-                    </template>
-                </Calendar>
+                />
             </template>
         </Column>
         <Column field="priority" header="Priority" :style="{ width: '9%' }">
