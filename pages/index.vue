@@ -55,18 +55,21 @@ const lineData = ref({
 });
 
 onMounted(() => {
-    pieChartOptions.value = setPieChartOptions();  
+    pieChartOptions.value = setPieChartOptions();
 
-    watch([completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData], ([cc, ic, uc]) => {
-        if (cc && ic && uc) {
-            pieChartData.value = setPieChartData(cc, ic, uc);
-        }
-    }, { immediate: true }); 
+    watch(
+        [completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData],
+        ([cc, ic, uc]) => {
+            if (cc && ic && uc) {
+                pieChartData.value = setPieChartData(cc, ic, uc);
+            }
+        },
+        { immediate: true }
+    );
 });
 
 const pieChartData = ref();
 const pieChartOptions = ref();
-
 
 const setPieChartData = (cc, ic, uc) => {
     const documentStyle = getComputedStyle(document.body);
@@ -77,7 +80,7 @@ const setPieChartData = (cc, ic, uc) => {
             {
                 data: [cc, ic, uc],
                 backgroundColor: ['#33bd7c', '#0ea5e9', '#475569'],
-                hoverBackgroundColor: ['#1a8251', '#0087c3','#2c3644']
+                hoverBackgroundColor: ['#1a8251', '#0087c3', '#2c3644']
             }
         ]
     };
@@ -114,14 +117,14 @@ const hasUserCompany = ref(null);
 const checkUser = () => {
     if (process.client) {
         hasUserCompany.value = JSON.parse(localStorage.getItem('userCompany'));
-        console.log('hasUserCompany =>', hasUserCompany.value);
+        // console.log('hasUserCompany =>', hasUserCompany.value);
         if (hasUserCompany.value === null || hasUserCompany.value?.length == 0) {
             visibleCreateCompany.value = true;
         } else {
             visibleCreateCompany.value = false;
         }
 
-        console.log('visibleCreateCompany =>', visibleCreateCompany.value);
+        // console.log('visibleCreateCompany =>', visibleCreateCompany.value);
     }
 };
 
@@ -321,7 +324,6 @@ const fetchTasks = async (projectId = '', status = '', startDate = '', dueDate =
     if (!hideLoading.value) {
         taskLoading.value = true;
     }
-    console.log('status', status);
 
     try {
         const token = useCookie('token');

@@ -18,16 +18,16 @@ export const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth();
-signInAnonymously(auth)
-    .then(() => {
-        console.log('signed in')
-        // Signed in..
-    })
-    .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ...
-    });
+// signInAnonymously(auth)
+//     .then(() => {
+//         console.log('signed in')
+//         // Signed in..
+//     })
+//     .catch((error) => {
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         // ...
+//     });
 // for Notification
 const messaging = getMessaging(app);
 const useFCMToken = async () => {
@@ -56,7 +56,7 @@ const useFCMToken = async () => {
 function requestPermission() {
     Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-            console.log('Notification permission granted.');
+            // console.log('Notification permission granted.');
         }
     })
 }
