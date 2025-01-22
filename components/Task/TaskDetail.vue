@@ -335,7 +335,28 @@ const handleTaskDetailSubmit = async () => {
 
         await editTask(taskDetailData);
         if (isTaskEdited.value === true) {
-            toast.add({ severity: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'warn' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'success' : 'success', summary: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Deadline Justification Required' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Updated' : 'Updated', detail: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Provide deadline justification' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Task details updated except due date' : 'Task details updated', group: 'br', life: 3000 });
+            toast.add({
+                severity:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'warn'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'success'
+                        : 'success',
+                summary:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'Deadline Justification Required'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'Updated'
+                        : 'Updated',
+                detail:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'Provide deadline justification'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'Task details updated except due date'
+                        : 'Task details updated',
+                group: 'br',
+                life: 3000
+            });
             selectedfile.value = null;
             editorViewMode.value = 'preview';
             if (isDescriptionEdited.value === true) {
@@ -935,10 +956,10 @@ const handletaskNameUpdate = async () => {
                                         <p>Description:</p>
                                     </div>
 
-                                    <ButtonGroup>
+                                    <!-- <ButtonGroup>
                                         <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
                                         <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
-                                    </ButtonGroup>
+                                    </ButtonGroup>  -->
                                 </div>
 
                                 <!-- <pre>description {{ description.length}}</pre> -->
@@ -963,9 +984,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor class="card" style="padding: 0;" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor class="card" style="padding: 0" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" language="en-US" />
 
-                                <MdEditor style="padding: 0;" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor style="padding: 0" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -1179,7 +1200,7 @@ const handletaskNameUpdate = async () => {
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
-                        <Card class="mb-2 card" style="padding: 0;" v-for="val in singleTaskComments" :key="val.id">
+                        <Card class="mb-2 card" style="padding: 0" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
@@ -1583,7 +1604,6 @@ input[type='file']::file-selector-button:hover {
 .p-card .p-card-body {
     gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
-    
 }
 
 .activity-btns {
@@ -1824,7 +1844,9 @@ a {
     z-index: 9999 !important;
     display: block !important;
 }
-
+.md-editor-preview {
+    color: inherit;
+}
 /* Dropdown styles */
 .mention-dropdown {
     position: absolute;
@@ -1864,10 +1886,10 @@ a {
     background: none !important;
 }
 
-#md-editor-v3{
+#md-editor-v3 {
     background-color: inherit !important;
     color: inherit !important;
-    
+
     border-radius: 10px;
 }
 </style>
