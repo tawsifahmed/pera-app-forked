@@ -11,7 +11,7 @@ import { toRaw } from 'vue';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks, isGetApiCalled } = storeToRefs(useCompanyStore());
 const { handleMissDeadlineShowTimer } = useClockStore();
 const { deadlineJustifyProvided } = storeToRefs(useClockStore());
 const createTaskP = ref(accessPermission('create_task'));
@@ -201,8 +201,65 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (node, isCtrlKeyPressed = false) => {
-    if (isCtrlKeyPressed) {
+const updateTaskName = async (node, KeyPressed = null) => {
+    console.log('node =>', toRaw(node));
+    if (KeyPressed == 'ctrl+shift+Enter') {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
+        };
+        const res = await createTask(newTask);
+        const data = res?.data
+        console.log('data ==>', data);
+        const obj = {
+            key: data?.id,
+            unique_id: data?.unique_id,
+            data: {...data}
+        }
+        console.log('obj ==>', obj);
+
+        const newChild = {
+            key: `new`, // Unique key
+            unique_id: `new-${Date.now()}`,
+            data: {
+                name: '', // Initially empty, will be filled by user input
+                assignee: {},
+                created_at: new Date().toISOString(),
+                dueDateValue: '',
+                status: {
+                    id: null,
+                    name: 'New',
+                    color_code: '#6466f1'
+                },
+                is_overdue: false
+            },
+            children: []
+        };
+
+        function waitForValue(callback) {
+            const checkInterval = 100;
+
+            const timer = setInterval(() => {
+                if (isGetApiCalled.value) {
+                    clearInterval(timer);
+                    callback();
+                }
+            }, checkInterval);
+        }
+
+        waitForValue(() => {
+            inlineCreateSubTask({ node: { ...obj, children: [newChild] } });
+        });
+
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    }
+
+    if (KeyPressed == 'ctrl+Enter') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
         }
@@ -688,10 +745,13 @@ const createNewTask = async () => {
     }
 };
 const inlineCreateSubTask = async (parentNode) => {
+console.log('parentNode ==>', parentNode);
     if (showInput.value) {
         removeChild(toRaw(tableData.value));
     }
     const node = toRaw(parentNode.node);
+console.log('parentNode node ==>', node);
+
     parentTaskId.value = node.key;
     const newChild = {
         key: `new`, // Unique key
@@ -711,7 +771,11 @@ const inlineCreateSubTask = async (parentNode) => {
         children: []
     };
     showInput.value = true;
+    console.log('node.key ==>', node.key);
+    console.log('newChild ==>', newChild);
+    console.log('toRaw(tableData.value) ==>', toRaw(tableData.value));
     const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
+    console.log('updateTable ==>', updateTable);
     tableData.value = structuredClone(updateTable);
     newTaskName.value = '';
     expandedKeys.value[parentNode.node.key] == true ? null : (expandedKeys.value[parentNode.node.key] = true);
@@ -937,9 +1001,14 @@ const handleRefresh = async () => {
                             v-if="slotProps.node.key == 'new'"
                             @keydown="
                                 (e) => {
+                                    if (e.key === 'Enter' && e.ctrlKey && e.shiftKey) {
+                                        e.preventDefault();
+                                        updateTaskName(slotProps.node, 'ctrl+shift+Enter');
+                                        return
+                                    }
                                     if (e.key === 'Enter' && e.ctrlKey) {
                                         e.preventDefault();
-                                        updateTaskName(slotProps.node, true);
+                                        updateTaskName(slotProps.node, 'ctrl+Enter');
                                     }
                                 }
                             "
