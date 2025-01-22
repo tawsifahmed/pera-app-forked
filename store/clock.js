@@ -47,7 +47,7 @@ export const useClockStore = defineStore('clock', () => {
     async function setManualTime(taskId, duration) {
         const formdata = new FormData();
         formdata.append("task_id", taskId);
-        formdata.append("duration", duration); 
+        formdata.append("duration", duration);
         const token = useCookie('token')
 
         try {
@@ -71,7 +71,7 @@ export const useClockStore = defineStore('clock', () => {
         }
     }
 
-    
+
 
     async function getStoreTimer() {
 
@@ -81,16 +81,15 @@ export const useClockStore = defineStore('clock', () => {
         //     space_id: storeTaskSpaceID.value,
         //     company_id: storeTaskCompanyID.value
         // }
-        console.log('timerData11', timerData)
     }
 
-    async function storeTaskTimer({task_id, project_id, space_id, company_id, timerStartTime}) {
-        if(task_id === null || project_id === null || space_id === null || company_id === null) {
+    async function storeTaskTimer({ task_id, project_id, space_id, company_id, timerStartTime }) {
+        if (task_id === null || project_id === null || space_id === null || company_id === null) {
             timerData.value = null
             await getStoreTimer();
             isTImerStopped.value = true
             return
-        }else{
+        } else {
             console.log('task_id', task_id)
             console.log('project_id', project_id)
             console.log('space_id', space_id)
@@ -107,18 +106,18 @@ export const useClockStore = defineStore('clock', () => {
             console.log('isTImerStopped', isTImerStopped.value)
             await getStoreTimer();
         }
-        
+
     }
 
-    async function handleMissDeadlineShowTimer (taskId, projId, dueDate) {
+    async function handleMissDeadlineShowTimer(taskId, projId, dueDate) {
         deadlineMissModal.value = true;
         deadlineTaskId.value = taskId;
         deadlineProjectId.value = projId;
         deadlineDueDate.value = dueDate;
         deadlineJustifyProvided.value = null;
-        
+
     }
-    async function closeDeadlineShowModal () {
+    async function closeDeadlineShowModal() {
         deadlineMissModal.value = false;
         deadlineTaskId.value = null;
         deadlineDueDate.value = null;
