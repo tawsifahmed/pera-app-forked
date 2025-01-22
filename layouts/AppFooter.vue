@@ -9,7 +9,7 @@ const logoUrl = computed(() => {
 
 <template>
     <div class="layout-footer">
-        <div class="flex justify-content-center gap-2" style="visibility: hidden;">
+        <div class="flex justify-content-center gap-2" style="visibility: hidden">
             <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
                 <img src="/appleBtn.webp" height="30" alt="Image" class="" />
             </a>
@@ -24,11 +24,11 @@ const logoUrl = computed(() => {
         </div>
 
         <div class="flex justify-content-center gap-2">
-            <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
+            <a href="https://apps.apple.com/us/app/the-pera/id6505035655" target="_blank">
                 <img src="/appleBtn.webp" height="30" alt="Image" class="" />
             </a>
 
-            <a href="https://apps.apple.com/us/app/the-pera/id6505035655" target="_blank">
+            <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
                 <img src="/googleBtn.webp" height="30" alt="Image" class="" />
             </a>
         </div>

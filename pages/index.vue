@@ -628,7 +628,7 @@ watch(
                         <Dropdown @change="filterTasks()" v-model="selectedStatus" :options="statuses" :disabled="!selectedProject" optionLabel="name" placeholder="Status" class="w-full md:w-10rem mb-2" />
                         <div class="mb-2 relative w-full md:w-16rem">
                             <!-- <Calendar v-model="dates" selectionMode="range" :manualInput="false" placeholder="Select Date" /> -->
-                            <Calendar @hide="handleDateFilter" dateFormat="dd/mm/yy" :manualInput="false" selectionMode="range" v-model="dateFilter" placeholder="Date Range" class="w-full text-sm" />
+                            <Calendar @hide="handleDateFilter" dateFormat="dd/mm/yy" :manualInput="false" selectionMode="range" v-model="dateFilter" placeholder="Filter by Due Dates" class="w-full text-sm" />
                             <!-- <p v-if="isCalendarStartSelected" @click="handleStartDateDelete" class="pi pi-times end-cross absolute cursor-pointer"></p> -->
                         </div>
                         <!-- <div class="mb-2 relative w-full md:w-8rem">
