@@ -675,7 +675,7 @@ const taskCardStyle = computed(() => ({
     boxShadow: '0px 2px 2px #e2e2e2',
     cursor: 'grab',
     padding: '12px 10px',
-    margin: '8px 0px'
+    margin: '8px 0px',
 }));
 
 const handleChange = (event, name) => {

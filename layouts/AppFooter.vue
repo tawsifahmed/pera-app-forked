@@ -18,9 +18,12 @@ const logoUrl = computed(() => {
                 <img src="/googleBtn.webp" height="30" alt="Image" class="" />
             </a>
         </div>
-        <div>
-            <img src="/demo/images/login/avatar.svg" alt="Logo" height="20" class="mr-2" />
+        <div class="flex justify-content-center gap-3 align-items-center">
+            <div class="flex align-items-center">
+                <img src="/demo/images/login/avatar.svg" alt="Logo" height="20" class="mr-2" />
             by<span class="font-medium">Singularity</span>
+            </div>
+            <NuxtLink to="/privacy-policy" class="" style="text-decoration: none; text-decoration: underline;">Privacy Policy</NuxtLink>
         </div>
 
         <div class="flex justify-content-center gap-2">

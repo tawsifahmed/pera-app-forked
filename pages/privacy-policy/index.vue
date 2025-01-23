@@ -1,6 +1,7 @@
 <script setup>
 import AppTopBar from '~/layouts/AppTopBar';
 definePageMeta({
+    middleware: 'auth',
     layout: false
 });
 </script>
