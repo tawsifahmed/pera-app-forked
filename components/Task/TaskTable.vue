@@ -866,8 +866,8 @@ const handleRefresh = async () => {
     <div v-if="viewMode === 'overview'">
         <div class="grid mt-2">
             <div class="col-12 lg:col-6 xl:col-3">
-                <div class="card mb-0" :style="`border-left:6px solid #000;`">
-                    <div to="/tags" class="flex justify-content-between">
+                <div class="card mb-0" :style="`border-left:6px solid #abdbe3;`">
+                    <div  class="flex justify-content-between">
                         <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
                         <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
                     </div>
@@ -876,7 +876,7 @@ const handleRefresh = async () => {
 
             <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
                 <div class="card mb-0" :style="`border-left:6px solid ${statsC.statusColor};`">
-                    <div to="/tags" class="flex justify-content-between">
+                    <div class="flex justify-content-between">
                         <h4 class="mb-0 text-xl font-semibold tracking-tight">{{ statsC.statusName }}</h4>
                         <div class="text-900 font-bold text-2xl">{{ statsC.taskCount }}</div>
                     </div>
@@ -2258,7 +2258,7 @@ textarea {
     background-color: transparent;
 }
 .vuecal__bg {
-    background-color: #f9f9f9;
+    background-color: inherit;
 }
 .vuecal__cell-events {
     display: flex;

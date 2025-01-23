@@ -1560,7 +1560,7 @@ const handletaskNameUpdate = async () => {
 input[type='file'] {
     width: 300px;
     max-width: 100%;
-    color: #444;
+    color: inherit;
     padding: 5px;
     background: inherit;
     border-radius: 5px;
@@ -1573,14 +1573,14 @@ input[type='file']::file-selector-button {
     background: #6366f1;
     padding: 7px 15px;
     border-radius: 5px;
-    color: #fff;
+    color: inherit;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s ease-in-out;
 }
 
 input[type='file']::file-selector-button:hover {
-    background: #059669;
+    background: #6366f1;
 }
 
 .input-fields {

@@ -625,7 +625,7 @@ onMessage(messaging, (message) => {
 }
 
 .time-int {
-    color: crimson;
+    color: #ff4639;
     animation: blink-animation 1s steps(5, start) infinite;
     font-weight: 400;
 }
