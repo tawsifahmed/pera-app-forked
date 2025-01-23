@@ -262,6 +262,9 @@ definePageMeta({
 </template>
 
 <style scoped>
+ol li::marker {
+    font-weight: bold;
+}
 .privacy {
     padding: 80px 0;
     max-width: 60%;

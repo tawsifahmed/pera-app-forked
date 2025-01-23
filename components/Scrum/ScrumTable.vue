@@ -1,7 +1,7 @@
 <script setup>
 import { useActiveCompanyStore } from '~/store/workCompany';
 import Editor from 'primevue/editor';
-const { scrumData, fetchData, employees, totalRecords } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords']);
+const { scrumData, fetchData, employees, totalRecords, readScrum } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords', 'readScrum']);
 const { menu } = storeToRefs(useActiveCompanyStore());
 const toast = useToast();
 const scrumModal = ref(false);
@@ -14,9 +14,14 @@ const employee = ref('');
 const url = useRuntimeConfig();
 const isLoading = ref(false);
 const handleRowClick = (data) => {
-    console.log(data);
-    selectedScrum.value = data;
-    scrumModal.value = true;
+    if(readScrum === true){
+
+        console.log(data);
+        selectedScrum.value = data;
+        scrumModal.value = true;
+    } else{
+        toast.add({ severity: 'error', summary: 'Permission Denied', detail: 'You do not have permission to view this page', group: 'br', life: 3000 });
+    }
 };
 
 // Delete functionality
