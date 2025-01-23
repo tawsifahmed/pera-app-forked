@@ -1800,6 +1800,7 @@ a {
     margin: 10px 0;
     padding: 0 5px;
     list-style: none;
+    color: #0099FF;
 }
 .ql-mention-list-item {
     cursor: pointer;

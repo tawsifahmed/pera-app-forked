@@ -390,9 +390,11 @@ const changeAttribute = async () => {
     prio.value = filterPriorities.value ? filterPriorities.value.code : '';
     sta.value = filterStatus.value ? filterStatus.value.id : '';
     que.value = filterSearch.value;
-    strD.value = filterDate.value[0] ? dateFormatter(filterDate.value[0]) : '';
-    enD.value = filterDate.value[1] ? dateFormatter(filterDate.value[1]) : '';
-    getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+    strD.value = filterDate?.value ? (filterDate.value[0] ? dateFormatter(filterDate.value[0]) : '') : '';
+    enD.value = filterDate?.value ? (filterDate.value[1] ? dateFormatter(filterDate.value[1]) : '') : '';
+    tableLoader.value = true;
+    await getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+    tableLoader.value = false;
 };
 
 const isCalendarSelected1 = ref(false);
