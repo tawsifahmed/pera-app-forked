@@ -1002,7 +1002,7 @@ const handletaskNameUpdate = async () => {
                                     <div
                                         v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-5 attch-w"
-                                        style="background-color: #f7fafc"
+                                        style="background-color: inherit"
                                     >
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
@@ -1015,7 +1015,7 @@ const handletaskNameUpdate = async () => {
                                         :key="item"
                                         target="_blank"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
-                                        style="background-color: #f7fafc"
+                                        style="background-color: inherit"
                                     >
                                         <!-- <pre v-if="checkAttachmentType(item?.file == 'image')">{{checkAttachmentType(item?.file)}}</pre> -->
                                         <a
@@ -1488,7 +1488,7 @@ const handletaskNameUpdate = async () => {
 }
 
 .attach-sec::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: inherit;
     /* Track color */
 }
 
@@ -1504,7 +1504,7 @@ const handletaskNameUpdate = async () => {
 
 .attachment-wrapper {
     margin-bottom: 0px !important;
-    color: #444;
+    color: inherit;
 }
 
 .attach-icon {
@@ -1889,7 +1889,10 @@ a {
 #md-editor-v3 {
     background-color: inherit !important;
     color: inherit !important;
-
     border-radius: 10px;
+}
+
+.text-xs {
+    color: inherit !important;
 }
 </style>
