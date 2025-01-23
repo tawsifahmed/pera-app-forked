@@ -886,7 +886,7 @@ const handleRefresh = async () => {
                     <template #content>
                         <div class="task-container">
                             <div>
-                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card card">
                                     <div class="title-group">
                                         <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
                                         <p class="rtitle line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
@@ -1246,7 +1246,7 @@ const handleRefresh = async () => {
                             <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
                                 <template v-slot:item="{ element }">
                                     <div class="">
-                                        <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                        <div class="kan-task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
                                                 <p class="font-semibold truncate-board text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
@@ -1813,7 +1813,7 @@ textarea {
     user-select: none;
 }
 
-.task-card {
+.kan-task-card {
     cursor: grab;
     padding: 12px 10px;
     /* margin: 10px 0px; */
@@ -2170,7 +2170,7 @@ textarea {
     border-radius: 5px;
     padding: 10px 10px;
     margin: 8px 0;
-    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    //box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
     cursor: pointer;
     display: flex;
     gap: 5px;

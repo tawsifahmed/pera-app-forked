@@ -646,7 +646,7 @@ watch(
 
                     <div v-else-if="taskList.length > 0">
                         <!-- Show task list when not loading and tasks are available -->
-                        <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card">
+                        <div v-for="task in taskList" :key="task.id" @click="() => handleTaskClick(task)" class="task-card card">
                             <div class="title-group">
                                 <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
