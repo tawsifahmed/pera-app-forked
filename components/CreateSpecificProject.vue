@@ -25,15 +25,15 @@ const dragOptions = computed(() => ({
 }));
 
 const taskCardStyle = computed(() => ({
-    backgroundColor: '#fff',
-    boxShadow: '0px 2px 2px #e2e2e2',
+    backgroundColor: 'inherit',
+    boxShadow: '0px 2px 2px inherit',
     cursor: 'grab',
     margin: '8px 0px'
 }));
 
 const taskCardHoverStyle = computed(() => ({
-    backgroundColor: '#f9f9f9',
-    boxShadow: '0px 4px 4px #e2e2e3',
+    backgroundColor: 'inherit',
+    boxShadow: '0px 4px 4px inherit',
     cursor: 'grab',
     margin: '8px 0px'
 }));
@@ -425,14 +425,14 @@ const handleClose = () => {
 }
 
 .delete-task {
-    border: 1px solid rgb(203 213 225);
+    border:  #0099FF;
     padding: 5px;
     margin: 3px 0;
     border-radius: 5px;
 }
 
 .delete-task .cross-icon {
-    border: 1px solid rgb(203, 213, 225);
+    border:  #0099FF;
     padding: 3px 5px;
     margin: 0;
     border-radius: 5px;
