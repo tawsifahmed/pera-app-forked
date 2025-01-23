@@ -733,14 +733,15 @@ const hideMoveTask = () => {
 };
 const moveTaskFetch = async (query) => {
     const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/projects/show/${projID}?search=${query}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/search?search=${query}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
         }
     });
-    console.log(data.value);
-    moveTaskData.value = data.value.tasks;
+    // console.log(data.value);
+    moveTaskData.value = data.value.data.tasks;
+    console.log(moveTaskData.value);
 };
 
 const handleTaskMove = async (selectedTask) => {
@@ -752,7 +753,8 @@ const handleTaskMove = async (selectedTask) => {
             Authorization: `Bearer ${token.value}`
         },
         body: {
-            parent_task_id: selectedTask.key
+            parent_task_id: selectedTask.task_id,
+            project_id: selectedTask.project_id
         }
     });
     emit('updateTaskTable');
@@ -1332,9 +1334,9 @@ const handletaskNameUpdate = async () => {
             </div>
             <div>
                 <span class="font-medium text-900 block mb-2">Tasks</span>
-                <div @click="() => handleTaskMove(tasks)" class="task-card" v-for="tasks in moveTaskData">
+                <div @click="() => handleTaskMove(tasks)" class="task-card card" v-for="tasks in moveTaskData">
                     <!-- <pre>{{ tasks }}</pre> -->
-                    {{ tasks?.data?.name }}
+                    {{ tasks?.task_name }}
                 </div>
             </div>
         </div>

@@ -166,7 +166,7 @@ const onPage = async (e) => {
     <!-- View Modal -->
     <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
         <div class="scr-title">
-            <p class="">Participants:</p>
+            <p class="">Perticipants:</p>
             <p class="">{{ selectedScrum.meeting_date }}</p>
         </div>
         <div class="participants">
