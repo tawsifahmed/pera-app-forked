@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import Editor from 'primevue/editor';
-
+import accessPermission from '~/composables/usePermission';
 definePageMeta({
     middleware: 'auth',
     layout: 'default'
@@ -9,7 +9,9 @@ definePageMeta({
 
 const url = useRuntimeConfig();
 const toast = useToast();
-
+const readScrum = ref(accessPermission('read_scrum'));
+const createScrumP = ref(accessPermission('create_scrum'));
+const updateScrumP = ref(accessPermission('update_scrum'));
 const totalRecords = ref(0);
 
 const scrumData = ref([]);
@@ -100,7 +102,7 @@ const handleClose = () => {
     <div class="card">
         <header class="header">
             <h3>Meeting Minutes</h3>
-            <Button @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
+            <Button v-if="createScrumP" @click="createModal = !createModal" icon="pi pi-plus" severity="secondary" />
         </header>
         <!-- <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" /> -->
         <ScrumTable 
@@ -108,6 +110,8 @@ const handleClose = () => {
             :fetchData="fetchScrum" 
             :employees="employees" 
             :totalRecords="totalRecords"
+            :readScrum="readScrum"
+            
         />
     </div>
 

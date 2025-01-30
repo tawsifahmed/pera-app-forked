@@ -25,15 +25,15 @@ const dragOptions = computed(() => ({
 }));
 
 const taskCardStyle = computed(() => ({
-    backgroundColor: '#fff',
-    boxShadow: '0px 2px 2px #e2e2e2',
+    backgroundColor: 'inherit',
+    boxShadow: '0px 2px 2px inherit',
     cursor: 'grab',
     margin: '8px 0px'
 }));
 
 const taskCardHoverStyle = computed(() => ({
-    backgroundColor: '#f9f9f9',
-    boxShadow: '0px 4px 4px #e2e2e3',
+    backgroundColor: 'inherit',
+    boxShadow: '0px 4px 4px inherit',
     cursor: 'grab',
     margin: '8px 0px'
 }));
@@ -296,7 +296,7 @@ const handleClose = () => {
                     Setup Task Status<i class="text-red-400 text-italic">*</i>
                     <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                 </p>
-                <div class="container">
+                <div class="">
                     <InputGroup>
                         <InputGroupAddon>
                             <ColorPicker v-tooltip.left="{ value: 'Pick Color' }" class="color-pick" style="width: 1.5rem" v-model="colorHEX" inputId="cp-hex" format="hex" />
@@ -372,7 +372,7 @@ const handleClose = () => {
                     Set Task Close Status<i class="text-red-400 text-italic">*</i>
                     <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                 </p>
-                <div class="container">
+                <div class="">
                     <div class="field">
                         <!-- {{ selectedCloseStatus }} -->
                         <Dropdown v-model="selectedCloseStatus" :options="taskStatusList" optionLabel="taskStatusName" placeholder="Select Status" class="w-full" />
@@ -382,14 +382,14 @@ const handleClose = () => {
                 </div>
             </div>
             <div class="flex w-full gap-2">
-                <div class="field flex flex-column mb-3" style="width: 50%">
+                <div class="field flex flex-column mb-3" style="width: 49%">
                     <label for="name"
                         >Gitlab ID
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
                     </label>
                     <InputText v-model="gitLabProjectId" required="true" />
                 </div>
-                <div class="field flex flex-column mb-3" style="width: 50%">
+                <div class="field flex flex-column mb-3" style="width: 49%">
                     <label for="name"
                         >Gitlab Token
                         <!-- <span v-tooltip.right="{ value: 'Demo Text Text' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span> -->
@@ -425,14 +425,14 @@ const handleClose = () => {
 }
 
 .delete-task {
-    border: 1px solid rgb(203 213 225);
+    border:  #0099FF;
     padding: 5px;
     margin: 3px 0;
     border-radius: 5px;
 }
 
 .delete-task .cross-icon {
-    border: 1px solid rgb(203, 213, 225);
+    border:  #0099FF;
     padding: 3px 5px;
     margin: 0;
     border-radius: 5px;

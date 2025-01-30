@@ -1,7 +1,7 @@
 <script setup>
 import { useActiveCompanyStore } from '~/store/workCompany';
 import Editor from 'primevue/editor';
-const { scrumData, fetchData, employees, totalRecords } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords']);
+const { scrumData, fetchData, employees, totalRecords, readScrum } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords', 'readScrum']);
 const { menu } = storeToRefs(useActiveCompanyStore());
 const toast = useToast();
 const scrumModal = ref(false);
@@ -14,9 +14,14 @@ const employee = ref('');
 const url = useRuntimeConfig();
 const isLoading = ref(false);
 const handleRowClick = (data) => {
-    console.log(data);
-    selectedScrum.value = data;
-    scrumModal.value = true;
+    if(readScrum === true){
+
+        console.log(data);
+        selectedScrum.value = data;
+        scrumModal.value = true;
+    } else{
+        toast.add({ severity: 'error', summary: 'Permission Denied', detail: 'You do not have permission to view this page', group: 'br', life: 3000 });
+    }
 };
 
 // Delete functionality
@@ -105,9 +110,9 @@ const onPage = async (e) => {
 </script>
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
-    <!-- <DataTable class="table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem"> -->
+    <!-- <DataTable class="scr-table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem"> -->
     <DataTable
-        class="table-st"
+        class="scr-table-st"
         :value="scrumData"
         :rowHover="true"
         :paginator="true"
@@ -160,30 +165,30 @@ const onPage = async (e) => {
 
     <!-- View Modal -->
     <Dialog lazy="true" v-model:visible="scrumModal" modal header="Scrum Details" :style="{ width: '90rem', height: '80rem' }" :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
-        <div class="title">
-            <p class="">Participants:</p>
+        <div class="scr-title">
+            <p class="">Perticipants:</p>
             <p class="">{{ selectedScrum.meeting_date }}</p>
         </div>
-        <div class="perticipants">
+        <div class="participants">
             <div class="flex gap-1 flex-wrap">
                 <div class="border rounded" v-for="child in selectedScrum.user_ids" :key="child.id" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
                     <div class="">{{ child.name }}</div>
                 </div>
             </div>
         </div>
-        <div class="details" v-html="selectedScrum?.description"></div>
+        <div class="scr-details" v-html="selectedScrum?.description"></div>
     </Dialog>
 
     <!-- Edit Modal -->
     <Dialog lazy="true" v-model:visible="editModal" modal header="Update Scrum" dismissableMask="true" :style="{ minWidth: '30vw' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <form @submit="handleUpdate" class="form" action="">
+        <form @submit="handleUpdate" class="scr-form" action="">
             <!-- <pre>{{ selectedScrum }}</pre> -->
             <!-- <div class="flex-auto">
                 <label for="space" class="font-bold block mb-2">Space: </label>
                 
                 <MultiSelect id="spaces" display="chip" v-model="spaces" :options="menu" filter resetFilterOnHide optionLabel="name" placeholder="Select Spaces" class="w-full" :maxSelectedLabels="2" />
             </div> -->
-            <div class="flex-auto">
+            <div class="flex-auto richtext-wrapper">
                 <label for="description" class="font-bold block mb-2">Description: </label>
                 <!-- <Textarea class="w-full" id="description" v-model="description" rows="10" placeholder="Scrum Description..." /> -->
                 <Editor v-model="description" editorStyle="height: 200px">
@@ -214,7 +219,7 @@ const onPage = async (e) => {
     </Dialog>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 /* Add any custom styles here */
 .participants {
     width: 40%;
@@ -227,15 +232,15 @@ const onPage = async (e) => {
     text-overflow: ellipsis; /* Adds "..." to indicate truncated content */
     line-height: 1.5; /* Adjusts the line height for better readability */
 }
-.table-st {
+.scr-table-st {
     border: inherit;
     border-radius: 10px;
     overflow: hidden;
 }
-.table-st thead tr {
+.scr-table-st thead tr {
     background: #ededed;
 }
-.title {
+.scr-title {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
@@ -243,7 +248,7 @@ const onPage = async (e) => {
     font-size: 14px;
     /* font-weight: 500; */
 }
-.title p {
+.scr-title p {
     margin: 0;
 }
 .perticipants {
@@ -252,10 +257,10 @@ const onPage = async (e) => {
     gap: 10px;
     flex-wrap: wrap;
 }
-.participants p {
+.perticipants p {
     font-size: 18px;
 }
-.details {
+.scr-details {
     padding: 16px;
     border: 1px solid #ededed;
     border-radius: 8px;
@@ -270,9 +275,11 @@ const onPage = async (e) => {
 .header h3 {
     margin: 0;
 }
-.form {
+.scr-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
+
+
 </style>

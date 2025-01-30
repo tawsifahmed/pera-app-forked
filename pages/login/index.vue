@@ -158,11 +158,11 @@ const handleReset = () => {
 
 const handleEmailSubmit = async () => {
     loading.value = true;
-    if(resetEmail.value === ''){
+    if (resetEmail.value === '') {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Email required', group: 'br', life: 3000 });
         loading.value = false;
         return;
-    }else{
+    } else {
         const response = await forgotPassword(resetEmail.value);
         if (response.code == 200) {
             resetForm.value = response.message;
@@ -174,10 +174,10 @@ const handleEmailSubmit = async () => {
     }
 };
 
-const confirmPasswordOtp = ref(false)
+const confirmPasswordOtp = ref(false);
 const forgotOtpHandler = async () => {
     loading.value = true;
-    if(forgotOtp.value === ''){
+    if (forgotOtp.value === '') {
         confirmPasswordOtp.value = true;
         toast.add({ severity: 'error', summary: 'Error', detail: 'OTP required', group: 'br', life: 3000 });
         loading.value = false;
@@ -188,7 +188,7 @@ const forgotOtpHandler = async () => {
         confirmPasswordOtp.value = false;
         resetForm.value = response.message;
         loading.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });        
+        toast.add({ severity: 'success', summary: 'Success', detail: response.message, group: 'br', life: 3000 });
     } else {
         loading.value = false;
         toast.add({ severity: 'error', summary: 'Error', detail: response.message, group: 'br', life: 3000 });
@@ -197,17 +197,15 @@ const forgotOtpHandler = async () => {
 
 const newPasswordHandler = async () => {
     loading.value = true;
-    if(newPassword.value.password === '' || newPassword.value.confirm_password === ''){
+    if (newPassword.value.password === '' || newPassword.value.confirm_password === '') {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Password required', group: 'br', life: 3000 });
         loading.value = false;
         return;
-
-    }else if (newPassword.value.password !== newPassword.value.confirm_password) {
+    } else if (newPassword.value.password !== newPassword.value.confirm_password) {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Passwords do not match', group: 'br', life: 3000 });
         loading.value = false;
         return;
-    }
-    else{
+    } else {
         const response = await passwordReset(resetEmail.value, newPassword);
         console.log(response);
         if (response.code == 200) {
@@ -247,8 +245,8 @@ onMounted(() => {
             <!-- <img :src="logoUrl" alt="Sakai logo" class="mb-5 w-6rem flex-shrink-0" /> -->
             <!-- <h2 class="font-bold">Pera App</h2> -->
             <Toast position="bottom-right" group="br" />
-            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%); ">
-                <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px; padding-top: 28px !important; padding-bottom: 34px !important;">
+            <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+                <div v-if="loginForm" class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px; padding-top: 28px !important; padding-bottom: 34px !important">
                     <div class="text-center mb-5">
                         <img src="/demo/images/login/avatar.svg" alt="Image" height="80" class="mb-3" />
                         <div data-v-d804f83c="" class="text-900 text-3xl font-medium mb-3">Sign in to continue</div>
@@ -284,13 +282,11 @@ onMounted(() => {
                     </div>
 
                     <div class="flex justify-content-center gap-2 mt-3">
-                        <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
-
+                        <a href="https://apps.apple.com/us/app/the-pera/id6505035655" target="_blank">
                             <img src="/appleBtn.webp" height="40" alt="Image" class="" />
                         </a>
-                 
-                        <a href="https://apps.apple.com/us/app/the-pera/id6505035655" target="_blank">
 
+                        <a href="https://play.google.com/store/apps/details?id=com.singularity.the.pera.app" target="_blank">
                             <img src="/googleBtn.webp" height="40" alt="Image" class="" />
                         </a>
                     </div>
@@ -364,7 +360,7 @@ onMounted(() => {
                     </div>
                     <form @submit.prevent="newPasswordHandler">
                         <div class="field md:w-28rem mb-5">
-                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password1</label>
+                            <label for="password" class="block text-900 font-medium text-xl mb-2">New Password</label>
                             <Password id="password" v-model="newPassword.password" placeholder="Enter password" :feedback="false" :toggleMask="true" class="w-full" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
                         </div>
                         <div class="field md:w-28rem mb-5">
