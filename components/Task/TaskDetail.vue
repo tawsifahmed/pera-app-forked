@@ -335,7 +335,28 @@ const handleTaskDetailSubmit = async () => {
 
         await editTask(taskDetailData);
         if (isTaskEdited.value === true) {
-            toast.add({ severity: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'warn' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'success' : 'success', summary: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Deadline Justification Required' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Updated' : 'Updated', detail: taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false ? 'Provide deadline justification' : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true ? 'Task details updated except due date' : 'Task details updated', group: 'br', life: 3000 });
+            toast.add({
+                severity:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'warn'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'success'
+                        : 'success',
+                summary:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'Deadline Justification Required'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'Updated'
+                        : 'Updated',
+                detail:
+                    taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true && isDescriptionEdited.value === false && isAsigneeEdited.value === false && isTagsEdited.value === false
+                        ? 'Provide deadline justification'
+                        : taskDetails.value.parent_task_id === null && taskDetails.value.due_date !== null && isDateEdited.value === true
+                        ? 'Task details updated except due date'
+                        : 'Task details updated',
+                group: 'br',
+                life: 3000
+            });
             selectedfile.value = null;
             editorViewMode.value = 'preview';
             if (isDescriptionEdited.value === true) {
@@ -712,14 +733,15 @@ const hideMoveTask = () => {
 };
 const moveTaskFetch = async (query) => {
     const token = useCookie('token');
-    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/projects/show/${projID}?search=${query}`, {
+    const { data, pending, error } = await useFetch(`${url.public.apiUrl}/search?search=${query}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
         }
     });
-    console.log(data.value);
-    moveTaskData.value = data.value.tasks;
+    // console.log(data.value);
+    moveTaskData.value = data.value.data.tasks;
+    console.log(moveTaskData.value);
 };
 
 const handleTaskMove = async (selectedTask) => {
@@ -731,7 +753,8 @@ const handleTaskMove = async (selectedTask) => {
             Authorization: `Bearer ${token.value}`
         },
         body: {
-            parent_task_id: selectedTask.key
+            parent_task_id: selectedTask.task_id,
+            project_id: selectedTask.project_id
         }
     });
     emit('updateTaskTable');
@@ -938,7 +961,7 @@ const handletaskNameUpdate = async () => {
                                     <ButtonGroup>
                                         <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
                                         <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
-                                    </ButtonGroup>
+                                    </ButtonGroup> 
                                 </div>
 
                                 <!-- <pre>description {{ description.length}}</pre> -->
@@ -963,9 +986,9 @@ const handletaskNameUpdate = async () => {
                                     </template>
                                 </Editor> -->
 
-                                <MdEditor class="card" style="padding: 0;" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor class="card" style="padding: 0" v-if="editorViewMode == 'edit'" v-model="description" editorStyle="height: 150px" :preview="false" :toolbars="[]" placeholder="Write here..." height="300px" language="en-US" />
 
-                                <MdEditor style="padding: 0;" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" theme="light" language="en-US" />
+                                <MdEditor style="padding: 0" v-else @click="handleEditorView()" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" language="en-US" />
                             </div>
 
                             <div v-if="updateTaskP" class="flex justify-content-end">
@@ -981,7 +1004,7 @@ const handletaskNameUpdate = async () => {
                                     <div
                                         v-if="taskDetails?.attachments && taskDetails?.attachments.length === 0"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-5 attch-w"
-                                        style="background-color: #f7fafc"
+                                        style="background-color: inherit"
                                     >
                                         <div class="pi pi-file text-6xl attach-icon"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
@@ -994,7 +1017,7 @@ const handletaskNameUpdate = async () => {
                                         :key="item"
                                         target="_blank"
                                         class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
-                                        style="background-color: #f7fafc"
+                                        style="background-color: inherit"
                                     >
                                         <!-- <pre v-if="checkAttachmentType(item?.file == 'image')">{{checkAttachmentType(item?.file)}}</pre> -->
                                         <a
@@ -1179,7 +1202,7 @@ const handletaskNameUpdate = async () => {
                                 <Button @click="hideJustification" label="↑ Hide" class="py-1 bg-gray-200 border-gray-100 text-surface-900 activity-btns" />
                             </div>
                         </div>
-                        <Card class="mb-2 card" style="padding: 0;" v-for="val in singleTaskComments" :key="val.id">
+                        <Card class="mb-2 card" style="padding: 0" v-for="val in singleTaskComments" :key="val.id">
                             <template #title>
                                 <div class="flex justify-content-start align-items-center">
                                     <img class="mr-2" v-if="val.commentator_image" :src="val.commentator_image" alt="" style="width: 28px; height: 28px; border-radius: 50%" />
@@ -1311,9 +1334,9 @@ const handletaskNameUpdate = async () => {
             </div>
             <div>
                 <span class="font-medium text-900 block mb-2">Tasks</span>
-                <div @click="() => handleTaskMove(tasks)" class="task-card" v-for="tasks in moveTaskData">
+                <div @click="() => handleTaskMove(tasks)" class="task-card card" v-for="tasks in moveTaskData">
                     <!-- <pre>{{ tasks }}</pre> -->
-                    {{ tasks?.data?.name }}
+                    {{ tasks?.task_name }}
                 </div>
             </div>
         </div>
@@ -1467,7 +1490,7 @@ const handletaskNameUpdate = async () => {
 }
 
 .attach-sec::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: inherit;
     /* Track color */
 }
 
@@ -1483,7 +1506,7 @@ const handletaskNameUpdate = async () => {
 
 .attachment-wrapper {
     margin-bottom: 0px !important;
-    color: #444;
+    color: inherit;
 }
 
 .attach-icon {
@@ -1539,7 +1562,7 @@ const handletaskNameUpdate = async () => {
 input[type='file'] {
     width: 300px;
     max-width: 100%;
-    color: #444;
+    color: inherit;
     padding: 5px;
     background: inherit;
     border-radius: 5px;
@@ -1552,14 +1575,14 @@ input[type='file']::file-selector-button {
     background: #6366f1;
     padding: 7px 15px;
     border-radius: 5px;
-    color: #fff;
+    color: inherit;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s ease-in-out;
 }
 
 input[type='file']::file-selector-button:hover {
-    background: #059669;
+    background: #6366f1;
 }
 
 .input-fields {
@@ -1583,7 +1606,6 @@ input[type='file']::file-selector-button:hover {
 .p-card .p-card-body {
     gap: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
-    
 }
 
 .activity-btns {
@@ -1780,6 +1802,7 @@ a {
     margin: 10px 0;
     padding: 0 5px;
     list-style: none;
+    color: #0099FF;
 }
 .ql-mention-list-item {
     cursor: pointer;
@@ -1824,7 +1847,9 @@ a {
     z-index: 9999 !important;
     display: block !important;
 }
-
+.md-editor-preview {
+    color: inherit;
+}
 /* Dropdown styles */
 .mention-dropdown {
     position: absolute;
@@ -1864,10 +1889,13 @@ a {
     background: none !important;
 }
 
-#md-editor-v3{
+#md-editor-v3 {
     background-color: inherit !important;
     color: inherit !important;
-    
     border-radius: 10px;
+}
+
+.text-xs {
+    color: inherit !important;
 }
 </style>

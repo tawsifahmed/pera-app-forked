@@ -51,6 +51,7 @@ export const useCompanyStore = defineStore('workStation', {
         asngUsers: [],
 
         subTasks: [],
+        isGetApiCalled: false,
 
         taskDetails: [],
         taskActivity: [],
@@ -324,6 +325,7 @@ export const useCompanyStore = defineStore('workStation', {
         },
 
         async getSingleProject(projectID, assignees = '', priority = '', status = '', query = '', start = '', end = '') {
+            this.isGetApiCalled = false;
             const token = useCookie('token');
             if (assignees) {
                 assignees = assignees.join(',');
@@ -343,6 +345,7 @@ export const useCompanyStore = defineStore('workStation', {
 
             this.singleProject = data.value?.data;
             this.tasks = data.value?.tasks;
+            this.isGetApiCalled = true;
             this.statuslist = data.value?.taskStatus;
 
             const kanbanData = this.statuslist.map((val) => {

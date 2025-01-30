@@ -80,3 +80,20 @@ $gutter: 1rem; //for primeflex grid system
     background: none;
     backdrop-filter: blur(100px);
 }
+
+.scr-details {
+    h1, h2, h3, h4, h5, h6, ol, ul, li, strong, u, span {
+        color: inherit !important;
+    }
+    p{
+        strong {
+            color: inherit !important;
+        }
+    }
+    .ql-align-justify{
+        strong {
+            color: inherit !important;
+        }
+        color: inherit !important;
+    }
+}

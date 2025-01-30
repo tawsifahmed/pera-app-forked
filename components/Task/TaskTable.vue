@@ -11,7 +11,7 @@ import { toRaw } from 'vue';
 const url = useRuntimeConfig();
 const usersListStore = useCompanyStore();
 const { getSingleProject, getTaskAssignModalData, editTask, createTask } = useCompanyStore();
-const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks } = storeToRefs(useCompanyStore());
+const { modStatusList, singleProject, statuslist, isTaskEdited, recentTaskData, countTasksByStatus, totalTaskCount, calendarTasks, tasks, isGetApiCalled } = storeToRefs(useCompanyStore());
 const { handleMissDeadlineShowTimer } = useClockStore();
 const { deadlineJustifyProvided } = storeToRefs(useClockStore());
 const createTaskP = ref(accessPermission('create_task'));
@@ -28,8 +28,7 @@ const id = route.params?.projects;
 const filterAssignees = ref();
 const filterPriorities = ref();
 const filterStatus = ref();
-const filterStartDueDate = ref();
-const filterEndDueDate = ref();
+const filterDate = ref();
 const filterSearch = ref();
 const usersLists = ref({});
 const viewMode = ref('list');
@@ -201,8 +200,65 @@ const handleDblClick = (node) => {
     handleInlineNameEdit(node);
 };
 
-const updateTaskName = async (node, isCtrlKeyPressed = false) => {
-    if (isCtrlKeyPressed) {
+const updateTaskName = async (node, KeyPressed = null) => {
+    console.log('node =>', toRaw(node));
+    if (KeyPressed == 'ctrl+shift+Enter') {
+        if (newTaskNameInput.value == null || '') {
+            return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
+        }
+        const newTask = {
+            name: newTaskNameInput.value,
+            parent_task_id: parentTaskId.value,
+            project_id: id
+        };
+        const res = await createTask(newTask);
+        const data = res?.data;
+        console.log('data ==>', data);
+        const obj = {
+            key: data?.id,
+            unique_id: data?.unique_id,
+            data: { ...data }
+        };
+        console.log('obj ==>', obj);
+
+        const newChild = {
+            key: `new`, // Unique key
+            unique_id: `new-${Date.now()}`,
+            data: {
+                name: '', // Initially empty, will be filled by user input
+                assignee: {},
+                created_at: new Date().toISOString(),
+                dueDateValue: '',
+                status: {
+                    id: null,
+                    name: 'New',
+                    color_code: '#6466f1'
+                },
+                is_overdue: false
+            },
+            children: []
+        };
+
+        function waitForValue(callback) {
+            const checkInterval = 100;
+
+            const timer = setInterval(() => {
+                if (isGetApiCalled.value) {
+                    clearInterval(timer);
+                    callback();
+                }
+            }, checkInterval);
+        }
+
+        waitForValue(() => {
+            inlineCreateSubTask({ node: { ...obj, children: [newChild] } });
+        });
+
+        newTaskNameInput.value = '';
+        return (showInput.value = false);
+    }
+
+    if (KeyPressed == 'ctrl+Enter') {
         if (newTaskNameInput.value == null || '') {
             return toast.add({ severity: 'warn', summary: 'Error', detail: 'Task name is required!', group: 'br', life: 3000 });
         }
@@ -309,13 +365,12 @@ const strD = ref();
 const enD = ref();
 const activeSubTask = ref(null);
 const handleFilterReset = () => {
-    if (filterAssignees.value || filterPriorities.value || filterStatus.value || filterSearch.value || filterStartDueDate.value || filterEndDueDate.value) {
+    if (filterAssignees.value || filterPriorities.value || filterStatus.value || filterSearch.value || filterDate.value) {
         filterAssignees.value = '';
         filterPriorities.value = '';
         filterStatus.value = '';
         filterSearch.value = '';
-        filterStartDueDate.value = '';
-        filterEndDueDate.value = '';
+        filterDate.value = [];
         userI.value = '';
         prio.value = '';
         sta.value = '';
@@ -335,38 +390,17 @@ const changeAttribute = async () => {
     prio.value = filterPriorities.value ? filterPriorities.value.code : '';
     sta.value = filterStatus.value ? filterStatus.value.id : '';
     que.value = filterSearch.value;
-    strD.value = filterStartDueDate.value;
-    enD.value = filterEndDueDate.value;
-    getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+    strD.value = filterDate?.value ? (filterDate.value[0] ? dateFormatter(filterDate.value[0]) : '') : '';
+    enD.value = filterDate?.value ? (filterDate.value[1] ? dateFormatter(filterDate.value[1]) : '') : '';
+    tableLoader.value = true;
+    await getSingleProject(id, userI.value, prio.value, sta.value, que.value, strD.value, enD.value);
+    tableLoader.value = false;
 };
 
 const isCalendarSelected1 = ref(false);
 const isCalendarSelected2 = ref(false);
 
-const startDateChange = (newDate) => {
-    const date = new Date(newDate);
-    filterStartDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    isCalendarSelected1.value = true;
-    changeAttribute();
-};
-const endDateChange = (newDate) => {
-    isCalendarSelected2.value = true;
-    const date = new Date(newDate);
-    filterEndDueDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    changeAttribute();
-};
-
-const handleDateDelete1 = () => {
-    isCalendarSelected1.value = false;
-    filterStartDueDate.value = '';
-    strD.value = '';
-    changeAttribute();
-};
-
-const handleDateDelete2 = () => {
-    isCalendarSelected2.value = false;
-    filterEndDueDate.value = '';
-    enD.value = '';
+const handleDateFilter = () => {
     changeAttribute();
 };
 
@@ -471,6 +505,7 @@ const handleTaskChanges = async (taskValue, task_id) => {
             const selectedDate = new Date(taskValue);
             selectedDate.setDate(selectedDate.getDate() + 1);
             sendEditDate = selectedDate.toISOString();
+            console.log("selectedDate ==>", selectedDate);
         }
         const editTaskData = {
             id: task_id,
@@ -640,7 +675,7 @@ const taskCardStyle = computed(() => ({
     boxShadow: '0px 2px 2px #e2e2e2',
     cursor: 'grab',
     padding: '12px 10px',
-    margin: '8px 0px'
+    margin: '8px 0px',
 }));
 
 const handleChange = (event, name) => {
@@ -688,10 +723,13 @@ const createNewTask = async () => {
     }
 };
 const inlineCreateSubTask = async (parentNode) => {
+    console.log('parentNode ==>', parentNode);
     if (showInput.value) {
         removeChild(toRaw(tableData.value));
     }
     const node = toRaw(parentNode.node);
+    console.log('parentNode node ==>', node);
+
     parentTaskId.value = node.key;
     const newChild = {
         key: `new`, // Unique key
@@ -711,7 +749,11 @@ const inlineCreateSubTask = async (parentNode) => {
         children: []
     };
     showInput.value = true;
+    console.log('node.key ==>', node.key);
+    console.log('newChild ==>', newChild);
+    console.log('toRaw(tableData.value) ==>', toRaw(tableData.value));
     const updateTable = addChild(node.key, newChild, toRaw(tableData.value));
+    console.log('updateTable ==>', updateTable);
     tableData.value = structuredClone(updateTable);
     newTaskName.value = '';
     expandedKeys.value[parentNode.node.key] == true ? null : (expandedKeys.value[parentNode.node.key] = true);
@@ -778,13 +820,11 @@ const handleRefresh = async () => {
         <Dropdown @change="changeAttribute()" v-model="filterPriorities" :options="priorities" optionLabel="name" placeholder="Priority" class="w-full md:w-17rem mb-2" />
         <Dropdown @change="changeAttribute()" v-model="filterStatus" :options="modStatusList" optionLabel="name" placeholder="Status" class="w-full md:w-17rem mb-2" />
         <div class="mb-2 relative">
-            <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate" placeholder="Start Due Date" class="w-full md:w-17rem" />
-            <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p>
+            <Calendar @hide="handleDateFilter" dateFormat="dd/mm/yy" :manualInput="false" selectionMode="range" v-model="filterDate" placeholder="Filter by Due Dates" class="w-full text-sm" />
+            <!-- <Calendar @date-select="startDateChange($event)" v-model="filterStartDueDate" placeholder="Start Due Date" class="w-full md:w-17rem" />
+            <p v-if="isCalendarSelected1" @click="handleDateDelete1" class="pi pi-times absolute cursor-pointer"></p> -->
         </div>
-        <div class="mb-2 relative">
-            <Calendar @date-select="endDateChange($event)" v-model="filterEndDueDate" placeholder="End Due Date" class="w-full md:w-17rem" />
-            <p v-if="isCalendarSelected2" @click="handleDateDelete2" class="pi pi-times end-cross absolute cursor-pointer"></p>
-        </div>
+
         <Button @click="handleFilterReset" label="Reset" class="mr-2 w-full md:w-15rem mb-2" severity="secondary" />
     </div>
     <Toolbar class="border-0 px-0">
@@ -826,8 +866,8 @@ const handleRefresh = async () => {
     <div v-if="viewMode === 'overview'">
         <div class="grid mt-2">
             <div class="col-12 lg:col-6 xl:col-3">
-                <div class="card mb-0" :style="`border-left:6px solid #000;`">
-                    <div to="/tags" class="flex justify-content-between">
+                <div class="card mb-0" :style="`border-left:6px solid #abdbe3;`">
+                    <div  class="flex justify-content-between">
                         <h4 class="mb-0 block text-xl font-semibold tracking-tight">Total Tasks</h4>
                         <div class="text-900 font-bold text-2xl">{{ totalTaskCount }}</div>
                     </div>
@@ -836,7 +876,7 @@ const handleRefresh = async () => {
 
             <div v-for="(statsC, index) in countTasksByStatus" :key="statsC" class="col-12 lg:col-6 xl:col-3">
                 <div class="card mb-0" :style="`border-left:6px solid ${statsC.statusColor};`">
-                    <div to="/tags" class="flex justify-content-between">
+                    <div class="flex justify-content-between">
                         <h4 class="mb-0 text-xl font-semibold tracking-tight">{{ statsC.statusName }}</h4>
                         <div class="text-900 font-bold text-2xl">{{ statsC.taskCount }}</div>
                     </div>
@@ -848,7 +888,7 @@ const handleRefresh = async () => {
                     <template #content>
                         <div class="task-container">
                             <div>
-                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card">
+                                <div v-for="recentTask in recentTaskData" :key="recentTask" @click="$emit('handleTaskDetailView', recentTask)" class="task-card card">
                                     <div class="title-group">
                                         <div v-tooltip.left="{ value: `Status: ${recentTask.statusName}` }" :class="`recenttaskstatus`" :style="`background-color: ${recentTask?.statusColor};`"></div>
                                         <p class="rtitle line-clamp-1" style="font-weight: 600">{{ recentTask?.taskName }}</p>
@@ -878,6 +918,7 @@ const handleRefresh = async () => {
         stripedRows
         :value="tableData"
         scrollable
+        scrollHeight="580px"
         scrollDirection="both"
         v-model:expandedKeys="expandedKeys"
         :lazy="true"
@@ -937,9 +978,14 @@ const handleRefresh = async () => {
                             v-if="slotProps.node.key == 'new'"
                             @keydown="
                                 (e) => {
+                                    if (e.key === 'Enter' && e.ctrlKey && e.shiftKey) {
+                                        e.preventDefault();
+                                        updateTaskName(slotProps.node, 'ctrl+shift+Enter');
+                                        return;
+                                    }
                                     if (e.key === 'Enter' && e.ctrlKey) {
                                         e.preventDefault();
-                                        updateTaskName(slotProps.node, true);
+                                        updateTaskName(slotProps.node, 'ctrl+Enter');
                                     }
                                 }
                             "
@@ -1202,7 +1248,7 @@ const handleRefresh = async () => {
                             <draggable v-model="list.content" :options="dragOptions" :disabled="!updateTaskP" class="draggable scrollbar" itemKey="name" group="cardItem" @change="(e) => handleChange(e, list.status)">
                                 <template v-slot:item="{ element }">
                                     <div class="">
-                                        <div class="task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
+                                        <div class="kan-task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
                                                 <p class="font-semibold truncate-board text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
@@ -1443,7 +1489,9 @@ const handleRefresh = async () => {
     overflow: hidden;
     width: 100% !important;
 }
-
+.table-st thead {
+    z-index: 30;
+}
 .table-st .p-treetable-emptymessage {
     display: flex;
     justify-content: center;
@@ -1767,7 +1815,7 @@ textarea {
     user-select: none;
 }
 
-.task-card {
+.kan-task-card {
     cursor: grab;
     padding: 12px 10px;
     /* margin: 10px 0px; */
@@ -2124,7 +2172,7 @@ textarea {
     border-radius: 5px;
     padding: 10px 10px;
     margin: 8px 0;
-    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    //box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
     cursor: pointer;
     display: flex;
     gap: 5px;
@@ -2210,7 +2258,7 @@ textarea {
     background-color: transparent;
 }
 .vuecal__bg {
-    background-color: #f9f9f9;
+    background-color: inherit;
 }
 .vuecal__cell-events {
     display: flex;
@@ -2236,5 +2284,10 @@ textarea {
 }
 .vuecal__event--focus {
     box-shadow: none !important;
+}
+.custom-footer{
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
 }
 </style>

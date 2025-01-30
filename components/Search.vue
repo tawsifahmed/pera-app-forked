@@ -14,7 +14,7 @@
                     <template #content>
                         <div class="task-container">
                             <div>
-                                <div v-for="task in tasksResult" :key="task" @click="handleRedirect('task', task)" class="task-card">
+                                <div v-for="task in tasksResult" :key="task" @click="handleRedirect('task', task)" class="task-card card">
                                     <div class="title-group flex justify-content-start align-items-center gap-2">
                                         <div :class="`staskstatus`" :style="`background-color: ${task.task_status_color};`"></div>
                                         <p class="stitle line-clamp-1" style="font-weight: 600">{{ task.task_name }}</p>
@@ -35,7 +35,7 @@
                     <template #content>
                         <div class="project-container">
                             <div>
-                                <div v-for="project in projectsResult" :key="project" @click="handleRedirect('project', project)" class="task-card">
+                                <div v-for="project in projectsResult" :key="project" @click="handleRedirect('project', project)" class="task-card card">
                                     <div class="title-group flex justify-content-start gap-2 align-items-center">
                                         <span class="pi pi-bars"></span>
                                         <p class="stitle line-clamp-1" style="font-weight: 600">{{ project.project_name }}</p>
@@ -51,7 +51,7 @@
                     <template #content>
                         <div class="space-container">
                             <div>
-                                <div v-for="space in spacesResult" :key="space" @click="handleRedirect('space', space)" class="task-card">
+                                <div v-for="space in spacesResult" :key="space" @click="handleRedirect('space', space)" class="task-card card">
                                     <span class="title-group flex justify-content-start gap-2 align-items-center">
                                         <div id="dynamic-div" :style="`background-color: ${space?.space_color}; width: 30px;`" class="flex font-semibold justify-content-center rounded py-1 px-2 w-fit text-white">
                                             {{ space?.space_name.charAt(0).toUpperCase() }}
@@ -203,7 +203,7 @@ onMounted(() => {
     border-radius: 5px;
     padding: 10px 10px;
     margin: 8px 0;
-    box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+    //box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
     cursor: pointer;
     display: flex;
     gap: 5px;

@@ -14,8 +14,8 @@ const startDate = ref('');
 
 const endDate = ref('');
 const selectedSpaces = ref();
-const projectList = ref([])
-const selectedProjects = ref(); 
+const projectList = ref([]);
+const selectedProjects = ref();
 const previewData = ref(null);
 const previewProjectWiseCount = ref(null);
 const previewSprintTask = ref(null);
@@ -27,7 +27,7 @@ onMounted(() => {
     if (!selectedSpaces.value || selectedSpaces.value.length === 0) {
         // Make sure the totalProjectsforReport has data before assigning
         if (totalProjectsforReport.value && totalProjectsforReport.value.length > 0) {
-            projectList.value = [...totalProjectsforReport.value];  // Use spread to ensure reactivity
+            projectList.value = [...totalProjectsforReport.value]; // Use spread to ensure reactivity
         } else {
             projectList.value = [];
         }
@@ -37,12 +37,12 @@ onMounted(() => {
 watch(selectedSpaces, (newVal) => {
     if (newVal && newVal.length > 0) {
         // Concatenate all projects from selectedSpaces
-        const concatenatedProjects = newVal.flatMap(space => space.projects);
+        const concatenatedProjects = newVal.flatMap((space) => space.projects);
         projectList.value = concatenatedProjects;
     } else {
         // Reset projectList to totalProjectsforReport if no spaces are selected
         if (totalProjectsforReport.value && totalProjectsforReport.value.length > 0) {
-            projectList.value = [...totalProjectsforReport.value];  // Ensure reactivity by using spread operator
+            projectList.value = [...totalProjectsforReport.value]; // Ensure reactivity by using spread operator
         } else {
             projectList.value = [];
         }
@@ -70,13 +70,13 @@ const handleGenerate = async () => {
     loading.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    let spaceIds 
-    if(selectedSpaces.value && selectedSpaces.value.length > 0) {
+    let spaceIds;
+    if (selectedSpaces.value && selectedSpaces.value.length > 0) {
         spaceIds = selectedSpaces.value?.map((item) => item.id);
         console.log('Space ID', spaceIds);
     }
 
-    let projectIds
+    let projectIds;
     // Only append project IDs if there are valid projects selected
     if (selectedProjects.value && selectedProjects.value.length > 0) {
         projectIds = selectedProjects.value?.map((item) => item.id);
@@ -94,13 +94,15 @@ const handleGenerate = async () => {
     //     formData.append('end_date', formattedEndDate);
     // }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/project-report/view?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token.value}`
-        },
-        
-    }); 
+    const { data, error } = await useFetch(
+        `${url.public.apiUrl}/project-report/view?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        }
+    );
 
     if (data.value?.code == 200) {
         previewData.value = data.value.data?.overView.map((item, index) => ({ ...item, index: index + 1 }));
@@ -121,13 +123,13 @@ const handleReportDownload = async () => {
     }
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
-    let spaceIds 
-    if(selectedSpaces.value && selectedSpaces.value.length > 0) {
+    let spaceIds;
+    if (selectedSpaces.value && selectedSpaces.value.length > 0) {
         spaceIds = selectedSpaces.value?.map((item) => item.id);
         console.log('Space ID', spaceIds);
     }
 
-    let projectIds
+    let projectIds;
     // Only append project IDs if there are valid projects selected
     if (selectedProjects.value && selectedProjects.value.length > 0) {
         projectIds = selectedProjects.value?.map((item) => item.id);
@@ -140,12 +142,15 @@ const handleReportDownload = async () => {
         // }
     }
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/project-report/download?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token.value}`
-        },
-    });
+    const { data, error } = await useFetch(
+        `${url.public.apiUrl}/project-report/download?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        }
+    );
     if (error.value) {
         console.log(error);
         return (loading1.value = false);
@@ -168,6 +173,21 @@ const handleChange = (field, event) => {
         startDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     } else {
         endDate.value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    }
+};
+
+const formattedDuration = (duration) => {
+    let timeTracked = duration;
+    const hours = Math.floor(timeTracked / 3600);
+    const minutes = Math.floor((timeTracked % 3600) / 60);
+    const seconds = timeTracked % 60;
+
+    if (hours > 0) {
+        timeTracked = `${hours} hr ${minutes} min ${seconds} sec`;
+    } else if (minutes > 0) {
+        timeTracked = `${minutes} min ${seconds} sec`;
+    } else {
+        timeTracked = `${seconds} sec`;
     }
 };
 
@@ -228,14 +248,14 @@ const handleReset = () => {
                         </template>
 
                         <template #end>
-                            <Button @click="handleReset" label='Reset' class="mr-2" />
+                            <Button @click="handleReset" label="Reset" class="mr-2" />
                             <Button @click="handleGenerate" class="" label="Generate" :loading="loading" />
                         </template>
                     </Toolbar>
                 </div>
                 <div v-if="previewData || previewProjectWiseCount || previewSprintTask" class="card">
                     <div class="flex align-items-center justify-content-between gap-2 mb-5">
-                        <h5 class="m-0" style="visibility: hidden;">Overview</h5>
+                        <h5 class="m-0" style="visibility: hidden">Overview</h5>
                         <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
                     </div>
                     <div class="card">
@@ -250,15 +270,14 @@ const handleReset = () => {
                             <Column field="unit_name" header="Unit Name"></Column>
                             <Column field="total_iteration" header="Total Number of Iteration"></Column>
                             <Column field="total_missed_deadline" header="No. of Missed Deadlines"></Column>
-                            
+
                             <Column field="missed_deadline_percentage" header="% of Missed Deadlines"></Column>
                         </DataTable>
                     </div>
-                    <br>
+                    <br />
                     <div class="card">
                         <div class="flex align-items-center justify-content-between gap-2 mb-5">
                             <h5 class="m-0">Project Wise Count</h5>
-                            
                         </div>
                         <DataTable v-if="previewProjectWiseCount" :value="previewProjectWiseCount" tableStyle="min-width: 50rem">
                             <template #empty>
@@ -271,7 +290,7 @@ const handleReset = () => {
                             <Column field="total_missed_deadline" header="No.of Missed Deadlines"></Column>
                         </DataTable>
                     </div>
-                    <br>
+                    <br />
                     <div class="card">
                         <div class="flex align-items-center justify-content-between gap-2 mb-5">
                             <h5 class="m-0">Sprint</h5>
@@ -286,7 +305,9 @@ const handleReset = () => {
                             <Column field="status" header="Status"></Column>
                             <Column field="due_date" header="Due Date"></Column>
                             <Column field="end_date" header="End Date"></Column>
-                            <Column field="duration" header="Duration"></Column>
+                            <Column field="duration" header="Duration">
+                         
+                            </Column>
                             <Column field="unit_name" header="Unit Name"></Column>
                             <Column field="missed_deadline" header="Missed Deadlines"></Column>
                         </DataTable>
