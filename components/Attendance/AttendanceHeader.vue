@@ -4,7 +4,7 @@ defineProps({
 });
 </script>
 <template>
-    <header class="header">
+    <header class="header pl-0">
         <h3>Attendance</h3>
     </header>
 </template>

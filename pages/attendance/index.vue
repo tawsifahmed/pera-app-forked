@@ -5,11 +5,16 @@ definePageMeta({
 });
 import { attendanceStore } from '~/store/attendance';
 const { getAttendance } = attendanceStore();
+const { attendanceD } = storeToRefs(attendanceStore());
 
-getAttendance();
+// onMounted(async() => {
+//     await getAttendance();
+// });
+// getAttendance();
 </script>
 <template>
     <div class="card">
+        <!-- <pre>{{attendanceD}}</pre> -->
         <AttendanceHeader />
         <AttendanceTable />
     </div>
