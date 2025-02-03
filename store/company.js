@@ -348,10 +348,27 @@ export const useCompanyStore = defineStore('workStation', {
             this.isGetApiCalled = true;
             this.statuslist = data.value?.taskStatus;
 
-            const kanbanData = this.statuslist.map((val) => {
-                const content = this.tasks.filter((item) => item.data.status.name === val.name);
-                return { name: val.name, statusColor: val.color_code, status: val, content: content };
-            });
+            function getKanbanData(tasks, statusList) {
+                return statusList.map((status) => {
+                    const content = [];
+
+                    function addTasksToContent(task) {
+                        if (task.data.status.name === status.name) {
+                            content.push(task);
+                        }
+
+                        if (task.children && task.children.length > 0) {
+                            task.children.forEach((childTask) => addTasksToContent(childTask));
+                        }
+                    }
+
+                    tasks.forEach((task) => addTasksToContent(task));
+
+                    return { name: status.name, statusColor: status.color_code, status: status, content: content };
+                });
+            }
+
+            const kanbanData = getKanbanData(this.tasks, this.statuslist);
 
             this.kanbanTasks = kanbanData;
             const calendarData = this.tasks.map((val) => {

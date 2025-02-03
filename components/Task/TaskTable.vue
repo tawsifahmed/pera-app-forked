@@ -1294,7 +1294,7 @@ const handleRefresh = async () => {
                                                     <i class="pi pi-flag text-lg"></i>
                                                     <p class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
-                                                <div
+                                                <!-- <div
                                                     class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
                                                     style="border-radius: 5px"
                                                     @click="
@@ -1311,14 +1311,13 @@ const handleRefresh = async () => {
                                                     <p class="mb-1">Subtask</p>
                                                     <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
-                                                </div>
+                                                </div> -->
                                             </div>
                                             {{ element.t_name }}
                                         </div>
-                                        <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
+                                        <!-- <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
                                             <div v-for="element in element.children" :key="element.unique_id" class="sub-card" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                                 <p class="font-semibold truncate-board text-sm title">{{ element.data.name }}</p>
-                                                <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
@@ -1366,7 +1365,7 @@ const handleRefresh = async () => {
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </template>
                             </draggable>
@@ -1821,6 +1820,7 @@ textarea {
     /* margin: 10px 0px; */
     border-radius: 8px;
     width: 20rem;
+    min-height: 120px;
 }
 
 .input-new {

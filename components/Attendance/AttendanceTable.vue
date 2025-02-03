@@ -82,9 +82,7 @@ getAttendanceData();
 
 <style scoped>
 /* Add any custom styles here */
-.participants {
-    width: 40%;
-}
+
 .description {
     width: 60%;
     display: block; /* Ensures the element behaves like a block for truncation */

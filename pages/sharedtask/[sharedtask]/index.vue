@@ -1,6 +1,7 @@
 <script setup>
 const url = useRuntimeConfig();
 import Column from 'primevue/column';
+import MdEditor from 'md-editor-v3';
 
 
 const isLogged = ref(false);
@@ -16,10 +17,13 @@ definePageMeta({
 const { sharedtask } = useRoute().params;
 const taskData = ref();
 const taskTable = ref([]);
+
+const description = ref('');
 const handleFetch = async () => {
     const { data, pending, error } = await useFetch(`${url.public.apiUrl}/tasks/shared/${sharedtask}`);
     taskData.value = data.value.data;
     taskTable.value = data.value.subTask;
+    description.value = data.value.data.description;
     console.log(data.value.subTask);
 };
 handleFetch();
@@ -128,7 +132,9 @@ const formattedTime = (time) => {
                                             </span>
                                         </template>
                                     </Editor> -->
-                                    <p v-html="taskData?.description" class="description-section"></p>
+                                    <MdEditor style="padding: 0" v-model="description" editorStyle="height: 150px" previewOnly class="custom-preview card" placeholder="Write here..." height="300px" language="en-US" />
+
+                                    <!-- <p v-html="taskData?.description" class="description-section"></p> -->
                                 </div>
                             </div>
 
