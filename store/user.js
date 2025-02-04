@@ -24,7 +24,7 @@ export const useUserStore = defineStore('user', () => {
         localStorage.setItem('userCompany', data.value.data.company_id)
     }
 
-    async function updateUser(id, name, phone, email, address, image) {
+    async function updateUser(id, name, phone, email, address, image, employee_id) {
         isLoading.value = true
 
         const formdata = new FormData()
@@ -36,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
         if (image != null) {
             formdata.append('image', image);
         }
+        formdata.append('employee_id', employee_id);
         const token = useCookie('token');
 
         try {
