@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <div class="field">
             <label for="company">Name<i class="text-red-500">*</i></label>
             <InputText id="editEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
