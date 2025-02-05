@@ -318,7 +318,7 @@ const dateFormatter = (data) => {
     const dateStr = data;
     const date = new Date(dateStr);
 
-    const year = date.getFullYear();
+    const year = String(date.getFullYear()).slice(-2);
     const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns 0-11
     const day = String(date.getDate()).padStart(2, '0');
 
@@ -670,11 +670,14 @@ watch(
                             <div class="title-group">
                                 <div v-tooltip.left="{ value: `Status: ${task.status_name}` }" :class="`status`" :style="`background-color: ${task?.status_color};`"></div>
                                 <p class="title line-clamp-1" style="font-weight: 600">{{ task?.name }}</p>
-                                <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
-                                <p class="title-project line-clamp-1">{{ task?.project_name }}</p>
                             </div>
-                            <div>
-                                <p style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</p>
+                            <div class="flex align-items-center gap-3">
+                                <div style="background-color: #00000040; height: 5px; width: 5px; border-radius: 15px"></div>
+                                <p class="title-project line-clamp-1" v-tooltip.left="task?.project_name.length > 11 ? { value: `Project: ${task.project_name}` } : false">
+                                    {{ task?.project_name.length > 11 ? task.project_name.slice(0, 11) + '...' : task.project_name }}
+                                </p>
+
+                                <i style="font-size: 12px">Due: {{ task.due_date ? dateFormatter(task?.due_date) : 'Not Set' }}</i>
                             </div>
                         </div>
                     </div>
@@ -771,7 +774,7 @@ watch(
 
 .title {
     margin: auto 0;
-    max-width: 300px;
+    max-width: 380px;
 }
 
 .title-project {

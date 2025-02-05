@@ -153,7 +153,7 @@ const formattedTime = (time) => {
                                             class="card attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-2 relative"
                                             style="background-color: #f7fafc"
                                         >
-                                            <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="`http://188.166.212.40/pera/public${item?.file}`">
+                                            <a target="_blank" class="attachment-wrapper cursor-pointer flex flex-column justify-content-center align-items-center gap-2 px-0 py-4 relative" :href="`https://pbe.singularitybd.net/${item?.file}`">
                                                 <div class="pi pi-file text-6xl attach-icon"></div>
                                                 <div class="attach-detail flex flex-column justify-content-center align-items-center mt-1 pt-1 px-3">
                                                     <!-- <div class="text-xs">{{ setFileUrl(item?.file) }}</div>
@@ -204,7 +204,7 @@ const formattedTime = (time) => {
                                 <template #content>
                                     <div v-if="setFileUrl(comment?.file)" class="flex justify-content-start my-2">
                                         <a
-                                            :href="`https://pbe.singularitybd.net/public/storage/${comment?.file}`"
+                                            :href="`https://pbe.singularitybd.net/storage/${comment?.file}`"
                                             target="_blank"
                                             class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file"
                                             style="background-color: #f7fafc"
