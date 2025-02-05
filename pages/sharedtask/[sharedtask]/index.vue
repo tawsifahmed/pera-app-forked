@@ -215,8 +215,8 @@ const formattedTime = (time) => {
                                             </div>
                                         </a>
                                     </div>
-                                    <p v-if="comment?.comment" class="m-0 ml-1">
-                                        {{ comment?.comment }}
+                                    <p v-if="comment?.comment" v-html="comment?.comment" class="m-0 ml-1">
+                                        
                                     </p>
                                     <p v-else class="m-0 ml-1" style="visibility: hidden;"> 
                                         .
@@ -539,5 +539,16 @@ input[type='file']::file-selector-button:hover {
     border: 1px solid #ddd;
     max-height: 130px;
     overflow-y: scroll;
+}
+
+
+#md-editor-v3 {
+    background-color: inherit !important;
+    color: inherit !important;
+    border-radius: 10px;
+}
+
+.text-xs {
+    color: inherit !important;
 }
 </style>
