@@ -171,6 +171,16 @@ const applyLightTheme = () => {
             }
         }
     };
+    pieChartOptions.value = {
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    color: '#495057'
+                }
+            }
+        }
+    };
 };
 
 const applyDarkTheme = () => {
@@ -197,6 +207,16 @@ const applyDarkTheme = () => {
                 },
                 grid: {
                     color: 'rgba(160, 167, 181, .3)'
+                }
+            }
+        }
+    };
+    pieChartOptions.value = {
+        plugins: {
+            legend: {
+                labels: {
+                    usePointStyle: true,
+                    color: '#ebedef'
                 }
             }
         }
