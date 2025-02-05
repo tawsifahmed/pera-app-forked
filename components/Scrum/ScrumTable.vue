@@ -170,7 +170,7 @@ const onPage = async (e) => {
             <p class="">{{ selectedScrum.meeting_date }}</p>
         </div>
         <div class="participants">
-            <div class="flex gap-1 flex-wrap">
+            <div class="flex gap-1 flex-wrap mt-1">
                 <div class="border rounded" v-for="child in selectedScrum.user_ids" :key="child.id" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
                     <div class="">{{ child.name }}</div>
                 </div>
@@ -222,7 +222,7 @@ const onPage = async (e) => {
 <style lang="scss" scoped>
 /* Add any custom styles here */
 .participants {
-    width: 40%;
+    //width: 40%;
 }
 .description {
     width: 60%;
