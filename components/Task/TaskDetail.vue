@@ -723,6 +723,7 @@ const adjustMentionListPosition = () => {
 // Move Task
 const op = ref('');
 const moveTaskData = ref([]);
+const moveTaskToDiffProject = ref([]);
 const moveSearch = ref('');
 const handleMoveTask = (event) => {
     op.value.toggle(event);
@@ -741,11 +742,14 @@ const moveTaskFetch = async (query) => {
     });
     // console.log(data.value);
     moveTaskData.value = data.value.data.tasks;
+    moveTaskToDiffProject.value = data.value.data.projects;
     console.log(moveTaskData.value);
 };
 
-const handleTaskMove = async (selectedTask) => {
-    console.log(selectedTask);
+const handleTaskMove = async (type, selectedTask) => {
+    console.log(selectedTask.project_id);
+    console.log(selectedTask.task_id);
+    // return
     const token = useCookie('token');
     const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/tasks/update/${taskDetails.value?.id}`, {
         method: 'POST',
@@ -753,8 +757,8 @@ const handleTaskMove = async (selectedTask) => {
             Authorization: `Bearer ${token.value}`
         },
         body: {
-            parent_task_id: selectedTask.task_id,
-            project_id: selectedTask.project_id
+            parent_task_id: selectedTask.task_id ?? 0,
+            project_id: selectedTask.project_id === undefined ? projID : selectedTask.project_id
         }
     });
     emit('updateTaskTable');
@@ -1318,7 +1322,7 @@ const handletaskNameUpdate = async () => {
 
     <!-- Move Task -->
     <OverlayPanel ref="op">
-        <div class="flex flex-column gap-3 w-25rem">
+        <div class="flex flex-column gap-3 w-28rem">
             <div>
                 <div class="flex justify-content-between align-items-center">
                     <span class="font-medium text-900 block mb-2">Move this Task</span>
@@ -1332,11 +1336,23 @@ const handletaskNameUpdate = async () => {
                     </InputGroupAddon>
                 </InputGroup>
             </div>
-            <div>
+            <div >
+                <span class="font-medium text-900 block mb-0 task-card card" @click="() => handleTaskMove('parent', '0')">Set as Parent</span>
+                
+            </div>
+            <div v-if="moveTaskData.length > 0" >
                 <span class="font-medium text-900 block mb-2">Tasks</span>
-                <div @click="() => handleTaskMove(tasks)" class="task-card card" v-for="tasks in moveTaskData">
+                <div @click="() => handleTaskMove('sub', tasks)" class="task-card card justify-content-between" v-for="tasks in moveTaskData">
                     <!-- <pre>{{ tasks }}</pre> -->
-                    {{ tasks?.task_name }}
+                    <p class="mb-0 move-task-name" v-tooltip.top="{ value: tasks?.task_name }">{{ tasks?.task_name }} </p>
+                    <i class="mb-0 font-bold"  v-tooltip.left="{ value: `Project: ${tasks.project_name}` }">{{ tasks?.project_name.length > 5 ? tasks.project_name.slice(0, 5) + '...' : tasks.project_name }}</i>
+                </div>
+            </div>
+            <div v-if="moveTaskToDiffProject.length > 0">
+                <span class="font-medium text-900 block mb-2">Projects</span>
+                <div @click="() => handleTaskMove('diffProject', project)" class="task-card card" v-for="project in moveTaskToDiffProject">
+                    <!-- <pre>{{ tasks }}</pre> -->
+                    {{ project.title }}
                 </div>
             </div>
         </div>
@@ -1698,6 +1714,14 @@ input[type='file']::file-selector-button:hover {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     max-width: 94%;
+}
+
+
+.move-task-name {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 81%;
 }
 
 .text-danger {
