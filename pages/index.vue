@@ -248,8 +248,8 @@ let currentPage = ref(1); // New variable for current page
 const filterTasks = async () => {
     projectId.value = selectedProject.value ? selectedProject.value.id : '';
     sta.value = selectedStatus.value ? selectedStatus.value.id : '';
-    startD.value = dateFilter.value[0] ? dateFormatter(dateFilter.value[0]) : '';
-    enD.value = dateFilter.value[1] ? dateFormatter(dateFilter.value[1]) : '';
+    startD.value = dateFilter.value ? (dateFilter.value[0] ? dateFormatter(dateFilter.value[0]) : '') : '';
+    enD.value = dateFilter.value ? (dateFilter.value[1] ? dateFormatter(dateFilter.value[1]) : '') : '';
     // return console.log(dateFilter.value);
     if (isLoadMoreClicked) {
         currentPage.value++;
