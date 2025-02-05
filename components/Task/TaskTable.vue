@@ -1250,10 +1250,10 @@ const handleRefresh = async () => {
                                     <div class="">
                                         <div class="kan-task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate-board text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
+                                                <p class="font-semibold truncate-board text-sm title" style="color: black;" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
-                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                    <p :style="`color:${element.data.status.color_code}`" class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
 
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
@@ -1287,7 +1287,7 @@ const handleRefresh = async () => {
                                                     </div>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
-                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <i class="pi pi-calendar-minus text-lg" style="color: black;"></i>
                                                     <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">

@@ -220,10 +220,10 @@ const handleReset = () => {
                 <div class="card">
                     <!-- <pre>{{ usersListStore }}</pre> -->
                     <Toast position="bottom-right" group="br" />
-                    <div class="d-flex mr-2">
+                    <!-- <div class="d-flex mr-2">
                         <h5 class="mb-1">Task Reports</h5>
-                    </div>
-                    <Toolbar class="border-0 px-0">
+                    </div> -->
+                    <Toolbar class="border-0 px-0 align-items-end">
                         <template #start>
                             <!-- <pre>{{totalProjectsforReport}}</pre>
                             <pre>{{selectedSpaces}}</pre> -->

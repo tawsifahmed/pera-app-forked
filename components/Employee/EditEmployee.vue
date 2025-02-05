@@ -94,7 +94,8 @@ const handleSubmitData = async () => {
                     email: email.value,
                     address: address.value,
                     phone: phone.value,
-                    role: user_type.value.name
+                    role: user_type.value.name,
+                    employee_id: employeeId.value
                 }
             });
 
