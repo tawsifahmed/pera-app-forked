@@ -142,11 +142,11 @@ onMounted(() => {
 
             <!-- <InputText type="password" v-model="password" class="w-full" /> -->
         </div>
-        <!-- <div class="field">
+        <div class="field">
             <label for="company">Employee ID 
             </label>
-            <InputText  v-model="employeeId" class="w-full" placeholder="Enter Name"/>
-        </div> -->
+            <InputText  v-model="employeeId" class="w-full" placeholder="Enter Employee ID"/>
+        </div>
 
         <div class="field flex flex-column">
             <!-- <pre>rol {{rolesLists}}</pre> -->

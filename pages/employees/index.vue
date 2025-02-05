@@ -57,6 +57,8 @@ const rolesLists = ref([]);
 
 const user_type = ref([]);
 
+const employeeId = ref('');
+
 const closeCreateModal = (evn) => {
     visibleCreateEmployee.value = false;
     init();
@@ -91,6 +93,7 @@ const editEmployee = (data) => {
     phone.value = data.phone;
     address.value = data.address;
     user_type.value = data.user_type;
+    employeeId.value = data.employee_id;
     rolesLists.value.map((item) => {
         if (item.name === data.user_type) {
             user_type.value = item;
@@ -281,7 +284,7 @@ const downloadTaskSheet = () => {
 
         <!-- Edit -->
         <Dialog v-model:visible="visibleEditEmployee" modal header="Edit Employee" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <EditEmployee :param="{ id, name, address, phone, email, user_type, rolesLists }" @closeEditModal="closeEditModal($event)" />
+            <EditEmployee :param="{ id, name, address, phone, email, user_type, employeeId, rolesLists }" @closeEditModal="closeEditModal($event)" />
         </Dialog>
 
         <Dialog v-model:visible="visibleDeleteEmployee" header=" " :style="{ width: '25rem' }" dismissableMask="true">

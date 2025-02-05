@@ -3,20 +3,20 @@
 
         <div class="field">
             <label for="company">Name<i class="text-red-500">*</i></label>
-            <InputText id="editEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
+            <InputText id="editEmployeeName" v-model="name" class="w-full" placeholder="Edit Name"/>
         </div>
 
         <div class="field">
             <label for="email">Email address<i class="text-red-500">*</i></label>
-            <InputText type="email" v-model="email" class="w-full" placeholder="Enter Email"/>
+            <InputText type="email" v-model="email" class="w-full" placeholder="Edit Email"/>
         </div>
         <div class="field">
             <label for="worktype">Phone</label>
-            <InputText v-model="phone" type="tel" class="w-full" placeholder="Enter Phone No."/>
+            <InputText v-model="phone" type="tel" class="w-full" placeholder="Edit Phone No."/>
         </div>
         <div class="field">
             <label for="company">Address</label>
-            <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Enter Address"/>
+            <Textarea v-model="address" rows="3" cols="20" class="w-full" placeholder="Edit Address"/>
         </div>
         <!-- <div class="field">
             <label for="company">Password</label>
@@ -24,6 +24,11 @@
         </div> -->
 
         <!-- <pre>{{user_type}}</pre> -->
+        <div class="field">
+            <label for="company">Employee ID 
+            </label>
+            <InputText  v-model="employeeId" class="w-full" placeholder="Edit Employee ID"/>
+        </div>
         <div class="field flex flex-column">
             <label>Role<i class="text-red-500">*</i></label>
             <Dropdown v-model="user_type" :options="rolesLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Role" checkmark :highlightOnSelect="false" class="w-full" />
@@ -57,6 +62,8 @@ const address = ref(props.param.address);
 const rolesLists = ref(props.param.rolesLists);
 
 const user_type = ref(props.param.user_type);
+
+const employeeId = ref(props.param.employeeId);
 // user_type.value = singleTask.data.priority ? { name: singleTask.data.priority, code: singleTask.data.priority } : '';
 
 const errorHandler = ref(false);
