@@ -1337,22 +1337,24 @@ const handletaskNameUpdate = async () => {
                 </InputGroup>
             </div>
             <div >
-                <span class="font-medium text-900 block mb-0 task-card card" @click="() => handleTaskMove('parent', '0')">Set as Parent</span>
+                <span class="font-medium text-900 block mb-0 task-card card" @click="() => handleTaskMove('parent', '0')" v-tooltip.top="{ value: `Set as parent task on this project.`, showDelay: 500 }">Set as Parent</span>
                 
             </div>
-            <div v-if="moveTaskData.length > 0" >
-                <span class="font-medium text-900 block mb-2">Tasks</span>
-                <div @click="() => handleTaskMove('sub', tasks)" class="task-card card justify-content-between" v-for="tasks in moveTaskData">
-                    <!-- <pre>{{ tasks }}</pre> -->
-                    <p class="mb-0 move-task-name" v-tooltip.top="{ value: tasks?.task_name }">{{ tasks?.task_name }} </p>
-                    <i class="mb-0 font-bold"  v-tooltip.left="{ value: `Project: ${tasks.project_name}` }">{{ tasks?.project_name.length > 5 ? tasks.project_name.slice(0, 5) + '...' : tasks.project_name }}</i>
+            <div class="move-task-wrapper">
+                <div v-if="moveTaskData.length > 0" >
+                    <span class="font-medium text-900 block mb-2">Tasks:</span>
+                    <div @click="() => handleTaskMove('sub', tasks)" class="task-card card justify-content-between" v-for="tasks in moveTaskData">
+                        <!-- <pre>{{ tasks }}</pre> -->
+                        <p class="mb-0 move-task-name" v-tooltip.top="{ value: tasks?.task_name }">{{ tasks?.task_name }} </p>
+                        <i class="mb-0 font-bold"  v-tooltip.left="{ value: `Project: ${tasks.project_name}` }">{{ tasks?.project_name.length > 8 ? tasks.project_name.slice(0, 8) + '...' : tasks.project_name }}</i>
+                    </div>
                 </div>
-            </div>
-            <div v-if="moveTaskToDiffProject.length > 0">
-                <span class="font-medium text-900 block mb-2">Projects</span>
-                <div @click="() => handleTaskMove('diffProject', project)" class="task-card card" v-for="project in moveTaskToDiffProject">
-                    <!-- <pre>{{ tasks }}</pre> -->
-                    {{ project.title }}
+                <div v-if="moveTaskToDiffProject.length > 0">
+                    <span class="font-medium text-900 block my-2">Projects:</span>
+                    <div @click="() => handleTaskMove('diffProject', project)" class="task-card card" v-for="project in moveTaskToDiffProject">
+                        <!-- <pre>{{ tasks }}</pre> -->
+                        {{ project.title }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -1717,11 +1719,16 @@ input[type='file']::file-selector-button:hover {
 }
 
 
+.move-task-wrapper{
+    height: 400px;
+    overflow-y: scroll;
+}
+
 .move-task-name {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
-    max-width: 81%;
+    max-width: 77.5%;
 }
 
 .text-danger {
