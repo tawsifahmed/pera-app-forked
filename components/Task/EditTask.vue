@@ -201,7 +201,7 @@ const handleUpdateTask = async () => {
         }
 
         if(singleTask?.data.parent_task_id === null && singleTask?.data?.dueDate !== null && isDateEdited.value === true){
-            handleMissDeadlineShowTimer(singleTask.key, projects, singleTask.data.dueDate);
+            handleMissDeadlineShowTimer(singleTask.key, projects, editTaskData.dueDate);
             delete editTaskData.dueDate;
         }
 
