@@ -2166,7 +2166,7 @@ textarea {
 }
 
 .task-container {
-    max-height: 28.5rem;
+    max-height: 25rem;
     overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }

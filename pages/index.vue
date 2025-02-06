@@ -741,7 +741,7 @@ watch(
 }
 
 .task-container {
-    max-height: 25rem;
+    max-height: 28.5rem;
     overflow-y: auto;
     padding: 10px;
 }
