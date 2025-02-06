@@ -20,8 +20,8 @@ export const useUserStore = defineStore('user', () => {
             //   watch: [this.userProfile]
             // }
         )
-        userProfile.value = data.value;
-        localStorage.setItem('userCompany', data.value.data.company_id)
+        userProfile.value = data?.value;
+        localStorage.setItem('userCompany', data?.value?.data?.company_id)
     }
 
     async function updateUser(id, name, phone, email, address, image, employee_id) {

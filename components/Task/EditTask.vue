@@ -70,10 +70,15 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
+import { useClockStore } from '~/store/clock';
+
 import { useCompanyStore } from '~/store/company';
 import Editor from 'primevue/editor';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
+
+const { handleMissDeadlineShowTimer } = useClockStore();
+const { trackedTime, deadlineJustifyProvided } = storeToRefs(useClockStore());
 
 const { editTask } = useCompanyStore();
 const { isTaskEdited, detectDuplicateTask } = storeToRefs(useCompanyStore());
@@ -154,8 +159,11 @@ watch(dueDate, (newVal, oldVal) => {
 });
 
 const checkDate = ref(dueDate.value);
+const isDateEdited = ref(false);
+
 watch(dueDate, (newValue, oldValue) => {
     if (newValue) {
+        isDateEdited.value = true;
         checkDate.value = new Date(newValue).toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase();
     }
 });
@@ -192,6 +200,11 @@ const handleUpdateTask = async () => {
             dueDate.value = postSubDate ? new Date(postSubDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).replace(',', '').toLowerCase() : null;
         }
 
+        if(singleTask?.data.parent_task_id === null && singleTask?.data?.dueDate !== null && isDateEdited.value === true){
+            handleMissDeadlineShowTimer(singleTask.key, projects, singleTask.data.dueDate);
+            delete editTaskData.dueDate;
+        }
+
         await editTask(editTaskData);
         if (detectDuplicateTask.value === true) {
             btnLoading.value = false;
@@ -200,7 +213,12 @@ const handleUpdateTask = async () => {
             btnLoading.value = false;
             emit('closeEditModal', false);
             emit('visibleEdit', 'visibleEdit');
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Task updated Successfully', group: 'br', life: 3000 });
+            toast.add({ 
+                severity: 
+                'success', 
+                summary: 'Successful', 
+                detail: 'Task updated Successfully', 
+                group: 'br', life: 3000 });
             if (isDescriptionEdited.value === true) {
                 isDescriptionEdited.value = false;
                 console.log('isDescriptionEdited Flagged');
@@ -212,6 +230,10 @@ const handleUpdateTask = async () => {
             if (isTagsEdited.value === true) {
                 isTagsEdited.value = false;
                 console.log('isTagsEdited Flagged');
+            }
+            if (isDateEdited.value === true) {
+                isDateEdited.value = false;
+                console.log('isDateEdited Flagged');
             }
         } else {
             btnLoading.value = false;

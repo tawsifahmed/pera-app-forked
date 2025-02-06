@@ -22,7 +22,7 @@ const { fileUpload, fileDelete } = useFileUploaderStore();
 const { isFileUpload, isLoading, isFileDeleted } = storeToRefs(useFileUploaderStore());
 
 const { getTaskTimerData, setManualTime, storeTaskTimer, handleMissDeadlineShowTimer } = useClockStore();
-const { trackedTime, deadlineJustifyProvided } = storeToRefs(useClockStore());
+const { deadlineJustifyProvided } = storeToRefs(useClockStore());
 
 const { editTask, addTaskComment, getTaskDetails, getSingleProject } = useCompanyStore();
 
