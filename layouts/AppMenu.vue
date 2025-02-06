@@ -4,6 +4,8 @@ import AppMenuItem from './AppMenuItem.vue';
 import accessPermission from '~/composables/usePermission';
 import { storeToRefs } from 'pinia';
 import { useActiveCompanyStore } from '~/store/workCompany';
+import { useToast } from 'primevue/usetoast';
+
 import { useCompanyStore } from '~/store/company'; // import the auth store we just created
 const { switchCompany } = useCompanyStore(); // use authenticateUser action from  auth store
 const { companySwitchToast, isCompanySwitched } = storeToRefs(useCompanyStore());

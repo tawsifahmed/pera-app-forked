@@ -1250,7 +1250,7 @@ const handleRefresh = async () => {
                                     <div class="">
                                         <div class="kan-task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate-board text-sm title" style="color: black;" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
+                                                <p class="font-semibold truncate-board text-sm title" style="color: black; cursor: pointer;" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p :style="`color:${element.data.status.color_code}`" class="status text-sm">{{ element.data.status.name }}</p>
@@ -2166,7 +2166,7 @@ textarea {
 }
 
 .task-container {
-    max-height: 25rem;
+    max-height: 28.5rem;
     overflow-y: auto;
     padding: 0px 8px 0px 1px;
 }

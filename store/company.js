@@ -74,7 +74,14 @@ export const useCompanyStore = defineStore('workStation', {
         unAssignedTasksChartData: 0,
         inProgressCnt: null,
         chartClosedTaskInfo: null,
-        rolesLists: null
+        rolesLists: null,
+        cookieOptions: {
+            maxAge: 60 * 60 * 24 * 30,
+            priority: 'high',
+            sameSite: true,
+            // httpOnly: true,
+            secure: true
+        }
     }),
 
     actions: {
@@ -128,7 +135,7 @@ export const useCompanyStore = defineStore('workStation', {
                 localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id));
                 this.isCompanyCreated = true;
                 this.companyId = data.value?.data?.id;
-                const rolePermission = useCookie('rolePermission');
+                const rolePermission = useCookie('rolePermission', this.cookieOptions);
                 rolePermission.value = data?.value?.permissions;
                 await this.getCompanyList();
                 await companies.getCompany();
@@ -177,7 +184,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (data.value?.code === 200) {
                 const userType = useCookie('userType');
                 userType.value = data?.value?.user_type;
-                const rolePermission = useCookie('rolePermission');
+                const rolePermission = useCookie('rolePermission', this.cookieOptions);
                 rolePermission.value = data?.value?.permissions;
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
