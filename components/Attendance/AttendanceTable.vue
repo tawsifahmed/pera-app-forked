@@ -4,6 +4,8 @@ import { attendanceStore } from '~/store/attendance';
 // const { getAttendance, googleAttendance } = attendanceStore();
 // const { attendanceD } = storeToRefs(attendanceStore());
 import { ref } from 'vue';
+import accessPermission from '~/composables/usePermission';
+const filterAssignee = ref(accessPermission('all_user_attendance'));
 const url = useRuntimeConfig();
 
 const statusColor = ref({
@@ -11,32 +13,54 @@ const statusColor = ref({
     absent: 'red',
     late: 'orange'
 });
-// console.log('vueData', attendanceD);
-
 
 const date = ref(null);
 date.value = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
+const selectedUser = ref(null);
 
-
+const usersLists = ref([]);
+const init = async (userTypes) => {
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('taskAssignModalData', () =>
+        $fetch(`${url.public.apiUrl}/users/list${userTypes ? `?role_id=${userTypes}` : ''}`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        usersLists.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
+    }
+};
 
 const formattedDate = ref(null);
+
+const setUser = ref(null);
 watch(date, () => console.log(date));
-const handleMonthSelect = async () => {
+const handleFilter = async () => {
     // console.log('date', date);
     const yearMonth = `${date.value.getFullYear()}-${String(date.value.getMonth() + 1).padStart(2, '0')}`;
     formattedDate.value = yearMonth;
     console.log('formattedDate', formattedDate.value);
-    await getAttendanceData(formattedDate.value, '');
-};
+    setUser.value = selectedUser.value ? selectedUser.value.id : '';
 
+    await getAttendanceData(formattedDate.value, setUser.value);
+};
+const handleFilterReset = () => {
+    date.value = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    selectedUser.value = null;
+    setUser.value = null;
+    handleFilter();
+};
 const attendanceData = ref([]);
 
-const getAttendanceData = async (month = '') => {
+const getAttendanceData = async (month = '', user = '') => {
     try {
         const token = useCookie('token');
         const monthParam = month ? `&month=${month}` : '';
-        const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/list?${monthParam}`, { 
+        const userParam = user ? `&user[]=${user}` : '';
+        const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/list?${monthParam}${userParam}`, { 
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -61,8 +85,13 @@ const getAttendanceData = async (month = '') => {
     }
 };
 
+
+
+
+
+init();
 onMounted(() => {
-    handleMonthSelect();
+    handleFilter();
 });
 
 </script>
@@ -70,8 +99,11 @@ onMounted(() => {
     <div>
         <div class="flex justify-content-between py-2">
             <!-- <Button label="Google Attendance" severity="primary" /> -->
-            <div class="">
-                <Calendar @date-select="handleMonthSelect($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
+            <div class="flex align-items-center">
+                <Calendar @date-select="handleFilter($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
+                <Dropdown v-if="filterAssignee" @change="handleFilter()" v-model="selectedUser" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Employee" class="w-full md:w-17rem ml-2" />
+                <Button @click="handleFilterReset" label="Reset" class=" ml-2" severity="secondary" />
+
             </div>
         </div>
         <!-- <pre>{{attendanceData}}</pre> -->
@@ -90,7 +122,7 @@ onMounted(() => {
         >
             <template #empty> <p class="text-center">No Data found.</p> </template>
             <template #loading> Loading. Please wait... </template>
-            <Column style="width: 2%" field="id" header="#" :body="(_, { rowIndex }) => rowIndex + 1"> </Column>
+            <!-- <Column style="width: 2%" field="id" header="#" :body="(_, { rowIndex }) => rowIndex + 1"> </Column> -->
             <Column style="width: 12%" field="user_name" header="Name"> </Column>
             <Column style="width: 12%" field="date" header="Date"></Column>
             <Column style="width: 12%" field="day" header="Day"></Column>

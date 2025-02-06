@@ -36,7 +36,7 @@
         </div> -->
 
         <div class="create-btn-wrappe">
-            <Button :disabled="editName === 'Admin'" label="Update" icon="pi pi-check" :loading="submitLoader" text="" @click="handleSubmitData" />
+            <Button  label="Update" icon="pi pi-check" :loading="submitLoader" text="" @click="handleSubmitData" />
         </div>
     </div>
 </template>
