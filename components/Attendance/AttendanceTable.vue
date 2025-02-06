@@ -12,38 +12,66 @@ const statusColor = ref({
     late: 'orange'
 });
 // console.log('vueData', attendanceD);
-const date = ref(null);
 
+
+const date = ref(null);
+date.value = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+
+
+
+const formattedDate = ref(null);
 watch(date, () => console.log(date));
+const handleMonthSelect = async () => {
+    // console.log('date', date);
+    const yearMonth = `${date.value.getFullYear()}-${String(date.value.getMonth() + 1).padStart(2, '0')}`;
+    formattedDate.value = yearMonth;
+    console.log('formattedDate', formattedDate.value);
+    await getAttendanceData(formattedDate.value, '');
+};
 
 const attendanceData = ref([]);
-const getAttendanceData = async (date, user = null) => {
+
+const getAttendanceData = async (month = '') => {
     try {
         const token = useCookie('token');
-        const { data, pending, error } = await useFetch(`${url.public.apiUrl}/attendance/list?user=${user ? user : ''}&month=${''}`, {
+        const monthParam = month ? `&month=${month}` : '';
+        const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/list?${monthParam}`, { 
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
         });
+
+        if (error.value) {
+            console.error("Error fetching attendance data:", error.value); 
+
+            return; 
+        }
+
         if (data.value) {
             attendanceData.value = data.value.data;
-            console.log('attendanceData', attendanceData.value);
-            console.log('attendanceData', data);
+        } else {
+          attendanceData.value = []; 
+          console.warn("API returned no data. Check the server or parameters");
         }
+
     } catch (e) {
-        console.log(e);
+        console.error("An unexpected error occurred:", e); 
     }
 };
 
-getAttendanceData();
+onMounted(() => {
+    handleMonthSelect();
+});
+
 </script>
 <template>
     <div>
         <div class="flex justify-content-between py-2">
             <!-- <Button label="Google Attendance" severity="primary" /> -->
             <div class="">
-                <Calendar v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
+                <Calendar @date-select="handleMonthSelect($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
             </div>
         </div>
         <!-- <pre>{{attendanceData}}</pre> -->
