@@ -1257,7 +1257,7 @@ const handleRefresh = async () => {
                                                 </div>
 
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
-                                                    <i class="pi pi-user text-lg"></i>
+                                                    <i class="pi pi-user text-lg" style="color: black;"></i>
                                                     <div class="flex justify-content-start gap-1">
                                                         <span
                                                             v-for="(assignee, index) in element.data.assigneeObj"
@@ -1291,8 +1291,11 @@ const handleRefresh = async () => {
                                                     <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
-                                                    <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
+                                                    <i class="pi pi-flag text-lg" style="color: black;"></i>
+                                                    <p :style="{
+                                                        color: element.data.priority?.name === 'Low' ? '#e1aa1e' : element.data.priority?.name === 'Normal' ? '#067bea' : element.data.priority?.name === 'High' ? '#ff4928' : element.data.priority?.name === 'Urgent' ? 'crimson' : '',
+                                                        fontWeight: 500
+                                                    }" class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
                                                 <!-- <div
                                                     class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
