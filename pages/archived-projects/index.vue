@@ -50,13 +50,9 @@ const init = async () => {
         }else{
             archivesLength.value = null;
         }
-        console.log('archivesLength', archivesLength.value);
+        // console.log('archivesLength', archivesLength.value);
     }
 };
-
-
-// const archivedProjects = ref([])
-
 
 const refProjectId = ref(null);
 const refSpaceId = ref(null);
