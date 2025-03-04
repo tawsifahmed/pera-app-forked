@@ -8,7 +8,7 @@ const { singleSpace, isProjectDeleted, isProjectEdited } = storeToRefs(useCompan
 const url = useRuntimeConfig();
 
 
-const createProjectP = ref(accessPermission('create_project'));
+const editArchiveP = ref(accessPermission('archive_edit'));
 const updateProjectP = ref(accessPermission('update_project'));
 const deleteProjectP = ref(accessPermission('delete_project'));
 
@@ -30,6 +30,7 @@ const toast = useToast();
 const visible = ref(false);
 
 const archivedProjects = ref([])
+const archivesLength = ref(null);
 
 const init = async () => {
     const token = useCookie('token');
@@ -42,7 +43,14 @@ const init = async () => {
     );
     if (data.value?.data?.length > 0) {
         archivedProjects.value = data.value?.data.map((item, index) => ({ ...item, index: index + 1 }));
-        console.log('archivedProjects', typeof archivedProjects.value.length);
+        console.log('archivedProjects', archivedProjects.value.length);
+        if (archivedProjects.value.length === 1) {
+            archivesLength.value = 1;
+            
+        }else{
+            archivesLength.value = null;
+        }
+        console.log('archivesLength', archivesLength.value);
     }
 };
 
@@ -55,18 +63,21 @@ const refSpaceId = ref(null);
 
 const unArchiveProjectDialog = ref(false);
 const confirmUnArchiveProject = (info) => {
-    // console.log('refCompanyId', projectId);
-    refProjectId.value = info.id;
-    console.log('refCompanyId', refProjectId.value);
-    refSpaceId.value = info.space_id;
-    unArchiveProjectDialog.value = true;
+    if(editArchiveP.value === false){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'You do not have permission to unarchive project', group: 'br', life: 3000 });
+        return;
+    }else{
+        // console.log('refCompanyId', projectId);
+        refProjectId.value = info.id;
+        console.log('refCompanyId', refProjectId.value);
+        refSpaceId.value = info.space_id;
+        unArchiveProjectDialog.value = true;
+    }
 };
 
 
-const unArchiveLoader = ref(false);
 
 const unArchivingProject = async () => {
-    unArchiveLoader.value = true;
     console.log('refCompanyIdFin', refProjectId.value);
 
     // return
@@ -84,14 +95,15 @@ const unArchivingProject = async () => {
 
     if (isProjectEdited.value === true) {
         toast.add({ severity: 'success', summary: 'Successful', detail: 'Project unarchived successfully', group: 'br', life: 3000 });
+        if(archivesLength.value === 1){
+            location.reload();
+        }
         init();
         unArchiveProjectDialog.value = false;
         console.log('space deleted');
         refProjectId.value = null;
         unArchiveLoader.value = false;
-        if(!archivedProjects.value){
-            location.reload();
-        }
+        
         
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to unarchive project', group: 'br', life: 3000 });

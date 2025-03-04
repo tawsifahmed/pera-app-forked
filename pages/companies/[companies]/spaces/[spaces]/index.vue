@@ -9,6 +9,8 @@ const { singleSpace, singleSpaceProjects, isProjectDeleted, isProjectEdited } = 
 const createProjectP = ref(accessPermission('create_project'));
 const updateProjectP = ref(accessPermission('update_project'));
 const deleteProjectP = ref(accessPermission('delete_project'));
+const editArchiveP = ref(accessPermission('archive_edit'));
+
 
 definePageMeta({
     middleware: 'auth',
@@ -37,6 +39,7 @@ const openCreateSpace = () => {
 const refProjectId = ref(null);
 
 const confirmDeleteProject = (spaceId) => {
+ 
     refProjectId.value = spaceId;
     console.log('refCompanyId', refProjectId.value);
     deleteProjectDialog.value = true;
@@ -44,9 +47,14 @@ const confirmDeleteProject = (spaceId) => {
 
 const archiveProjectDialog = ref(false);
 const confirmArchiveProject = (projectId) => {
-    refProjectId.value = projectId;
-    console.log('refCompanyId', refProjectId.value);
-    archiveProjectDialog.value = true;
+    if(editArchiveP.value === false){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'You do not have permission to archive project', group: 'br', life: 3000 });
+        return;
+    } else{
+        refProjectId.value = projectId;
+        console.log('refCompanyId', refProjectId.value);
+        archiveProjectDialog.value = true;
+    }
 };
 
 const deleteProjectDialog = ref(false);
