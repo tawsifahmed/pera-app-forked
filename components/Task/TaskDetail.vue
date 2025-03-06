@@ -504,11 +504,16 @@ async function changeBounceStatusData(selectedBncStatus) {
     }
 }
 
-const setFileUrl = (url) => {
+const setFileUrl = (url, showInComment = false) => {
     const urlString = url;
     const partsOfString = urlString.split('/');
     const lastPartOfString = partsOfString[partsOfString.length - 1];
-    return lastPartOfString.slice(0, 10);
+    // return lastPartOfString.slice(0, 10);
+    if (showInComment) {
+        return lastPartOfString;
+    }else{
+        return lastPartOfString.length > 10 ? lastPartOfString.slice(0, 7)+ '...' : lastPartOfString.slice(0, 10);
+    }
 };
 
 const setDateFormat = (dateUrl) => {
@@ -1216,10 +1221,10 @@ const handletaskNameUpdate = async () => {
                             </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
-                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 custom-line-clamp-1 comment-file" style="background-color: #f7fafc">
                                         <div class="pi pi-file"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
-                                            <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
+                                            <div class="text-xs">{{ setFileUrl(val?.file, true) }}</div>
                                         </div>
                                     </a>
                                 </div>
@@ -1928,5 +1933,11 @@ a {
 
 .text-xs {
     color: inherit !important;
+}
+.custom-line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>
