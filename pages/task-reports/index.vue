@@ -202,7 +202,7 @@ const handleReset = () => {
                   </template> -->
                 </Column>
                 <Column field="task_due_date" header="Due Date"></Column>
-                <Column field="task_date_done" header="Date Done"></Column>
+                <Column field="task_date_done" header="End Date"></Column>
                 <Column field="duration" header="Duration"></Column>
                 <Column field="unit" header="Unit"></Column>
                 <Column field="overdue" header="Missed Deadlines"></Column>
