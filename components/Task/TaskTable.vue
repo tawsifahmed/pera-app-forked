@@ -1250,14 +1250,14 @@ const handleRefresh = async () => {
                                     <div class="">
                                         <div class="kan-task-card" :style="taskCardStyle" :key="element.id" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                             <div class="">
-                                                <p class="font-semibold truncate-board text-sm title" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
+                                                <p class="font-semibold truncate-board text-sm title" style="color: black; cursor: pointer;" v-tooltip.top="{ value: `${element.data.name}` }">{{ element.data.name }}</p>
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
-                                                    <p class="status text-sm">{{ element.data.status.name }}</p>
+                                                    <p :style="`color:${element.data.status.color_code}`" class="status text-sm">{{ element.data.status.name }}</p>
                                                 </div>
 
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.assigneeObj?.length > 0">
-                                                    <i class="pi pi-user text-lg"></i>
+                                                    <i class="pi pi-user text-lg" style="color: black;"></i>
                                                     <div class="flex justify-content-start gap-1">
                                                         <span
                                                             v-for="(assignee, index) in element.data.assigneeObj"
@@ -1287,14 +1287,17 @@ const handleRefresh = async () => {
                                                     </div>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.dueDateValue">
-                                                    <i class="pi pi-calendar-minus text-lg"></i>
+                                                    <i class="pi pi-calendar-minus text-lg" style="color: black;"></i>
                                                     <p :style="`color: ${element.data.dueDateColor}; font-weight: 500;`" class="text-sm">{{ element.data.dueDateValue }}</p>
                                                 </div>
                                                 <div class="mt-2 flex align-items-center gap-2" v-if="element.data?.priority?.name">
-                                                    <i class="pi pi-flag text-lg"></i>
-                                                    <p class="text-sm">{{ element.data.priority?.name }}</p>
+                                                    <i class="pi pi-flag text-lg" style="color: black;"></i>
+                                                    <p :style="{
+                                                        color: element.data.priority?.name === 'Low' ? '#e1aa1e' : element.data.priority?.name === 'Normal' ? '#067bea' : element.data.priority?.name === 'High' ? '#ff4928' : element.data.priority?.name === 'Urgent' ? 'crimson' : '',
+                                                        fontWeight: 500
+                                                    }" class="text-sm">{{ element.data.priority?.name }}</p>
                                                 </div>
-                                                <div
+                                                <!-- <div
                                                     class="mt-2 flex align-items-center gap-2 cursor-pointer p-1 rounded hover:bg-gray-100"
                                                     style="border-radius: 5px"
                                                     @click="
@@ -1311,14 +1314,13 @@ const handleRefresh = async () => {
                                                     <p class="mb-1">Subtask</p>
                                                     <i :class="`pi ${activeSubTask == element.unique_id ? 'pi-angle-down' : 'pi-angle-right'}  text-lg`"></i>
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
-                                                </div>
+                                                </div> -->
                                             </div>
                                             {{ element.t_name }}
                                         </div>
-                                        <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
+                                        <!-- <div :class="activeSubTask === element.unique_id ? '' : 'hidden'">
                                             <div v-for="element in element.children" :key="element.unique_id" class="sub-card" @click="$emit('handleTaskDetailView', element, list.content, list.name)">
                                                 <p class="font-semibold truncate-board text-sm title">{{ element.data.name }}</p>
-                                                <!-- <p class="truncate text-sm desc">{{ element.data.description }}</p> -->
                                                 <div class="flex align-items-center gap-2 mt-1">
                                                     <div class="status-icon" :style="`background-color:${element.data.status.color_code}`"></div>
                                                     <p class="status text-sm">{{ element.data.status.name }}</p>
@@ -1366,7 +1368,7 @@ const handleRefresh = async () => {
                                                     <p class="text-sm font-semibold">{{ element.children.length }}</p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </template>
                             </draggable>
@@ -1821,6 +1823,7 @@ textarea {
     /* margin: 10px 0px; */
     border-radius: 8px;
     width: 20rem;
+    min-height: 120px;
 }
 
 .input-new {

@@ -3,12 +3,14 @@ import Dialog from 'primevue/dialog';
 import { storeToRefs } from 'pinia';
 import { useCompanyStore } from '~/store/company';
 import accessPermission from '~/composables/usePermission';
-const { getSingleSpace, deleteProject } = useCompanyStore();
-const { singleSpace, singleSpaceProjects, isProjectDeleted } = storeToRefs(useCompanyStore());
+const { getSingleSpace, deleteProject, editProject } = useCompanyStore();
+const { singleSpace, singleSpaceProjects, isProjectDeleted, isProjectEdited } = storeToRefs(useCompanyStore());
 
 const createProjectP = ref(accessPermission('create_project'));
 const updateProjectP = ref(accessPermission('update_project'));
 const deleteProjectP = ref(accessPermission('delete_project'));
+const editArchiveP = ref(accessPermission('archive_edit'));
+
 
 definePageMeta({
     middleware: 'auth',
@@ -37,9 +39,22 @@ const openCreateSpace = () => {
 const refProjectId = ref(null);
 
 const confirmDeleteProject = (spaceId) => {
+ 
     refProjectId.value = spaceId;
     console.log('refCompanyId', refProjectId.value);
     deleteProjectDialog.value = true;
+};
+
+const archiveProjectDialog = ref(false);
+const confirmArchiveProject = (projectId) => {
+    if(editArchiveP.value === false){
+        toast.add({ severity: 'error', summary: 'Error', detail: 'You do not have permission to archive project', group: 'br', life: 3000 });
+        return;
+    } else{
+        refProjectId.value = projectId;
+        console.log('refCompanyId', refProjectId.value);
+        archiveProjectDialog.value = true;
+    }
 };
 
 const deleteProjectDialog = ref(false);
@@ -52,14 +67,49 @@ const deletingProject = async () => {
     await deleteProject(refProjectId.value, spaces);
 
     if (isProjectDeleted.value === true) {
-        toast.add({ severity: 'success', summary: 'Successful', detail: 'Project Deleted Successfully', group: 'br', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Project deleted successfully', group: 'br', life: 3000 });
         deleteProjectDialog.value = false;
         console.log('space deleted');
+        refProjectId.value = null;
         deleteLoader.value = false;
     } else {
         toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to delete project', group: 'br', life: 3000 });
         console.log('space not deleted');
+        refProjectId.value = null;
         deleteLoader.value = false;
+    }
+};
+
+const archiveLoader = ref(false);
+
+const archivingProject = async () => {
+    archiveLoader.value = true;
+    console.log('refCompanyIdFin', refProjectId.value);
+
+    // return
+    let archive = 1;
+    const editProjectData = {
+            id: refProjectId.value,
+            // name: projectNameInput.value,
+            // description: projectDescriptionInput.value,
+            space_id: spaces,
+            // statuses: transformedTaskStatusList,
+            // git_project_id: gitLabProjectId.value,
+            is_archive: archive
+        };
+    await editProject(editProjectData);
+
+    if (isProjectEdited.value === true) {
+        toast.add({ severity: 'success', summary: 'Successful', detail: 'Project archived successfully', group: 'br', life: 3000 });
+        console.log('space deleted');
+        refProjectId.value = null;
+        archiveLoader.value = false;
+        archiveProjectDialog.value = false;
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to archive project', group: 'br', life: 3000 });
+        console.log('space not deleted');
+        refProjectId.value = null;
+        archiveLoader.value = false;
     }
 };
 
@@ -142,9 +192,11 @@ const isPage = ref(true);
                         <Button class="cursor-pointer text-white mr-3 px-5 py-2" label="Enter" />
                     </NuxtLink> -->
                     <Button v-if="updateProjectP" icon="pi pi-pencil" text class="" severity="success" rounded @click="edittProject(slotProps.data)" />
-                    <Button v-if="deleteProjectP" icon="pi pi-trash" text class="" severity="warning" rounded @click="confirmDeleteProject(slotProps.data.id)" />
+                    <Button icon="pi pi-download" text class="" severity="warning" rounded  v-tooltip.top="{ value: `Archive` }" @click="confirmArchiveProject(slotProps.data.id)"/>
+                    <Button v-if="deleteProjectP" icon="pi pi-trash" text class="" severity="danger" rounded @click="confirmDeleteProject(slotProps.data.id)" />
+
                     <Button v-if="!updateProjectP" icon="pi pi-pencil" text class="" severity="success" style="visibility: hidden" />
-                    <Button v-if="!deleteProjectP" icon="pi pi-trash" text class="" severity="warning" style="visibility: hidden" />
+                    <Button v-if="!deleteProjectP" icon="pi pi-trash" text class="" severity="danger" style="visibility: hidden" />
                 </template>
             </Column>
         </DataTable>
@@ -153,6 +205,11 @@ const isPage = ref(true);
             <p>Are you sure you want to delete?</p>
             <Button label="No" icon="pi pi-times" text @click="deleteProjectDialog = false" />
             <Button label="Yes" icon="pi pi-check" :loading="deleteLoader" text @click="deletingProject" />
+        </Dialog>
+        <Dialog v-model:visible="archiveProjectDialog" header=" " dismissableMask="true" :style="{ width: '25rem' }">
+            <p>Do you want to <i class="font-bold">archive</i> this project?</p>
+            <Button label="No" icon="pi pi-times" text @click="archiveProjectDialog = false" />
+            <Button label="Yes" icon="pi pi-check" :loading="archiveLoader" text @click="archivingProject" />
         </Dialog>
 
         <Dialog v-model:visible="visibleEditProject" modal header="Edit Project" dismissableMask="true" :style="{ width: '30rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">

@@ -19,6 +19,7 @@ const uploadedImage = ref(null);
 const phone = ref(userProfile?.data?.phone);
 const email = ref(userProfile?.data?.email);
 const address = ref(userProfile?.data?.address);
+const employeeId = ref(userProfile?.data?.employee_id);
 const newPassword = ref({
     password: '',
     confirm_password: ''
@@ -40,7 +41,7 @@ watch(newPassword.value, () => {
 
 const handleSubmit = async () => {
     loading.value = true;
-    const response = await updateUser(userId.value, userName.value, phone.value, email.value, address.value, uploadedImage.value);
+    const response = await updateUser(userId.value, userName.value, phone.value, email.value, address.value, uploadedImage.value, employeeId.value);
     if (response?.code === 200) {
         toast.add({ severity: 'success', summary: 'Success', detail: 'Profile Updated Successfully', group: 'br', life: 3000 });
     } else {
@@ -128,6 +129,12 @@ const newPasswordHandler = async () => {
                     <FloatLabel>
                         <InputText id="address" v-model="address" class="w-full" />
                         <label for="address">Address</label>
+                    </FloatLabel>
+                </div>
+                <div class="col-12 lg:col-6 mb-3">
+                    <FloatLabel>
+                        <InputText id="address" v-model="employeeId" class="w-full" />
+                        <label for="address">Employee ID</label>
                     </FloatLabel>
                 </div>
                 <div class="col-12 mb-3 flex justify-content-center">

@@ -23,6 +23,8 @@ const address = ref('');
 
 const password = ref('');
 
+const employeeId = ref('');
+
 const password_confirmation = ref('');
 
 const errorHandler = ref(false);
@@ -61,6 +63,7 @@ const handleSubmitData = async () => {
                     address: address.value,
                     phone: phone.value,
                     password: password.value,
+                    employee_id: employeeId.value,
                     password_confirmation: password.value,
                     role: selectedRoles.value.name
                 }
@@ -107,7 +110,7 @@ onMounted(() => {
             <label for="company"
                 >Name<i class="text-red-400 text-italic">*</i>
                 <!-- <span v-tooltip.right="{ value: 'Demo Text Text Demo Text Text Demo Text Text Demo Text Text Demo Text Text.' }" class="pi pi-info-circle cursor-pointer ml-1 text-sm instruction-tip"></span -->
-            ></label>
+            </label>
             <InputText id="createEmployeeName" v-model="name" class="w-full" placeholder="Enter Name"/>
         </div>
 
@@ -138,6 +141,11 @@ onMounted(() => {
             <Password v-model="password" placeholder="Enter password" :feedback="false" :invalid="confirmPassError" toggleMask class="w-full" inputClass="w-full"></Password>
 
             <!-- <InputText type="password" v-model="password" class="w-full" /> -->
+        </div>
+        <div class="field">
+            <label for="company">Employee ID 
+            </label>
+            <InputText  v-model="employeeId" class="w-full" placeholder="Enter Employee ID"/>
         </div>
 
         <div class="field flex flex-column">

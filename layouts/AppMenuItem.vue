@@ -36,18 +36,26 @@ const props = defineProps({
 const isActiveMenu = ref(false);
 const itemKey = ref(null);
 
+const router = useRouter();
+
 const items = ref([
     {
         label: 'Space Settings',
         items: [
             {
                 label: 'Manage Space',
-                icon: 'pi pi-table'
+                icon: 'pi pi-table',
+                command: () => {
+                    router.push(`/companies/${company_id.value}`);
+                }
+            },
+            {
+                label: 'Archived Projects',
+                icon: 'pi pi-download',
+                command: () => {
+                    router.push(`/archived-projects`);
+                }
             }
-            // {
-            //     label: 'Show all Space',
-            //     icon: 'pi pi-eye'
-            // },
             // {
             //     label: 'Show Archive',
             //     icon: 'pi pi-inbox'
@@ -97,11 +105,17 @@ const itemClickSubMenu = (event, item, index) => {
     isActiveMenu.value = true;
 };
 
-const clickSpaceMenu = (event) => {
-    if (event[0].items[0].label == 'Manage Space') {
-        return navigateTo(`/companies/${company_id.value}`);
-    }
-};
+// const clickSpaceMenu = (event) => {
+//     // console.log('event', event)
+//     // console.log('top c', event[0].items[1].label)
+//     // return
+//     if (event[0].items[0].label == 'Manage Space') {
+//         return navigateTo(`/companies/${company_id.value}`);
+//     }
+//     if (event[0].items[1].label == 'Archived Projects') {
+//         return navigateTo(`/archived-projects`);
+//     }
+// };
 
 const checkActiveRoute = (item) => {
     return route.path === item.to;
@@ -143,7 +157,8 @@ const toggle = (event) => {
             </div>
         </a>
         <router-link
-            class="flex align-items-center justify-content-between" style="margin-left: 1px !important; padding-left: 7px !important;"
+            class="flex align-items-center justify-content-between"
+            style="margin-left: 1px !important; padding-left: 7px !important"
             v-if="item.to && !item.items && item.visible !== false"
             @click="itemClick($event, item, index)"
             :class="[item.class, { 'active-route': checkActiveRoute(item) }]"
@@ -151,7 +166,7 @@ const toggle = (event) => {
             :to="item.to"
         >
             <div class="flex flex-row align-items-center">
-                <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important;"></i>
+                <i :class="item.icon" class="layout-menuitem-icon" style="margin-top: 1px !important"></i>
                 <span v-tooltip.right="{ value: `${item.label.length > 22 ? item.label : ''}` }" class="layout-menuitem-text">{{ item.label.length > 22 ? item.label.slice(0, 22) + '...' : item.label }}</span>
             </div>
             <!-- <span
@@ -195,7 +210,7 @@ const toggle = (event) => {
             <i v-if="item.items" class="pi pi-fw pi-angle-down layout-submenu-toggler"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
-            <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1" style="margin-left: 1px;" >
+            <ul v-show="root ? true : isActiveMenu" class="layout-submenu p-1" style="margin-left: 1px">
                 <app-menu-item v-for="(child, i) in item.items" :key="child" :index="i" :item="child" :parentItemKey="itemKey" :root="false"></app-menu-item>
                 <!-- <CreateSpace /> -->
             </ul>

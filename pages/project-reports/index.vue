@@ -176,7 +176,10 @@ const handleChange = (field, event) => {
     }
 };
 
-const formattedDuration = (duration) => {
+
+
+
+const formattedDuration = computed(() => (duration) => { 
     let timeTracked = duration;
     const hours = Math.floor(timeTracked / 3600);
     const minutes = Math.floor((timeTracked % 3600) / 60);
@@ -189,7 +192,8 @@ const formattedDuration = (duration) => {
     } else {
         timeTracked = `${seconds} sec`;
     }
-};
+    return timeTracked;
+});
 
 const handleReset = () => {
     startDate.value = '';
@@ -216,10 +220,10 @@ const handleReset = () => {
                 <div class="card">
                     <!-- <pre>{{ usersListStore }}</pre> -->
                     <Toast position="bottom-right" group="br" />
-                    <div class="d-flex mr-2">
+                    <!-- <div class="d-flex mr-2">
                         <h5 class="mb-1">Task Reports</h5>
-                    </div>
-                    <Toolbar class="border-0 px-0">
+                    </div> -->
+                    <Toolbar class="border-0 px-0 align-items-end">
                         <template #start>
                             <!-- <pre>{{totalProjectsforReport}}</pre>
                             <pre>{{selectedSpaces}}</pre> -->
@@ -305,8 +309,10 @@ const handleReset = () => {
                             <Column field="status" header="Status"></Column>
                             <Column field="due_date" header="Due Date"></Column>
                             <Column field="end_date" header="End Date"></Column>
-                            <Column field="duration" header="Duration">
-                         
+                            <Column field="" header="Duration">
+                                <template #body="slotProps">
+                                    {{ formattedDuration(slotProps.data.duration) }}
+                                </template>
                             </Column>
                             <Column field="unit_name" header="Unit Name"></Column>
                             <Column field="missed_deadline" header="Missed Deadlines"></Column>

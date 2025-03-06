@@ -15,7 +15,15 @@ export const useAuthStore = defineStore('auth', {
     resendOtpMsg: null,
     detectDuplicateEmail: false,
     resetState: null,
-    resetToken: ''
+    resetToken: '',
+    cookieOptions: {
+      maxAge: 60 * 60 * 24 * 30,
+      priority: 'high',
+      sameSite: true,
+      // httpOnly: true,
+      secure: true
+    }
+  
   }),
 
   actions: {
@@ -53,9 +61,9 @@ export const useAuthStore = defineStore('auth', {
           if (this.userCompany) {
             localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
           }
-          const token = useCookie('token');
+          const token = useCookie('token', this.cookieOptions );
           token.value = data?.value?.access_token;
-          const rolePermission = useCookie('rolePermission');
+          const rolePermission = useCookie('rolePermission', this.cookieOptions);
           rolePermission.value = data?.value?.permissions;
           this.authenticated = true;
         } else {
@@ -155,9 +163,10 @@ export const useAuthStore = defineStore('auth', {
                 if (this.userCompany) {
                   localStorage.setItem('userCompany', JSON.stringify(this.userCompany))
                 }
-                const token = useCookie('token');
+
+                const token = useCookie('token', this.cookieOptions );
                 token.value = data?.value?.access_token;
-                const rolePermission = useCookie('rolePermission');
+                const rolePermission = useCookie('rolePermission', this.cookieOptions);
                 rolePermission.value = data?.value?.permissions;
                 // const rolePermission
                 this.authenticated = true; //  authenticated state value to true

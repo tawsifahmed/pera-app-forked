@@ -74,7 +74,14 @@ export const useCompanyStore = defineStore('workStation', {
         unAssignedTasksChartData: 0,
         inProgressCnt: null,
         chartClosedTaskInfo: null,
-        rolesLists: null
+        rolesLists: null,
+        cookieOptions: {
+            maxAge: 60 * 60 * 24 * 30,
+            priority: 'high',
+            sameSite: true,
+            // httpOnly: true,
+            secure: true
+        }
     }),
 
     actions: {
@@ -128,7 +135,7 @@ export const useCompanyStore = defineStore('workStation', {
                 localStorage.setItem('userCompany', JSON.stringify(data.value?.data?.id));
                 this.isCompanyCreated = true;
                 this.companyId = data.value?.data?.id;
-                const rolePermission = useCookie('rolePermission');
+                const rolePermission = useCookie('rolePermission', this.cookieOptions);
                 rolePermission.value = data?.value?.permissions;
                 await this.getCompanyList();
                 await companies.getCompany();
@@ -177,7 +184,7 @@ export const useCompanyStore = defineStore('workStation', {
             if (data.value?.code === 200) {
                 const userType = useCookie('userType');
                 userType.value = data?.value?.user_type;
-                const rolePermission = useCookie('rolePermission');
+                const rolePermission = useCookie('rolePermission', this.cookieOptions);
                 rolePermission.value = data?.value?.permissions;
                 this.isCompanySwitched = true;
                 this.companySwitchToast = data.value.message;
@@ -348,10 +355,27 @@ export const useCompanyStore = defineStore('workStation', {
             this.isGetApiCalled = true;
             this.statuslist = data.value?.taskStatus;
 
-            const kanbanData = this.statuslist.map((val) => {
-                const content = this.tasks.filter((item) => item.data.status.name === val.name);
-                return { name: val.name, statusColor: val.color_code, status: val, content: content };
-            });
+            function getKanbanData(tasks, statusList) {
+                return statusList.map((status) => {
+                    const content = [];
+
+                    function addTasksToContent(task) {
+                        if (task.data.status.name === status.name) {
+                            content.push(task);
+                        }
+
+                        if (task.children && task.children.length > 0) {
+                            task.children.forEach((childTask) => addTasksToContent(childTask));
+                        }
+                    }
+
+                    tasks.forEach((task) => addTasksToContent(task));
+
+                    return { name: status.name, statusColor: status.color_code, status: status, content: content };
+                });
+            }
+
+            const kanbanData = getKanbanData(this.tasks, this.statuslist);
 
             this.kanbanTasks = kanbanData;
             const calendarData = this.tasks.map((val) => {
@@ -512,7 +536,9 @@ export const useCompanyStore = defineStore('workStation', {
                 this.getChartData();
             }
         },
-        async editProject({ id, name, description, space_id, statuses, git_project_id, git_token }) {
+        async editProject({ id, name, description, space_id, statuses, git_project_id, git_token, is_archive }) {
+            // console.log('archive', is_archive);
+            // return
             const token = useCookie('token');
             const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/update/${id}`, {
                 method: 'POST',
@@ -526,7 +552,8 @@ export const useCompanyStore = defineStore('workStation', {
                     space_id: space_id,
                     statuses: statuses,
                     git_project_id: git_project_id,
-                    git_token: git_token
+                    git_token: git_token,
+                    is_archive: is_archive
                 }
             });
 
