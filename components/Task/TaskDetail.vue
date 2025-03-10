@@ -1216,7 +1216,7 @@ const handletaskNameUpdate = async () => {
                             </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
-                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc">
+                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc; color: black;">
                                         <div class="pi pi-file"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file) }}</div>
