@@ -64,7 +64,7 @@ const handleReportDownload = async () => {
     const formattedStartDate = dateFormatter(startDate.value);
     const formattedEndDate = dateFormatter(endDate.value);
 
-    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}&project_id=${selectedProject.value.id}`, {
+    const { data, error } = await useFetch(`${url.public.apiUrl}/tasks/report-download?start_date=${startDate.value}&end_date=${endDate.value}${selectedProject?.value.id ? `&project_id=${selectedProject.value.id}`:''}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
