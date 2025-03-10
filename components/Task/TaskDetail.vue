@@ -1007,7 +1007,7 @@ const handletaskNameUpdate = async () => {
 
                         <!-- tab for details, sub task  -->
                         <TabView class="mt-3">
-                            <TabPanel class="file-upload" header="Detail">
+                            <TabPanel class="file-upload" header="Attachments">
                                 <p class="m-0">Attachments: {{ taskDetails?.attachments && taskDetails?.attachments?.length > 0 ? taskDetails?.attachments?.length : 0 }}</p>
                                 <div class="my-3 attach-sec flex align-items-center justify-content-start gap-2" style="overflow-x: scroll">
                                     <div
