@@ -123,7 +123,7 @@ initFilters();
 <template>
     <div v-if="readTags" class="card">
         <div class="d-flex mr-2">
-            <h5 class="mb-1">Tags</h5>
+            <h5 class="mb-1">Tag List</h5>
         </div>
         <Toolbar class="border-0 px-0">
             <template #start>

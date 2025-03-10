@@ -74,28 +74,28 @@ if (readDashboard.value) {
 if (readEmployee.value) {
     const settings = model.value.find((item) => item.option === 'settings_option');
     if (settings) {
-        settings.items.unshift({ label: 'Employee List', icon: 'pi pi-fw pi-user-plus', to: '/employees' });
+        settings.items.unshift({ label: 'Employees', icon: 'pi pi-fw pi-user-plus', to: '/employees' });
     }
 }
 
 if (readEmployee.value) {
     const settings = model.value.find((item) => item.option === 'settings_option');
     if (settings) {
-        settings.items.push({ label: 'Team List', icon: 'pi pi-fw pi-users', to: '/teams' });
+        settings.items.push({ label: 'Teams', icon: 'pi pi-fw pi-users', to: '/teams' });
     }
 }
 
 if (readRole.value) {
     const settings = model.value.find((item) => item.option === 'settings_option');
     if (settings) {
-        settings.items.push({ label: 'Role List', icon: 'pi pi-fw pi-user-edit', to: '/roles' });
+        settings.items.push({ label: 'Roles', icon: 'pi pi-fw pi-user-edit', to: '/roles' });
     }
 }
 
 if (readTags.value) {
     const settings = model.value.find((item) => item.option === 'settings_option');
     if (settings) {
-        settings.items.push({ label: 'Tag List', icon: 'pi pi-fw pi-tags', to: '/tags' });
+        settings.items.push({ label: 'Tags', icon: 'pi pi-fw pi-tags', to: '/tags' });
     }
 }
 

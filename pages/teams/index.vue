@@ -149,7 +149,7 @@ initFilters();
         <div class="d-flex mr-2">
             <Toast position="bottom-right" group="br" />
             <div class="d-flex mr-2">
-                <h5 class="mb-1">Teams</h5>
+                <h5 class="mb-1">Team List</h5>
             </div>
         </div>
         <Toolbar class="border-0 px-0">
