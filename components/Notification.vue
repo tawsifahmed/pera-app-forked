@@ -106,6 +106,7 @@ const handleNavigate = async (type) => {
 </script>
 <template>
     <div  class="card card1">
+        <h5 class="mb-1">Notifications</h5>
         <!-- <pre>{{ notificationData }}</pre> -->
         <div v-if="notificationData.length > 0" v-for="notify in notificationData" :key="notify" class="">
             <div @click="handleClick(notify)" v-html="notify.title" :class="`notifyTitle ${notify.is_read === 0 ? 'unread' : ''}`"></div>

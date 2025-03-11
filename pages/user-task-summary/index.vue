@@ -110,7 +110,7 @@ const handleReset = () => {
                     <div class="flex-auto">
                         <!-- <pre>{{selectedProject.id}}</pre> -->
                         <label for="icondisplay" class="font-bold block mb-2">Project: </label>
-                        <Dropdown @change="filterTasks()" v-model="selectedProject" :options="totalProjects"
+                        <Dropdown @change="filterTasks()" v-model="selectedProject" filter :options="totalProjects"
                         optionLabel="name" placeholder="Select Project (Optional)" />
                     </div>
                     <div class="flex-auto">
@@ -118,7 +118,7 @@ const handleReset = () => {
                         <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                     <div class="flex-auto">
-                        <label for="icondisplay" class="font-bold block mb-2"> End Date: </label>
+                        <label for="icondisplay" class="font-bold block mb-2">End Date: </label>
                         <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
                     </div>
                 </div>

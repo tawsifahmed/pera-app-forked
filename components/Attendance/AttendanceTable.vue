@@ -86,7 +86,35 @@ const getAttendanceData = async (month = '', user = '') => {
 };
 
 
+const handleDownload = async () => {
+    const token = useCookie('token');
+    const month = formattedDate.value;
+    const user = setUser.value;
+    const monthParam = month ? `month=${month}` : '';
+    const userParam = user ? `&user[]=${user}` : '';
+    const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/download?${monthParam}${userParam}`, { 
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
+        }
+    });
 
+    if (error.value) {
+        console.error("Error fetching attendance data:", error.value); 
+        return; 
+    }
+
+    if (data.value) {
+        const link = document.createElement('a');
+        link.href = data.value.download_path;
+        link.target = '_blank';
+        link.setAttribute('download', `attendance-${month}.csv`);
+        document.body.appendChild(link);
+        link.click();
+    } else {
+        console.warn("API returned no data. Check the server or parameters");
+    }
+};
 
 
 init();
@@ -102,6 +130,7 @@ onMounted(() => {
             <div class="flex align-items-center">
                 <Calendar @date-select="handleFilter($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
                 <Dropdown v-if="filterAssignee" @change="handleFilter()" v-model="selectedUser" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Employee" class="w-full md:w-17rem ml-2" />
+                <Button @click="handleDownload" label="Download" class=" ml-2" severity="primary" />
                 <Button @click="handleFilterReset" label="Reset" class=" ml-2" severity="secondary" />
 
             </div>
