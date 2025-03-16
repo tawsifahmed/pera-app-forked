@@ -705,6 +705,7 @@ const createNewTask = async () => {
             assignee: {},
             created_at: new Date().toISOString(),
             dueDateValue: '',
+            unique_id: '',
             status: {
                 id: null,
                 name: 'New',
@@ -739,6 +740,7 @@ const inlineCreateSubTask = async (parentNode) => {
             assignee: {},
             created_at: new Date().toISOString(),
             dueDateValue: '',
+            unique_id: '',
             status: {
                 id: null,
                 name: 'New',
@@ -946,7 +948,7 @@ const handleShareTaskId = (unique_key) => {
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="" expander :style="{ width: '40%' }" :showAddButton="true">
+        <Column field="name" header="Name" class="" expander :style="{ width: '39%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -1066,9 +1068,9 @@ const handleShareTaskId = (unique_key) => {
                 </div>
             </template>
         </Column>
-        <Column header="ID" :style="{ width: '7%' }">
+        <Column header="ID" :style="{ width: '7%' }" style="padding: 0.75rem 0rem;">
             <template #body="slotProps">
-                <div @click="handleShareTaskId(slotProps.node.data.unique_id)" v-tooltip.top="{ value: 'Copy Task ID' }" class="w-full flex gap-1 flex-nowrap overflow-hidden cursor-pointer">
+                <div v-if="slotProps.node.key !== 'new'" @click="handleShareTaskId(slotProps.node.data.unique_id)" v-tooltip.top="{ value: 'Copy Task ID' }" class="w-full flex gap-1 flex-nowrap overflow-hidden cursor-pointer">
                     <div class="flex justify-content-center align-items-center py-1" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
                         <p class="pi pi-copy text-sm p-0 m-0 mr-1 "></p>
                          <h6 class="text-sm m-0">
@@ -1078,7 +1080,7 @@ const handleShareTaskId = (unique_key) => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '6%' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '7%' }">
             <template #body="slotProps">
                 <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
                     <span class="flex justify-content-center assignee-wrapper"> </span>

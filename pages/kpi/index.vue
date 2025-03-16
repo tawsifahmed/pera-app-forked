@@ -245,13 +245,16 @@ quaterYear.value = date.getFullYear();
         <!-- <pre>{{ usersListStore }}</pre> -->
         <Toast position="bottom-right" group="br" />
         <div class="d-flex mr-2">
-            <h5 class="mb-1">KPI Report</h5>
+            <h5 class="mb-1">KPI</h5>
         </div>
 
         <!-- kpi tabs -->
 
         <TabView @tabChange="onTabChange" class="mt-3">
-            <TabPanel v-if="readKpi" class="file-upload" header="KPI">
+            <TabPanel header="Dashboard">
+                <KpiDashboard />
+            </TabPanel>
+            <TabPanel v-if="readKpi" class="file-upload" header="KPI Report">
                 <TabView>
                     <TabPanel v-if="createKpi" header="Generate">
                         <div class="card mx-auto" style="max-width: 50rem">
