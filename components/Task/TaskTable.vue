@@ -812,6 +812,21 @@ const handleRefresh = async () => {
         refreshDisabled.value = false;
     }, 3500);
 };
+
+const handleShareTaskId = (unique_key) => {
+    if (unique_key) {
+        // navigator.clipboard.writeText(singleTask?.key);
+        const el = document.createElement('textarea');
+        el.value = unique_key;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        toast.add({ severity: 'success', summary: 'Task ID copied', detail: 'Task ID copied to clipboard', group: 'br', life: 3000 });
+    } else {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Task ID not found', group: 'br', life: 3000 });
+    }
+};
 </script>
 
 <template>
@@ -931,7 +946,7 @@ const handleRefresh = async () => {
             <p class="text-center font-medium font-italic">No data found</p>
         </template>
         <!-- <Column class="cursor-pointer" field="name" header="Name" expander :style="{ width: '50%' }"></Column> -->
-        <Column field="name" header="Name" class="" expander :style="{ width: '45%' }" :showAddButton="true">
+        <Column field="name" header="Name" class="" expander :style="{ width: '40%' }" :showAddButton="true">
             <template #body="slotProps">
                 <div class="inline-block w-full align-items-center tasktitle-hover cursor-pointer relative" @mouseenter="handleMouseEnter(slotProps.node.key)">
                     <div @dblclick="handleDblClick(slotProps.node)" class="flex w-full">
@@ -1043,11 +1058,23 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column header="Tags" :style="{ width: '11%' }">
+        <Column header="Tags" :style="{ width: '10%' }">
             <template #body="slotProps">
                 <div class="flex gap-1 flex-nowrap overflow-hidden">
                     <!-- <pre>{{ slotProps.node.data.tagsObj }}</pre> -->
                     <Tag v-for="tags in slotProps.node.data.tagsObj" :key="tags" severity="secondary" :value="tags.name" class="text-nowrap" v-tooltip.top="{ value: `${tags.name}` }"></Tag>
+                </div>
+            </template>
+        </Column>
+        <Column header="ID" :style="{ width: '7%' }">
+            <template #body="slotProps">
+                <div @click="handleShareTaskId(slotProps.node.data.unique_id)" v-tooltip.top="{ value: 'Copy Task ID' }" class="w-full flex gap-1 flex-nowrap overflow-hidden cursor-pointer">
+                    <div class="flex justify-content-center align-items-center py-1" style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">
+                        <p class="pi pi-copy text-sm p-0 m-0 mr-1 "></p>
+                         <h6 class="text-sm m-0">
+                            {{ slotProps.node.data.unique_id.slice(0, 4) }}.. 
+                         </h6>
+                    </div>
                 </div>
             </template>
         </Column>
@@ -1138,7 +1165,7 @@ const handleRefresh = async () => {
                 </div>
             </template>
         </Column>
-        <Column field="status" header="Status" :style="{ width: '10%' }">
+        <Column field="status" header="Status" :style="{ width: '9%' }">
             <template #body="slotProps">
                 <div v-if="slotProps.node.key !== 'new'" class="inline-block">
                     <div class="task-status-2">
