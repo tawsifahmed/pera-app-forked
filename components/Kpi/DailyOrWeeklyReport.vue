@@ -249,65 +249,123 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div v-if="readQuarter" class="grid">
-        <div class="col-12 xl:col-6">
-            <div class="card h-full">
-                <h5>Task Completed Vs. Bugs Discovered</h5>
-                <div class="">
-                    <Chart type="bar" :data="vBarChartData" :options="vBarChartOptions" class="h-30rem" />
+    <TabView @tabChange="onTabChange" class="mt-3">
+        <TabPanel header="Dashboard">
+            <div v-if="readQuarter" class="grid">
+                <div class="col-12 xl:col-6">
+                    <div class="card h-full">
+                        <h5>Task Completed Vs. Bugs Discovered</h5>
+                        <div class="">
+                            <Chart type="bar" :data="vBarChartData" :options="vBarChartOptions" class="h-30rem" />
+                        </div>
+        
+                        <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
+                    </div>
                 </div>
-
-                <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
-            </div>
-        </div>
-        <div class="col-12 xl:col-6">
-            <div class="card h-full">
-                <h5>Deliverable Status</h5>
-                <div class="w-full flex justify-content-center">
-                    <Chart type="doughnut" :data="chartData" :options="chartDataOptions" class="w-full md:w-30rem" />
+                <div class="col-12 xl:col-6">
+                    <div class="card h-full">
+                        <h5>Deliverable Status</h5>
+                        <div class="w-full flex justify-content-center">
+                            <Chart type="doughnut" :data="chartData" :options="chartDataOptions" class="w-full md:w-30rem" />
+                        </div>
+        
+                        <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
+                    </div>
                 </div>
-
-                <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
             </div>
-        </div>
-    </div>
-    <Dialog v-model:visible="modal" modal header="Create Quarter" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-        <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
-        <form class="" action="" @submit.prevent="handleKpiCreation">
+            <Dialog v-model:visible="modal" modal header="Create Quarter" dismissableMask="true" :style="{ width: '40rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
+                <form class="" action="" @submit.prevent="handleKpiCreation">
+                    <div class="card">
+                        <div class="kpi-form grid">
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Quarter Name:</label>
+                                    <InputText type="text" v-model="quarterCreate.name" placeholder="Name" min="0" class="w-full" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Start Date:</label>
+                                    <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
+                                    <Calendar v-model="quarterCreate.end_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="user-selection w-full">
+                                    <label for="icondisplay" class="font-bold block mb-2">Year:</label>
+                                    <Calendar v-model="quarterCreate.year" view="year" dateFormat="yy" fluid :manualInputs="false" class="w-full" placeholder="YYYY" />
+                                </div>
+                            </div>
+                            <p class="text-center w-full text-red-500">{{ errorMsg }}</p>
+                            <div class="col-12 mx-auto flex justify-content-center">
+                                <Button label="Create" severity="info" type="submit" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </Dialog>
+        </TabPanel>
+        <TabPanel header="Report">
             <div class="card">
-                <div class="kpi-form grid">
-                    <div class="col-12">
-                        <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">Quarter Name:</label>
-                            <InputText type="text" v-model="quarterCreate.name" placeholder="Name" min="0" class="w-full" />
+                <div class="d-flex mr-2">
+                    <h5 class="mb-1">Report</h5>
+                </div>
+                <Toolbar class="border-0 px-0">
+                    <template #start>
+                        <div class="flex gap-2">
+                            <div class="flex-auto">
+                                <!-- <pre>{{selectedProject.id}}</pre> -->
+                                <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
+                                <Dropdown @change="filterTasks()" class="select-emp" v-model="employee" :options="employees"
+                                optionLabel="name" placeholder="Select Employee" />
+                            </div>
+                            <div class="flex-auto">
+                                <label for="icondisplay" class="font-bold block mb-2">Start Date: </label>
+                                <Calendar v-model="startDate" @date-select="handleChange('startDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                            </div>
+                            <div class="flex-auto">
+                                <label for="icondisplay" class="font-bold block mb-2"> End Date: </label>
+                                <Calendar v-model="endDate" @date-select="handleChange('endtDate', $event)" showIcon iconDisplay="input" inputId="icondisplay" />
+                            </div>
                         </div>
+                    </template>
+        
+                    <template #end>
+                        <Button @click="handleGenerate" class="w-full" label="Generate" :loading="loading" />
+                    </template>
+                </Toolbar>
+            </div>
+            <div v-if="previewData" class="card">
+                <div>
+                    <div class="flex align-items-center justify-content-between gap-2 mb-5">
+                        <h5 class="m-0">Preview</h5>
+                        <Button @click="handleReportDownload" class="w-fit" label="Download" :loading="loading1" />
                     </div>
-                    <div class="col-12">
-                        <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">Start Date:</label>
-                            <Calendar v-model="quarterCreate.start_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">End Date:</label>
-                            <Calendar v-model="quarterCreate.end_date" dateFormat="mm-dd" fluid :manualInputs="false" class="w-full" required placeholder="MM-DD" />
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="user-selection w-full">
-                            <label for="icondisplay" class="font-bold block mb-2">Year:</label>
-                            <Calendar v-model="quarterCreate.year" view="year" dateFormat="yy" fluid :manualInputs="false" class="w-full" placeholder="YYYY" />
-                        </div>
-                    </div>
-                    <p class="text-center w-full text-red-500">{{ errorMsg }}</p>
-                    <div class="col-12 mx-auto flex justify-content-center">
-                        <Button label="Create" severity="info" type="submit" />
-                    </div>
+                    <DataTable :value="previewData" tableStyle="min-width: 50rem">
+                        <template #empty> <p class="text-center">No Data found...</p> </template>
+                        <Column field="date" header="Date"></Column>
+                        <Column field="scrum_meeting" header="Stand-up Meeting Attendance"></Column>
+                        <Column field="bounce" header="Number of Bounces"></Column>
+                        <Column field="update" header="Task Update Compliance"></Column>
+                        <Column field="commit" header="Code Commit"></Column>
+                        <Column field="projects" header="No. of Projects Worked"></Column>
+                        <Column field="pull_request" header="Pull Request"></Column>
+                        <Column field="bug" header="Bug Discovered"></Column>
+                        <Column field="build_failed" header="Build Failed"></Column>
+                        <Column field="completed" header="Timely Delivery"></Column>
+                        <Column field="overdue" header="Missed Delivery"></Column>
+                    </DataTable>
                 </div>
             </div>
-        </form>
-    </Dialog>
+        </TabPanel>
+    </TabView>
+
 </template>
 <style scoped>
 .editButtonPosition {

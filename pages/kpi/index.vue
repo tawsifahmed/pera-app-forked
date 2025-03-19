@@ -239,6 +239,9 @@ fetchSection();
 fetchSubSection();
 const date = new Date();
 quaterYear.value = date.getFullYear();
+
+const dailyReport = ref('daily');
+const weeklyReport = ref('weekly');
 </script>
 <template>
     <div class="card">
@@ -251,8 +254,11 @@ quaterYear.value = date.getFullYear();
         <!-- kpi tabs -->
 
         <TabView @tabChange="onTabChange" class="mt-3">
-            <TabPanel header="Dashboard">
-                <KpiDashboard />
+             <TabPanel header="Daily Report">
+                <KpiDailyOrWeeklyReport :type="dailyReport" />
+            </TabPanel>
+            <TabPanel header="Weekly Report">
+                <KpiDailyOrWeeklyReport :type="weeklyReport"/>
             </TabPanel>
             <TabPanel v-if="readKpi" class="file-upload" header="KPI Report">
                 <TabView>
@@ -339,9 +345,6 @@ quaterYear.value = date.getFullYear();
                         <KpiReport :quater="quater" />
                     </TabPanel>
                 </TabView>
-            </TabPanel>
-            <TabPanel v-if="readSection" header="Daily Report">
-                <KpiDailyReport />
             </TabPanel>
             <TabPanel v-if="readSection" header="Sections">
                 <KpiSection />

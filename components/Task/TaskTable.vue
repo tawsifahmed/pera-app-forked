@@ -1080,7 +1080,7 @@ const handleShareTaskId = (unique_key) => {
                 </div>
             </template>
         </Column>
-        <Column field="assignee" header="Assignee" :style="{ width: '7%' }">
+        <Column field="assignee" header="Assignee" :style="{ width: '7%', padding: '0.75rem 0.4rem' }">
             <template #body="slotProps">
                 <div v-if="slotProps.node.key !== 'new'" class="flex justify-content-start gap-1 userL">
                     <span class="flex justify-content-center assignee-wrapper"> </span>

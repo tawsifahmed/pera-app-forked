@@ -60,7 +60,7 @@ const getAttendanceData = async (month = '', user = '') => {
         const token = useCookie('token');
         const monthParam = month ? `&month=${month}` : '';
         const userParam = user ? `&user[]=${user}` : '';
-        const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/list?${monthParam}${userParam}`, { 
+        const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/list?${monthParam}${userParam}`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -68,23 +68,21 @@ const getAttendanceData = async (month = '', user = '') => {
         });
 
         if (error.value) {
-            console.error("Error fetching attendance data:", error.value); 
+            console.error('Error fetching attendance data:', error.value);
 
-            return; 
+            return;
         }
 
         if (data.value) {
             attendanceData.value = data.value.data;
         } else {
-          attendanceData.value = []; 
-          console.warn("API returned no data. Check the server or parameters");
+            attendanceData.value = [];
+            console.warn('API returned no data. Check the server or parameters');
         }
-
     } catch (e) {
-        console.error("An unexpected error occurred:", e); 
+        console.error('An unexpected error occurred:', e);
     }
 };
-
 
 const handleDownload = async () => {
     const token = useCookie('token');
@@ -92,7 +90,7 @@ const handleDownload = async () => {
     const user = setUser.value;
     const monthParam = month ? `month=${month}` : '';
     const userParam = user ? `&user[]=${user}` : '';
-    const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/download?${monthParam}${userParam}`, { 
+    const { data, error } = await useFetch(`${url.public.apiUrl}/attendance/download?${monthParam}${userParam}`, {
         method: 'GET',
         headers: {
             Authorization: `Bearer ${token.value}`
@@ -100,8 +98,8 @@ const handleDownload = async () => {
     });
 
     if (error.value) {
-        console.error("Error fetching attendance data:", error.value); 
-        return; 
+        console.error('Error fetching attendance data:', error.value);
+        return;
     }
 
     if (data.value) {
@@ -112,43 +110,31 @@ const handleDownload = async () => {
         document.body.appendChild(link);
         link.click();
     } else {
-        console.warn("API returned no data. Check the server or parameters");
+        console.warn('API returned no data. Check the server or parameters');
     }
 };
-
 
 init();
 onMounted(() => {
     handleFilter();
 });
-
 </script>
 <template>
     <div>
         <div class="flex justify-content-between py-2">
             <!-- <Button label="Google Attendance" severity="primary" /> -->
-            <div class="flex align-items-center">
-                <Calendar @date-select="handleFilter($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
-                <Dropdown v-if="filterAssignee" @change="handleFilter()" v-model="selectedUser" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Employee" class="w-full md:w-17rem ml-2" />
-                <Button @click="handleDownload" label="Download" class=" ml-2" severity="primary" />
-                <Button @click="handleFilterReset" label="Reset" class=" ml-2" severity="secondary" />
-
+            <div class="flex align-items-center justify-content-between w-full mx-2 mb-3">
+                <div>
+                    <Calendar @date-select="handleFilter($event, slotProps)" v-model="date" view="month" dateFormat="mm/yy" placeholder="Select Month" />
+                    <Dropdown v-if="filterAssignee" @change="handleFilter()" v-model="selectedUser" :options="usersLists" filter resetFilterOnHide optionLabel="name" placeholder="Select Employee" class="w-full md:w-17rem ml-2" />
+                    <Button @click="handleFilterReset" label="Reset" class="ml-2" severity="secondary" />
+                </div>
+                <Button @click="handleDownload" label="Download" class="ml-2" severity="primary" />
             </div>
         </div>
         <!-- <pre>{{attendanceData}}</pre> -->
         <!-- Add your table and other components here -->
-        <DataTable
-            class="table-st"
-            :value="attendanceData"
-            :rowHover="true"
-            :paginator="false"
-            :rows="30"
-            stripedRows
-            scrollable
-            scrollHeight="62vh"
-            tableStyle="min-width: 50rem"
-            :rowsPerPageOptions="[5, 10, 20, 50]"
-        >
+        <DataTable class="table-st" :value="attendanceData" :rowHover="true" :paginator="false" :rows="30" stripedRows scrollable scrollHeight="62vh" tableStyle="min-width: 50rem" :rowsPerPageOptions="[5, 10, 20, 50]">
             <template #empty> <p class="text-center">No Data found.</p> </template>
             <template #loading> Loading. Please wait... </template>
             <!-- <Column style="width: 2%" field="id" header="#" :body="(_, { rowIndex }) => rowIndex + 1"> </Column> -->
@@ -164,7 +150,7 @@ onMounted(() => {
                         <span :style="`color:${statusColor[slotProps.data.status.toLowerCase()]}; text-transform:capitalize `">{{ slotProps.data.status }}</span>
                     </div>
                 </template>
-                </Column>
+            </Column>
         </DataTable>
     </div>
 </template>
