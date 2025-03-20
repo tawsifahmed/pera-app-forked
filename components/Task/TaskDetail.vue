@@ -505,14 +505,23 @@ async function changeBounceStatusData(selectedBncStatus) {
 }
 
 const setFileUrl = (url, showInComment = false) => {
+    if (!url) {
+        return '';
+    }
+    
     const urlString = url;
     const partsOfString = urlString.split('/');
+     
+    if (!partsOfString || partsOfString.length === 0) {
+        return '';
+    }
+    
     const lastPartOfString = partsOfString[partsOfString.length - 1];
-    // return lastPartOfString.slice(0, 10);
+    
     if (showInComment) {
         return lastPartOfString;
-    }else{
-        return lastPartOfString.length > 10 ? lastPartOfString.slice(0, 7)+ '...' : lastPartOfString.slice(0, 10);
+    } else {
+        return lastPartOfString.length > 10 ? lastPartOfString.slice(0, 7) + '...' : lastPartOfString;
     }
 };
 
