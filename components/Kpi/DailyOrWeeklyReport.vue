@@ -2,7 +2,7 @@
 import accessPermission from '~/composables/usePermission';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-
+const weekly_kpi_view = accessPermission('weekly_kpi_view');
 const { type } = defineProps(['type']);
 const url = useRuntimeConfig();
 const toast = useToast();
@@ -87,6 +87,7 @@ const formatDate = (date, time) => {
 
 const overAllData = ref(null);
 const previewData = ref([]);
+const attendanceData =ref({});
 const getKpiData = async () => {
     const token = useCookie('token');
     const formattedStartDate = formatDate(startDate.value, '00:00:00');
@@ -115,8 +116,40 @@ const getKpiData = async () => {
     );
 
     if (data.value?.data?.length > 0) {
+        attendanceData.value = data.value?.attendanceData;
         overAllData.value = data.value?.overAllData;
         previewData.value = data.value?.data;
+    }
+};
+
+const loading1 = ref(false);
+const downloadKpiReport = async () => {
+    loading1.value = true;
+    const token = useCookie('token');
+    const formattedStartDate = formatDate(startDate.value, '00:00:00');
+    const formattedEndDate = formatDate(endDate.value, '23:59:59');
+    const userId = userNameAndId.value?.id;
+
+    let apiUrl = `${url.public.apiUrl}/kpi/dashboard-download?start_date=${formattedStartDate}&end_date=${formattedEndDate}${userId ? `&user_id=${userId}` : ''}`;
+    apiUrl = decodeURIComponent(apiUrl);
+
+    try {
+        const { data, pending, error } = await useFetch(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        });
+
+        if (data.value) {
+            const link = document.createElement('a');
+            link.href = data.value.download_path;
+            link.target = '_blank';
+            link.click();
+            loading1.value = false;
+        }
+    } catch (e) {
+        console.error('Error downloading kpi report:', e);
+        loading1.value = false;
     }
 };
 
@@ -264,30 +297,39 @@ const handleRedirect = async (data) => {
 <template>
     <div class="grid">
         <!-- <pre>
+            weekly_kpi_view {{ weekly_kpi_view }}
             week value {{ week }}
             start date {{ startDate }}
             end date {{ endDate }}
         </pre> -->
-        <div class="col-12 flex justify-content-end align-items-end gap-2">
-            <div class=" ">
-                <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
-                <Dropdown @change="filterTasks()" class="select-emp" v-model="userNameAndId" :options="usersLists" optionLabel="name" placeholder="Select Employee" />
-            </div>
-            <div class="">
-                <label for="icondisplay" class="font-bold block mb-2">
-                    <!-- week value {{ week }} -->
-                    {{ type === 'daily' ? 'Date:' : type === 'weekly' ? 'Week:' : 'Date:' }}
-                </label>
-                <Calendar v-if="type === 'daily'" v-model="currentDate" @date-select="handleChange('currentDate', $event)" weekLabel showIcon iconDisplay="input" inputId="icondisplay" />
-                <VueDatePicker v-if="type === 'weekly'" v-model="week" clearValue week-picker />
-            </div>
-
+        <div class="col-12 flex justify-content-between align-items-center">
             <div>
-                <Button class="w-full" label="Download" />
+                <div v-if="type === 'weekly'" class="flex gap-2 flex-wrap dash-inf-right">
+                    <Button class="nwrp" :label="`Absent: ${attendanceData?.absent}`" severity="info" outlined />
+                    <Button class="nwrp" :label="`Late: ${attendanceData?.late}`" severity="help" outlined />
+                    <Button class="nwrp" :label="`Present: ${attendanceData?.present}`" severity="contrast" outlined />
+                </div>
+            </div>
+            <div class="flex justify-content-end align-items-end gap-2">
+                <div class=" ">
+                    <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
+                    <Dropdown :disabled="!weekly_kpi_view " @change="filterTasks()" class="select-emp" v-model="userNameAndId" :options="usersLists" optionLabel="name" placeholder="Select Employee" />
+                </div>
+                <div class="">
+                    <label for="icondisplay" class="font-bold block mb-2">
+                        <!-- week value {{ week }} -->
+                        {{ type === 'daily' ? 'Date:' : type === 'weekly' ? 'Week:' : 'Date:' }}
+                    </label>
+                    <Calendar v-if="type === 'daily'" v-model="currentDate" @date-select="handleChange('currentDate', $event)" weekLabel showIcon iconDisplay="input" inputId="icondisplay" />
+                    <VueDatePicker v-if="type === 'weekly'" v-model="week" week-start="0" week-picker />
+                </div>    
+                <div>
+                    <Button @click="downloadKpiReport" class="w-full" label="Download" :loading="loading1" />
+                </div>
             </div>
         </div>
         <!-- <pre>{{overAllData}}</pre> -->
-        <div class="col-12 card p-0" style="overflow: hidden">
+        <div class="col-12 card p-0 mt-2 mb-2" style="overflow: hidden">
             <div>
                 <DataTable :value="previewData" tableStyle="min-width: 50rem" :loading="tableLoader">
                     <template #empty> <p class="text-center">No Data found...</p> </template>
@@ -335,11 +377,11 @@ const handleRedirect = async (data) => {
         </div>
         <Dialog v-model:visible="tableModal" modal :header="modalTitle" dismissableMask="true" :style="{ width: '60rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
             <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
-             <!-- <pre>
+            <!-- <pre>
                             {{ modalData }}
              </pre> -->
             <div v-for="(value, key) in modalData" :key="value">
-                <div @click="handleRedirect(value)" class="card mb-2 cursor-pointer t-card" style="padding: 0.5rem 0.6rem;">
+                <div @click="handleRedirect(value)" class="card mb-2 cursor-pointer t-card" style="padding: 0.5rem 0.6rem">
                     <div>
                         <p class="mb-0" v-if="modalTitle === 'Task Update Compliance'"><span class="font-bold">Task Name:</span> {{ value?.name }}</p>
                         <p class="mb-0" v-else><span class="font-bold">Project:</span> {{ value?.name }}</p>
@@ -367,7 +409,7 @@ const handleRedirect = async (data) => {
     display: none !important;
 }
 
-.t-card:hover{
+.t-card:hover {
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     transition: 0.3s;
 }
