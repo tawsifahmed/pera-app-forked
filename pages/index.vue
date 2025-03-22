@@ -12,8 +12,8 @@ const companies = useActiveCompanyStore();
 // companies.getCompany();
 const { totalCompanies, totalProjects } = storeToRefs(useActiveCompanyStore());
 const url = useRuntimeConfig();
-const { getChartData, getTaskAssignModalData, getRoles, getTagsAssignModalData } = useCompanyStore();
-const { chartProjectInfo, inProgressCnt, chartClosedTaskInfo, totalDashboardProjects, completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData, users, rolesLists, tags } = storeToRefs(useCompanyStore());
+const { getChartData } = useCompanyStore();
+const { chartProjectInfo, inProgressCnt, chartClosedTaskInfo, totalDashboardProjects, completedTasksChartData, inProgressTasksChartData, unAssignedTasksChartData } = storeToRefs(useCompanyStore());
 const { authenticateUser } = useAuthStore(); // use authenticateUser action from  auth store
 const { userCompany } = storeToRefs(useAuthStore());
 
@@ -384,9 +384,7 @@ window.addEventListener('scroll', () => {
 fetchTasks();
 
 onMounted(() => {
-    getRoles();
-    getTaskAssignModalData();
-    getTagsAssignModalData();
+    
     getChartData();
     checkUser();
     // ProductService.getProductsSmall().then((data) => (products.value = data));

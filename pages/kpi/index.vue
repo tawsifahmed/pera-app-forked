@@ -225,12 +225,18 @@ const formatDate = (data) => {
     const date = new Date(data);
     return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}`;
 };
+
+let functionsCalled = ref(false); // Flag to track if the functions have been called
+
 const onTabChange = (event) => {
-    if (event.index == 0) {
-        init();
-        fetchQuater();
-        fetchSection();
-        fetchSubSection();
+    if ((event.index === 2 || event.index === 3 || event.index === 4) && !functionsCalled.value) {
+        // init();
+        // fetchQuater();
+        // fetchSection();
+        // fetchSubSection();
+
+        // Set the flag to true after calling the functions
+        functionsCalled.value = true;
     }
 };
 init();

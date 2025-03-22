@@ -27,7 +27,7 @@ async function getUserData() {
 const usersLists = ref([]);
 const getUsers = async (userTypes) => {
     const token = useCookie('token');
-    const { data, pending, error } = await useAsyncData('userLiist', () =>
+    const { data, pending, error } = await useAsyncData(`userLiist${type}`, () =>
         $fetch(`${url.public.apiUrl}/users/list${userTypes ? `?role_id=${userTypes}` : ''}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -49,7 +49,7 @@ const getCurrentWeekRange = () => {
     startOfWeek.setDate(today.getDate() - dayOfWeek);
     startOfWeek.setHours(0, 0, 0, 0);
 
-    endOfWeek.setDate(today.getDate() + (6 - dayOfWeek));
+    endOfWeek.setDate(today.getDate() + (5 - dayOfWeek));
     endOfWeek.setHours(23, 59, 59, 999);
 
     return [startOfWeek.toISOString(), endOfWeek.toISOString()];
@@ -61,46 +61,52 @@ const currentDate = ref(new Date().toISOString().split('T')[0]);
 const startDate = ref('');
 const endDate = ref('');
 
-const handleDateChange = async() => {
+const handleDateChange = async () => {
     if (type === 'daily') {
         startDate.value = currentDate.value;
         endDate.value = currentDate.value;
     } else if (type === 'weekly') {
         if (week.value.length === 2) {
-        const start = new Date(week.value[0]); // Convert to Date object
-        const end = new Date(week.value[1]);   // Convert to Date object
+            const start = new Date(week.value[0]); // Convert to Date object
+            const end = new Date(week.value[1]); // Convert to Date object
 
-        // Format the dates as 'YYYY-MM-DD'
-        startDate.value = start.toISOString().split('T')[0]; // Extract the date part
-        endDate.value = end.toISOString().split('T')[0]; 
+            // Format the dates as 'YYYY-MM-DD'
+            startDate.value = start.toISOString().split('T')[0]; // Extract the date part
+            endDate.value = end.toISOString().split('T')[0];
         }
     }
-}
+};
 const formatDate = (date, time) => {
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
     const day = String(d.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day} ${time}`;
 };
 
 const overAllData = ref(null);
+const previewData = ref([]);
 const getKpiData = async () => {
     const token = useCookie('token');
     const formattedStartDate = formatDate(startDate.value, '00:00:00');
     const formattedEndDate = formatDate(endDate.value, '23:59:59');
-
-
     const userId = userNameAndId.value?.id;
+
     console.log('User ID =>', userNameAndId.value);
 
     let apiUrl = `${url.public.apiUrl}/kpi/dashboard?start_date=${formattedStartDate}&end_date=${formattedEndDate}${userId ? `&user_id=${userId}` : ''}`;
-
-    // Decode URI to remove encoded characters
     apiUrl = decodeURIComponent(apiUrl);
 
-    const { data, pending, error } = await useAsyncData('getKpiData', () =>
+    let asyncDataKey = 'getKpiData'; // default key
+
+    if (type === 'daily') {
+        asyncDataKey = 'getDailyKpiData';
+    } else if (type === 'weekly') {
+        asyncDataKey = 'getWeeklyKpiData';
+    }
+
+    const { data, pending, error } = await useAsyncData(asyncDataKey, () =>
         $fetch(apiUrl, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -109,32 +115,39 @@ const getKpiData = async () => {
     );
 
     if (data.value?.data?.length > 0) {
-        overAllData.value = data.value.overAllData;
+        overAllData.value = data.value?.overAllData;
+        previewData.value = data.value?.data;
     }
 };
 
+const isInitialized = ref(false);
+
 watch([userNameAndId, currentDate, week], async () => {
-    console.log('watcher called');
+    if (!isInitialized.value) return; // prevent watcher from running on mount
+    tableLoader.value = true;
     await handleDateChange();
     await getKpiData();
+    tableLoader.value = false;
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 
     vBarChartData.value = setVBarChartData();
     vBarChartOptions.value = setVBarChartOptions();
 });
-
-
+const tableLoader = ref(true);
 onMounted(async () => {
     await handleDateChange();
     await getUserData();
     await getUsers();
     await getKpiData();
+    tableLoader.value = false;
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 
     vBarChartData.value = setVBarChartData();
     vBarChartOptions.value = setVBarChartOptions();
+
+    isInitialized.value = true; // set initialization complete
 });
 
 const vBarChartData = ref();
@@ -232,11 +245,11 @@ onMounted(() => {
 </script>
 <template>
     <div class="grid">
-        <pre>
+        <!-- <pre>
             week value {{ week }}
             start date {{ startDate }}
             end date {{ endDate }}
-        </pre>
+        </pre> -->
         <div class="col-12 flex justify-content-end align-items-end gap-2">
             <div class=" ">
                 <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
@@ -256,6 +269,32 @@ onMounted(() => {
             </div>
         </div>
         <!-- <pre>{{overAllData}}</pre> -->
+        <div class="col-12 card">
+            <div>
+                <DataTable :value="previewData" tableStyle="min-width: 50rem" :loading="tableLoader">
+                    <template #empty> <p class="text-center">No Data found...</p> </template>
+                    <Column style="text-wrap: nowrap" field="date" header="Date"></Column>
+                    <Column field="standUpMeetingAttendance" header="Stand-up Meeting Attendance"></Column>
+                    <Column field="bounceCount" header="No. of Bounces"></Column>
+                    <Column field="tasks" header="Task Update Compliance">
+                        <template #body="slotProps">
+                            <span>{{ slotProps?.data?.tasks?.length }}</span>
+                        </template>
+                    </Column>
+                    <Column field="codeCommit" header="Code Commit"></Column>
+                    <Column field="projects" header="No. of Projects Worked">
+                        <template #body="slotProps">
+                            <span>{{ slotProps?.data?.projects?.length }}</span>
+                        </template>
+                    </Column>
+                    <Column field="pullRequest" header="Pull Request"></Column>
+                    <Column field="bugDiscovered" header="Bug Discovered"></Column>
+                    <Column field="buildFaild" header="Build Failed"></Column>
+                    <Column field="timlyDelivary" header="Timely Delivery"></Column>
+                    <Column field="missDelivary" header="Missed Delivery"></Column>
+                </DataTable>
+            </div>
+        </div>
         <div class="col-12 xl:col-6">
             <div class="card h-full">
                 <h5>Task Completed Vs. Bugs Discovered</h5>
