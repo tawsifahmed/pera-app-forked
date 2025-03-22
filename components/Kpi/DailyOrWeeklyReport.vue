@@ -54,29 +54,51 @@ const getCurrentWeekRange = () => {
 
     return [startOfWeek.toISOString(), endOfWeek.toISOString()];
 };
+
 week.value = getCurrentWeekRange();
 
 const currentDate = ref(new Date().toISOString().split('T')[0]);
 const startDate = ref('');
 const endDate = ref('');
-if (type === 'daily') {
-    startDate.value = currentDate.value;
-    endDate.value = currentDate.value;
-} else {
-    startDate.value = week.value[0].split('T')[0];
-    endDate.value = week.value[1].split('T')[0];
+
+const handleDateChange = async() => {
+    if (type === 'daily') {
+        startDate.value = currentDate.value;
+        endDate.value = currentDate.value;
+    } else if (type === 'weekly') {
+        if (week.value.length === 2) {
+        const start = new Date(week.value[0]); // Convert to Date object
+        const end = new Date(week.value[1]);   // Convert to Date object
+
+        // Format the dates as 'YYYY-MM-DD'
+        startDate.value = start.toISOString().split('T')[0]; // Extract the date part
+        endDate.value = end.toISOString().split('T')[0]; 
+        }
+    }
 }
+const formatDate = (date, time) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${time}`;
+};
 
 const overAllData = ref(null);
 const getKpiData = async () => {
     const token = useCookie('token');
-    const formattedStartDate = `${startDate.value} 00:00:00`;
-    const formattedEndDate = `${endDate.value} 23:59:59`;
+    const formattedStartDate = formatDate(startDate.value, '00:00:00');
+    const formattedEndDate = formatDate(endDate.value, '23:59:59');
+
 
     const userId = userNameAndId.value?.id;
     console.log('User ID =>', userNameAndId.value);
 
-    const apiUrl = `${url.public.apiUrl}/kpi/dashboard?start_date=${formattedStartDate}&end_date=${formattedEndDate}${userId ? `&user_id=${userId}` : ''}`;
+    let apiUrl = `${url.public.apiUrl}/kpi/dashboard?start_date=${formattedStartDate}&end_date=${formattedEndDate}${userId ? `&user_id=${userId}` : ''}`;
+
+    // Decode URI to remove encoded characters
+    apiUrl = decodeURIComponent(apiUrl);
 
     const { data, pending, error } = await useAsyncData('getKpiData', () =>
         $fetch(apiUrl, {
@@ -92,6 +114,8 @@ const getKpiData = async () => {
 };
 
 watch([userNameAndId, currentDate, week], async () => {
+    console.log('watcher called');
+    await handleDateChange();
     await getKpiData();
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
@@ -102,6 +126,7 @@ watch([userNameAndId, currentDate, week], async () => {
 
 
 onMounted(async () => {
+    await handleDateChange();
     await getUserData();
     await getUsers();
     await getKpiData();
@@ -120,7 +145,7 @@ const setVBarChartData = () => {
         labels: ['Task Completed', 'Bugs Discovered'],
         datasets: [
             {
-                data: [overAllData.value?.completeTaskCount, overAllData.value?.bugDiscovered],
+                data: [overAllData.value?.completeTaskCount ? overAllData.value?.completeTaskCount : 0, overAllData.value?.bugDiscovered ? overAllData.value?.bugDiscovered : 0],
                 backgroundColor: ['rgba(249, 115, 22, 0.2)', 'rgba(6, 182, 212, 0.2)', 'rgb(107, 114, 128, 0.2)', 'rgba(139, 92, 246 0.2)'],
                 borderColor: ['rgb(249, 115, 22)', 'rgb(6, 182, 212)', 'rgb(107, 114, 128)', 'rgb(139, 92, 246)'],
                 borderWidth: 1
@@ -177,7 +202,7 @@ const setChartData = () => {
         labels: ['No. of Timely Deliver', 'No. of Missed Deadline'],
         datasets: [
             {
-                data: [overAllData.value?.timlyDelivary, overAllData.value?.missDelivary],
+                data: [overAllData.value?.timlyDelivary ? overAllData.value?.timlyDelivary : 0, overAllData.value?.missDelivary ? overAllData.value?.missDelivary : 0],
                 backgroundColor: [documentStyle.getPropertyValue('--cyan-500'), documentStyle.getPropertyValue('--orange-500'), documentStyle.getPropertyValue('--gray-500')],
                 hoverBackgroundColor: [documentStyle.getPropertyValue('--cyan-400'), documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--gray-400')]
             }
@@ -207,6 +232,11 @@ onMounted(() => {
 </script>
 <template>
     <div class="grid">
+        <pre>
+            week value {{ week }}
+            start date {{ startDate }}
+            end date {{ endDate }}
+        </pre>
         <div class="col-12 flex justify-content-end align-items-end gap-2">
             <div class=" ">
                 <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
