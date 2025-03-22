@@ -239,9 +239,27 @@ const setChartOptions = () => {
     };
 };
 
-onMounted(() => {
-    // init();
-});
+const tableModal = ref(false);
+const modalData = ref(null);
+const modalTitle = ref('');
+const showModal = (data, title) => {
+    if (data.length > 0) {
+        console.log('data', data);
+        modalData.value = data;
+        modalTitle.value = title;
+        tableModal.value = true;
+    }
+};
+
+const handleRedirect = async (data) => {
+    let url;
+    if (modalTitle.value === 'Task Update Compliance') {
+        url = `/companies/${data?.company_id}/spaces/${data?.space_id}/projects/${data?.project_id}?task_key=${data?.id}`;
+    } else {
+        url = `/companies/${data?.company_id}/spaces/${data?.space_id}/projects/${data?.id}`;
+    }
+    window.open(url, '_blank');
+};
 </script>
 <template>
     <div class="grid">
@@ -269,7 +287,7 @@ onMounted(() => {
             </div>
         </div>
         <!-- <pre>{{overAllData}}</pre> -->
-        <div class="col-12 card">
+        <div class="col-12 card p-0" style="overflow: hidden">
             <div>
                 <DataTable :value="previewData" tableStyle="min-width: 50rem" :loading="tableLoader">
                     <template #empty> <p class="text-center">No Data found...</p> </template>
@@ -278,13 +296,13 @@ onMounted(() => {
                     <Column field="bounceCount" header="No. of Bounces"></Column>
                     <Column field="tasks" header="Task Update Compliance">
                         <template #body="slotProps">
-                            <span>{{ slotProps?.data?.tasks?.length }}</span>
+                            <span @click="showModal(slotProps?.data?.tasks, 'Task Update Compliance')" class="cursor-pointer hover:text-primary font-semibold">{{ slotProps?.data?.tasks?.length }}</span>
                         </template>
                     </Column>
                     <Column field="codeCommit" header="Code Commit"></Column>
                     <Column field="projects" header="No. of Projects Worked">
                         <template #body="slotProps">
-                            <span>{{ slotProps?.data?.projects?.length }}</span>
+                            <span @click="showModal(slotProps?.data?.projects, 'No. of Projects Worked')" class="cursor-pointer hover:text-primary font-semibold">{{ slotProps?.data?.projects?.length }}</span>
                         </template>
                     </Column>
                     <Column field="pullRequest" header="Pull Request"></Column>
@@ -315,6 +333,22 @@ onMounted(() => {
                 <!-- <Chart type="pie" :data="pieData" :options="pieOptions" /> -->
             </div>
         </div>
+        <Dialog v-model:visible="tableModal" modal :header="modalTitle" dismissableMask="true" :style="{ width: '60rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <!-- <TagsCreateTag @closeCreateModal="closeCreateModal($event)" /> -->
+             <!-- <pre>
+                            {{ modalData }}
+             </pre> -->
+            <div v-for="(value, key) in modalData" :key="value">
+                <div @click="handleRedirect(value)" class="card mb-2 cursor-pointer t-card" style="padding: 0.5rem 0.6rem;">
+                    <div>
+                        <p class="mb-0" v-if="modalTitle === 'Task Update Compliance'"><span class="font-bold">Task Name:</span> {{ value?.name }}</p>
+                        <p class="mb-0" v-else><span class="font-bold">Project:</span> {{ value?.name }}</p>
+                        <p class="mb-0" v-if="value?.project_name"><span class="font-bold">Project:</span> {{ value?.project_name }}</p>
+                        <p class="mb-0"><span class="font-bold">Space:</span> {{ value?.space_name }}</p>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
     </div>
 </template>
 <style>
@@ -331,5 +365,10 @@ onMounted(() => {
 
 .dp--clear-btn {
     display: none !important;
+}
+
+.t-card:hover{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
 }
 </style>
