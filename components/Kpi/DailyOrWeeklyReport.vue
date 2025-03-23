@@ -67,19 +67,25 @@ const handleDateChange = async () => {
         endDate.value = currentDate.value;
     } else if (type === 'weekly') {
         if (week.value.length === 2) {
-            const start = new Date(week.value[0]); // Convert to Date object
-            const end = new Date(week.value[1]); // Convert to Date object
+            const start = new Date(week.value[0]); 
+            let end = new Date(week.value[1]); 
 
-            // Format the dates as 'YYYY-MM-DD'
-            startDate.value = start.toISOString().split('T')[0]; // Extract the date part
+            startDate.value = start.toISOString().split('T')[0]; 
+
+            const dayOfEnd = end.getDay();
+            if (dayOfEnd !== 5) {
+                end.setDate(end.getDate() - (dayOfEnd - 5));
+            }
+
             endDate.value = end.toISOString().split('T')[0];
         }
     }
 };
+
 const formatDate = (date, time) => {
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day} ${time}`;
@@ -88,6 +94,7 @@ const formatDate = (date, time) => {
 const overAllData = ref(null);
 const previewData = ref([]);
 const attendanceData =ref({});
+
 const getKpiData = async () => {
     const token = useCookie('token');
     const formattedStartDate = formatDate(startDate.value, '00:00:00');
@@ -99,7 +106,7 @@ const getKpiData = async () => {
     let apiUrl = `${url.public.apiUrl}/kpi/dashboard?start_date=${formattedStartDate}&end_date=${formattedEndDate}${userId ? `&user_id=${userId}` : ''}`;
     apiUrl = decodeURIComponent(apiUrl);
 
-    let asyncDataKey = 'getKpiData'; // default key
+    let asyncDataKey = 'getKpiData';
 
     if (type === 'daily') {
         asyncDataKey = 'getDailyKpiData';

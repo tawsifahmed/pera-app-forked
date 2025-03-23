@@ -1033,6 +1033,7 @@ const handleShareTaskId = (unique_key) => {
                             icon="pi pi-pencil"
                             class="w-fit h-fit p-1"
                             style="font-size: 0.8rem !important"
+                            
                         />
                         <Button
                             @click="inlineCreateSubTask(slotProps)"
