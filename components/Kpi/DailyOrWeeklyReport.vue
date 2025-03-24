@@ -195,12 +195,12 @@ const vBarChartOptions = ref();
 
 const setVBarChartData = () => {
     return {
-        labels: ['Task Completed', 'Bugs Discovered'],
+        labels: ['Task Completed', 'Task Bounced'],
         datasets: [
             {
                 data: [overAllData.value?.completeTaskCount ? overAllData.value?.completeTaskCount : 0, overAllData.value?.bugDiscovered ? overAllData.value?.bugDiscovered : 0],
-                backgroundColor: ['rgba(249, 115, 22, 0.2)', 'rgba(6, 182, 212, 0.2)', 'rgb(107, 114, 128, 0.2)', 'rgba(139, 92, 246 0.2)'],
-                borderColor: ['rgb(249, 115, 22)', 'rgb(6, 182, 212)', 'rgb(107, 114, 128)', 'rgb(139, 92, 246)'],
+                backgroundColor: ['#339966', '#ffcc00' ],
+                borderColor: ['#29744f', '#aa8800'],
                 borderWidth: 1
             }
         ]
@@ -252,7 +252,7 @@ const setChartData = () => {
     const documentStyle = getComputedStyle(document.body);
 
     return {
-        labels: ['No. of Timely Deliver', 'No. of Missed Deadline'],
+        labels: ['No. of Timely Delivered', 'No. of Missed Deadline'],
         datasets: [
             {
                 data: [overAllData.value?.timlyDelivary ? overAllData.value?.timlyDelivary : 0, overAllData.value?.missDelivary ? overAllData.value?.missDelivary : 0],
@@ -341,11 +341,15 @@ const handleRedirect = async (data) => {
                 <DataTable :value="previewData" tableStyle="min-width: 50rem" :loading="tableLoader">
                     <template #empty> <p class="text-center">No Data found...</p> </template>
                     <Column style="text-wrap: nowrap" field="date" header="Date"></Column>
-                    <Column field="standUpMeetingAttendance" header="Stand-up Meeting Attendance"></Column>
-                    <Column field="bounceCount" header="No. of Bounces"></Column>
-                    <Column field="tasks" header="Task Update Compliance">
+                    <Column field="standUpMeetingAttendance" header="Stand-up Meeting Attendance">
                         <template #body="slotProps">
-                            <span @click="showModal(slotProps?.data?.tasks, 'Task Update Compliance')" class="cursor-pointer hover:text-primary font-semibold">{{ slotProps?.data?.tasks?.length }}</span>
+                            <span class="cursor-pointer hover:text-primary font-semibold">{{ slotProps?.data?.standUpMeetingAttendance === 0 ? 'No' : 'Yes' }}</span>
+                        </template>
+                    </Column>
+                    <Column field="bounceCount" header="No. of Bounces"></Column>
+                    <Column field="tasks" header="Task Completed">
+                        <template #body="slotProps">
+                            <span @click="showModal(slotProps?.data?.tasks, 'Task Completed')" class="cursor-pointer hover:text-primary font-semibold">{{ slotProps?.data?.tasks?.length }}</span>
                         </template>
                     </Column>
                     <Column field="codeCommit" header="Code Commit"></Column>
@@ -355,16 +359,16 @@ const handleRedirect = async (data) => {
                         </template>
                     </Column>
                     <Column field="pullRequest" header="Pull Request"></Column>
-                    <Column field="bugDiscovered" header="Bug Discovered"></Column>
+                    <Column field="bugDiscovered" header="Task Bounce"></Column>
                     <Column field="buildFaild" header="Build Failed"></Column>
-                    <Column field="timlyDelivary" header="Timely Delivery"></Column>
-                    <Column field="missDelivary" header="Missed Delivery"></Column>
+                    <Column field="timlyDelivary" header="Timely Delivered"></Column>
+                    <Column field="missDelivary" header="Missed Deadline"></Column>
                 </DataTable>
             </div>
         </div>
         <div class="col-12 xl:col-6">
             <div class="card h-full">
-                <h5>Task Completed Vs. Bugs Discovered</h5>
+                <h5>Task Completed Vs. Task Bounced</h5>
                 <div class="">
                     <Chart type="bar" :data="vBarChartData" :options="vBarChartOptions" class="h-30rem" />
                 </div>

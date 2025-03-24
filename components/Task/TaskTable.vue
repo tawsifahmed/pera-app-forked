@@ -1874,7 +1874,7 @@ textarea {
 }
 
 .scrollbar::-webkit-scrollbar {
-    display: none !important;
+    display: block !important;
 }
 
 .ghost {
