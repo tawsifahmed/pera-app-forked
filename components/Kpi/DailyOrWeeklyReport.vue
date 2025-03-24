@@ -293,7 +293,7 @@ const showModal = (data, title) => {
 
 const handleRedirect = async (data) => {
     let url;
-    if (modalTitle.value === 'Task Update Compliance') {
+    if (modalTitle.value === 'Task Completed') {
         url = `/companies/${data?.company_id}/spaces/${data?.space_id}/projects/${data?.project_id}?task_key=${data?.id}`;
     } else {
         url = `/companies/${data?.company_id}/spaces/${data?.space_id}/projects/${data?.id}`;
