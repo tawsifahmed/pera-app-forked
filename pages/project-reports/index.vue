@@ -66,6 +66,12 @@ const handleGenerate = async () => {
         loading.value = false;
         return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Both Dates', group: 'br', life: 3000 });
     }
+
+    if (!startDate.value && !endDate.value) {
+        loading.value = false;
+        return toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select Dates', group: 'br', life: 3000 });
+    }
+    
     const token = useCookie('token');
     loading.value = true;
     const formattedStartDate = dateFormatter(startDate.value);
@@ -81,28 +87,33 @@ const handleGenerate = async () => {
     if (selectedProjects.value && selectedProjects.value.length > 0) {
         projectIds = selectedProjects.value?.map((item) => item.id);
         console.log('Project ID', projectIds);
-        // formData.append('project_id', projectIds);
-        // if (projectIds.length > 0) {
-        //     projectIds.forEach((id) => {
-        //         formData.append('project_id[]', id);
-        //     });
-        // }
     }
 
-    // if (startDate.value && endDate.value) {
-    //     formData.append('start_date', formattedStartDate);
-    //     formData.append('end_date', formattedEndDate);
-    // }
+    const params = new URLSearchParams();
 
-    const { data, error } = await useFetch(
-        `${url.public.apiUrl}/project-report/view?space_ids=${spaceIds ? spaceIds : ''}&project_ids=${projectIds ? projectIds : ''}&start_date=${startDate.value ? formattedStartDate : ''}&end_date=${endDate.value ? formattedEndDate : ''}`,
-        {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token.value}`
-            }
+    if (spaceIds) {
+        params.append('space_ids', spaceIds);
+    }
+
+    if (projectIds) {
+        params.append('project_ids', projectIds);
+    }
+
+    if (startDate.value) {
+        params.append('start_date', formattedStartDate);
+    }
+
+    if (endDate.value) {
+        params.append('end_date', formattedEndDate);
+    }
+    const apiUrl = `${url.public.apiUrl}/project-report/view${params.toString() ? '?' + params.toString() : ''}`;
+
+    const { data, error } = await useFetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token.value}`
         }
-    );
+    });
 
     if (data.value?.code == 200) {
         previewData.value = data.value.data?.overView.map((item, index) => ({ ...item, index: index + 1 }));
@@ -176,10 +187,7 @@ const handleChange = (field, event) => {
     }
 };
 
-
-
-
-const formattedDuration = computed(() => (duration) => { 
+const formattedDuration = computed(() => (duration) => {
     let timeTracked = duration;
     const hours = Math.floor(timeTracked / 3600);
     const minutes = Math.floor((timeTracked % 3600) / 60);

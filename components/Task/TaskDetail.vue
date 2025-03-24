@@ -212,7 +212,10 @@ const stopTimer = () => {
     timeTrack.value = secondsToHHMMSS(taskDetails.value.total_duration);
 };
 
-const bounceStatus = ref([{ is_bounce: 'No' }, { is_bounce: 'Yes' }]);
+const bounceStatus = ref([
+    { name: 'Yes', code: 'yes' },
+    { name: 'No', code: 'no' }
+]);
 
 const vModelBncStatus = ref();
 
@@ -443,11 +446,6 @@ onMounted(async () => {
     };
     status.value = obg;
 
-    const bncObj = {
-        is_bounce: taskDetails.value.is_bounce
-    };
-    vModelBncStatus.value = bncObj;
-
     if (taskDetails.value?.is_timer_start === 'true') {
         startTimer();
     }
@@ -478,16 +476,29 @@ async function changeStatusData(status) {
     }
 }
 
-async function changeBounceStatusData(selectedBncStatus) {
+const bouncedPerson = ref(null);
+const bounceLoading = ref(false);
+
+async function handleBounce() {
+    
+    bounceLoading.value = true;
+
+    if (!bouncedPerson.value || !vModelBncStatus.value) {
+        toast.add({ severity: 'warn', summary: 'Warning', detail: 'Please select both user and status', group: 'br', life: 3000 });
+        bounceLoading.value = false;
+        return;
+    }
     try {
         const token = useCookie('token');
-        const { data, pending } = await useFetch(`${url.public.apiUrl}/tasks/update/${taskDetails.value?.id}`, {
+        const { data, pending } = await useFetch(`${url.public.apiUrl}/bounce/update`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token.value}`
             },
             body: {
-                is_bounce: selectedBncStatus.is_bounce
+                task_id: taskDetails.value?.id,
+                user_id: bouncedPerson.value?.id,
+                status: vModelBncStatus.value?.code
             }
         });
 
@@ -495,12 +506,17 @@ async function changeBounceStatusData(selectedBncStatus) {
 
         if (data.value?.app_message === 'success') {
             getTaskDetails(taskDetails.value?.id);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Bounce Status Changed', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Bounce Status Updated', group: 'br', life: 3000 });
+            vModelBncStatus.value = null;
+            bounceLoading.value = false;
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
+            bounceLoading.value = false;
         }
     } catch (error) {
         console.error('Error fetching data:', error);
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
+        bounceLoading.value = false;
     }
 }
 
@@ -508,16 +524,16 @@ const setFileUrl = (url, showInComment = false) => {
     if (!url) {
         return '';
     }
-    
+
     const urlString = url;
     const partsOfString = urlString.split('/');
-     
+
     if (!partsOfString || partsOfString.length === 0) {
         return '';
     }
-    
+
     const lastPartOfString = partsOfString[partsOfString.length - 1];
-    
+
     if (showInComment) {
         return lastPartOfString;
     } else {
@@ -979,7 +995,7 @@ const handletaskNameUpdate = async () => {
                                     <ButtonGroup>
                                         <Button label="" icon="pi pi-pencil" size="small" severity="secondary" @click="handleViews('edit')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'edit' }" />
                                         <Button label="" size="small" icon="pi pi-eye" severity="secondary" @click="handleViews('preview')" :class="{ 'bg-indigo-400 text-white': editorViewMode == 'preview' }" />
-                                    </ButtonGroup> 
+                                    </ButtonGroup>
                                 </div>
 
                                 <!-- <pre>description {{ description.length}}</pre> -->
@@ -1157,22 +1173,34 @@ const handletaskNameUpdate = async () => {
                                     </Column>
                                 </TreeTable>
                             </TabPanel>
-                            <TabPanel :header="`Bounce ${vModelBncStatus?.is_bounce === 'Yes' ? '1' : ''}`">
+                            <TabPanel :header="`Bounce`">
                                 <div class="card">
-                                    <div class="flex justify-content-start align-items-center task-detail-wrapper">
-                                        <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
-                                            <span class="pi pi-flag"></span>
-                                            <p class="text-nowrap">Bounce Status:</p>
+                                    <div class="flex align-items-end gap-2">
+                                        <div class="justify-content-start align-items-center">
+                                            <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
+                                                <span class="pi pi-user"></span>
+                                                <p class="text-nowrap">Select User:</p>
+                                            </div>
+                                            <Dropdown :disabled="!editBounceP" v-model="bouncedPerson" :options="assignees" optionLabel="name" placeholder="Select User" style="width: 146.41px" />
                                         </div>
-                                        <Dropdown
-                                            @change="changeBounceStatusData(vModelBncStatus)"
-                                            :disabled="!editBounceP"
-                                            v-model="vModelBncStatus"
-                                            :options="bounceStatus"
-                                            optionLabel="is_bounce"
-                                            placeholder="Select Status"
-                                            style="width: 146.41px"
-                                        />
+                                        <div class="justify-content-start align-items-center">
+                                            <div class="flex justify-content-start gap-2 align-items-center bounce-detail-property">
+                                                <span class="pi pi-flag"></span>
+                                                <p class="text-nowrap">Select Status:</p>
+                                            </div>
+                                            <Dropdown :disabled="!editBounceP" v-model="vModelBncStatus" :options="bounceStatus" optionLabel="name" placeholder="Select Status" style="width: 146.41px" />
+                                        </div>
+                                        <Button @click="handleBounce" class="fit" type="submit" label="Submit" :loading="bounceLoading" />
+                                    </div>
+                                    <hr class="w-full" />
+                                    <div>
+                                        <p class="text-nowrap mb-1">Bounced Users:</p>
+                                        <div class="flex justify-content-start gap-2 align-items-center">
+                                            <!-- {{taskDetails?.user_bounce}} -->
+                                            <div class="border rounded w-fit" v-for="bouncedUser in taskDetails?.user_bounce" :key="bouncedUser"  >
+                                                <p v-if="bouncedUser?.bounce_status === 'yes'"  style="border: 1px solid rgba(167, 167, 167, 0.486); border-radius: 5px; padding: 2px 5px">{{ bouncedUser?.user_name }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </TabPanel>
@@ -1230,7 +1258,7 @@ const handletaskNameUpdate = async () => {
                             </template>
                             <template #content>
                                 <div v-if="setFileUrl(val?.file)" class="flex justify-content-start my-2">
-                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc; color: black;">
+                                    <a :href="val?.file" target="_blank" class="bg-gray-200 attachment-wrapper cursor-pointer flex align-items-center px-3 py-3 gap-2 comment-file" style="background-color: #f7fafc; color: black">
                                         <div class="pi pi-file"></div>
                                         <div class="attach-detail flex flex-column justify-content-center align-items-center">
                                             <div class="text-xs">{{ setFileUrl(val?.file, true) }}</div>
@@ -1350,17 +1378,16 @@ const handletaskNameUpdate = async () => {
                     </InputGroupAddon>
                 </InputGroup>
             </div>
-            <div >
+            <div>
                 <span class="font-medium text-900 block mb-0 task-card card" @click="() => handleTaskMove('parent', '0')" v-tooltip.top="{ value: `Set as parent task on this project.`, showDelay: 500 }">Set as Parent</span>
-                
             </div>
             <div class="move-task-wrapper">
-                <div v-if="moveTaskData.length > 0" >
+                <div v-if="moveTaskData.length > 0">
                     <span class="font-medium text-900 block mb-2">Tasks:</span>
                     <div @click="() => handleTaskMove('sub', tasks)" class="task-card card justify-content-between" v-for="tasks in moveTaskData">
                         <!-- <pre>{{ tasks }}</pre> -->
-                        <p class="mb-0 move-task-name" v-tooltip.top="{ value: tasks?.task_name }">{{ tasks?.task_name }} </p>
-                        <i class="mb-0 font-bold"  v-tooltip.left="{ value: `Project: ${tasks.project_name}` }">{{ tasks?.project_name.length > 8 ? tasks.project_name.slice(0, 8) + '...' : tasks.project_name }}</i>
+                        <p class="mb-0 move-task-name" v-tooltip.top="{ value: tasks?.task_name }">{{ tasks?.task_name }}</p>
+                        <i class="mb-0 font-bold" v-tooltip.left="{ value: `Project: ${tasks.project_name}` }">{{ tasks?.project_name.length > 8 ? tasks.project_name.slice(0, 8) + '...' : tasks.project_name }}</i>
                     </div>
                 </div>
                 <div v-if="moveTaskToDiffProject.length > 0">
@@ -1732,8 +1759,7 @@ input[type='file']::file-selector-button:hover {
     max-width: 94%;
 }
 
-
-.move-task-wrapper{
+.move-task-wrapper {
     height: 400px;
     overflow-y: scroll;
 }
@@ -1847,7 +1873,7 @@ a {
     margin: 10px 0;
     padding: 0 5px;
     list-style: none;
-    color: #0099FF;
+    color: #0099ff;
 }
 .ql-mention-list-item {
     cursor: pointer;
@@ -1944,9 +1970,9 @@ a {
     color: inherit !important;
 }
 .custom-line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 </style>
