@@ -508,6 +508,7 @@ async function handleBounce() {
             getTaskDetails(taskDetails.value?.id);
             toast.add({ severity: 'success', summary: 'Successful', detail: 'Bounce Status Updated', group: 'br', life: 3000 });
             vModelBncStatus.value = null;
+            bouncedPerson.value = null;
             bounceLoading.value = false;
         } else {
             toast.add({ severity: 'error', summary: 'Error', detail: 'Unable to change bounce status', group: 'br', life: 3000 });
