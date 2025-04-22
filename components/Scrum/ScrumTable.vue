@@ -1,7 +1,7 @@
 <script setup>
 import { useActiveCompanyStore } from '~/store/workCompany';
 import Editor from 'primevue/editor';
-const { scrumData, fetchData, employees, totalRecords, readScrum } = defineProps(['scrumData', 'fetchData', 'employees', 'totalRecords', 'readScrum']);
+const {  employees, readScrum } = defineProps([ 'employees', 'readScrum']);
 const { menu } = storeToRefs(useActiveCompanyStore());
 const toast = useToast();
 const scrumModal = ref(false);
@@ -92,10 +92,36 @@ watch(description, (newValue) => {
     }
 });
 
+const scrumData = ref([])
+const totalPage = ref(0);
+// Fetch Scrum
+const totalRecords = ref(0);
+const fetchScrum = async () => {
+    isLoading.value = true;
+    const token = useCookie('token');
+    const { data, pending, error } = await useAsyncData('scrumData', () =>
+        $fetch(`${url.public.apiUrl}/scrum-meeting/list`, {
+            headers: {
+                Authorization: `Bearer ${token.value}`
+            }
+        })
+    );
+    if (data.value?.data?.length > 0) {
+        scrumData.value = data.value?.data;
+        totalRecords.value = data.value?.total;
+        // totalPage.value = Math.ceil(totalRecords.value / 15);
+        console.log('totalRecords:', totalRecords.value);
+        console.log('totalPage data:', totalPage.value);
+    }
+    return (isLoading.value = false);
+};
+fetchScrum();
+
 const onPage = async (e) => {
+    // console.log('page', e);
     const token = useCookie('token');
     isLoading.value = true;
-    const { data, pending, error } = await useAsyncData('scrumData', () =>
+    const { data, pending, error } = await useAsyncData('scrumData1', () =>
         $fetch(`${url.public.apiUrl}/scrum-meeting/list?page=${e.page + 1}&limit=${e.rows}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
@@ -111,19 +137,22 @@ const onPage = async (e) => {
 <template>
     <!-- <pre>{{ selectedScrum }}</pre> -->
     <!-- <DataTable class="scr-table-st" :value="scrumData" :rowHover="true" paginator :rows="30" v-if="scrumData && scrumData.length > 0" stripedRows tableStyle="min-width: 50rem"> -->
+        <!-- <pre>totalRecords{{scrumData}}</pre> -->
     <DataTable
         class="scr-table-st"
+        lazy
+        :totalRecords="totalRecords"
         :value="scrumData"
         :rowHover="true"
         :paginator="true"
-        :rows="10"
+        :rows="15"
         v-if="scrumData && scrumData.length > 0"
         stripedRows
         scrollable
         tableStyle="min-width: 50rem"
-        :totalRecords="totalRecords"
         :loading="isLoading"
-        :rowsPerPageOptions="[5, 10, 20, 50]"
+        :rowsPerPageOptions="[5, 15, 20, 50]"
+        
         @page="onPage"
     >
         <!-- <Column style="width: 2%" field="id" header="Serial">

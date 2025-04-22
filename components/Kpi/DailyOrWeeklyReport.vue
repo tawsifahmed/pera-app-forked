@@ -394,7 +394,7 @@ const handleRedirect = async (data) => {
             <div v-for="(value, key) in modalData" :key="value">
                 <div @click="handleRedirect(value)" class="card mb-2 cursor-pointer t-card" style="padding: 0.5rem 0.6rem">
                     <div>
-                        <p class="mb-0" v-if="modalTitle === 'Task Update Compliance'"><span class="font-bold">Task Name:</span> {{ value?.name }}</p>
+                        <p class="mb-0" v-if="modalTitle === 'Task Completed'"><span class="font-bold">Task Name:</span> {{ value?.name }}</p>
                         <p class="mb-0" v-else><span class="font-bold">Project:</span> {{ value?.name }}</p>
                         <p class="mb-0" v-if="value?.project_name"><span class="font-bold">Project:</span> {{ value?.project_name }}</p>
                         <p class="mb-0"><span class="font-bold">Space:</span> {{ value?.space_name }}</p>

@@ -54,6 +54,7 @@ const handleSubmit = async (e) => {
     }
 };
 
+const totalPage = ref(0);
 // Fetch Scrum
 const fetchScrum = async () => {
     isLoading.value = true;
@@ -67,7 +68,10 @@ const fetchScrum = async () => {
     );
     if (data.value?.data?.length > 0) {
         scrumData.value = data.value?.data;
-        totalRecords.value = data.value?.totalRecords;
+        totalRecords.value = data.value?.total;
+        // totalPage.value = Math.ceil(totalRecords.value / 15);
+        console.log('totalRecords:', totalRecords.value);
+        console.log('totalPage data:', totalPage.value);
     }
     return (isLoading.value = false);
 };
@@ -85,7 +89,7 @@ const init = async () => {
         employees.value = data.value?.data.map((e) => ({ name: e.name, id: e.id }));
     }
 };
-fetchScrum();
+
 onMounted(() => {
     init();
     // console.log('call');
@@ -106,10 +110,7 @@ const handleClose = () => {
         </header>
         <!-- <ScrumTable :scrumData="scrumData" :fetchData="fetchScrum" :employees="employees" /> -->
         <ScrumTable 
-            :scrumData="scrumData" 
-            :fetchData="fetchScrum" 
             :employees="employees" 
-            :totalRecords="totalRecords"
             :readScrum="readScrum"
             
         />
