@@ -67,10 +67,10 @@ const handleDateChange = async () => {
         endDate.value = currentDate.value;
     } else if (type === 'weekly') {
         if (week.value.length === 2) {
-            const start = new Date(week.value[0]); 
-            let end = new Date(week.value[1]); 
+            const start = new Date(week.value[0]);
+            let end = new Date(week.value[1]);
 
-            startDate.value = start.toISOString().split('T')[0]; 
+            startDate.value = start.toISOString().split('T')[0];
 
             const dayOfEnd = end.getDay();
             if (dayOfEnd !== 5) {
@@ -93,7 +93,7 @@ const formatDate = (date, time) => {
 
 const overAllData = ref(null);
 const previewData = ref([]);
-const attendanceData =ref({});
+const attendanceData = ref({});
 
 const getKpiData = async () => {
     const token = useCookie('token');
@@ -199,7 +199,7 @@ const setVBarChartData = () => {
         datasets: [
             {
                 data: [overAllData.value?.completeTaskCount ? overAllData.value?.completeTaskCount : 0, overAllData.value?.bugDiscovered ? overAllData.value?.bugDiscovered : 0],
-                backgroundColor: ['#339966', '#ffcc00' ],
+                backgroundColor: ['#339966', '#ffcc00'],
                 borderColor: ['#29744f', '#aa8800'],
                 borderWidth: 1
             }
@@ -284,7 +284,7 @@ const modalData = ref(null);
 const modalTitle = ref('');
 const showModal = (data, title) => {
     if (data.length > 0) {
-        console.log('data', data);
+        // console.log('data', data);
         modalData.value = data;
         modalTitle.value = title;
         tableModal.value = true;
@@ -320,7 +320,7 @@ const handleRedirect = async (data) => {
             <div class="flex justify-content-end align-items-end gap-2">
                 <div class=" ">
                     <label for="icondisplay" class="font-bold block mb-2">Employee: </label>
-                    <Dropdown :disabled="!weekly_kpi_view " @change="filterTasks()" class="select-emp" v-model="userNameAndId" :options="usersLists" optionLabel="name" placeholder="Select Employee" />
+                    <Dropdown :disabled="!weekly_kpi_view" @change="filterTasks()" class="select-emp" v-model="userNameAndId" :options="usersLists" optionLabel="name" placeholder="Select Employee" />
                 </div>
                 <div class="">
                     <label for="icondisplay" class="font-bold block mb-2">
@@ -329,7 +329,7 @@ const handleRedirect = async (data) => {
                     </label>
                     <Calendar v-if="type === 'daily'" v-model="currentDate" @date-select="handleChange('currentDate', $event)" weekLabel showIcon iconDisplay="input" inputId="icondisplay" />
                     <VueDatePicker v-if="type === 'weekly'" v-model="week" week-start="0" week-picker />
-                </div>    
+                </div>
                 <div>
                     <Button @click="downloadKpiReport" class="w-full" label="Download" :loading="loading1" />
                 </div>
@@ -391,7 +391,7 @@ const handleRedirect = async (data) => {
             <!-- <pre>
                             {{ modalData }}
              </pre> -->
-            <div v-for="(value, key) in modalData" :key="value">
+            <div v-for="value in modalData" :key="value">
                 <div @click="handleRedirect(value)" class="card mb-2 cursor-pointer t-card" style="padding: 0.5rem 0.6rem">
                     <div>
                         <p class="mb-0" v-if="modalTitle === 'Task Completed'"><span class="font-bold">Task Name:</span> {{ value?.name }}</p>
