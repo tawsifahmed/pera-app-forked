@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { useActiveCompanyStore } from '~/store/workCompany';
 import { useCompanyStore } from '~/store/company';
+import apiLink from '../utils/apiEndpoint';
 const companies = useActiveCompanyStore()
 const spaces = useCompanyStore()
 export const useWorkProjectStore = defineStore('workProjects', {
@@ -15,7 +16,7 @@ export const useWorkProjectStore = defineStore('workProjects', {
     actions: {
         async createProjects({ name, description, space_id, statuses, git_project_id, git_token }) {
             const token = useCookie('token');
-            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/projects/create`, {
+            const { data, pending } = await useFetch(`${apiLink}/projects/create`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,

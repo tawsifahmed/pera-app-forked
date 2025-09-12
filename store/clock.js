@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-
+import apiLink from '../utils/apiEndpoint';
 export const useClockStore = defineStore('clock', () => {
 
     const trackedTime = ref(null)
@@ -24,7 +24,7 @@ export const useClockStore = defineStore('clock', () => {
             }
             console.log('Saction', action)
 
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/${url}`, {
+            const response = await fetch(`${apiLink}/api/v1/tasks/${url}`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -51,7 +51,7 @@ export const useClockStore = defineStore('clock', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/set-manual-time`, {
+            const response = await fetch(`${apiLink}/api/v1/set-manual-time`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,

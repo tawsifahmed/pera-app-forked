@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-
+import apiLink from '../utils/apiEndpoint';
 export const useActiveCompanyStore = defineStore('ActiveCompany', {
   state: () => ({
     availableCompanies: null,
@@ -121,7 +121,7 @@ export const useActiveCompanyStore = defineStore('ActiveCompany', {
       const token = useCookie('token');
       const { data, pending, error } = await useAsyncData(
         'companyList',
-        () => $fetch('https://pbe.singularitybd.net/api/v1/company/list', {
+        () => $fetch(`${apiLink}/company/list`, {
           headers: {
             Authorization: `Bearer ${token.value}`,
           },

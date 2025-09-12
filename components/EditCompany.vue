@@ -1,14 +1,8 @@
 <script setup>
-import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useCompanyStore } from '~/store/company'; // import the auth store we just created
-const { editCompany, getCompanyList } = useCompanyStore(); // use authenticateUser action from  auth store
+import { storeToRefs } from 'pinia'; 
+import { useCompanyStore } from '~/store/company'; 
+const { editCompany, getCompanyList } = useCompanyStore(); 
 const { isCompanyEdited } = storeToRefs(useCompanyStore());
-
-// import { storeToRefs } from 'pinia'
-// import {useWorkStation} from '@/store/workSpace'
-// const workStation = useWorkStation()
-// const { setWorkStation } = workStation
-// const { workStations } = storeToRefs(workStation)
 
 const { refCompanyId } = defineProps(['refCompanyId']);
 

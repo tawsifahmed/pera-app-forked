@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia';
+import apiLink from '../utils/apiEndpoint';
+
 import { useFCMToken } from '~/composables/firebase';
 // import { useAsyncData } from '@nuxtjs/composition-api';
 
@@ -30,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
     async authenticateUser({ email, password }) {
       const fcm_token = await useFCMToken();
       // return console.log(fcm_token);
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/login`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -73,7 +75,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async registerUser({ userName, email, password, confirmPass }) {
-      const { data, pending, error } = await useFetch(`https://pbe.singularitybd.net/api/v1/register`, {
+      const { data, pending, error } = await useFetch(`${apiLink}/api/v1/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -107,7 +109,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async registerInviteUser({ id, userName, email, password, confirmPass }) {
-      const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/invite-user-register`, {
+      const { data, pending } = await useFetch(`${apiLink}/api/v1/invite-user-register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -127,7 +129,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async otpVerify({ email, password, otp }) {
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/verify-email`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -149,7 +151,7 @@ export const useAuthStore = defineStore('auth', {
 
           this.userCreated = true;
           if (this.userCreated) {
-            const { data, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/login`, {
+            const { data, pending } = await useFetch(`${apiLink}/api/v1/login`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: {
@@ -186,7 +188,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async resendOtp({ email }) {
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/resend-otp`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -219,7 +221,7 @@ export const useAuthStore = defineStore('auth', {
 
     },
     async forgotPassword(email) {
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -233,7 +235,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     async forgotPasswordOtp(email, otp) {
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/forgot-password-otp`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/forgot-password-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: {
@@ -253,7 +255,7 @@ export const useAuthStore = defineStore('auth', {
       const authToken = token.value ? token.value : this.resetToken;
       console.log('token', token.value)
       console.log('this.resetToken', this.resetToken)
-      const { data, error, pending } = await useFetch(`https://pbe.singularitybd.net/api/v1/reset-password`, {
+      const { data, error, pending } = await useFetch(`${apiLink}/api/v1/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

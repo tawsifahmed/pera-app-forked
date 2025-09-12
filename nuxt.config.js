@@ -1,9 +1,10 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import apiLink from "./utils/apiEndpoint";
+
 export default defineNuxtConfig({
     ssr: false,
     runtimeConfig: {
         public: {
-            apiUrl: process.env.API_URL,
+            apiUrl: apiLink,
             // adminEmail: process.env.ADMIN_EMAIL,
             // adminPassword: process.env.ADMIN_PASSWORD
             // apiUrl: process.env.API_URL ?? 'http://localhost:8000'

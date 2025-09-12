@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-
+import apiLink from "../utils/apiEndpoint";
 export const attendanceStore = defineStore('attendanceStore', {
     state: () => ({
         attendance: []
@@ -9,7 +9,7 @@ export const attendanceStore = defineStore('attendanceStore', {
             const token = useCookie('token')
             try {
 
-                const response = await useFetch(`https://pbe.singularitybd.net/api/v1/attendance/list?user=${user ? user : ''}&month=${''}`, {
+                const response = await useFetch(`${apiLink}/api/v1/attendance/list?user=${user ? user : ''}&month=${''}`, {
                     method: 'GET',
                     headers: { Authorization: `Bearer ${token.value}`, },
                 })

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-
+import apiLink from '../utils/apiEndpoint';
 export const useUserStore = defineStore('user', () => {
 
     const userProfile = ref(null);
@@ -10,7 +10,7 @@ export const useUserStore = defineStore('user', () => {
         const token = useCookie('token');
         const { data, pending, error } = await useAsyncData(
             'userProf',
-            () => $fetch('https://pbe.singularitybd.net/api/v1/users/profile', {
+            () => $fetch(`${apiLink}/users/profile`, {
                 headers: {
                     Authorization: `Bearer ${token.value}`,
                 },
@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
         const token = useCookie('token');
 
         try {
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/users/update/${id}`, {
+            const response = await fetch(`${apiLink}/users/update/${id}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,

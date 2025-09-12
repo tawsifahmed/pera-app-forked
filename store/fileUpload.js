@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-
+import apiLink from '../utils/apiEndpoint';
 export const useFileUploaderStore = defineStore('fileUpload', () => {
 
     const isFileUpload = ref(false)
@@ -17,7 +17,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-upload`, {
+            const response = await fetch(`${apiLink}/tasks/attachment-upload`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
@@ -50,7 +50,7 @@ export const useFileUploaderStore = defineStore('fileUpload', () => {
         const token = useCookie('token')
 
         try {
-            const response = await fetch(`https://pbe.singularitybd.net/api/v1/tasks/attachment-delete/${id}`, {
+            const response = await fetch(`${apiLink}/tasks/attachment-delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token.value}`,
